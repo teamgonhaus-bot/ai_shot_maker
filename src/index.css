@@ -4,36 +4,40 @@
   --bg-main: #f0f2f0;
   --bg-card: #ffffff;
   --bg-subtle: #f8faf9;
-  
+
   /* Semantic Themes */
-  --theme-core: #ff6b00;      /* Orange */
+  --theme-core: #ff6b00;
+  /* Orange */
   --theme-core-bg: #fff5ed;
-  
-  --theme-human: #0084ff;     /* Blue */
+
+  --theme-human: #0084ff;
+  /* Blue */
   --theme-human-bg: #f0f7ff;
-  
-  --theme-env: #8b5cf6;       /* Purple */
+
+  --theme-env: #8b5cf6;
+  /* Purple */
   --theme-env-bg: #f5f3ff;
-  
-  --theme-camera: #10b981;    /* Green */
+
+  --theme-camera: #10b981;
+  /* Green */
   --theme-camera-bg: #ecfdf5;
-  
+
   --text-primary: #0f172a;
   --text-secondary: #475569;
   --text-muted: #94a3b8;
-  
+
   --border-subtle: rgba(0, 0, 0, 0.05);
   --border-medium: rgba(0, 0, 0, 0.1);
-  
+
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  
+
   --radius-xl: 24px;
   --radius-2xl: 32px;
   --radius-3xl: 40px;
-  
+
   --transition-default: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -88,10 +92,25 @@ body {
 }
 
 /* Section Themes */
-.theme-core { --current-theme: var(--theme-core); --current-theme-bg: var(--theme-core-bg); }
-.theme-human { --current-theme: var(--theme-human); --current-theme-bg: var(--theme-human-bg); }
-.theme-env { --current-theme: var(--theme-env); --current-theme-bg: var(--theme-env-bg); }
-.theme-camera { --current-theme: var(--theme-camera); --current-theme-bg: var(--theme-camera-bg); }
+.theme-core {
+  --current-theme: var(--theme-core);
+  --current-theme-bg: var(--theme-core-bg);
+}
+
+.theme-human {
+  --current-theme: var(--theme-human);
+  --current-theme-bg: var(--theme-human-bg);
+}
+
+.theme-env {
+  --current-theme: var(--theme-env);
+  --current-theme-bg: var(--theme-env-bg);
+}
+
+.theme-camera {
+  --current-theme: var(--theme-camera);
+  --current-theme-bg: var(--theme-camera-bg);
+}
 
 .section-header {
   display: flex;
@@ -135,41 +154,112 @@ body {
 }
 
 /* Grid & Utility (Fallback for No Tailwind) */
-.grid { display: grid; }
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.flex-wrap { flex-wrap: wrap; }
+.grid {
+  display: grid;
+}
 
-.gap-2 { gap: 0.5rem; }
-.gap-4 { gap: 1rem; }
-.gap-6 { gap: 1.5rem; }
-.gap-8 { gap: 2rem; }
-.gap-10 { gap: 2.5rem; }
+.flex {
+  display: flex;
+}
 
-.w-full { width: 100%; }
-.h-full { height: 100%; }
+.flex-col {
+  flex-direction: column;
+}
 
-.p-4 { padding: 1rem; }
-.p-6 { padding: 1.5rem; }
-.p-8 { padding: 2rem; }
-.pb-24 { padding-bottom: 6rem; }
+.items-center {
+  align-items: center;
+}
 
-.rounded-xl { border-radius: 1rem; }
-.rounded-2xl { border-radius: 1.5rem; }
-.rounded-3xl { border-radius: 2.5rem; }
+.justify-between {
+  justify-content: space-between;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.gap-6 {
+  gap: 1.5rem;
+}
+
+.gap-8 {
+  gap: 2rem;
+}
+
+.gap-10 {
+  gap: 2.5rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.p-8 {
+  padding: 2rem;
+}
+
+.pb-24 {
+  padding-bottom: 6rem;
+}
+
+.rounded-xl {
+  border-radius: 1rem;
+}
+
+.rounded-2xl {
+  border-radius: 1.5rem;
+}
+
+.rounded-3xl {
+  border-radius: 2.5rem;
+}
 
 @media (min-width: 768px) {
-  .md\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (min-width: 1280px) {
-  .xl\:grid-cols-12 { grid-template-columns: repeat(12, 1fr); }
-  .xl\:col-span-7 { grid-column: span 7 / span 7; }
-  .xl\:col-span-4 { grid-column: span 4 / span 4; }
-  .xl\:col-span-1 { grid-column: span 1 / span 1; }
-  .xl\:pb-0 { padding-bottom: 0; }
+  .xl\:grid-cols-12 {
+    grid-template-columns: repeat(12, 1fr);
+  }
+
+  .xl\:col-span-7 {
+    grid-column: span 7 / span 7;
+  }
+
+  .xl\:col-span-4 {
+    grid-column: span 4 / span 4;
+  }
+
+  .xl\:col-span-1 {
+    grid-column: span 1 / span 1;
+  }
+
+  .xl\:pb-0 {
+    padding-bottom: 0;
+  }
 }
 
 /* Specialized Components */
@@ -211,7 +301,9 @@ body {
 }
 
 @media (min-width: 1280px) {
-  .mobile-bottom-nav { display: none; }
+  .mobile-bottom-nav {
+    display: none;
+  }
 }
 
 .sidebar-web {
@@ -230,8 +322,8 @@ body {
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: var(--text-muted);
   border-radius: 10px;
 }
-
