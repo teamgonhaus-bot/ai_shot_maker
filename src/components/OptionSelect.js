@@ -1,27 +1,38 @@
 import React from 'react';
-import { ChevronDown } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function OptionSelect({ label, value, onChange, options, icon: Icon }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       {label && (
-        <label className="text-xs font-bold tracking-widest text-zinc-500 uppercase flex items-center gap-2">
+        <label className="text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase flex items-center gap-2 px-1">
           {Icon && <Icon className="w-3 h-3" />} {label}
         </label>
       )}
-      <div className="relative">
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full p-3 bg-zinc-900/50 border border-zinc-800 rounded-xl text-sm text-zinc-200 focus:ring-1 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all appearance-none cursor-pointer hover:bg-zinc-800/50"
-        >
-          {options.map((opt) => (
-            <option key={opt} value={opt} className="bg-zinc-900">
-              {opt}
-            </option>
-          ))}
-        </select>
-        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600 pointer-events-none" />
+      <div className="flex flex-wrap gap-2">
+        {options.map((opt) => {
+          const isSelected = value === opt;
+          return (
+            <button
+              key={opt}
+              onClick={() => onChange(opt)}
+              className={`relative px-4 py-2 rounded-2xl text-xs font-medium transition-all border ${
+                isSelected 
+                  ? 'text-white border-transparent' 
+                  : 'text-zinc-500 border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:text-zinc-300'
+              }`}
+            >
+              {isSelected && (
+                <motion.div
+                  layoutId={`${label}-bg`}
+                  className="absolute inset-0 bg-orange-500 rounded-2xl shadow-lg shadow-orange-500/20"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+              <span className="relative z-10">{opt}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

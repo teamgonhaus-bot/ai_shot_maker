@@ -259,96 +259,131 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 lg:p-12 selection:bg-orange-500/30">
-      <div className="max-w-[1600px] mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8">
+    <div className="min-h-screen selection:bg-orange-500/30 overflow-x-hidden">
+      <div className="noise-overlay" />
+      
+      <div className="max-w-[1600px] mx-auto px-6 py-12 lg:px-12 grid grid-cols-1 xl:grid-cols-12 gap-10">
         
         {/* Navigation / Sidebar */}
-        <aside className="xl:col-span-1 hidden xl:flex flex-col items-center py-8 glass-panel h-[calc(100vh-6rem)] sticky top-12 gap-8">
-          <div className="p-3 bg-orange-500 rounded-2xl shadow-lg shadow-orange-500/20">
+        <aside className="xl:col-span-1 hidden xl:flex flex-col items-center py-10 glass-panel h-[calc(100vh-6rem)] sticky top-12 gap-10">
+          <div className="p-4 accent-gradient rounded-[22px] shadow-2xl shadow-orange-500/40 cursor-pointer hover:scale-110 transition-transform duration-500">
             <Camera className="w-6 h-6 text-white" />
           </div>
-          <div className="flex flex-col gap-6 text-zinc-500">
-            <Zap className="w-6 h-6 hover:text-orange-400 cursor-pointer transition-colors" />
-            <Palette className="w-6 h-6 hover:text-orange-400 cursor-pointer transition-colors" />
-            <LayoutTemplate className="w-6 h-6 hover:text-orange-400 cursor-pointer transition-colors" />
-            <Settings className="w-6 h-6 hover:text-orange-400 cursor-pointer transition-colors" />
+          <div className="flex flex-col gap-8 text-zinc-600">
+            <Zap className="w-6 h-6 hover:text-orange-500 cursor-pointer transition-all hover:scale-110" />
+            <Palette className="w-6 h-6 hover:text-orange-500 cursor-pointer transition-all hover:scale-110" />
+            <LayoutTemplate className="w-6 h-6 hover:text-orange-500 cursor-pointer transition-all hover:scale-110" />
+            <Settings className="w-6 h-6 hover:text-orange-500 cursor-pointer transition-all hover:scale-110" />
+          </div>
+          <div className="mt-auto pb-4">
+             <div className="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-[10px] font-bold text-zinc-500">GM</div>
           </div>
         </aside>
 
         {/* Main Content Area */}
-        <main className="xl:col-span-8 space-y-8 animate-fade-in">
-          <header className="flex flex-col gap-2">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight gradient-text">AI Shot Maker <span className="text-sm font-mono text-orange-500 ml-2 uppercase tracking-widest border border-orange-500/30 px-2 py-0.5 rounded-full">v2.0</span></h1>
-            <p className="text-zinc-500 font-medium max-w-2xl">Create professional-grade architectural and product photography prompts with ease. Integrated with spatial staging logic.</p>
+        <main className="xl:col-span-8 space-y-12 animate-fade-in">
+          <header className="flex flex-col gap-4">
+            <div className="flex items-center gap-3">
+               <h1 className="text-5xl md:text-6xl font-bold tracking-tighter gradient-text">AI Shot Maker</h1>
+               <span className="text-[10px] font-bold text-orange-500 border border-orange-500/20 px-3 py-1 rounded-full uppercase tracking-widest bg-orange-500/5">PRO v2.5</span>
+            </div>
+            <p className="text-zinc-500 font-medium max-w-xl text-lg leading-relaxed">
+              Craft high-end architectural and product photography prompts. 
+              Built for <span className="text-zinc-300">Midjourney & Stable Diffusion</span>.
+            </p>
           </header>
 
-          <div className="grid grid-cols-1 gap-8">
+          <div className="grid grid-cols-1 gap-10">
             {/* Input Sections */}
-            <section className="glass-panel p-8 space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-6">
+            <section className="glass-panel p-10 space-y-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                {/* Section: Base Context */}
+                <div className="space-y-8">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 bg-orange-500/10 rounded-lg border border-orange-500/20">
+                    <div className="p-2.5 bg-orange-500/10 rounded-xl border border-orange-500/20">
                       <Sparkles className="w-4 h-4 text-orange-500" />
                     </div>
-                    <h3 className="font-bold text-zinc-200">Base Context & Products</h3>
+                    <h3 className="text-sm font-bold text-zinc-200 tracking-tight">Core Concept</h3>
                   </div>
-                  <ImageUploader onImageSelect={setAttachedImage} />
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold tracking-widest text-zinc-500 uppercase">Product Description</label>
+                  
+                  <div className="control-group">
+                    <ImageUploader onImageSelect={setAttachedImage} />
+                  </div>
+
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase px-1">Product Context</label>
                     <textarea
                       value={productDesc}
                       onChange={(e) => setProductDesc(e.target.value)}
-                      placeholder="e.g., a contemporary velvet armchair"
-                      className="w-full p-4 glass-input h-28 resize-none text-sm placeholder:text-zinc-700"
+                      placeholder="e.g., a minimalist concrete dining table with linen runner"
+                      className="w-full p-5 glass-input h-32 resize-none text-sm placeholder:text-zinc-700 leading-relaxed"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-6">
+                {/* Section: Subjects */}
+                <div className="space-y-8">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                    <div className="p-2.5 bg-blue-500/10 rounded-xl border border-blue-500/20">
                       <User className="w-4 h-4 text-blue-400" />
                     </div>
-                    <h3 className="font-bold text-zinc-200">Human Element</h3>
+                    <h3 className="text-sm font-bold text-zinc-200 tracking-tight">Human Staging</h3>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  
+                  <div className="space-y-8 p-6 rounded-3xl border border-white/5 bg-white/[0.02]">
                     <OptionSelect label="Count" value={config.subjectNum} onChange={(v) => handleConfigChange('subjectNum', v)} options={OPTIONS_DATA.subjectNum} />
-                    <OptionSelect label="Gender" value={config.subjectGender} onChange={(v) => handleConfigChange('subjectGender', v)} options={OPTIONS_DATA.subjectGender} />
-                    <OptionSelect label="Age" value={config.subjectAge} onChange={(v) => handleConfigChange('subjectAge', v)} options={OPTIONS_DATA.subjectAge} />
-                    <OptionSelect label="Region" value={config.subjectRegion} onChange={(v) => handleConfigChange('subjectRegion', v)} options={OPTIONS_DATA.subjectRegion} />
-                  </div>
-                  <div className="grid grid-cols-1 gap-4 pt-4 border-t border-zinc-800/50">
-                    <OptionSelect label="Hair Style" value={config.subjectHair} onChange={(v) => handleConfigChange('subjectHair', v)} options={OPTIONS_DATA.subjectHair} />
-                    <OptionSelect label="Outfit Style" value={config.subjectStyle} onChange={(v) => handleConfigChange('subjectStyle', v)} options={OPTIONS_DATA.subjectStyle} />
+                    
+                    <AnimatePresence>
+                      {config.subjectNum !== "없음" && (
+                        <motion.div 
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-6 pt-4 border-t border-white/5"
+                        >
+                          <div className="grid grid-cols-2 gap-6">
+                            <OptionSelect label="Gender" value={config.subjectGender} onChange={(v) => handleConfigChange('subjectGender', v)} options={OPTIONS_DATA.subjectGender} />
+                            <OptionSelect label="Age" value={config.subjectAge} onChange={(v) => handleConfigChange('subjectAge', v)} options={OPTIONS_DATA.subjectAge} />
+                          </div>
+                          <OptionSelect label="Region" value={config.subjectRegion} onChange={(v) => handleConfigChange('subjectRegion', v)} options={OPTIONS_DATA.subjectRegion} />
+                          <OptionSelect label="Hair Style" value={config.subjectHair} onChange={(v) => handleConfigChange('subjectHair', v)} options={OPTIONS_DATA.subjectHair} />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-8 border-t border-zinc-800/50">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 bg-purple-500/10 rounded-lg border border-purple-500/20">
+              {/* Section: Environment */}
+              <div className="pt-10 border-t border-white/5 space-y-10">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-purple-500/10 rounded-xl border border-purple-500/20">
                     <Home className="w-4 h-4 text-purple-400" />
                   </div>
-                  <h3 className="font-bold text-zinc-200">Environment & Staging</h3>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <OptionSelect label="Space Type" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} />
-                  <OptionSelect label="Detail" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={SPACE_DETAILS_MAP[config.spaceType] || ["선택안함"]} />
-                  <OptionSelect label="Interior" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} />
-                  <OptionSelect label="Lighting" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} />
+                  <h3 className="text-sm font-bold text-zinc-200 tracking-tight">Environment & Lighting</h3>
                 </div>
 
-                <div className="mt-8 p-6 bg-zinc-950/40 rounded-2xl border border-zinc-800/50">
-                  <div className="flex items-center justify-between mb-6">
-                    <label className="flex items-center gap-2 text-sm font-semibold text-zinc-300">
-                      <Layers className="w-4 h-4 text-zinc-500" /> 고급 소재 설정 활성화
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                   <div className="control-group">
+                      <OptionSelect label="Space Type" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} />
+                      <OptionSelect label="Location Detail" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={SPACE_DETAILS_MAP[config.spaceType] || ["선택안함"]} />
+                   </div>
+                   <div className="control-group">
+                      <OptionSelect label="Interior Aesthetic" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} />
+                      <OptionSelect label="Lighting Mood" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} />
+                   </div>
+                </div>
+
+                <div className="p-8 rounded-[32px] bg-gradient-to-br from-zinc-900/50 to-black/50 border border-white/5">
+                  <div className="flex items-center justify-between mb-8">
+                    <label className="flex items-center gap-3 text-xs font-bold tracking-widest text-zinc-400 uppercase">
+                      <Layers className="w-4 h-4 text-orange-500" /> Advanced Material Details
                     </label>
                     <button 
                       onClick={() => setUseDetailMaterial(!useDetailMaterial)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${useDetailMaterial ? 'bg-orange-500' : 'bg-zinc-800'}`}
+                      className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-500 ${useDetailMaterial ? 'bg-orange-500' : 'bg-zinc-800'}`}
                     >
-                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${useDetailMaterial ? 'translate-x-6' : 'translate-x-1'}`} />
+                      <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-xl transition-transform duration-500 ${useDetailMaterial ? 'translate-x-6' : 'translate-x-1'}`} />
                     </button>
                   </div>
                   
@@ -360,66 +395,71 @@ export default function App() {
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden"
                       >
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
-                          <OptionSelect label="Floor" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} />
-                          <OptionSelect label="Wood" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} />
-                          <OptionSelect label="Metal" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} />
-                          <OptionSelect label="Wall" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 pt-4">
+                          <OptionSelect label="Flooring" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} />
+                          <OptionSelect label="Woodwork" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} />
+                          <OptionSelect label="Metal Accents" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} />
+                          <OptionSelect label="Wall Finish" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} />
                         </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
+              </div>
 
-                <div className="pt-8 border-t border-zinc-800/50">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 bg-pink-500/10 rounded-lg border border-pink-500/20">
-                      <Palette className="w-4 h-4 text-pink-400" />
-                    </div>
-                    <h3 className="font-bold text-zinc-200">Visual Aesthetic Styles</h3>
+              {/* Section: Styles */}
+              <div className="pt-10 border-t border-white/5">
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="p-2.5 bg-pink-500/10 rounded-xl border border-pink-500/20">
+                    <Palette className="w-4 h-4 text-pink-400" />
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {Object.keys(DICTIONARY.styles).map(style => {
-                      const isSelected = config.styles.includes(style);
-                      return (
-                        <button
-                          key={style}
-                          onClick={() => {
-                            setConfig(prev => ({
-                              ...prev,
-                              styles: isSelected 
-                                ? prev.styles.filter(s => s !== style)
-                                : [...prev.styles, style]
-                            }));
-                          }}
-                          className={`px-3 py-2 rounded-xl text-xs font-medium transition-all border ${
-                            isSelected 
-                              ? 'bg-orange-500 border-orange-500 text-white shadow-lg shadow-orange-500/20' 
-                              : 'bg-zinc-900/50 border-zinc-800 text-zinc-500 hover:border-zinc-700 hover:text-zinc-300'
-                          }`}
-                        >
-                          {style}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <h3 className="text-sm font-bold text-zinc-200 tracking-tight">Visual Aesthetic Styles</h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {Object.keys(DICTIONARY.styles).map(style => {
+                    const isSelected = config.styles.includes(style);
+                    return (
+                      <button
+                        key={style}
+                        onClick={() => {
+                          setConfig(prev => ({
+                            ...prev,
+                            styles: isSelected 
+                              ? prev.styles.filter(s => s !== style)
+                              : [...prev.styles, style]
+                          }));
+                        }}
+                        className={`px-4 py-2.5 rounded-2xl text-[11px] font-bold tracking-tight transition-all border ${
+                          isSelected 
+                            ? 'bg-orange-500 border-transparent text-white shadow-xl shadow-orange-500/30' 
+                            : 'bg-white/[0.03] border-white/5 text-zinc-500 hover:border-white/10 hover:text-zinc-300'
+                        }`}
+                      >
+                        {style}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </section>
           </div>
         </main>
 
-
         {/* Right Sidebar: Controls & Library */}
-        <aside className="xl:col-span-3 space-y-6">
-          <div className="glass-panel p-6 sticky top-12 space-y-6 shadow-orange-500/5">
+        <aside className="xl:col-span-3 space-y-8">
+          <div className="glass-panel p-8 sticky top-12 space-y-8">
+            <div className="space-y-4">
+               <label className="text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase px-1">Shot Control</label>
+               <OptionSelect label="Camera Angle" value={config.camera} onChange={(v) => handleConfigChange('camera', v)} options={OPTIONS_DATA.camera} />
+            </div>
+
             <button
               onClick={generatePrompt}
               disabled={isGenerating}
-              className="w-full accent-gradient text-white font-bold py-4 px-6 rounded-2xl shadow-xl shadow-orange-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex justify-center items-center gap-3 disabled:opacity-50"
+              className="w-full accent-gradient text-white text-sm font-bold py-5 px-8 rounded-3xl shadow-2xl shadow-orange-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex justify-center items-center gap-3 disabled:opacity-50"
             >
               {isGenerating ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Wand2 className="w-5 h-5" />}
-              Build Architect Prompt
+              Generate Prompt
             </button>
 
             <PromptOutput prompt={generatedPrompt} />
@@ -429,20 +469,20 @@ export default function App() {
                 <motion.div 
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
-                  className="pt-6 border-t border-zinc-800/50 space-y-4"
+                  className="pt-8 border-t border-white/5 space-y-5"
                 >
-                  <label className="text-xs font-bold tracking-widest text-zinc-500 uppercase">Save to Library</label>
-                  <div className="flex gap-2">
+                  <label className="text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase px-1">Library Management</label>
+                  <div className="flex gap-3">
                     <input
                       type="text"
                       value={templateName}
                       onChange={(e) => setTemplateName(e.target.value)}
-                      placeholder="Name this preset..."
-                      className="flex-1 p-3 glass-input text-sm"
+                      placeholder="Preset name..."
+                      className="flex-1 p-4 glass-input text-sm"
                     />
                     <button
                       onClick={handleSaveTemplate}
-                      className="p-3 bg-zinc-800 hover:bg-orange-500 hover:text-white rounded-xl transition-all"
+                      className="p-4 bg-zinc-900 border border-white/5 hover:bg-orange-500 hover:text-white rounded-2xl transition-all shadow-lg"
                     >
                       <Save className="w-5 h-5" />
                     </button>
@@ -451,19 +491,19 @@ export default function App() {
               )}
             </AnimatePresence>
 
-            <div className="pt-6 border-t border-zinc-800/50 space-y-4">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold tracking-widest text-zinc-500 uppercase flex items-center gap-2">
+            <div className="pt-8 border-t border-white/5 space-y-6">
+              <div className="flex items-center justify-between px-1">
+                <label className="text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase flex items-center gap-2">
                   <LayoutTemplate className="w-3 h-3" /> Preset Library
                 </label>
-                <span className="text-[10px] font-mono text-zinc-600 uppercase">{savedTemplates.length} Items</span>
+                <span className="text-[9px] font-mono font-bold text-zinc-600 bg-zinc-900 px-2 py-0.5 rounded-full">{savedTemplates.length}</span>
               </div>
               
-              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+              <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
                 {savedTemplates.length === 0 ? (
-                  <div className="text-center py-8 border border-dashed border-zinc-800/50 rounded-2xl">
-                    <ImageIcon className="w-8 h-8 text-zinc-800 mx-auto mb-2" />
-                    <p className="text-xs text-zinc-600">No saved presets</p>
+                  <div className="text-center py-10 border border-dashed border-white/5 rounded-[32px] bg-white/[0.01]">
+                    <ImageIcon className="w-8 h-8 text-zinc-800 mx-auto mb-3 opacity-20" />
+                    <p className="text-[10px] text-zinc-700 font-bold uppercase tracking-widest">Library Empty</p>
                   </div>
                 ) : (
                   savedTemplates.map(template => (
