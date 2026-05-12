@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trash2, ExternalLink, Box } from 'lucide-react';
+import { Trash2, Box } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function TemplateCard({ template, onLoad, onDelete }) {
