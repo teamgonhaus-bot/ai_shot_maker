@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Camera, Save, Sparkles, User, Home, Settings, Layers, 
-  Info, Wand2, LayoutTemplate, Palette, Zap, Image as ImageIcon 
+  Wand2, LayoutTemplate, Palette, Zap, Image as ImageIcon 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from './firebase';
-import { collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from 'firebase/firestore';
 
 // Modular Components
 import ImageUploader from './components/ImageUploader';

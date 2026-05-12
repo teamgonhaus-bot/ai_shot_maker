@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ImageIcon, X, Upload } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export default function ImageUploader({ onImageSelect }) {
   const [preview, setPreview] = useState(null);

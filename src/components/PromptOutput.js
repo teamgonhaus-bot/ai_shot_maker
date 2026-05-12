@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Copy, Check, Terminal } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export default function PromptOutput({ prompt }) {
   const [copied, setCopied] = useState(false);
