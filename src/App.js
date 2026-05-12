@@ -3,7 +3,7 @@ import {
   Camera, Save, Sparkles, User, Home, Settings, Layers, 
   Wand2, LayoutTemplate, Palette, Zap, Image as ImageIcon 
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { db } from './firebase';
 import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from 'firebase/firestore';
 
@@ -74,7 +74,7 @@ export default function App() {
     detailWall: "선택안함"
   });
   const [useDetailMaterial, setUseDetailMaterial] = useState(false);
-  const [attachedImage, setAttachedImage] = useState(null);
+  const [, setAttachedImage] = useState(null);
   const [generatedPrompt, setGeneratedPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [savedTemplates, setSavedTemplates] = useState([]);
