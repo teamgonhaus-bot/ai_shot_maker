@@ -175,8 +175,8 @@ export default function App() {
     <div className="app-container">
       {/* Header Section */}
       <header className="app-header">
-        <div className="flex justify-between items-center mb-8">
-          <div className="user-profile">
+        <div className="flex justify-between items-center mb-4">
+          <div className="user-profile" style={{ marginBottom: 0 }}>
             <div className="avatar">
               <UserIcon className="w-6 h-6" />
             </div>
@@ -185,18 +185,9 @@ export default function App() {
               <p className="text-xs text-slate-500">Premium Prompt Engine</p>
             </div>
           </div>
-          <div className="flex gap-4">
-            <div className="p-3 bg-white rounded-full shadow-sm">
-              <Search className="w-5 h-5 text-slate-400" />
-            </div>
-            <div className="p-3 bg-white rounded-full shadow-sm relative">
-              <Bell className="w-5 h-5 text-slate-400" />
-              <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></div>
-            </div>
-          </div>
         </div>
         
-        <h1 className="hero-title mb-8">Explore<br/>Generations</h1>
+        <h1 className="hero-title mb-4">Explore<br/>Generations</h1>
       </header>
 
       {/* Navigation (Vibrant Cards) */}
@@ -310,16 +301,35 @@ export default function App() {
               </div>
             </section>
 
-            {/* Final Action Card */}
-            <div className="vibrant-card card-black" onClick={generatePrompt}>
-              <div className="card-icon">
-                <Wand2 className="w-5 h-5" />
+            {/* Status Window */}
+            <section className="control-section bg-slate-900 text-white">
+              <span className="section-label bg-slate-800 text-slate-300">Selected Options</span>
+              <div className="flex flex-wrap gap-2 text-sm font-medium">
+                {Object.entries(config).filter(([k, v]) => v !== "선택안함" && v !== "없음").map(([k, v]) => (
+                  <span key={k} className="px-3 py-1.5 bg-slate-800 rounded-full text-purple-300">
+                    {v}
+                  </span>
+                ))}
+                {productDesc && (
+                  <span className="px-3 py-1.5 bg-slate-800 rounded-full text-purple-300">
+                    "{productDesc}"
+                  </span>
+                )}
+                {Object.values(config).every(v => v === "선택안함" || v === "없음") && !productDesc && (
+                  <span className="text-slate-500">No options selected yet.</span>
+                )}
               </div>
-              <p className="text-2xl font-black">{isGenerating ? 'GENERATING...' : 'GENERATE<br/>PROMPT NOW'}</p>
-              <div className="card-arrow">
-                <ChevronRight className="w-5 h-5" />
-              </div>
-            </div>
+            </section>
+
+            {/* Final Action Button */}
+            <button 
+              onClick={generatePrompt}
+              disabled={isGenerating}
+              className="w-full py-4 px-6 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl text-xl font-black shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed mb-8"
+            >
+              <Wand2 className="w-6 h-6" />
+              {isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}
+            </button>
 
             {/* Result Section */}
             {generatedPrompt && (
