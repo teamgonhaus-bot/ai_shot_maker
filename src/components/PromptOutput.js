@@ -15,42 +15,32 @@ export default function PromptOutput({ prompt }) {
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-4"
     >
-      <div className="flex items-center justify-between px-1">
-        <label className="text-[10px] font-extrabold tracking-[0.2em] text-zinc-400 uppercase flex items-center gap-2">
-          <Terminal className="w-3.5 h-3.5 text-orange-500" /> Output Prompt
+      <div className="flex items-center justify-between">
+        <label className="label-caps flex items-center gap-2">
+          <Terminal className="w-4 h-4 text-emerald-500" /> Output Result
         </label>
         <button
           onClick={handleCopy}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[10px] font-bold tracking-widest uppercase transition-all duration-500 ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-bold tracking-widest uppercase transition-all ${
             copied 
-              ? 'bg-green-500 text-white shadow-xl shadow-green-500/20' 
-              : 'bg-white border-2 border-zinc-50 text-zinc-500 hover:border-orange-500/30 hover:text-orange-500 shadow-sm'
+              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' 
+              : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
           }`}
         >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={copied ? 'check' : 'copy'}
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.5 }}
-              className="flex items-center gap-2"
-            >
-              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-              {copied ? 'Copied' : 'Copy'}
-            </motion.div>
-          </AnimatePresence>
+          {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+          {copied ? 'Copied' : 'Copy'}
         </button>
       </div>
 
       <div className="relative group">
-        <div className="relative p-8 bg-white border-2 border-zinc-50 rounded-[40px] text-sm text-zinc-800 leading-relaxed font-mono break-words shadow-sm overflow-hidden min-h-[120px]">
-          {prompt}
-          <div className="absolute -bottom-6 -right-6 p-4 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity duration-1000 pointer-events-none">
-            <Zap className="w-32 h-32" />
+        <div className="relative p-6 bg-slate-50 border border-slate-100 rounded-2xl text-sm text-slate-700 font-mono break-words leading-relaxed min-h-[100px]">
+          {prompt || "Your prompt will appear here..."}
+          <div className="absolute bottom-2 right-2 opacity-10 pointer-events-none">
+            <Zap className="w-12 h-12" />
           </div>
         </div>
       </div>

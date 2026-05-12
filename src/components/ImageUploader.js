@@ -25,7 +25,7 @@ export default function ImageUploader({ onImageSelect }) {
 
   return (
     <div className="space-y-4">
-      <label className="text-[10px] font-extrabold tracking-[0.2em] text-zinc-400 uppercase px-1">Attached Image</label>
+      <label className="label-caps">Attached Reference</label>
       <div className="relative group">
         <AnimatePresence mode="wait">
           {preview ? (
@@ -34,15 +34,15 @@ export default function ImageUploader({ onImageSelect }) {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative aspect-video w-full rounded-[40px] overflow-hidden shadow-2xl"
+              className="relative aspect-video w-full rounded-2xl overflow-hidden shadow-lg"
             >
               <img src={preview} alt="Preview" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
                 <button
                   onClick={removeImage}
-                  className="p-4 bg-white text-red-500 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all"
+                  className="p-3 bg-white text-red-500 rounded-full shadow-xl hover:scale-110 active:scale-95 transition-all"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
             </motion.div>
@@ -60,13 +60,13 @@ export default function ImageUploader({ onImageSelect }) {
                 accept="image/*"
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
               />
-              <div className="absolute inset-0 bg-white border-2 border-dashed border-zinc-100 rounded-[40px] flex flex-col items-center justify-center gap-4 group-hover:border-orange-500 group-hover:bg-orange-50/50 transition-all duration-500">
-                <div className="p-5 bg-orange-50 rounded-full text-orange-500 group-hover:scale-110 transition-transform duration-500">
-                  <Upload className="w-8 h-8" />
+              <div className="absolute inset-0 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center gap-3 group-hover:border-[var(--current-theme)] group-hover:bg-white transition-all duration-300">
+                <div className="p-4 bg-white rounded-xl text-slate-400 group-hover:text-[var(--current-theme)] shadow-sm transition-all">
+                  <Upload className="w-6 h-6" />
                 </div>
                 <div className="text-center">
-                  <p className="text-sm font-bold text-zinc-800">Drop image here</p>
-                  <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">or click to browse</p>
+                  <p className="text-sm font-bold text-slate-600">Drop image here</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">or click to browse</p>
                 </div>
               </div>
             </motion.div>

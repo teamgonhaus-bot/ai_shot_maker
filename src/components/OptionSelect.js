@@ -12,16 +12,17 @@ export default function OptionSelect({ label, value, onChange, options, icon: Ic
             <button
               key={opt}
               onClick={() => onChange(opt)}
-              className={`relative px-5 py-3 rounded-2xl text-xs font-bold transition-all ${
+              className={`relative px-5 py-3 rounded-xl text-xs font-bold transition-all ${
                 isSelected 
-                  ? 'text-white shadow-xl' 
-                  : 'text-zinc-500 bg-white border-2 border-zinc-50 hover:bg-zinc-50 hover:text-zinc-800'
+                  ? 'text-white shadow-lg' 
+                  : 'text-slate-500 bg-slate-50 border-2 border-transparent hover:border-slate-200'
               }`}
             >
               {isSelected && (
                 <motion.div
                   layoutId={`${label}-bg`}
-                  className="absolute inset-0 bg-orange-500 rounded-2xl -z-10"
+                  className="absolute inset-0 rounded-xl -z-10"
+                  style={{ backgroundColor: 'var(--current-theme, #ff6b00)' }}
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}
