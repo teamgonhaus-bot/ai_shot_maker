@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Camera, Save, Sparkles, User, Home, Settings, Layers, 
-  Wand2, LayoutTemplate, Palette, Zap, ArrowRight, Search, 
-  Bell, User as UserIcon, ChevronRight, X, Trash2
+  Save, Home, Settings, Wand2, LayoutTemplate, Zap, ArrowRight, 
+  Search, Bell, User as UserIcon, ChevronRight, X 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from './firebase';

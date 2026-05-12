@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Copy, Check, Terminal, Zap } from 'lucide-react';
+import { Copy, Check, Terminal } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function PromptOutput({ prompt }) {
