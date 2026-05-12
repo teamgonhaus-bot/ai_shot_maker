@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Save, Home, Settings, Wand2, LayoutTemplate, Zap, ArrowRight, 
-  User as UserIcon, X 
+  Save, Home, Settings, Wand2, LayoutTemplate, Zap, ArrowRight, X 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from './firebase';
@@ -174,42 +173,31 @@ export default function App() {
   return (
     <div className="app-container">
       {/* Header Section */}
-      <header className="app-header">
-        <div className="flex justify-between items-center mb-4">
-          <div className="user-profile" style={{ marginBottom: 0 }}>
-            <div className="avatar">
-              <UserIcon className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-bold text-slate-900">AI Shot Maker</p>
-              <p className="text-xs text-slate-500">Premium Prompt Engine</p>
-            </div>
-          </div>
-        </div>
-        
-        <h1 className="hero-title mb-4">Explore<br/>Generations</h1>
+      <header className="app-header pt-6">
+        <h1 className="text-5xl font-black text-black tracking-tight mb-2">Create</h1>
+        <p className="text-sm font-semibold text-slate-500 uppercase tracking-widest">AI Prompt Dashboard</p>
       </header>
 
-      {/* Navigation (Vibrant Cards) */}
-      <div className="mb-12">
-        <div className="vibrant-card card-purple" onClick={() => setActiveTab('home')}>
-          <div className="card-icon">
-            <Zap className="w-5 h-5" />
+      {/* Navigation (Horizontal Scroll Cards) */}
+      <div className="mb-8 flex gap-4 overflow-x-auto hide-scrollbar snap-x px-2 pb-4">
+        <div 
+          className={`min-w-[280px] p-6 rounded-[32px] snap-center cursor-pointer transition-all ${activeTab === 'home' ? 'bg-black text-white shadow-xl' : 'bg-white text-black shadow-sm'}`} 
+          onClick={() => setActiveTab('home')}
+        >
+          <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mb-12">
+            <Zap className={`w-6 h-6 ${activeTab === 'home' ? 'text-white' : 'text-black'}`} />
           </div>
-          <p className="text-2xl font-black">START NEW<br/>CREATION</p>
-          <div className="card-arrow">
-            <ArrowRight className="w-5 h-5" />
-          </div>
+          <p className="text-2xl font-black leading-tight">Start New<br/>Creation</p>
         </div>
         
-        <div className="vibrant-card card-yellow" onClick={() => setActiveTab('library')}>
-          <div className="card-icon">
-            <LayoutTemplate className="w-5 h-5" />
+        <div 
+          className={`min-w-[280px] p-6 rounded-[32px] snap-center cursor-pointer transition-all ${activeTab === 'library' ? 'bg-black text-white shadow-xl' : 'bg-white text-black shadow-sm'}`} 
+          onClick={() => setActiveTab('library')}
+        >
+          <div className="w-12 h-12 rounded-full bg-black/5 flex items-center justify-center mb-12">
+            <LayoutTemplate className={`w-6 h-6 ${activeTab === 'library' ? 'text-white' : 'text-black'}`} />
           </div>
-          <p className="text-2xl font-black">MY SAVED<br/>LIBRARY</p>
-          <div className="card-arrow">
-            <ArrowRight className="w-5 h-5" />
-          </div>
+          <p className="text-2xl font-black leading-tight">My Saved<br/>Library</p>
         </div>
       </div>
 
@@ -223,16 +211,16 @@ export default function App() {
             className="space-y-6"
           >
             {/* Core Subject Card */}
-            <section className="control-section">
-              <span className="section-label">Core Subject</span>
+            <section className="bg-white p-6 rounded-[32px] shadow-sm">
+              <span className="inline-block px-3 py-1 bg-[#F2F2F7] rounded-full text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-6">Core Subject</span>
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Main Concept</p>
+                  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Main Concept</p>
                   <textarea
                     value={productDesc}
                     onChange={(e) => setProductDesc(e.target.value)}
                     placeholder="Describe your scene (e.g., minimalist coffee table)"
-                    className="w-full p-6 bg-slate-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-purple-500 text-lg transition-all"
+                    className="w-full p-5 bg-[#F2F2F7] rounded-[24px] border-none outline-none focus:ring-2 focus:ring-black text-[15px] font-medium transition-all"
                     rows={3}
                   />
                 </div>
@@ -245,9 +233,9 @@ export default function App() {
               <motion.section 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="control-section"
+                className="bg-white p-6 rounded-[32px] shadow-sm"
               >
-                <span className="section-label">Human Staging</span>
+                <span className="inline-block px-3 py-1 bg-[#F2F2F7] rounded-full text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-6">Human Staging</span>
                 <div className="space-y-6">
                   <div className="grid-cols-2">
                     <OptionSelect label="Gender" value={config.subjectGender} onChange={(v) => handleConfigChange('subjectGender', v)} options={OPTIONS_DATA.subjectGender} />
@@ -260,8 +248,8 @@ export default function App() {
             )}
 
             {/* Environment Card */}
-            <section className="control-section">
-              <span className="section-label">Environment</span>
+            <section className="bg-white p-6 rounded-[32px] shadow-sm">
+              <span className="inline-block px-3 py-1 bg-[#F2F2F7] rounded-full text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-6">Environment</span>
               <div className="space-y-6">
                 <div className="grid-cols-2">
                   <OptionSelect label="Space Type" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} />
@@ -272,12 +260,12 @@ export default function App() {
                   <OptionSelect label="Lighting" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} />
                 </div>
 
-                <div className="p-6 bg-slate-50 rounded-3xl">
-                  <div className="flex justify-between items-center mb-6">
-                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Material Details</p>
+                <div className="p-5 bg-[#F2F2F7] rounded-[24px]">
+                  <div className="flex justify-between items-center mb-4">
+                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Material Details</p>
                     <button 
                       onClick={() => setUseDetailMaterial(!useDetailMaterial)}
-                      className={`relative w-12 h-6 rounded-full transition-colors ${useDetailMaterial ? 'bg-purple-600' : 'bg-slate-300'}`}
+                      className={`relative w-12 h-6 rounded-full transition-colors ${useDetailMaterial ? 'bg-black' : 'bg-slate-300'}`}
                     >
                       <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${useDetailMaterial ? 'translate-x-6' : ''}`} />
                     </button>
@@ -302,34 +290,38 @@ export default function App() {
             </section>
 
             {/* Status Window */}
-            <section className="control-section bg-slate-900 text-white">
-              <span className="section-label bg-slate-800 text-slate-300">Selected Options</span>
-              <div className="flex flex-wrap gap-2 text-sm font-medium">
+            <section className="bg-black text-white p-6 rounded-[32px] shadow-lg">
+              <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-[11px] font-bold text-white uppercase tracking-wider mb-4">Selected Options</span>
+              <div className="flex flex-wrap gap-2 text-[13px] font-semibold">
                 {Object.entries(config).filter(([k, v]) => v !== "선택안함" && v !== "없음").map(([k, v]) => (
-                  <span key={k} className="px-3 py-1.5 bg-slate-800 rounded-full text-purple-300">
+                  <span key={k} className="px-3 py-1.5 bg-white/10 rounded-full text-white">
                     {v}
                   </span>
                 ))}
                 {productDesc && (
-                  <span className="px-3 py-1.5 bg-slate-800 rounded-full text-purple-300">
+                  <span className="px-3 py-1.5 bg-white/10 rounded-full text-white">
                     "{productDesc}"
                   </span>
                 )}
                 {Object.values(config).every(v => v === "선택안함" || v === "없음") && !productDesc && (
-                  <span className="text-slate-500">No options selected yet.</span>
+                  <span className="text-slate-400">No options selected yet.</span>
                 )}
               </div>
             </section>
 
-            {/* Final Action Button */}
-            <button 
-              onClick={generatePrompt}
-              disabled={isGenerating}
-              className="w-full py-4 px-6 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl text-xl font-black shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed mb-8"
-            >
-              <Wand2 className="w-6 h-6" />
-              {isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}
-            </button>
+            {/* Final Action Button (Bento Box) */}
+            <div className="bento-grid mb-8">
+              <button 
+                onClick={generatePrompt}
+                disabled={isGenerating}
+                className="col-span-full py-8 px-6 bg-black text-white rounded-[32px] text-xl font-black shadow-xl hover:scale-[1.02] transition-all flex flex-col items-center justify-center gap-4 disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
+                  <Wand2 className="w-6 h-6 text-white" />
+                </div>
+                {isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}
+              </button>
+            </div>
 
             {/* Result Section */}
             {generatedPrompt && (
@@ -340,19 +332,19 @@ export default function App() {
               >
                 <PromptOutput prompt={generatedPrompt} />
                 
-                <div className="control-section">
-                  <span className="section-label">Library Save</span>
-                  <div className="flex gap-4">
+                <div className="bg-white p-6 rounded-[32px] shadow-sm">
+                  <span className="inline-block px-3 py-1 bg-[#F2F2F7] rounded-full text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-6">Library Save</span>
+                  <div className="flex gap-3">
                     <input
                       type="text"
                       value={templateName}
                       onChange={(e) => setTemplateName(e.target.value)}
                       placeholder="Enter preset name..."
-                      className="flex-1 p-4 bg-slate-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-purple-500"
+                      className="flex-1 p-4 bg-[#F2F2F7] rounded-[20px] border-none outline-none focus:ring-2 focus:ring-black font-medium"
                     />
                     <button
                       onClick={handleSaveTemplate}
-                      className="p-4 bg-purple-600 text-white rounded-2xl shadow-lg hover:scale-105 transition-all"
+                      className="p-4 bg-black text-white rounded-[20px] shadow-md hover:scale-105 transition-all"
                     >
                       <Save className="w-6 h-6" />
                     </button>
@@ -400,26 +392,7 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Bottom Navigation Bar */}
-      <nav className="bottom-nav">
-        <div className={`nav-item ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>
-          <Home className="w-6 h-6" />
-        </div>
-        <div className={`nav-item ${activeTab === 'library' ? 'active' : ''}`} onClick={() => setActiveTab('library')}>
-          <LayoutTemplate className="w-6 h-6" />
-        </div>
-        <div className="nav-item">
-          <Zap className="w-6 h-6" />
-        </div>
-        <div className="nav-item">
-          <Settings className="w-6 h-6" />
-        </div>
-        <div className="nav-item">
-          <UserIcon className="w-6 h-6" />
-        </div>
-      </nav>
-      
-      <div className="h-32"></div> {/* Spacing for bottom nav */}
+      <div className="h-12"></div>
     </div>
   );
 }

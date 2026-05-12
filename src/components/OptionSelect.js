@@ -3,7 +3,7 @@ import React from 'react';
 export default function OptionSelect({ label, value, onChange, options, icon: Icon }) {
   return (
     <div className="space-y-3">
-      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">
         {label}
       </p>
       <div className="flex flex-wrap gap-2">
@@ -13,14 +13,14 @@ export default function OptionSelect({ label, value, onChange, options, icon: Ic
             <button
               key={opt}
               onClick={() => onChange(opt)}
-              className={`relative px-5 py-3 rounded-full text-sm font-bold transition-all border-2 ${
+              className={`relative px-4 py-2.5 rounded-[20px] text-[13px] font-semibold transition-all duration-300 ${
                 isSelected 
-                  ? 'text-white border-purple-600 bg-purple-600 shadow-md' 
-                  : 'text-slate-600 border-slate-200 bg-white hover:border-purple-300 hover:bg-purple-50'
+                  ? 'bg-black text-white shadow-md scale-105' 
+                  : 'bg-[#F2F2F7] text-slate-600 hover:bg-[#E5E5EA]'
               }`}
             >
-              <span className="relative z-10 flex items-center gap-2">
-                {Icon && <Icon className="w-3.5 h-3.5" />} {opt}
+              <span className="relative z-10 flex items-center gap-1.5">
+                {Icon && <Icon className="w-4 h-4" />} {opt}
               </span>
             </button>
           );
