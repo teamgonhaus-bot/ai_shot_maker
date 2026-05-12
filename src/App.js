@@ -3,7 +3,7 @@ import {
   Camera, Save, Sparkles, User, Home, Settings, Layers, 
   Wand2, LayoutTemplate, Palette, Zap, Image as ImageIcon 
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { db } from './firebase';
 import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from 'firebase/firestore';
 
