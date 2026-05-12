@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Save, Home, Settings, Wand2, LayoutTemplate, Zap, ArrowRight, 
-  Search, Bell, User as UserIcon, ChevronRight, X 
+  User as UserIcon, X 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from './firebase';
