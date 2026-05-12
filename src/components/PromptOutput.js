@@ -17,32 +17,33 @@ export default function PromptOutput({ prompt }) {
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-4"
+      className="vibrant-card card-purple shadow-xl shadow-purple-500/20"
     >
-      <div className="flex items-center justify-between">
-        <label className="label-caps flex items-center gap-2">
-          <Terminal className="w-4 h-4 text-emerald-500" /> Output Result
-        </label>
+      <div className="flex items-center justify-between mb-4">
+        <span className="px-4 py-1 bg-black text-white rounded-full text-[10px] font-black uppercase tracking-widest">
+          Final Result
+        </span>
         <button
           onClick={handleCopy}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-bold tracking-widest uppercase transition-all ${
-            copied 
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' 
-              : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+          className={`p-3 rounded-full transition-all ${
+            copied ? 'bg-white text-emerald-500' : 'bg-white/20 text-white hover:bg-white/40'
           }`}
         >
-          {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-          {copied ? 'Copied' : 'Copy'}
+          {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
         </button>
       </div>
 
-      <div className="relative group">
-        <div className="relative p-6 bg-slate-50 border border-slate-100 rounded-2xl text-sm text-slate-700 font-mono break-words leading-relaxed min-h-[100px]">
-          {prompt || "Your prompt will appear here..."}
-          <div className="absolute bottom-2 right-2 opacity-10 pointer-events-none">
-            <Zap className="w-12 h-12" />
-          </div>
-        </div>
+      <div className="space-y-4">
+        <h3 className="text-3xl font-black uppercase tracking-tighter leading-none text-white">
+          Generated Prompt
+        </h3>
+        <p className="text-sm font-medium text-white/80 font-mono leading-relaxed bg-black/10 p-6 rounded-2xl border border-white/10">
+          {prompt}
+        </p>
+      </div>
+
+      <div className="absolute top-4 right-4 opacity-5 pointer-events-none">
+        <Terminal className="w-32 h-32 text-white" />
       </div>
     </motion.div>
   );

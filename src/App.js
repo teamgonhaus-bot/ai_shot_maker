@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Camera, Save, Sparkles, User, Home, Settings, Layers, 
-  Wand2, LayoutTemplate, Palette, Zap, Image as ImageIcon 
+  Wand2, LayoutTemplate, Palette, Zap, ArrowRight, Search, 
+  Bell, User as UserIcon, ChevronRight, X, Trash2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from './firebase';
 import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from 'firebase/firestore';
 
 // Modular Components
-import ImageUploader from './components/ImageUploader';
 import OptionSelect from './components/OptionSelect';
 import PromptOutput from './components/PromptOutput';
 import TemplateCard from './components/TemplateCard';
@@ -74,11 +74,11 @@ export default function App() {
     detailWall: "선택안함"
   });
   const [useDetailMaterial, setUseDetailMaterial] = useState(false);
-  const [, setAttachedImage] = useState(null);
   const [generatedPrompt, setGeneratedPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [savedTemplates, setSavedTemplates] = useState([]);
   const [templateName, setTemplateName] = useState("");
+  const [activeTab, setActiveTab] = useState('home');
 
   useEffect(() => {
     const q = query(collection(db, "templates"), orderBy("createdAt", "desc"));
@@ -101,7 +101,7 @@ export default function App() {
         prompt: generatedPrompt,
         config: config,
         createdAt: new Date(),
-        thumbnailColor: `hsl(${Math.random() * 360}, 70%, 60%)`
+        thumbnailColor: ['#7C3AED', '#FACC15', '#18181B', '#BEF264', '#EF4444'][Math.floor(Math.random() * 5)]
       });
       setTemplateName("");
     } catch (e) {
@@ -120,6 +120,7 @@ export default function App() {
   const handleLoadTemplate = (template) => {
     setConfig(template.config);
     setGeneratedPrompt(template.prompt);
+    setActiveTab('home');
   };
 
   const generatePrompt = () => {
@@ -127,7 +128,6 @@ export default function App() {
     setTimeout(() => {
       const parts = [];
       
-      // 1. Core Subject
       let subjectStr = productDesc || "a high-end product";
       if (config.subjectNum !== "없음") {
         const traits = [];
@@ -144,7 +144,6 @@ export default function App() {
         parts.push(`professional architectural photography of ${subjectStr}`);
       }
 
-      // 2. Environment
       if (config.spaceType !== "선택안함") {
         let envStr = DICTIONARY.spaceType[config.spaceType];
         if (config.spaceDetail !== "선택안함") envStr += `, ${DICTIONARY.spaceDetail[config.spaceDetail]}`;
@@ -153,7 +152,6 @@ export default function App() {
 
       if (config.interiorStyle !== "선택안함") parts.push(`designed with ${DICTIONARY.interiorStyle[config.interiorStyle]}`);
 
-      // 3. Materials
       if (useDetailMaterial) {
         const materials = [];
         if (config.detailFloor !== "선택안함") materials.push(DICTIONARY.detailFloor[config.detailFloor]);
@@ -163,7 +161,6 @@ export default function App() {
         if (materials.length > 0) parts.push(`highlighting ${materials.join(", ")}`);
       }
 
-      // 4. Lighting & Camera
       if (config.light !== "선택안함") parts.push(`illuminated by ${DICTIONARY.light[config.light]}`);
       if (config.camera !== "선택안함") parts.push(`shot from ${DICTIONARY.camera[config.camera]}`);
 
@@ -171,233 +168,249 @@ export default function App() {
 
       setGeneratedPrompt(parts.join(", "));
       setIsGenerating(false);
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }, 800);
   };
 
   return (
-    <div className="min-h-screen selection:bg-orange-500/30 overflow-x-hidden pb-24 xl:pb-0">
-      <div className="app-container">
-        <div className="main-grid">
-          
-          {/* Sidebar (Web Only) */}
-          <aside className="hidden xl:flex sidebar-web sticky top-6">
-            <div className="p-4 bg-orange-500 rounded-2xl shadow-lg shadow-orange-500/30 cursor-pointer">
-              <Camera className="w-6 h-6 text-white" />
+    <div className="app-container">
+      {/* Header Section */}
+      <header className="app-header">
+        <div className="flex justify-between items-center mb-8">
+          <div className="user-profile">
+            <div className="avatar">
+              <UserIcon className="w-6 h-6" />
             </div>
-            <div className="flex flex-col gap-6 text-slate-400 mt-8">
-              <Zap className="w-6 h-6 hover:text-orange-500 cursor-pointer transition-all" />
-              <Palette className="w-6 h-6 hover:text-orange-500 cursor-pointer transition-all" />
-              <LayoutTemplate className="w-6 h-6 hover:text-orange-500 cursor-pointer transition-all" />
-              <Settings className="w-6 h-6 hover:text-orange-500 cursor-pointer transition-all" />
+            <div>
+              <p className="text-bold text-slate-900">AI Shot Maker</p>
+              <p className="text-xs text-slate-500">Premium Prompt Engine</p>
             </div>
-          </aside>
+          </div>
+          <div className="flex gap-4">
+            <div className="p-3 bg-white rounded-full shadow-sm">
+              <Search className="w-5 h-5 text-slate-400" />
+            </div>
+            <div className="p-3 bg-white rounded-full shadow-sm relative">
+              <Bell className="w-5 h-5 text-slate-400" />
+              <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></div>
+            </div>
+          </div>
+        </div>
+        
+        <h1 className="hero-title mb-8">Explore<br/>Generations</h1>
+      </header>
 
-          {/* Mobile Bottom Navigation */}
-          <nav className="mobile-bottom-nav">
-            <Camera className="w-6 h-6 text-orange-500" />
-            <Zap className="w-6 h-6 text-slate-400" />
-            <LayoutTemplate className="w-6 h-6 text-slate-400" />
-            <User className="w-6 h-6 text-slate-400" />
-          </nav>
+      {/* Navigation (Vibrant Cards) */}
+      <div className="mb-12">
+        <div className="vibrant-card card-purple" onClick={() => setActiveTab('home')}>
+          <div className="card-icon">
+            <Zap className="w-5 h-5" />
+          </div>
+          <p className="text-2xl font-black">START NEW<br/>CREATION</p>
+          <div className="card-arrow">
+            <ArrowRight className="w-5 h-5" />
+          </div>
+        </div>
+        
+        <div className="vibrant-card card-yellow" onClick={() => setActiveTab('library')}>
+          <div className="card-icon">
+            <LayoutTemplate className="w-5 h-5" />
+          </div>
+          <p className="text-2xl font-black">MY SAVED<br/>LIBRARY</p>
+          <div className="card-arrow">
+            <ArrowRight className="w-5 h-5" />
+          </div>
+        </div>
+      </div>
 
-          {/* Main Content */}
-          <main className="space-y-8 animate-slide-up">
-            <header className="px-2">
-              <h1 className="heading-primary">AI Shot Maker</h1>
-              <p className="text-slate-500 font-semibold text-lg max-w-lg">
-                Create high-end architectural and product photography prompts. <span className="text-slate-900">Mobile & Web optimized.</span>
-              </p>
-            </header>
-
-            <div className="space-y-6">
-              {/* Core Concept Section */}
-              <section className="section-card theme-core">
-                <div className="section-header">
-                  <div className="icon-box">
-                    <Sparkles className="w-6 h-6" />
-                  </div>
-                  <h3 className="heading-section">Core Concept</h3>
+      <AnimatePresence mode="wait">
+        {activeTab === 'home' ? (
+          <motion.div 
+            key="home"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-6"
+          >
+            {/* Core Subject Card */}
+            <section className="control-section">
+              <span className="section-label">Core Subject</span>
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Main Concept</p>
+                  <textarea
+                    value={productDesc}
+                    onChange={(e) => setProductDesc(e.target.value)}
+                    placeholder="Describe your scene (e.g., minimalist coffee table)"
+                    className="w-full p-6 bg-slate-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-purple-500 text-lg transition-all"
+                    rows={3}
+                  />
                 </div>
+                <OptionSelect label="Number of People" value={config.subjectNum} onChange={(v) => handleConfigChange('subjectNum', v)} options={OPTIONS_DATA.subjectNum} />
+              </div>
+            </section>
 
+            {/* Human Staging Card */}
+            {config.subjectNum !== "없음" && (
+              <motion.section 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="control-section"
+              >
+                <span className="section-label">Human Staging</span>
                 <div className="space-y-6">
-                  <ImageUploader onImageSelect={setAttachedImage} />
-                  <div className="space-y-2">
-                    <label className="label-caps">Scene Description</label>
-                    <textarea
-                      value={productDesc}
-                      onChange={(e) => setProductDesc(e.target.value)}
-                      placeholder="What are we shooting today? Describe the product or main subject..."
-                      className="custom-input h-32 resize-none"
-                    />
+                  <div className="grid-cols-2">
+                    <OptionSelect label="Gender" value={config.subjectGender} onChange={(v) => handleConfigChange('subjectGender', v)} options={OPTIONS_DATA.subjectGender} />
+                    <OptionSelect label="Age Group" value={config.subjectAge} onChange={(v) => handleConfigChange('subjectAge', v)} options={OPTIONS_DATA.subjectAge} />
                   </div>
+                  <OptionSelect label="Regional Style" value={config.subjectRegion} onChange={(v) => handleConfigChange('subjectRegion', v)} options={OPTIONS_DATA.subjectRegion} />
+                  <OptionSelect label="Hair Style" value={config.subjectHair} onChange={(v) => handleConfigChange('subjectHair', v)} options={OPTIONS_DATA.subjectHair} />
                 </div>
-              </section>
+              </motion.section>
+            )}
 
-              {/* Human Staging Section */}
-              <section className="section-card theme-human">
-                <div className="section-header">
-                  <div className="icon-box">
-                    <User className="w-6 h-6" />
-                  </div>
-                  <h3 className="heading-section">Human Staging</h3>
+            {/* Environment Card */}
+            <section className="control-section">
+              <span className="section-label">Environment</span>
+              <div className="space-y-6">
+                <div className="grid-cols-2">
+                  <OptionSelect label="Space Type" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} />
+                  <OptionSelect label="Detail" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={SPACE_DETAILS_MAP[config.spaceType] || ["선택안함"]} />
                 </div>
-                
-                <div className="space-y-6">
-                  <OptionSelect label="Presence" value={config.subjectNum} onChange={(v) => handleConfigChange('subjectNum', v)} options={OPTIONS_DATA.subjectNum} />
-                  
+                <div className="grid-cols-2">
+                  <OptionSelect label="Style" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} />
+                  <OptionSelect label="Lighting" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} />
+                </div>
+
+                <div className="p-6 bg-slate-50 rounded-3xl">
+                  <div className="flex justify-between items-center mb-6">
+                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Material Details</p>
+                    <button 
+                      onClick={() => setUseDetailMaterial(!useDetailMaterial)}
+                      className={`relative w-12 h-6 rounded-full transition-colors ${useDetailMaterial ? 'bg-purple-600' : 'bg-slate-300'}`}
+                    >
+                      <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${useDetailMaterial ? 'translate-x-6' : ''}`} />
+                    </button>
+                  </div>
                   <AnimatePresence>
-                    {config.subjectNum !== "없음" && (
+                    {useDetailMaterial && (
                       <motion.div 
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="space-y-6 pt-6 border-t border-slate-100"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="grid-cols-2 pt-2"
                       >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <OptionSelect label="Gender" value={config.subjectGender} onChange={(v) => handleConfigChange('subjectGender', v)} options={OPTIONS_DATA.subjectGender} />
-                          <OptionSelect label="Age" value={config.subjectAge} onChange={(v) => handleConfigChange('subjectAge', v)} options={OPTIONS_DATA.subjectAge} />
-                        </div>
-                        <OptionSelect label="Regional Aesthetic" value={config.subjectRegion} onChange={(v) => handleConfigChange('subjectRegion', v)} options={OPTIONS_DATA.subjectRegion} />
-                        <OptionSelect label="Hair Style" value={config.subjectHair} onChange={(v) => handleConfigChange('subjectHair', v)} options={OPTIONS_DATA.subjectHair} />
+                        <OptionSelect label="Flooring" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} />
+                        <OptionSelect label="Woodwork" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} />
+                        <OptionSelect label="Metal" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} />
+                        <OptionSelect label="Wall" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} />
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
-              </section>
-
-              {/* Environment Section */}
-              <section className="section-card theme-env">
-                <div className="section-header">
-                  <div className="icon-box">
-                    <Home className="w-6 h-6" />
-                  </div>
-                  <h3 className="heading-section">Environment</h3>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <OptionSelect label="Space Type" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} />
-                    <OptionSelect label="Detail" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={SPACE_DETAILS_MAP[config.spaceType] || ["선택안함"]} />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <OptionSelect label="Interior Style" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} />
-                    <OptionSelect label="Lighting" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} />
-                  </div>
-
-                  <div className="p-6 rounded-2xl bg-slate-50 border border-slate-100">
-                    <div className="flex items-center justify-between mb-6">
-                      <label className="flex items-center gap-3 text-xs font-bold tracking-widest text-slate-500 uppercase">
-                        <Layers className="w-4 h-4 text-purple-500" /> Detailed Materials
-                      </label>
-                      <button 
-                        onClick={() => setUseDetailMaterial(!useDetailMaterial)}
-                        className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 ${useDetailMaterial ? 'bg-purple-500' : 'bg-slate-300'}`}
-                      >
-                        <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${useDetailMaterial ? 'translate-x-6' : 'translate-x-1'}`} />
-                      </button>
-                    </div>
-                    
-                    <AnimatePresence>
-                      {useDetailMaterial && (
-                        <motion.div 
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2"
-                        >
-                          <OptionSelect label="Floor" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} />
-                          <OptionSelect label="Wood" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} />
-                          <OptionSelect label="Metal" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} />
-                          <OptionSelect label="Wall" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-              </section>
-            </div>
-          </main>
-
-          {/* Right Sidebar: Controls & Library */}
-          <aside className="space-y-6">
-            <div className="section-card theme-camera sticky top-6">
-              <div className="section-header">
-                <div className="icon-box">
-                  <Camera className="w-6 h-6" />
-                </div>
-                <h3 className="heading-section">Controls</h3>
               </div>
+            </section>
 
-              <div className="space-y-6">
-                <OptionSelect label="Shot Angle" value={config.camera} onChange={(v) => handleConfigChange('camera', v)} options={OPTIONS_DATA.camera} />
-                
-                <button
-                  onClick={generatePrompt}
-                  disabled={isGenerating}
-                  className="w-full bg-slate-900 text-white font-bold py-5 px-8 rounded-2xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex justify-center items-center gap-3 disabled:opacity-50"
-                >
-                  {isGenerating ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Wand2 className="w-5 h-5" />}
-                  Generate Prompt
-                </button>
+            {/* Final Action Card */}
+            <div className="vibrant-card card-black" onClick={generatePrompt}>
+              <div className="card-icon">
+                <Wand2 className="w-5 h-5" />
+              </div>
+              <p className="text-2xl font-black">{isGenerating ? 'GENERATING...' : 'GENERATE<br/>PROMPT NOW'}</p>
+              <div className="card-arrow">
+                <ChevronRight className="w-5 h-5" />
+              </div>
+            </div>
 
+            {/* Result Section */}
+            {generatedPrompt && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="space-y-6"
+              >
                 <PromptOutput prompt={generatedPrompt} />
-
-                <AnimatePresence>
-                  {generatedPrompt && (
-                    <motion.div 
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      className="pt-6 border-t border-slate-100 space-y-4"
+                
+                <div className="control-section">
+                  <span className="section-label">Library Save</span>
+                  <div className="flex gap-4">
+                    <input
+                      type="text"
+                      value={templateName}
+                      onChange={(e) => setTemplateName(e.target.value)}
+                      placeholder="Enter preset name..."
+                      className="flex-1 p-4 bg-slate-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                    <button
+                      onClick={handleSaveTemplate}
+                      className="p-4 bg-purple-600 text-white rounded-2xl shadow-lg hover:scale-105 transition-all"
                     >
-                      <label className="label-caps">Save to Library</label>
-                      <div className="flex gap-3">
-                        <input
-                          type="text"
-                          value={templateName}
-                          onChange={(e) => setTemplateName(e.target.value)}
-                          placeholder="Preset name..."
-                          className="flex-1 p-4 bg-slate-50 border border-slate-100 rounded-xl text-sm outline-none focus:border-emerald-500"
-                        />
-                        <button
-                          onClick={handleSaveTemplate}
-                          className="p-4 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl transition-all"
-                        >
-                          <Save className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                <div className="pt-6 border-t border-slate-100 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <label className="label-caps">Preset Library</label>
-                    <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">{savedTemplates.length}</span>
-                  </div>
-                  
-                  <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                    {savedTemplates.length === 0 ? (
-                      <div className="text-center py-10 border-2 border-dashed border-slate-50 rounded-2xl">
-                        <ImageIcon className="w-8 h-8 text-slate-200 mx-auto mb-2" />
-                        <p className="text-[10px] text-slate-300 font-bold uppercase tracking-widest">Library Empty</p>
-                      </div>
-                    ) : (
-                      savedTemplates.map(template => (
-                        <TemplateCard 
-                          key={template.id} 
-                          template={template} 
-                          onLoad={handleLoadTemplate} 
-                          onDelete={handleDeleteTemplate} 
-                        />
-                      ))
-                    )}
+                      <Save className="w-6 h-6" />
+                    </button>
                   </div>
                 </div>
-              </div>
+              </motion.div>
+            )}
+          </motion.div>
+        ) : (
+          <motion.div 
+            key="library"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="space-y-6"
+          >
+            <div className="flex justify-between items-center px-2 mb-4">
+              <h2 className="text-3xl font-black uppercase">Library</h2>
+              <button 
+                onClick={() => setActiveTab('home')}
+                className="p-3 bg-white rounded-full shadow-sm"
+              >
+                <X className="w-5 h-5 text-slate-400" />
+              </button>
             </div>
-          </aside>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {savedTemplates.length === 0 ? (
+                <div className="col-span-full py-20 text-center bg-white rounded-[40px] shadow-sm">
+                  <LayoutTemplate className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+                  <p className="text-slate-400 font-bold">Your library is empty</p>
+                </div>
+              ) : (
+                savedTemplates.map(template => (
+                  <TemplateCard 
+                    key={template.id} 
+                    template={template} 
+                    onLoad={handleLoadTemplate} 
+                    onDelete={handleDeleteTemplate} 
+                  />
+                ))
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Bottom Navigation Bar */}
+      <nav className="bottom-nav">
+        <div className={`nav-item ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>
+          <Home className="w-6 h-6" />
         </div>
-      </div>
+        <div className={`nav-item ${activeTab === 'library' ? 'active' : ''}`} onClick={() => setActiveTab('library')}>
+          <LayoutTemplate className="w-6 h-6" />
+        </div>
+        <div className="nav-item">
+          <Zap className="w-6 h-6" />
+        </div>
+        <div className="nav-item">
+          <Settings className="w-6 h-6" />
+        </div>
+        <div className="nav-item">
+          <UserIcon className="w-6 h-6" />
+        </div>
+      </nav>
+      
+      <div className="h-32"></div> {/* Spacing for bottom nav */}
     </div>
   );
 }

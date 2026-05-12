@@ -8,26 +8,26 @@ export default function TemplateCard({ template, onLoad, onDelete }) {
       layout
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      whileHover={{ y: -4 }}
-      className="group relative flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl hover:border-orange-500/30 transition-all cursor-pointer shadow-sm hover:shadow-md"
+      whileHover={{ y: -4, scale: 1.02 }}
+      className="group relative vibrant-card cursor-pointer shadow-md overflow-hidden"
+      style={{ backgroundColor: template.thumbnailColor || 'var(--color-purple)' }}
       onClick={() => onLoad(template)}
     >
-      <div 
-        className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner relative overflow-hidden"
-        style={{ background: template.thumbnailColor || 'var(--theme-core-bg)' }}
-      >
-        <Box className="w-5 h-5 text-white/90 relative z-10" />
-        <div className="absolute inset-0 bg-gradient-to-tr from-black/10 to-white/10"></div>
+      <div className="card-icon">
+        <Box className="w-5 h-5 text-white/90" />
       </div>
 
-      <div className="flex-1 min-w-0">
-        <h4 className="font-bold text-sm text-slate-900 truncate group-hover:text-orange-600 transition-colors">
+      <div className="flex-1 min-w-0 pr-12">
+        <h4 className="font-black text-2xl uppercase tracking-tighter text-white leading-tight mb-2">
           {template.name}
         </h4>
-        <p className="text-[10px] text-slate-400 truncate font-medium">
+        <p className="text-xs font-medium text-white/70 line-clamp-2">
           {template.prompt}
         </p>
+      </div>
+
+      <div className="absolute top-8 right-8">
+        <ArrowRight className="w-6 h-6 text-white" />
       </div>
 
       <button
@@ -35,7 +35,7 @@ export default function TemplateCard({ template, onLoad, onDelete }) {
           e.stopPropagation();
           onDelete(template.id);
         }}
-        className="p-2 text-slate-300 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"
+        className="absolute bottom-6 right-6 p-3 bg-white/20 hover:bg-red-500 text-white rounded-full transition-all opacity-0 group-hover:opacity-100 backdrop-blur-md"
         title="Delete"
       >
         <Trash2 className="w-4 h-4" />
