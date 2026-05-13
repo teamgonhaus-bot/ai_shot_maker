@@ -26,74 +26,25 @@ body {
 
 /* Layout System */
 .app-container {
-  max-width: 680px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 24px 16px;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Base Utilities */
 .text-bold { font-weight: 700; }
 .text-black { font-weight: 900; }
 
-.grid-cols-2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
 .w-full { width: 100%; }
 
-/* Guaranteed iOS Styles (Compact Bento Grid) */
+/* Guaranteed iOS Styles */
 .ios-bg-main { background-color: #F2F2F7; }
 .ios-bg-card { background-color: #FFFFFF; border: none; }
 .ios-bg-black { background-color: #000000; }
 .ios-text-gray { color: #8E8E93; }
-
-.ios-rounded-lg { border-radius: 12px; }
-.ios-rounded-xl { border-radius: 20px; }
-.ios-rounded-pill { border-radius: 9999px; }
-
-/* Soft card shadow */
-.ios-shadow { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); }
-.ios-shadow-lg { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08); }
-
-/* Black "App Style" Button */
-.ios-black-btn {
-  background-color: #000000;
-  color: #FFFFFF;
-  border-radius: 20px;
-  padding: 16px 20px;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.2s ease;
-  border: none;
-}
-
-/* Pill version of the black button */
-.ios-black-pill {
-  background-color: #000000;
-  color: #FFFFFF;
-  border-radius: 9999px;
-  padding: 8px 16px;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.2s ease;
-  border: none;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-/* White Pill Button */
-.ios-white-pill {
-  background-color: #FFFFFF;
-  color: #000000;
-  border-radius: 9999px;
-  padding: 8px 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease;
-  border: none;
-  font-size: 13px;
-  font-weight: 700;
-}
 
 /* Interactive Animation - scale down on click */
 .ios-interact {
@@ -104,12 +55,48 @@ body {
   transform: scale(0.97);
 }
 
-/* Card Style for Form Sections */
+/* Card Style for Sections */
 .ios-bento-card {
   background-color: #FFFFFF;
-  border-radius: 20px;
-  padding: 20px;
+  border-radius: 24px;
+  padding: 24px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   border: none;
   margin-bottom: 16px;
+}
+
+/* Action Button */
+.ios-black-btn {
+  background-color: #000000;
+  color: #FFFFFF;
+  border-radius: 16px;
+  padding: 16px;
+  transition: all 0.2s ease;
+  border: none;
+  width: 100%;
+}
+
+.ios-black-pill {
+  background-color: #000000;
+  color: #FFFFFF;
+  border-radius: 9999px;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ios-white-pill {
+  background-color: transparent;
+  color: #8E8E93;
+  border-radius: 9999px;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+}
+.ios-white-pill:hover {
+  background-color: rgba(0,0,0,0.05);
 }

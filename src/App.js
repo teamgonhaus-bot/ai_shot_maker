@@ -209,14 +209,16 @@ export default function App() {
           >
             {/* Core Subject Card */}
             <section className="ios-bento-card">
-              <div className="space-y-5">
-                <div className="space-y-2">
-                  <p className="text-[12px] font-bold text-gray-400 uppercase tracking-widest">Main Concept</p>
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col mb-4">
+                  <div className="mb-[12px]">
+                    <p className="text-[13px] font-semibold text-gray-500 uppercase tracking-widest m-0">Main Concept</p>
+                  </div>
                   <textarea
                     value={productDesc}
                     onChange={(e) => setProductDesc(e.target.value)}
                     placeholder="Describe your scene (e.g., minimalist coffee table)"
-                    className="w-full p-4 ios-bg-main ios-rounded-lg border-none outline-none focus:ring-2 focus:ring-black text-[14px] font-semibold transition-all"
+                    className="w-full p-4 bg-[#F2F2F7] rounded-xl border-none outline-none focus:ring-2 focus:ring-black text-[15px] font-medium transition-all resize-none"
                     rows={3}
                   />
                 </div>
@@ -231,11 +233,9 @@ export default function App() {
                 animate={{ opacity: 1, y: 0 }}
                 className="ios-bento-card"
               >
-                <div className="space-y-4">
-                  <div className="grid-cols-2">
-                    <OptionSelect label="Gender" value={config.subjectGender} onChange={(v) => handleConfigChange('subjectGender', v)} options={OPTIONS_DATA.subjectGender} />
-                    <OptionSelect label="Age Group" value={config.subjectAge} onChange={(v) => handleConfigChange('subjectAge', v)} options={OPTIONS_DATA.subjectAge} />
-                  </div>
+                <div className="flex flex-col">
+                  <OptionSelect label="Gender" value={config.subjectGender} onChange={(v) => handleConfigChange('subjectGender', v)} options={OPTIONS_DATA.subjectGender} />
+                  <OptionSelect label="Age Group" value={config.subjectAge} onChange={(v) => handleConfigChange('subjectAge', v)} options={OPTIONS_DATA.subjectAge} />
                   <OptionSelect label="Regional Style" value={config.subjectRegion} onChange={(v) => handleConfigChange('subjectRegion', v)} options={OPTIONS_DATA.subjectRegion} />
                   <OptionSelect label="Hair Style" value={config.subjectHair} onChange={(v) => handleConfigChange('subjectHair', v)} options={OPTIONS_DATA.subjectHair} />
                 </div>
@@ -244,24 +244,20 @@ export default function App() {
 
             {/* Environment Card */}
             <section className="ios-bento-card">
-              <div className="space-y-4">
-                <div className="grid-cols-2">
-                  <OptionSelect label="Space Type" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} />
-                  <OptionSelect label="Detail" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={SPACE_DETAILS_MAP[config.spaceType] || ["선택안함"]} />
-                </div>
-                <div className="grid-cols-2">
-                  <OptionSelect label="Style" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} />
-                  <OptionSelect label="Lighting" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} />
-                </div>
+              <div className="flex flex-col">
+                <OptionSelect label="Space Type" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} />
+                <OptionSelect label="Detail" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={SPACE_DETAILS_MAP[config.spaceType] || ["선택안함"]} />
+                <OptionSelect label="Style" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} />
+                <OptionSelect label="Lighting" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} />
 
-                <div className="p-4 ios-bg-main ios-rounded-lg">
-                  <div className="flex justify-between items-center">
-                    <p className="text-[12px] font-bold text-gray-400 uppercase tracking-widest">Material Details</p>
+                <div className="p-4 bg-[#F2F2F7] rounded-xl mt-2">
+                  <div className="flex justify-between items-center mb-2">
+                    <p className="text-[13px] font-semibold text-gray-500 uppercase tracking-widest m-0">Material Details</p>
                     <button 
                       onClick={() => setUseDetailMaterial(!useDetailMaterial)}
-                      className={`relative w-12 h-6 ios-rounded-pill transition-colors ${useDetailMaterial ? 'ios-bg-black' : 'bg-gray-300'}`}
+                      className={`relative w-12 h-6 rounded-full transition-colors border-none cursor-pointer ${useDetailMaterial ? 'bg-black' : 'bg-gray-300'}`}
                     >
-                      <div className={`absolute top-1 left-1 w-4 h-4 ios-bg-card ios-rounded-pill transition-transform ${useDetailMaterial ? 'translate-x-6' : ''}`} />
+                      <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${useDetailMaterial ? 'translate-x-6' : ''}`} />
                     </button>
                   </div>
                   <AnimatePresence>
@@ -270,7 +266,7 @@ export default function App() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="grid-cols-2 pt-2"
+                        className="flex flex-col overflow-hidden pt-4"
                       >
                         <OptionSelect label="Flooring" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} />
                         <OptionSelect label="Woodwork" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} />
@@ -284,20 +280,20 @@ export default function App() {
             </section>
 
             {/* Status Window */}
-            <section className="ios-black-btn w-full mb-4">
-              <div className="flex flex-wrap gap-2 text-[13px] font-semibold">
+            <section className="mb-4">
+              <div className="flex flex-wrap gap-2 text-[13px] font-medium px-2">
                 {Object.entries(config).filter(([k, v]) => v !== "선택안함" && v !== "없음").map(([k, v]) => (
-                  <span key={k} className="px-3 py-1 bg-white/20 ios-rounded-pill text-white">
+                  <span key={k} className="px-3 py-1 bg-[#E9E9EB] rounded-full text-black">
                     {v}
                   </span>
                 ))}
                 {productDesc && (
-                  <span className="px-3 py-1 bg-white/20 ios-rounded-pill text-white">
+                  <span className="px-3 py-1 bg-[#E9E9EB] rounded-full text-black">
                     "{productDesc}"
                   </span>
                 )}
                 {Object.values(config).every(v => v === "선택안함" || v === "없음") && !productDesc && (
-                  <span className="text-gray-400 text-sm">No options selected.</span>
+                  <span className="text-gray-400 text-[13px]">No options selected.</span>
                 )}
               </div>
             </section>
@@ -330,11 +326,11 @@ export default function App() {
                       value={templateName}
                       onChange={(e) => setTemplateName(e.target.value)}
                       placeholder="Enter preset name..."
-                      className="flex-1 px-4 py-3 ios-bg-main ios-rounded-lg border-none outline-none focus:ring-2 focus:ring-black font-semibold text-[14px]"
+                      className="flex-1 px-4 py-3 bg-[#F2F2F7] rounded-xl border-none outline-none focus:ring-2 focus:ring-black font-medium text-[15px]"
                     />
                     <button
                       onClick={handleSaveTemplate}
-                      className="ios-black-btn ios-interact px-6 py-3"
+                      className="bg-black text-white px-6 py-3 rounded-xl flex items-center justify-center transition-colors border-none cursor-pointer ios-interact"
                     >
                       <Save className="w-5 h-5" />
                     </button>

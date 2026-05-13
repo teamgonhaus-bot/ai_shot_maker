@@ -19,23 +19,22 @@ export default function PromptOutput({ prompt }) {
       animate={{ opacity: 1, y: 0 }}
       className="ios-bento-card w-full relative overflow-hidden"
     >
-      <div className="flex items-center justify-between mb-4 relative z-10">
-        <span className="text-[12px] font-bold text-gray-400 uppercase tracking-widest">
-          Final Result
-        </span>
-        <button
-          onClick={handleCopy}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all text-[12px] font-bold ${
-            copied ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-          }`}
-        >
-          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-          {copied ? 'Copied' : 'Copy'}
-        </button>
-      </div>
-
-      <div className="space-y-4 relative z-10">
-        <p className="text-[14px] font-medium text-black leading-relaxed p-4 bg-[#F2F2F7] rounded-xl border-none">
+      <div className="flex flex-col relative z-10">
+        <div className="flex items-center justify-between mb-[12px]">
+          <span className="text-[13px] font-semibold text-gray-400 uppercase tracking-widest m-0">
+            Final Result
+          </span>
+          <button
+            onClick={handleCopy}
+            className={`flex items-center justify-center p-2 rounded-full transition-colors border-none cursor-pointer ios-interact ${
+              copied ? 'bg-[#E9E9EB] text-green-600' : 'bg-[#E9E9EB] text-gray-600 hover:bg-[#D1D1D6]'
+            }`}
+            title="Copy to clipboard"
+          >
+            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+          </button>
+        </div>
+        <p className="text-[15px] font-medium text-black leading-relaxed p-4 bg-[#F2F2F7] rounded-xl border-none m-0">
           {prompt}
         </p>
       </div>
