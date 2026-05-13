@@ -22,9 +22,9 @@ export default function OptionSelect({ label, value, onChange, options, icon: Ic
   };
 
   return (
-    <div className="flex flex-col mb-8">
+    <div className="flex flex-col ios-option-group">
       {label && <label className="ios-option-label">{label}</label>}
-      <div className="flex flex-wrap" style={{ gap: '10px' }}>
+      <div className="flex flex-wrap" style={{ gap: '8px' }}>
         {options.map((opt) => {
           const active = isSelected(opt);
           return (
@@ -37,7 +37,7 @@ export default function OptionSelect({ label, value, onChange, options, icon: Ic
                   : 'bg-[#E9E9EB] text-[#3A3A3C] hover:bg-[#D1D1D6]'
               }`}
               style={{ 
-                padding: '8px 16px',
+                padding: '6px 16px',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',

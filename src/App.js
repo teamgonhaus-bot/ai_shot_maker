@@ -86,49 +86,53 @@ const OPTIONS_DATA = {
 };
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
   const [productDesc, setProductDesc] = useState(() => localStorage.getItem('shotmaker_productDesc') || "");
-  const [config, setConfig] = useState(() => {
-    const saved = localStorage.getItem('shotmaker_config');
-    return saved ? JSON.parse(saved) : {
-      subjectNum: "없음",
-      subjectGender: "선택안함",
-      subjectAge: "선택안함",
-      subjectRegion: "선택안함",
-      subjectClothesStyle: "선택안함",
-      subjectClothesType: "선택안함",
-      subjectHair: "선택안함",
-      spaceType: "스튜디오",
-      spaceDetail: "단색 배경",
-      interiorStyle: "선택안함",
-      light: "선택안함",
-      detailFloor: "밝은 우드 마루",
-      detailWood: "오크(참나무)",
-      detailMetal: "황동(브라스)",
-      detailWall: "화이트 페인트",
-      cameraAngle: "선택안함",
-      shotStyle: []
-    };
+  const [config, setConfig] = useState({
+    subjectNum: "없음",
+    subjectGender: "선택안함",
+    subjectAge: "선택안함",
+    subjectRegion: "선택안함",
+    subjectClothesStyle: "선택안함",
+    subjectClothesType: "선택안함",
+    subjectHair: "선택안함",
+    spaceType: "스튜디오",
+    spaceDetail: "단색 배경",
+    interiorStyle: "선택안함",
+    light: "선택안함",
+    detailFloor: "밝은 우드 마루",
+    detailWood: "오크(참나무)",
+    detailMetal: "황동(브라스)",
+    detailWall: "화이트 페인트",
+    cameraAngle: "선택안함",
+    shotStyle: []
   });
-  const [useDetailMaterial, setUseDetailMaterial] = useState(() => localStorage.getItem('shotmaker_useDetailMaterial') === 'true');
-  const [removeText, setRemoveText] = useState(() => {
-    const saved = localStorage.getItem('shotmaker_removeText');
-    return saved !== null ? saved === 'true' : true;
-  });
+  const [useDetailMaterial, setUseDetailMaterial] = useState(false);
+  const [removeText, setRemoveText] = useState(true);
   const [generatedPrompt, setGeneratedPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [savedTemplates, setSavedTemplates] = useState([]);
   const [templateName, setTemplateName] = useState("");
   const [activeTab, setActiveTab] = useState('home');
 
-  // Persistence Sync
+  // Initial Data Load & Persistence Sync
   useEffect(() => {
-    localStorage.setItem('shotmaker_config', JSON.stringify(config));
-    localStorage.setItem('shotmaker_productDesc', productDesc);
-    localStorage.setItem('shotmaker_useDetailMaterial', useDetailMaterial);
-    localStorage.setItem('shotmaker_removeText', removeText);
-  }, [config, productDesc, useDetailMaterial, removeText]);
+    const loadSavedData = () => {
+      const savedConfig = localStorage.getItem('shotmaker_config');
+      if (savedConfig) setConfig(JSON.parse(savedConfig));
+      
+      const savedMat = localStorage.getItem('shotmaker_useDetailMaterial');
+      if (savedMat) setUseDetailMaterial(savedMat === 'true');
+      
+      const savedText = localStorage.getItem('shotmaker_removeText');
+      if (savedText) setRemoveText(savedText === 'true');
 
-  useEffect(() => {
+      // Set loading false after states are synced
+      setTimeout(() => setIsLoading(false), 300);
+    };
+
+    loadSavedData();
+
     const q = query(collection(db, "templates"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const templates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -137,17 +141,22 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (!isLoading) {
+      localStorage.setItem('shotmaker_config', JSON.stringify(config));
+      localStorage.setItem('shotmaker_productDesc', productDesc);
+      localStorage.setItem('shotmaker_useDetailMaterial', useDetailMaterial);
+      localStorage.setItem('shotmaker_removeText', removeText);
+    }
+  }, [config, productDesc, useDetailMaterial, removeText, isLoading]);
+
   const handleConfigChange = (key, value) => {
     setConfig(prev => {
       const next = { ...prev, [key]: value };
-      
-      if (key === 'spaceType') {
-        next.spaceDetail = OPTIONS_DATA.spaceDetail[value][0];
-      }
+      if (key === 'spaceType') next.spaceDetail = OPTIONS_DATA.spaceDetail[value][0];
       if (key === 'subjectGender' && value !== '여성' && !OPTIONS_DATA.subjectClothesType.others.includes(prev.subjectClothesType)) {
         next.subjectClothesType = "선택안함";
       }
-      
       return next;
     });
   };
@@ -186,7 +195,7 @@ export default function App() {
     setIsGenerating(true);
     setTimeout(() => {
       const parts = [];
-      let subjectStr = productDesc || "a high-end product";
+      let subjectStr = "a high-end masterpiece";
       
       if (config.subjectNum !== "없음") {
         const traits = [];
@@ -203,7 +212,7 @@ export default function App() {
         if (config.subjectClothesType !== "선택안함") details.push(DICTIONARY.subjectClothesType[config.subjectClothesType]);
         
         if (details.length > 0) humanStr += ` ${details.join(", ")}`;
-        parts.push(`featuring ${subjectStr} with ${humanStr} posing naturally`);
+        parts.push(`featuring ${humanStr} posing naturally`);
       } else {
         parts.push(`professional architectural photography of ${subjectStr}`);
       }
@@ -238,9 +247,11 @@ export default function App() {
     }, 800);
   };
 
+  if (isLoading) return <div className="ios-loading-screen">Loading Studio...</div>;
+
   return (
     <div className="app-container">
-      <header className="flex justify-between items-center mb-10">
+      <header className="flex justify-between items-center mb-12">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           <h1 className="text-3xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
           <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest m-0">Advanced Prompt Studio</p>
@@ -259,16 +270,6 @@ export default function App() {
             <section>
               <h2 className="ios-section-title">인물 (Subject)</h2>
               <div className="ios-bento-card">
-                <div className="flex flex-col mb-8">
-                  <label className="ios-option-label">Main Concept</label>
-                  <textarea
-                    value={productDesc}
-                    onChange={(e) => setProductDesc(e.target.value)}
-                    placeholder="Describe your scene..."
-                    className="w-full p-4 bg-[#F2F2F7] rounded-2xl border-none outline-none focus:ring-2 focus:ring-black text-[15px] font-medium transition-all resize-none"
-                    rows={3}
-                  />
-                </div>
                 <OptionSelect label="인원" value={config.subjectNum} onChange={(v) => handleConfigChange('subjectNum', v)} options={OPTIONS_DATA.subjectNum} theme="red" />
                 {config.subjectNum !== "없음" && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
@@ -343,18 +344,32 @@ export default function App() {
                   onChange={(v) => handleConfigChange('shotStyle', v)} 
                   options={OPTIONS_DATA.shotStyle} 
                   multiSelect={true}
-                  theme="blue"
+                  theme="purple"
                 />
               </div>
             </section>
 
-            {/* Action Area */}
+            {/* Action Area with Summary Panel */}
             <div className="pt-4 pb-20">
+              <div className="ios-option-label mb-2 px-1">현재 선택된 옵션 (Summary)</div>
+              <div className="ios-summary-panel">
+                <div className="flex flex-wrap">
+                  {Object.entries(config).map(([key, val]) => {
+                    if (val === "선택안함" || val === "없음" || (Array.isArray(val) && val.length === 0)) return null;
+                    if (Array.isArray(val)) {
+                      return val.map(v => <span key={v} className="ios-summary-tag">{v}</span>);
+                    }
+                    return <span key={key} className="ios-summary-tag">{val}</span>;
+                  })}
+                  {removeText && <span className="ios-summary-tag">텍스트 제거</span>}
+                </div>
+              </div>
+
               <button 
                 onClick={generatePrompt}
                 disabled={isGenerating}
                 className="w-full ios-black-btn ios-interact flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
-                style={{ borderRadius: '9999px', padding: '22px', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}
+                style={{ borderRadius: '9999px', padding: '20px', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}
               >
                 <Wand2 className="w-5 h-5 text-white" />
                 <span className="text-[17px] font-black">{isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}</span>
@@ -407,6 +422,9 @@ export default function App() {
         )}
       </AnimatePresence>
 
+      <footer className="ios-footer">
+        v0.1 · AI Shot Maker
+      </footer>
       <div className="h-12"></div>
     </div>
   );
