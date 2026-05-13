@@ -15,10 +15,10 @@ export default function OptionSelect({ label, value, onChange, options, icon: Ic
             <button
               key={opt}
               onClick={() => onChange(opt)}
-              className={`relative px-5 py-3 ios-rounded-xl text-[14px] font-semibold transition-all duration-300 ${
+              className={`relative px-5 py-3 ios-rounded-xl text-[14px] font-semibold flex items-center justify-center ios-interact border-none ${
                 isSelected 
-                  ? 'ios-bg-black text-white ios-shadow-lg scale-105' 
-                  : 'ios-bg-main text-black hover:ios-bg-card ios-shadow'
+                  ? 'ios-black-btn shadow-none' 
+                  : 'ios-bg-card ios-shadow text-black'
               }`}
             >
               <span className="relative z-10 flex items-center gap-2">

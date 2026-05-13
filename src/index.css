@@ -34,8 +34,9 @@
 body {
   background-color: var(--bg-main);
   color: var(--text-primary);
-  font-family: 'Outfit', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
 }
 
 /* Layout System */
@@ -217,7 +218,7 @@ body {
 
 /* Guaranteed iOS Styles (Bypassing Tailwind JIT issues) */
 .ios-bg-main { background-color: #F2F2F7; }
-.ios-bg-card { background-color: #FFFFFF; }
+.ios-bg-card { background-color: #FFFFFF; border: none; }
 .ios-bg-dark { background-color: #1C1C1E; }
 .ios-bg-black { background-color: #000000; }
 .ios-text-gray { color: #8E8E93; }
@@ -227,8 +228,39 @@ body {
 .ios-rounded-2xl { border-radius: 32px; }
 .ios-rounded-full { border-radius: 9999px; }
 
-.ios-shadow { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); }
-.ios-shadow-lg { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); }
+/* Soft card shadow */
+.ios-shadow { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04); }
+.ios-shadow-lg { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08); }
+
+/* Black "App Style" Button with Inner Glow & Deep Shadow */
+.ios-black-btn {
+  background-color: #000000;
+  color: #FFFFFF;
+  border-radius: 24px;
+  padding: 16px 20px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  border: none;
+}
+
+/* White "App Style" Button / Card */
+.ios-white-btn {
+  background-color: #FFFFFF;
+  color: #000000;
+  border-radius: 24px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  border: none;
+}
+
+/* Interactive Animation - scale down on click */
+.ios-interact {
+  transition: all 0.2s ease;
+}
+.ios-interact:active {
+  transform: scale(0.97);
+}
 
 .ios-divider {
   border-bottom: 1px solid #E5E5EA;
