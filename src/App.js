@@ -87,7 +87,6 @@ const OPTIONS_DATA = {
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [productDesc, setProductDesc] = useState(() => localStorage.getItem('shotmaker_productDesc') || "");
   const [config, setConfig] = useState({
     subjectNum: "없음",
     subjectGender: "선택안함",
@@ -144,11 +143,10 @@ export default function App() {
   useEffect(() => {
     if (!isLoading) {
       localStorage.setItem('shotmaker_config', JSON.stringify(config));
-      localStorage.setItem('shotmaker_productDesc', productDesc);
       localStorage.setItem('shotmaker_useDetailMaterial', useDetailMaterial);
       localStorage.setItem('shotmaker_removeText', removeText);
     }
-  }, [config, productDesc, useDetailMaterial, removeText, isLoading]);
+  }, [config, useDetailMaterial, removeText, isLoading]);
 
   const handleConfigChange = (key, value) => {
     setConfig(prev => {
