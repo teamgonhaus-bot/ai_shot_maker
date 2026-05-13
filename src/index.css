@@ -8,6 +8,8 @@
   --text-primary: #000000;
   --text-secondary: #8E8E93;
   --text-muted: #AEAEB2;
+  --color-orange: #FF9500;
+  --color-orange-dark: #E67E00;
 }
 
 * {
@@ -99,4 +101,27 @@ body {
 }
 .ios-white-pill:hover {
   background-color: rgba(0,0,0,0.05);
+}
+
+/* Premium Selection State */
+.ios-selected-pill {
+  background-color: var(--color-orange) !important;
+  color: white !important;
+  box-shadow: 
+    inset 0 2px 4px rgba(0,0,0,0.2),
+    0 2px 4px rgba(255, 149, 0, 0.3) !important;
+  transform: translateY(1px);
+}
+
+.ios-selected-pill:active {
+  transform: translateY(2px) scale(0.98);
+}
+
+.ios-option-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8E8E93;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
 }

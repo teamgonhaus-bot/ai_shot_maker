@@ -12,45 +12,77 @@ import PromptOutput from './components/PromptOutput';
 import TemplateCard from './components/TemplateCard';
 
 const DICTIONARY = {
-  subjectNum: { "없음": "", "1명": "a single person", "2명": "two people", "3명 이상": "a group of people" },
-  subjectGender: { "선택안함": "", "남성": "male", "여성": "female", "중성적": "androgynous" },
-  subjectAge: { "선택안함": "", "20대": "in their 20s", "30대": "in their 30s", "40대": "in their 40s", "50대 이상": "middle-aged" },
-  subjectRegion: { "선택안함": "", "한국인": "Korean", "동양인": "Asian", "서양인": "Caucasian", "흑인": "Black", "히스패닉": "Hispanic" },
-  subjectHair: { "선택안함": "", "긴 생머리": "with long straight hair", "단발머리": "with short bob hair", "포니테일": "with a ponytail", "포마드": "with sleek pomade hair", "자연스러운 스타일": "with natural messy hair" },
-  spaceType: { "선택안함": "", "거실": "a spacious modern living room", "침실": "a cozy minimalist bedroom", "주방": "a high-end designer kitchen", "욕실": "a luxury spa-like bathroom", "오피스": "a professional home office", "카페/상업공간": "a trendy minimalist cafe interior" },
-  spaceDetail: { "선택안함": "", "미니멀": "with minimalist aesthetics", "럭셔리": "with luxury high-end finishes", "인더스트리얼": "with industrial raw textures", "내추럴": "with natural organic elements", "모던": "with clean modern lines" },
-  interiorStyle: { "선택안함": "", "화이트 & 우드": "white and warm wood palette", "올 블랙": "monochromatic all-black interior", "콘크리트 & 메탈": "raw concrete and brushed metal", "베이지 톤": "warm beige and cream tones", "파스텔": "soft pastel color palette" },
-  light: { "선택안함": "", "자연광": "natural sunlight streaming through windows", "골든아워": "warm golden hour lighting", "스튜디오 조명": "professional studio softbox lighting", "야간/네온": "moody night lighting with neon accents", "안개/몽환": "dreamy misty lighting" },
-  camera: { "선택안함": "", "아이레벨": "eye-level shot", "하이앵글": "high-angle perspective", "로우앵글": "low-angle heroic shot", "광각": "wide-angle architectural shot", "클로즈업": "macro close-up shot" },
-  detailFloor: { "선택안함": "", "원목마루": "polished oak wood flooring", "대리석": "premium white marble floor", "테라조": "modern terrazzo flooring", "노출콘크리트": "raw polished concrete floor" },
-  detailWood: { "선택안함": "", "월넛": "dark walnut wood textures", "오크": "light natural oak wood", "티크": "rich teak wood details" },
-  detailMetal: { "선택안함": "", "브러쉬드 골드": "brushed gold metal accents", "실버/크롬": "polished chrome details", "블랙 스틸": "matte black steel frames" },
-  detailWall: { "선택안함": "", "템바보드": "vertical tambour wood panels", "아트월": "stone texture art wall", "페인트벽": "clean matte painted walls" }
+  subjectNum: { "없음": "", "혼자": "a single person", "다수": "a group of people" },
+  subjectGender: { "선택안함": "", "여성": "female", "남성": "male", "혼성": "mixed gender" },
+  subjectAge: { "선택안함": "", "10대": "teenager", "20대": "in their 20s", "30대": "in their 30s", "40대": "in their 40s", "중장년": "middle-aged" },
+  subjectRegion: { "선택안함": "", "한국": "Korean", "일본": "Japanese", "북유럽": "Northern European", "북미": "North American" },
+  subjectClothesStyle: { "선택안함": "", "캐주얼": "casual style", "비즈니스": "business style", "스트릿": "streetwear style", "미니멀": "minimalist style", "포멀/정장": "formal suit style" },
+  subjectClothesType: { 
+    "선택안함": "", "기본 스커트": "wearing a basic skirt", "미니스커트": "wearing a miniskirt", "롱스커트": "wearing a long skirt", 
+    "긴바지": "wearing long pants", "반바지": "wearing shorts", "원피스": "wearing a dress", 
+    "아웃도어": "wearing outdoor apparel", "스포츠 복장": "wearing sportswear" 
+  },
+  subjectHair: { "선택안함": "", "긴머리": "with long hair", "짧은머리": "with short hair", "단발": "with bob hair", "펌": "with permed hair", "염색": "with dyed hair", "묶은머리": "with tied hair" },
+  
+  spaceType: { "스튜디오": "a professional studio environment", "오피스": "a modern office space", "홈": "a cozy home interior", "리테일": "a retail commercial space", "라운지": "a luxury lounge area", "야외": "an outdoor setting" },
+  spaceDetail: { 
+    "단색 배경": "with a solid color background", "인테리어 세트장": "within a designed interior set",
+    "사무실": "in a standard office setup", "회의실": "in a formal meeting room", "중역실": "in an executive office suite", "오피스 라운지": "in a relaxed office lounge",
+    "리빙": "in a living room area", "다이닝": "in a dining room setting", "룸": "in a private room",
+    "카페": "in a trendy cafe", "식당": "in a modern restaurant", "쇼룸": "in a premium showroom",
+    "호텔 라운지": "in a luxury hotel lounge", "공항 라운지": "in a premium airport lounge",
+    "도심": "in a bustling city urban environment", "자연": "surrounded by natural scenery", "테라스": "on a scenic terrace"
+  },
+  interiorStyle: { "선택안함": "", "미드센추리 모던": "mid-century modern style", "모던 미니멀": "modern minimal style", "내추럴 우드": "natural wood interior style", "젠 스타일": "Zen-inspired style", "인더스트리얼": "industrial style", "스칸디나비안": "Scandinavian style" },
+  light: { "선택안함": "", "자연광": "natural sunlight", "시네마틱": "cinematic dramatic lighting", "스튜디오 조명": "professional studio softbox lighting", "무드등": "soft mood lighting" },
+  
+  detailFloor: { "밝은 우드 마루": "light wood flooring", "어두운 우드 마루": "dark walnut wood flooring", "테라조 타일": "modern terrazzo tile floor", "대리석": "premium marble flooring", "콘크리트": "polished concrete floor", "조약돌 바닥": "pebble stone floor", "자갈 바닥": "gravel floor" },
+  detailWood: { "오크(참나무)": "natural oak wood textures", "월넛(호두나무)": "rich walnut wood details", "자작나무": "birch wood accents", "티크": "premium teak wood" },
+  detailMetal: { "황동(브라스)": "brushed brass metal points", "크롬/실버": "polished chrome silver accents", "무광 블랙": "matte black metal frames", "로즈골드": "elegant rose gold details" },
+  detailWall: { "화이트 페인트": "clean white painted walls", "노출 콘크리트": "exposed raw concrete walls", "웨인스코팅": "elegant wainscoted walls", "파스텔톤 벽지": "soft pastel wallpaper", "붉은 벽돌": "rustic red brick walls" },
+  
+  cameraAngle: { "선택안함": "", "정면": "frontal shot", "하이앵글": "high-angle shot", "로우앵글": "low-angle shot", "아이레벨": "eye-level shot", "클로즈업": "close-up shot", "버드아이 뷰": "bird's eye view", "웜즈아이 뷰": "worm's eye view", "더치 앵글": "dutch angle shot", "초광각": "ultra-wide angle shot", "망원 샷": "telephoto lens shot", "풀 샷": "full body shot", "드론 샷": "aerial drone shot" },
+  shotStyle: {
+    "컬러블로킹": "color blocking aesthetic", "네거티브 스페이스": "negative space composition", "하드 섀도우": "hard shadows", 
+    "톤온톤-모노크로매틱": "tone-on-tone monochromatic palette", "플랫 레이": "flat lay perspective", "매크로-디테일": "macro detail shot", 
+    "와비사비-어스톤": "wabi-sabi earth tone aesthetic", "모션 캡쳐-동적 연출": "motion capture dynamic pose", 
+    "인테리어 잡지 샷(사실적)": "realistic interior magazine photography", "와이드 건축/공간 샷": "wide architectural space shot", 
+    "인테리어 비네트(코너)": "interior vignette corner shot", "라이프스타일 인테리어": "lifestyle interior scene", 
+    "클로즈업 디테일": "close-up detail focus", "심도 얕은 샷(아웃포커싱)": "shallow depth of field with bokeh"
+  }
 };
 
 const OPTIONS_DATA = {
-  subjectNum: ["없음", "1명", "2명", "3명 이상"],
-  subjectGender: ["선택안함", "남성", "여성", "중성적"],
-  subjectAge: ["선택안함", "20대", "30대", "40대", "50대 이상"],
-  subjectRegion: ["선택안함", "한국인", "동양인", "서양인", "흑인"],
-  subjectHair: ["선택안함", "긴 생머리", "단발머리", "포니테일", "포마드", "자연스러운 스타일"],
-  spaceType: ["선택안함", "거실", "침실", "주방", "욕실", "오피스", "카페/상업공간"],
-  interiorStyle: ["선택안함", "화이트 & 우드", "올 블랙", "콘크리트 & 메탈", "베이지 톤", "파스텔"],
-  light: ["선택안함", "자연광", "골든아워", "스튜디오 조명", "야간/네온", "안개/몽환"],
-  camera: ["선택안함", "아이레벨", "하이앵글", "로우앵글", "광각", "클로즈업"],
-  detailFloor: ["선택안함", "원목마루", "대리석", "테라조", "노출콘크리트"],
-  detailWood: ["선택안함", "월넛", "오크", "티크"],
-  detailMetal: ["선택안함", "브러쉬드 골드", "실버/크롬", "블랙 스틸"],
-  detailWall: ["선택안함", "템바보드", "아트월", "페인트벽"]
-};
-
-const SPACE_DETAILS_MAP = {
-  "거실": ["선택안함", "미니멀", "럭셔리", "내추럴", "모던"],
-  "침실": ["선택안함", "아늑한", "호텔식", "다락방"],
-  "주방": ["선택안함", "아일랜드형", "오픈형", "카페테리아"],
-  "욕실": ["선택안함", "스파형", "건식", "대리석"],
-  "오피스": ["선택안함", "서재형", "공유오피스", "창조적"],
-  "카페/상업공간": ["선택안함", "쇼룸", "부티크", "팝업스토어"]
+  subjectNum: ["없음", "혼자", "다수"],
+  subjectGender: ["선택안함", "여성", "남성", "혼성"],
+  subjectAge: ["선택안함", "10대", "20대", "30대", "40대", "중장년"],
+  subjectRegion: ["선택안함", "한국", "일본", "북유럽", "북미"],
+  subjectClothesStyle: ["선택안함", "캐주얼", "비즈니스", "스트릿", "미니멀", "포멀/정장"],
+  subjectClothesType: {
+    female: ["선택안함", "기본 스커트", "미니스커트", "롱스커트", "긴바지", "반바지", "원피스", "아웃도어", "스포츠 복장"],
+    others: ["선택안함", "긴바지", "반바지", "아웃도어", "스포츠 복장"]
+  },
+  subjectHair: ["선택안함", "긴머리", "짧은머리", "단발", "펌", "염색", "묶은머리"],
+  spaceType: ["스튜디오", "오피스", "홈", "리테일", "라운지", "야외"],
+  spaceDetail: {
+    "스튜디오": ["단색 배경", "인테리어 세트장"],
+    "오피스": ["사무실", "회의실", "중역실", "오피스 라운지"],
+    "홈": ["리빙", "다이닝", "룸"],
+    "리테일": ["카페", "식당", "쇼룸"],
+    "라운지": ["호텔 라운지", "공항 라운지"],
+    "야외": ["도심", "자연", "테라스"]
+  },
+  interiorStyle: ["선택안함", "미드센추리 모던", "모던 미니멀", "내추럴 우드", "젠 스타일", "인더스트리얼", "스칸디나비안"],
+  light: ["선택안함", "자연광", "시네마틱", "스튜디오 조명", "무드등"],
+  detailFloor: ["밝은 우드 마루", "어두운 우드 마루", "테라조 타일", "대리석", "콘크리트", "조약돌 바닥", "자갈 바닥"],
+  detailWood: ["오크(참나무)", "월넛(호두나무)", "자작나무", "티크"],
+  detailMetal: ["황동(브라스)", "크롬/실버", "무광 블랙", "로즈골드"],
+  detailWall: ["화이트 페인트", "노출 콘크리트", "웨인스코팅", "파스텔톤 벽지", "붉은 벽돌"],
+  cameraAngle: ["선택안함", "정면", "하이앵글", "로우앵글", "아이레벨", "클로즈업", "버드아이 뷰", "웜즈아이 뷰", "더치 앵글", "초광각", "망원 샷", "풀 샷", "드론 샷"],
+  shotStyle: [
+    "컬러블로킹", "네거티브 스페이스", "하드 섀도우", "톤온톤-모노크로매틱", "플랫 레이", "매크로-디테일", "와비사비-어스톤", "모션 캡쳐-동적 연출", 
+    "인테리어 잡지 샷(사실적)", "와이드 건축/공간 샷", "인테리어 비네트(코너)", "라이프스타일 인테리어", "클로즈업 디테일", "심도 얕은 샷(아웃포커싱)"
+  ]
 };
 
 export default function App() {
@@ -60,18 +92,22 @@ export default function App() {
     subjectGender: "선택안함",
     subjectAge: "선택안함",
     subjectRegion: "선택안함",
+    subjectClothesStyle: "선택안함",
+    subjectClothesType: "선택안함",
     subjectHair: "선택안함",
-    spaceType: "선택안함",
-    spaceDetail: "선택안함",
+    spaceType: "스튜디오",
+    spaceDetail: "단색 배경",
     interiorStyle: "선택안함",
     light: "선택안함",
-    camera: "선택안함",
-    detailFloor: "선택안함",
-    detailWood: "선택안함",
-    detailMetal: "선택안함",
-    detailWall: "선택안함"
+    detailFloor: "밝은 우드 마루",
+    detailWood: "오크(참나무)",
+    detailMetal: "황동(브라스)",
+    detailWall: "화이트 페인트",
+    cameraAngle: "선택안함",
+    shotStyle: []
   });
   const [useDetailMaterial, setUseDetailMaterial] = useState(false);
+  const [removeText, setRemoveText] = useState(true);
   const [generatedPrompt, setGeneratedPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [savedTemplates, setSavedTemplates] = useState([]);
@@ -88,7 +124,19 @@ export default function App() {
   }, []);
 
   const handleConfigChange = (key, value) => {
-    setConfig(prev => ({ ...prev, [key]: value }));
+    setConfig(prev => {
+      const next = { ...prev, [key]: value };
+      
+      // Auto-update sub-options when parent changes
+      if (key === 'spaceType') {
+        next.spaceDetail = OPTIONS_DATA.spaceDetail[value][0];
+      }
+      if (key === 'subjectGender' && value !== '여성' && !OPTIONS_DATA.subjectClothesType.others.includes(prev.subjectClothesType)) {
+        next.subjectClothesType = "선택안함";
+      }
+      
+      return next;
+    });
   };
 
   const handleSaveTemplate = async () => {
@@ -127,6 +175,8 @@ export default function App() {
       const parts = [];
       
       let subjectStr = productDesc || "a high-end product";
+      
+      // Subject Logic
       if (config.subjectNum !== "없음") {
         const traits = [];
         if (config.subjectAge !== "선택안함") traits.push(DICTIONARY.subjectAge[config.subjectAge]);
@@ -135,34 +185,53 @@ export default function App() {
         
         let humanStr = DICTIONARY.subjectNum[config.subjectNum];
         if (traits.length > 0) humanStr += ` (${traits.join(", ")})`;
-        if (config.subjectHair !== "선택안함") humanStr += ` ${DICTIONARY.subjectHair[config.subjectHair]}`;
+        
+        const details = [];
+        if (config.subjectHair !== "선택안함") details.push(DICTIONARY.subjectHair[config.subjectHair]);
+        if (config.subjectClothesStyle !== "선택안함") details.push(DICTIONARY.subjectClothesStyle[config.subjectClothesStyle]);
+        if (config.subjectClothesType !== "선택안함") details.push(DICTIONARY.subjectClothesType[config.subjectClothesType]);
+        
+        if (details.length > 0) humanStr += ` ${details.join(", ")}`;
         
         parts.push(`featuring ${subjectStr} with ${humanStr} posing naturally`);
       } else {
         parts.push(`professional architectural photography of ${subjectStr}`);
       }
 
-      if (config.spaceType !== "선택안함") {
-        let envStr = DICTIONARY.spaceType[config.spaceType];
-        if (config.spaceDetail !== "선택안함") envStr += `, ${DICTIONARY.spaceDetail[config.spaceDetail]}`;
-        parts.push(`set in ${envStr}`);
-      }
+      // Space Logic
+      let envStr = DICTIONARY.spaceType[config.spaceType];
+      if (config.spaceDetail) envStr += `, ${DICTIONARY.spaceDetail[config.spaceDetail]}`;
+      parts.push(`set in ${envStr}`);
 
       if (config.interiorStyle !== "선택안함") parts.push(`designed with ${DICTIONARY.interiorStyle[config.interiorStyle]}`);
 
+      // Material Logic
       if (useDetailMaterial) {
         const materials = [];
-        if (config.detailFloor !== "선택안함") materials.push(DICTIONARY.detailFloor[config.detailFloor]);
-        if (config.detailWood !== "선택안함") materials.push(DICTIONARY.detailWood[config.detailWood]);
-        if (config.detailMetal !== "선택안함") materials.push(DICTIONARY.detailMetal[config.detailMetal]);
-        if (config.detailWall !== "선택안함") materials.push(DICTIONARY.detailWall[config.detailWall]);
-        if (materials.length > 0) parts.push(`highlighting ${materials.join(", ")}`);
+        materials.push(DICTIONARY.detailFloor[config.detailFloor]);
+        materials.push(DICTIONARY.detailWood[config.detailWood]);
+        materials.push(DICTIONARY.detailMetal[config.detailMetal]);
+        materials.push(DICTIONARY.detailWall[config.detailWall]);
+        parts.push(`highlighting ${materials.join(", ")}`);
       }
 
+      // Lighting & Camera Logic
       if (config.light !== "선택안함") parts.push(`illuminated by ${DICTIONARY.light[config.light]}`);
-      if (config.camera !== "선택안함") parts.push(`shot from ${DICTIONARY.camera[config.camera]}`);
+      if (config.cameraAngle !== "선택안함") parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
 
-      parts.push("8k resolution, photorealistic, cinematic lighting, architectural digest style, highly detailed textures");
+      // Shot Style (Multi-select)
+      if (config.shotStyle.length > 0) {
+        const styles = config.shotStyle.map(s => DICTIONARY.shotStyle[s]);
+        parts.push(`rendered with ${styles.join(", ")}`);
+      }
+
+      // Text/Logo Removal
+      if (removeText) {
+        parts.push("textless, no text, no watermarks, clear image");
+      }
+
+      // Fixed Quality Tags
+      parts.push("8k resolution, highly detailed, masterpiece, photorealistic, interior design magazine cover");
 
       setGeneratedPrompt(parts.join(", "));
       setIsGenerating(false);
@@ -234,10 +303,17 @@ export default function App() {
                 className="ios-bento-card"
               >
                 <div className="flex flex-col">
-                  <OptionSelect label="Gender" value={config.subjectGender} onChange={(v) => handleConfigChange('subjectGender', v)} options={OPTIONS_DATA.subjectGender} />
-                  <OptionSelect label="Age Group" value={config.subjectAge} onChange={(v) => handleConfigChange('subjectAge', v)} options={OPTIONS_DATA.subjectAge} />
-                  <OptionSelect label="Regional Style" value={config.subjectRegion} onChange={(v) => handleConfigChange('subjectRegion', v)} options={OPTIONS_DATA.subjectRegion} />
-                  <OptionSelect label="Hair Style" value={config.subjectHair} onChange={(v) => handleConfigChange('subjectHair', v)} options={OPTIONS_DATA.subjectHair} />
+                  <OptionSelect label="성별 (Gender)" value={config.subjectGender} onChange={(v) => handleConfigChange('subjectGender', v)} options={OPTIONS_DATA.subjectGender} />
+                  <OptionSelect label="연령대 (Age Group)" value={config.subjectAge} onChange={(v) => handleConfigChange('subjectAge', v)} options={OPTIONS_DATA.subjectAge} />
+                  <OptionSelect label="지역/인종 (Region/Race)" value={config.subjectRegion} onChange={(v) => handleConfigChange('subjectRegion', v)} options={OPTIONS_DATA.subjectRegion} />
+                  <OptionSelect label="옷 스타일 (Clothing Style)" value={config.subjectClothesStyle} onChange={(v) => handleConfigChange('subjectClothesStyle', v)} options={OPTIONS_DATA.subjectClothesStyle} />
+                  <OptionSelect 
+                    label="옷 종류 (Clothing Type)" 
+                    value={config.subjectClothesType} 
+                    onChange={(v) => handleConfigChange('subjectClothesType', v)} 
+                    options={config.subjectGender === '여성' ? OPTIONS_DATA.subjectClothesType.female : OPTIONS_DATA.subjectClothesType.others} 
+                  />
+                  <OptionSelect label="헤어 스타일 (Hair Style)" value={config.subjectHair} onChange={(v) => handleConfigChange('subjectHair', v)} options={OPTIONS_DATA.subjectHair} />
                 </div>
               </motion.section>
             )}
@@ -245,14 +321,14 @@ export default function App() {
             {/* Environment Card */}
             <section className="ios-bento-card">
               <div className="flex flex-col">
-                <OptionSelect label="Space Type" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} />
-                <OptionSelect label="Detail" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={SPACE_DETAILS_MAP[config.spaceType] || ["선택안함"]} />
-                <OptionSelect label="Style" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} />
-                <OptionSelect label="Lighting" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} />
+                <OptionSelect label="공간 종류 (Space Type)" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} />
+                <OptionSelect label="세부 공간 (Detailed Space)" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} />
+                <OptionSelect label="인테리어 양식 (Interior Style)" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} />
+                <OptionSelect label="조명 (Lighting)" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} />
 
-                <div className="p-4 bg-[#F2F2F7] rounded-xl mt-2">
-                  <div className="flex justify-between items-center mb-2">
-                    <p className="text-[13px] font-semibold text-gray-500 uppercase tracking-widest m-0">Material Details</p>
+                <div className="p-4 bg-[#F2F2F7] rounded-2xl mt-2">
+                  <div className="flex justify-between items-center mb-4">
+                    <p className="ios-option-label m-0">세부 소재 및 컬러 (Material Details)</p>
                     <button 
                       onClick={() => setUseDetailMaterial(!useDetailMaterial)}
                       className={`relative w-12 h-6 rounded-full transition-colors border-none cursor-pointer ${useDetailMaterial ? 'bg-black' : 'bg-gray-300'}`}
@@ -266,12 +342,12 @@ export default function App() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="flex flex-col overflow-hidden pt-4"
+                        className="flex flex-col overflow-hidden"
                       >
-                        <OptionSelect label="Flooring" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} />
-                        <OptionSelect label="Woodwork" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} />
-                        <OptionSelect label="Metal" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} />
-                        <OptionSelect label="Wall" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} />
+                        <OptionSelect label="바닥 타일/마루" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} />
+                        <OptionSelect label="우드 소재" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} />
+                        <OptionSelect label="메탈 포인트" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} />
+                        <OptionSelect label="벽 소재/컬러" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} />
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -279,22 +355,27 @@ export default function App() {
               </div>
             </section>
 
-            {/* Status Window */}
-            <section className="mb-4">
-              <div className="flex flex-wrap gap-2 text-[13px] font-medium px-2">
-                {Object.entries(config).filter(([k, v]) => v !== "선택안함" && v !== "없음").map(([k, v]) => (
-                  <span key={k} className="px-3 py-1 bg-[#E9E9EB] rounded-full text-black">
-                    {v}
-                  </span>
-                ))}
-                {productDesc && (
-                  <span className="px-3 py-1 bg-[#E9E9EB] rounded-full text-black">
-                    "{productDesc}"
-                  </span>
-                )}
-                {Object.values(config).every(v => v === "선택안함" || v === "없음") && !productDesc && (
-                  <span className="text-gray-400 text-[13px]">No options selected.</span>
-                )}
+            {/* Camera & Shot Card */}
+            <section className="ios-bento-card">
+              <div className="flex flex-col">
+                <div className="flex justify-between items-center mb-6 px-1">
+                  <p className="ios-option-label m-0">텍스트/로고 제거 (Remove Text/Logo)</p>
+                  <button 
+                    onClick={() => setRemoveText(!removeText)}
+                    className={`relative w-12 h-6 rounded-full transition-colors border-none cursor-pointer ${removeText ? 'bg-black' : 'bg-gray-300'}`}
+                  >
+                    <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${removeText ? 'translate-x-6' : ''}`} />
+                  </button>
+                </div>
+                
+                <OptionSelect label="카메라 구도 (Camera Angle)" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} />
+                <OptionSelect 
+                  label="연출 샷 스타일 (Shot Style - 다중 선택)" 
+                  value={config.shotStyle} 
+                  onChange={(v) => handleConfigChange('shotStyle', v)} 
+                  options={OPTIONS_DATA.shotStyle} 
+                  multiSelect={true}
+                />
               </div>
             </section>
 
@@ -304,6 +385,7 @@ export default function App() {
                 onClick={generatePrompt}
                 disabled={isGenerating}
                 className="w-full ios-black-btn ios-interact flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
+                style={{ borderRadius: '9999px', padding: '20px' }}
               >
                 <Wand2 className="w-5 h-5 text-white" />
                 <span className="text-[16px] font-black">{isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}</span>
