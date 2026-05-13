@@ -17,33 +17,27 @@ export default function PromptOutput({ prompt }) {
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="vibrant-card card-purple shadow-xl shadow-purple-500/20"
+      className="ios-bento-card w-full relative overflow-hidden"
     >
-      <div className="flex items-center justify-between mb-4">
-        <span className="px-4 py-1 bg-black text-white rounded-full text-[10px] font-black uppercase tracking-widest">
+      <div className="flex items-center justify-between mb-4 relative z-10">
+        <span className="text-[12px] font-bold text-gray-400 uppercase tracking-widest">
           Final Result
         </span>
         <button
           onClick={handleCopy}
-          className={`p-3 rounded-full transition-all ${
-            copied ? 'bg-white text-emerald-500' : 'bg-white/20 text-white hover:bg-white/40'
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all text-[12px] font-bold ${
+            copied ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
-          {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+          {copied ? 'Copied' : 'Copy'}
         </button>
       </div>
 
-      <div className="space-y-4">
-        <h3 className="text-3xl font-black uppercase tracking-tighter leading-none text-white">
-          Generated Prompt
-        </h3>
-        <p className="text-sm font-medium text-white/80 font-mono leading-relaxed bg-black/10 p-6 rounded-2xl border border-white/10">
+      <div className="space-y-4 relative z-10">
+        <p className="text-[14px] font-medium text-black leading-relaxed p-4 bg-[#F2F2F7] rounded-xl border-none">
           {prompt}
         </p>
-      </div>
-
-      <div className="absolute top-4 right-4 opacity-5 pointer-events-none">
-        <Terminal className="w-32 h-32 text-white" />
       </div>
     </motion.div>
   );

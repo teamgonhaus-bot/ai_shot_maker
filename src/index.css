@@ -3,26 +3,11 @@
 :root {
   --bg-main: #F2F2F7;
   --bg-card: #FFFFFF;
-  
-  /* Brand Colors */
-  --color-purple: #7C3AED;
-  --color-yellow: #FACC15;
   --color-black: #000000;
-  --color-gray: #F2F2F7;
-  --color-darkgray: #1C1C1E;
   
   --text-primary: #000000;
   --text-secondary: #8E8E93;
   --text-muted: #AEAEB2;
-  
-  --radius-pill: 9999px;
-  --radius-lg: 20px;
-  --radius-xl: 32px;
-  --radius-2xl: 40px;
-  
-  --transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-  --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.04);
-  --shadow-hover: 0 10px 40px rgba(0, 0, 0, 0.08);
 }
 
 * {
@@ -41,228 +26,90 @@ body {
 
 /* Layout System */
 .app-container {
-  max-width: 1200px;
+  max-width: 680px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 24px 16px;
   min-height: 100vh;
 }
 
-@media (min-width: 1024px) {
-  .app-container {
-    padding: 2rem;
-    display: grid;
-    grid-template-columns: 1fr 400px;
-    gap: 2rem;
-  }
-}
-
-/* Header Styling */
-.app-header {
-  margin-bottom: 2rem;
-  padding: 0 0.5rem;
-}
-
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-pill);
-  background: var(--color-black);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  overflow: hidden;
-}
-
-.hero-title {
-  font-size: 3.5rem;
-  font-weight: 900;
-  letter-spacing: -0.05em;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-/* Vibrant Card System */
-.vibrant-card {
-  border-radius: var(--radius-xl);
-  padding: 2rem;
-  position: relative;
-  overflow: hidden;
-  transition: var(--transition);
-  margin-bottom: 1rem;
-}
-
-.vibrant-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-hover);
-}
-
-.card-purple { background-color: var(--color-purple); color: white; }
-.card-yellow { background-color: var(--color-yellow); color: var(--text-primary); }
-.card-black { background-color: var(--color-black); color: white; }
-.card-green { background-color: var(--color-green); color: var(--text-primary); }
-.card-red { background-color: var(--color-red); color: white; }
-.card-white { background-color: white; color: var(--text-primary); border: 1px solid #E4E4E7; }
-
-.card-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-}
-
-.card-black .card-icon { background: rgba(255, 255, 255, 0.1); }
-.card-white .card-icon { background: #F4F4F5; }
-
-.card-arrow {
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.card-white .card-arrow { background: #18181B; color: white; }
-
-/* Form Controls */
-.control-section {
-  background: white;
-  border-radius: var(--radius-xl);
-  padding: 2rem;
-  margin-bottom: 1.5rem;
-  box-shadow: var(--shadow-card);
-}
-
-.section-label {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  background: #F4F4F5;
-  border-radius: var(--radius-pill);
-  font-size: 0.75rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  margin-bottom: 1.5rem;
-}
-
-/* Navigation Bar */
-.bottom-nav {
-  position: fixed;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--color-black);
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-pill);
-  display: flex;
-  gap: 1.5rem;
-  z-index: 1000;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
-
-.nav-item {
-  color: #71717A;
-  transition: var(--transition);
-}
-
-.nav-item.active {
-  color: white;
-}
-
-/* Utilities */
+/* Base Utilities */
 .text-bold { font-weight: 700; }
-.text-xl { font-size: 1.5rem; }
-.text-4xl { font-size: 2.5rem; }
-
-.mb-4 { margin-bottom: 1rem; }
-.mb-8 { margin-bottom: 2rem; }
+.text-black { font-weight: 900; }
 
 .grid-cols-2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: 12px;
 }
 
 .w-full { width: 100%; }
 
-/* Hide Scrollbar for Horizontal Scroll */
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* Bento Box Grid Utilities */
-.bento-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1rem;
-}
-
-/* Guaranteed iOS Styles (Bypassing Tailwind JIT issues) */
+/* Guaranteed iOS Styles (Compact Bento Grid) */
 .ios-bg-main { background-color: #F2F2F7; }
 .ios-bg-card { background-color: #FFFFFF; border: none; }
-.ios-bg-dark { background-color: #1C1C1E; }
 .ios-bg-black { background-color: #000000; }
 .ios-text-gray { color: #8E8E93; }
 
-.ios-rounded-lg { border-radius: 16px; }
-.ios-rounded-xl { border-radius: 24px; }
-.ios-rounded-2xl { border-radius: 32px; }
-.ios-rounded-full { border-radius: 9999px; }
+.ios-rounded-lg { border-radius: 12px; }
+.ios-rounded-xl { border-radius: 20px; }
+.ios-rounded-pill { border-radius: 9999px; }
 
 /* Soft card shadow */
-.ios-shadow { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04); }
+.ios-shadow { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); }
 .ios-shadow-lg { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08); }
 
-/* Black "App Style" Button with Inner Glow & Deep Shadow */
+/* Black "App Style" Button */
 .ios-black-btn {
   background-color: #000000;
   color: #FFFFFF;
-  border-radius: 24px;
+  border-radius: 20px;
   padding: 16px 20px;
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease;
   border: none;
 }
 
-/* White "App Style" Button / Card */
-.ios-white-btn {
-  background-color: #FFFFFF;
-  color: #000000;
-  border-radius: 24px;
-  padding: 16px 20px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+/* Pill version of the black button */
+.ios-black-pill {
+  background-color: #000000;
+  color: #FFFFFF;
+  border-radius: 9999px;
+  padding: 8px 16px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease;
   border: none;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* White Pill Button */
+.ios-white-pill {
+  background-color: #FFFFFF;
+  color: #000000;
+  border-radius: 9999px;
+  padding: 8px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 /* Interactive Animation - scale down on click */
 .ios-interact {
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 .ios-interact:active {
   transform: scale(0.97);
 }
 
-.ios-divider {
-  border-bottom: 1px solid #E5E5EA;
-  margin-bottom: 1.5rem;
+/* Card Style for Form Sections */
+.ios-bento-card {
+  background-color: #FFFFFF;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  border: none;
+  margin-bottom: 16px;
 }
