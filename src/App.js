@@ -8,6 +8,7 @@ import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from '
 
 // Modular Components
 import OptionSelect from './components/OptionSelect';
+import IOSToggle from './components/IOSToggle';
 import PromptOutput from './components/PromptOutput';
 import TemplateCard from './components/TemplateCard';
 
@@ -166,6 +167,8 @@ export default function App() {
         name: templateName,
         prompt: generatedPrompt,
         config: config,
+        useDetailMaterial,
+        removeText,
         createdAt: new Date(),
         thumbnailColor: ['#7C3AED', '#FACC15', '#18181B', '#BEF264', '#EF4444'][Math.floor(Math.random() * 5)]
       });
@@ -185,6 +188,8 @@ export default function App() {
 
   const handleLoadTemplate = (template) => {
     setConfig(template.config);
+    setUseDetailMaterial(template.useDetailMaterial || false);
+    setRemoveText(template.removeText !== undefined ? template.removeText : true);
     setGeneratedPrompt(template.prompt);
     setActiveTab('home');
   };
@@ -298,12 +303,12 @@ export default function App() {
                 <OptionSelect label="조명" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="green" />
                 
                 <div className="p-5 bg-[#F2F2F7] rounded-3xl mt-4">
-                  <div className="flex justify-between items-center mb-6">
-                    <p className="ios-option-label m-0">세부 소재 및 컬러 (Materials)</p>
-                    <button onClick={() => setUseDetailMaterial(!useDetailMaterial)} className={`relative w-12 h-6 rounded-full transition-colors border-none cursor-pointer ${useDetailMaterial ? 'bg-[#34C759]' : 'bg-gray-300'}`}>
-                      <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${useDetailMaterial ? 'translate-x-6' : ''}`} />
-                    </button>
-                  </div>
+                  <IOSToggle 
+                    label="세부 소재 및 컬러 (Materials)" 
+                    isOn={useDetailMaterial} 
+                    onToggle={() => setUseDetailMaterial(!useDetailMaterial)} 
+                    activeColor="#34C759"
+                  />
                   <AnimatePresence>
                     {useDetailMaterial && (
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="flex flex-col overflow-hidden">
@@ -322,12 +327,12 @@ export default function App() {
             <section>
               <h2 className="ios-section-title">카메라 (Camera)</h2>
               <div className="ios-bento-card">
-                <div className="flex justify-between items-center mb-8 px-1">
-                  <p className="ios-option-label m-0">텍스트/로고 제거</p>
-                  <button onClick={() => setRemoveText(!removeText)} className={`relative w-12 h-6 rounded-full transition-colors border-none cursor-pointer ${removeText ? 'bg-[#007AFF]' : 'bg-gray-300'}`}>
-                    <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${removeText ? 'translate-x-6' : ''}`} />
-                  </button>
-                </div>
+                <IOSToggle 
+                  label="텍스트/로고 제거" 
+                  isOn={removeText} 
+                  onToggle={() => setRemoveText(!removeText)} 
+                  activeColor="#AF52DE"
+                />
                 <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
               </div>
             </section>
