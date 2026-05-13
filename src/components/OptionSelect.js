@@ -31,21 +31,12 @@ export default function OptionSelect({ label, value, onChange, options, icon: Ic
             <button
               key={opt}
               onClick={() => handleClick(opt)}
-              className={`rounded-full text-[13px] font-medium transition-all border-none cursor-pointer ios-interact ${
-                active 
-                  ? `ios-selected-pill theme-${theme}` 
-                  : 'bg-[#E9E9EB] text-[#3A3A3C] hover:bg-[#D1D1D6]'
+              className={`ios-pill ios-interact ${
+                active ? `ios-selected-pill theme-${theme}` : ''
               }`}
-              style={{ 
-                padding: '6px 16px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minWidth: 'fit-content'
-              }}
             >
-              <span className="flex items-center gap-2">
-                {Icon && <Icon className="w-4 h-4" />} {opt}
+              <span className="flex items-center gap-1.5">
+                {Icon && <Icon className="w-3.5 h-3.5" />} {opt}
               </span>
             </button>
           );

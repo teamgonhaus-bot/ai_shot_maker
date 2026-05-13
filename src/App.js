@@ -254,14 +254,14 @@ export default function App() {
 
   return (
     <div className="app-container">
-      <header className="flex justify-between items-center mb-12">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <h1 className="text-3xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest m-0">Advanced Prompt Studio</p>
+      <header className="flex justify-between items-center mb-8">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <h1 className="text-2xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest m-0">Advanced Prompt Studio</p>
         </div>
-        <div className="flex gap-2 bg-gray-200/50 p-1 rounded-full">
-          <button className={`ios-interact ${activeTab === 'home' ? 'ios-black-pill' : 'ios-white-pill'}`} onClick={() => setActiveTab('home')}>Create</button>
-          <button className={`ios-interact ${activeTab === 'library' ? 'ios-black-pill' : 'ios-white-pill'}`} onClick={() => setActiveTab('library')}>Library</button>
+        <div className="flex gap-1.5 bg-gray-200/50 p-1 rounded-full">
+          <button className={`ios-pill ios-interact ${activeTab === 'home' ? 'bg-black text-white' : 'bg-transparent text-gray-500'}`} style={{ padding: '6px 14px' }} onClick={() => setActiveTab('home')}>Create</button>
+          <button className={`ios-pill ios-interact ${activeTab === 'library' ? 'bg-black text-white' : 'bg-transparent text-gray-500'}`} style={{ padding: '6px 14px' }} onClick={() => setActiveTab('library')}>Library</button>
         </div>
       </header>
 
@@ -271,8 +271,8 @@ export default function App() {
             
             {/* 👤 인물 섹션 */}
             <section>
-              <h2 className="ios-section-title">인물 (Subject)</h2>
-              <div className="ios-bento-card">
+              <h2 className="ios-section-title" style={{ marginTop: '24px' }}>인물 (Subject)</h2>
+              <div className="ios-bento-card" style={{ padding: '20px' }}>
                 <OptionSelect label="인원" value={config.subjectNum} onChange={(v) => handleConfigChange('subjectNum', v)} options={OPTIONS_DATA.subjectNum} theme="red" />
                 {config.subjectNum !== "없음" && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
@@ -302,7 +302,7 @@ export default function App() {
                 <OptionSelect label="인테리어 양식" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} theme="green" />
                 <OptionSelect label="조명" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="green" />
                 
-                <div className="p-5 bg-[#F2F2F7] rounded-3xl mt-4">
+                <div className="mt-4 border-t border-gray-100">
                   <IOSToggle 
                     label="세부 소재 및 컬러 (Materials)" 
                     isOn={useDetailMaterial} 
@@ -325,14 +325,16 @@ export default function App() {
 
             {/* ⚙️ 카메라 섹션 */}
             <section>
-              <h2 className="ios-section-title">카메라 (Camera)</h2>
-              <div className="ios-bento-card">
-                <IOSToggle 
-                  label="텍스트/로고 제거" 
-                  isOn={removeText} 
-                  onToggle={() => setRemoveText(!removeText)} 
-                  activeColor="#AF52DE"
-                />
+              <h2 className="ios-section-title" style={{ marginTop: '24px' }}>카메라 (Camera)</h2>
+              <div className="ios-bento-card" style={{ padding: '20px' }}>
+                <div className="mb-4 border-b border-gray-100">
+                  <IOSToggle 
+                    label="텍스트/로고 제거" 
+                    isOn={removeText} 
+                    onToggle={() => setRemoveText(!removeText)} 
+                    activeColor="#AF52DE"
+                  />
+                </div>
                 <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
               </div>
             </section>
