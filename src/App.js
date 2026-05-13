@@ -256,7 +256,7 @@ export default function App() {
     <div className="app-container">
       <header className="flex justify-between items-center mb-12">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <h1 className="text-3xl font-black text-black tracking-tight leading-none m-0">Shot Maker Pro</h1>
+          <h1 className="text-3xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
           <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest m-0">Advanced Prompt Studio</p>
         </div>
         <div className="flex gap-2 bg-gray-200/50 p-1 rounded-full">
@@ -303,26 +303,12 @@ export default function App() {
                 <OptionSelect label="조명" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="green" />
                 
                 <div className="p-5 bg-[#F2F2F7] rounded-3xl mt-4">
-                  <div className="flex justify-between items-center mb-8 px-1">
-                    <span style={{ fontSize: '14px', fontWeight: '500', color: '#000000' }}>
-                      세부 소재 및 컬러 (Materials)
-                    </span>
-                    <button 
-                      onClick={() => setUseDetailMaterial(!useDetailMaterial)}
-                      className="relative w-[50px] h-[28px] rounded-full transition-all duration-300 border-none cursor-pointer"
-                      style={{ 
-                        backgroundColor: useDetailMaterial ? '#34C759' : '#E9E9EB',
-                        display: 'block'
-                      }}
-                    >
-                      <div 
-                        className="absolute top-[2px] left-[2px] w-[24px] h-[24px] bg-white rounded-full shadow-md transition-transform duration-300"
-                        style={{ 
-                          transform: useDetailMaterial ? 'translateX(22px)' : 'translateX(0)' 
-                        }}
-                      />
-                    </button>
-                  </div>
+                  <IOSToggle 
+                    label="세부 소재 및 컬러 (Materials)" 
+                    isOn={useDetailMaterial} 
+                    onToggle={() => setUseDetailMaterial(!useDetailMaterial)} 
+                    activeColor="#34C759"
+                  />
                   <AnimatePresence>
                     {useDetailMaterial && (
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="flex flex-col overflow-hidden">
@@ -341,26 +327,12 @@ export default function App() {
             <section>
               <h2 className="ios-section-title">카메라 (Camera)</h2>
               <div className="ios-bento-card">
-                <div className="flex justify-between items-center mb-8 px-1">
-                  <span style={{ fontSize: '14px', fontWeight: '500', color: '#000000' }}>
-                    텍스트/로고 제거
-                  </span>
-                  <button 
-                    onClick={() => setRemoveText(!removeText)}
-                    className="relative w-[50px] h-[28px] rounded-full transition-all duration-300 border-none cursor-pointer"
-                    style={{ 
-                      backgroundColor: removeText ? '#AF52DE' : '#E9E9EB',
-                      display: 'block'
-                    }}
-                  >
-                    <div 
-                      className="absolute top-[2px] left-[2px] w-[24px] h-[24px] bg-white rounded-full shadow-md transition-transform duration-300"
-                      style={{ 
-                        transform: removeText ? 'translateX(22px)' : 'translateX(0)' 
-                      }}
-                    />
-                  </button>
-                </div>
+                <IOSToggle 
+                  label="텍스트/로고 제거" 
+                  isOn={removeText} 
+                  onToggle={() => setRemoveText(!removeText)} 
+                  activeColor="#AF52DE"
+                />
                 <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
               </div>
             </section>
