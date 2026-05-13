@@ -86,33 +86,47 @@ const OPTIONS_DATA = {
 };
 
 export default function App() {
-  const [productDesc, setProductDesc] = useState("");
-  const [config, setConfig] = useState({
-    subjectNum: "없음",
-    subjectGender: "선택안함",
-    subjectAge: "선택안함",
-    subjectRegion: "선택안함",
-    subjectClothesStyle: "선택안함",
-    subjectClothesType: "선택안함",
-    subjectHair: "선택안함",
-    spaceType: "스튜디오",
-    spaceDetail: "단색 배경",
-    interiorStyle: "선택안함",
-    light: "선택안함",
-    detailFloor: "밝은 우드 마루",
-    detailWood: "오크(참나무)",
-    detailMetal: "황동(브라스)",
-    detailWall: "화이트 페인트",
-    cameraAngle: "선택안함",
-    shotStyle: []
+  const [productDesc, setProductDesc] = useState(() => localStorage.getItem('shotmaker_productDesc') || "");
+  const [config, setConfig] = useState(() => {
+    const saved = localStorage.getItem('shotmaker_config');
+    return saved ? JSON.parse(saved) : {
+      subjectNum: "없음",
+      subjectGender: "선택안함",
+      subjectAge: "선택안함",
+      subjectRegion: "선택안함",
+      subjectClothesStyle: "선택안함",
+      subjectClothesType: "선택안함",
+      subjectHair: "선택안함",
+      spaceType: "스튜디오",
+      spaceDetail: "단색 배경",
+      interiorStyle: "선택안함",
+      light: "선택안함",
+      detailFloor: "밝은 우드 마루",
+      detailWood: "오크(참나무)",
+      detailMetal: "황동(브라스)",
+      detailWall: "화이트 페인트",
+      cameraAngle: "선택안함",
+      shotStyle: []
+    };
   });
-  const [useDetailMaterial, setUseDetailMaterial] = useState(false);
-  const [removeText, setRemoveText] = useState(true);
+  const [useDetailMaterial, setUseDetailMaterial] = useState(() => localStorage.getItem('shotmaker_useDetailMaterial') === 'true');
+  const [removeText, setRemoveText] = useState(() => {
+    const saved = localStorage.getItem('shotmaker_removeText');
+    return saved !== null ? saved === 'true' : true;
+  });
   const [generatedPrompt, setGeneratedPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [savedTemplates, setSavedTemplates] = useState([]);
   const [templateName, setTemplateName] = useState("");
   const [activeTab, setActiveTab] = useState('home');
+
+  // Persistence Sync
+  useEffect(() => {
+    localStorage.setItem('shotmaker_config', JSON.stringify(config));
+    localStorage.setItem('shotmaker_productDesc', productDesc);
+    localStorage.setItem('shotmaker_useDetailMaterial', useDetailMaterial);
+    localStorage.setItem('shotmaker_removeText', removeText);
+  }, [config, productDesc, useDetailMaterial, removeText]);
 
   useEffect(() => {
     const q = query(collection(db, "templates"), orderBy("createdAt", "desc"));
@@ -127,7 +141,6 @@ export default function App() {
     setConfig(prev => {
       const next = { ...prev, [key]: value };
       
-      // Auto-update sub-options when parent changes
       if (key === 'spaceType') {
         next.spaceDetail = OPTIONS_DATA.spaceDetail[value][0];
       }
@@ -173,10 +186,8 @@ export default function App() {
     setIsGenerating(true);
     setTimeout(() => {
       const parts = [];
-      
       let subjectStr = productDesc || "a high-end product";
       
-      // Subject Logic
       if (config.subjectNum !== "없음") {
         const traits = [];
         if (config.subjectAge !== "선택안함") traits.push(DICTIONARY.subjectAge[config.subjectAge]);
@@ -192,45 +203,33 @@ export default function App() {
         if (config.subjectClothesType !== "선택안함") details.push(DICTIONARY.subjectClothesType[config.subjectClothesType]);
         
         if (details.length > 0) humanStr += ` ${details.join(", ")}`;
-        
         parts.push(`featuring ${subjectStr} with ${humanStr} posing naturally`);
       } else {
         parts.push(`professional architectural photography of ${subjectStr}`);
       }
 
-      // Space Logic
       let envStr = DICTIONARY.spaceType[config.spaceType];
       if (config.spaceDetail) envStr += `, ${DICTIONARY.spaceDetail[config.spaceDetail]}`;
       parts.push(`set in ${envStr}`);
-
       if (config.interiorStyle !== "선택안함") parts.push(`designed with ${DICTIONARY.interiorStyle[config.interiorStyle]}`);
 
-      // Material Logic
       if (useDetailMaterial) {
-        const materials = [];
-        materials.push(DICTIONARY.detailFloor[config.detailFloor]);
-        materials.push(DICTIONARY.detailWood[config.detailWood]);
-        materials.push(DICTIONARY.detailMetal[config.detailMetal]);
-        materials.push(DICTIONARY.detailWall[config.detailWall]);
+        const materials = [
+          DICTIONARY.detailFloor[config.detailFloor],
+          DICTIONARY.detailWood[config.detailWood],
+          DICTIONARY.detailMetal[config.detailMetal],
+          DICTIONARY.detailWall[config.detailWall]
+        ];
         parts.push(`highlighting ${materials.join(", ")}`);
       }
 
-      // Lighting & Camera Logic
       if (config.light !== "선택안함") parts.push(`illuminated by ${DICTIONARY.light[config.light]}`);
       if (config.cameraAngle !== "선택안함") parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
-
-      // Shot Style (Multi-select)
       if (config.shotStyle.length > 0) {
         const styles = config.shotStyle.map(s => DICTIONARY.shotStyle[s]);
         parts.push(`rendered with ${styles.join(", ")}`);
       }
-
-      // Text/Logo Removal
-      if (removeText) {
-        parts.push("textless, no text, no watermarks, clear image");
-      }
-
-      // Fixed Quality Tags
+      if (removeText) parts.push("textless, no text, no watermarks, clear image");
       parts.push("8k resolution, highly detailed, masterpiece, photorealistic, interior design magazine cover");
 
       setGeneratedPrompt(parts.join(", "));
@@ -241,113 +240,78 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Header Section */}
-      <header className="flex justify-between items-center mb-6">
+      <header className="flex justify-between items-center mb-10">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <h1 className="text-3xl font-black text-black tracking-tight leading-none m-0">Create</h1>
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest m-0">AI Prompt Dashboard</p>
+          <h1 className="text-3xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
+          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest m-0">Advanced Prompt Studio</p>
         </div>
-        
-        {/* Navigation Pills */}
         <div className="flex gap-2 bg-gray-200/50 p-1 rounded-full">
-          <button 
-            className={`ios-interact ${activeTab === 'home' ? 'ios-black-pill' : 'ios-white-pill bg-transparent shadow-none text-gray-500 hover:bg-white/50'}`}
-            onClick={() => setActiveTab('home')}
-          >
-            Start New
-          </button>
-          <button 
-            className={`ios-interact ${activeTab === 'library' ? 'ios-black-pill' : 'ios-white-pill bg-transparent shadow-none text-gray-500 hover:bg-white/50'}`}
-            onClick={() => setActiveTab('library')}
-          >
-            Library
-          </button>
+          <button className={`ios-interact ${activeTab === 'home' ? 'ios-black-pill' : 'ios-white-pill'}`} onClick={() => setActiveTab('home')}>Create</button>
+          <button className={`ios-interact ${activeTab === 'library' ? 'ios-black-pill' : 'ios-white-pill'}`} onClick={() => setActiveTab('library')}>Library</button>
         </div>
       </header>
 
-
-
       <AnimatePresence mode="wait">
         {activeTab === 'home' ? (
-          <motion.div 
-            key="home"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-6"
-          >
-            {/* Core Subject Card */}
-            <section className="ios-bento-card">
-              <div className="flex flex-col gap-6">
-                <div className="flex flex-col mb-4">
-                  <div className="mb-[12px]">
-                    <p className="text-[13px] font-semibold text-gray-500 uppercase tracking-widest m-0">Main Concept</p>
-                  </div>
+          <motion.div key="home" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-12">
+            
+            {/* 👤 인물 섹션 */}
+            <section>
+              <h2 className="ios-section-title">인물 (Subject)</h2>
+              <div className="ios-bento-card">
+                <div className="flex flex-col mb-8">
+                  <label className="ios-option-label">Main Concept</label>
                   <textarea
                     value={productDesc}
                     onChange={(e) => setProductDesc(e.target.value)}
-                    placeholder="Describe your scene (e.g., minimalist coffee table)"
-                    className="w-full p-4 bg-[#F2F2F7] rounded-xl border-none outline-none focus:ring-2 focus:ring-black text-[15px] font-medium transition-all resize-none"
+                    placeholder="Describe your scene..."
+                    className="w-full p-4 bg-[#F2F2F7] rounded-2xl border-none outline-none focus:ring-2 focus:ring-black text-[15px] font-medium transition-all resize-none"
                     rows={3}
                   />
                 </div>
-                <OptionSelect label="Number of People" value={config.subjectNum} onChange={(v) => handleConfigChange('subjectNum', v)} options={OPTIONS_DATA.subjectNum} />
+                <OptionSelect label="인원" value={config.subjectNum} onChange={(v) => handleConfigChange('subjectNum', v)} options={OPTIONS_DATA.subjectNum} theme="red" />
+                {config.subjectNum !== "없음" && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
+                    <OptionSelect label="성별" value={config.subjectGender} onChange={(v) => handleConfigChange('subjectGender', v)} options={OPTIONS_DATA.subjectGender} theme="red" />
+                    <OptionSelect label="연령대" value={config.subjectAge} onChange={(v) => handleConfigChange('subjectAge', v)} options={OPTIONS_DATA.subjectAge} theme="red" />
+                    <OptionSelect label="지역/인종" value={config.subjectRegion} onChange={(v) => handleConfigChange('subjectRegion', v)} options={OPTIONS_DATA.subjectRegion} theme="red" />
+                    <OptionSelect label="옷 스타일" value={config.subjectClothesStyle} onChange={(v) => handleConfigChange('subjectClothesStyle', v)} options={OPTIONS_DATA.subjectClothesStyle} theme="red" />
+                    <OptionSelect 
+                      label="옷 종류" 
+                      value={config.subjectClothesType} 
+                      onChange={(v) => handleConfigChange('subjectClothesType', v)} 
+                      options={config.subjectGender === '여성' ? OPTIONS_DATA.subjectClothesType.female : OPTIONS_DATA.subjectClothesType.others} 
+                      theme="red"
+                    />
+                    <OptionSelect label="헤어 스타일" value={config.subjectHair} onChange={(v) => handleConfigChange('subjectHair', v)} options={OPTIONS_DATA.subjectHair} theme="red" />
+                  </motion.div>
+                )}
               </div>
             </section>
 
-            {/* Human Staging Card */}
-            {config.subjectNum !== "없음" && (
-              <motion.section 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="ios-bento-card"
-              >
-                <div className="flex flex-col">
-                  <OptionSelect label="성별 (Gender)" value={config.subjectGender} onChange={(v) => handleConfigChange('subjectGender', v)} options={OPTIONS_DATA.subjectGender} />
-                  <OptionSelect label="연령대 (Age Group)" value={config.subjectAge} onChange={(v) => handleConfigChange('subjectAge', v)} options={OPTIONS_DATA.subjectAge} />
-                  <OptionSelect label="지역/인종 (Region/Race)" value={config.subjectRegion} onChange={(v) => handleConfigChange('subjectRegion', v)} options={OPTIONS_DATA.subjectRegion} />
-                  <OptionSelect label="옷 스타일 (Clothing Style)" value={config.subjectClothesStyle} onChange={(v) => handleConfigChange('subjectClothesStyle', v)} options={OPTIONS_DATA.subjectClothesStyle} />
-                  <OptionSelect 
-                    label="옷 종류 (Clothing Type)" 
-                    value={config.subjectClothesType} 
-                    onChange={(v) => handleConfigChange('subjectClothesType', v)} 
-                    options={config.subjectGender === '여성' ? OPTIONS_DATA.subjectClothesType.female : OPTIONS_DATA.subjectClothesType.others} 
-                  />
-                  <OptionSelect label="헤어 스타일 (Hair Style)" value={config.subjectHair} onChange={(v) => handleConfigChange('subjectHair', v)} options={OPTIONS_DATA.subjectHair} />
-                </div>
-              </motion.section>
-            )}
-
-            {/* Environment Card */}
-            <section className="ios-bento-card">
-              <div className="flex flex-col">
-                <OptionSelect label="공간 종류 (Space Type)" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} />
-                <OptionSelect label="세부 공간 (Detailed Space)" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} />
-                <OptionSelect label="인테리어 양식 (Interior Style)" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} />
-                <OptionSelect label="조명 (Lighting)" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} />
-
-                <div className="p-4 bg-[#F2F2F7] rounded-2xl mt-2">
-                  <div className="flex justify-between items-center mb-4">
-                    <p className="ios-option-label m-0">세부 소재 및 컬러 (Material Details)</p>
-                    <button 
-                      onClick={() => setUseDetailMaterial(!useDetailMaterial)}
-                      className={`relative w-12 h-6 rounded-full transition-colors border-none cursor-pointer ${useDetailMaterial ? 'bg-black' : 'bg-gray-300'}`}
-                    >
+            {/* 🏠 공간 섹션 */}
+            <section>
+              <h2 className="ios-section-title">공간 (Space)</h2>
+              <div className="ios-bento-card">
+                <OptionSelect label="공간 종류" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} theme="green" />
+                <OptionSelect label="세부 공간" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} theme="green" />
+                <OptionSelect label="인테리어 양식" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} theme="green" />
+                <OptionSelect label="조명" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="green" />
+                
+                <div className="p-5 bg-[#F2F2F7] rounded-3xl mt-4">
+                  <div className="flex justify-between items-center mb-6">
+                    <p className="ios-option-label m-0">세부 소재 및 컬러 (Materials)</p>
+                    <button onClick={() => setUseDetailMaterial(!useDetailMaterial)} className={`relative w-12 h-6 rounded-full transition-colors border-none cursor-pointer ${useDetailMaterial ? 'bg-[#34C759]' : 'bg-gray-300'}`}>
                       <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${useDetailMaterial ? 'translate-x-6' : ''}`} />
                     </button>
                   </div>
                   <AnimatePresence>
                     {useDetailMaterial && (
-                      <motion.div 
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="flex flex-col overflow-hidden"
-                      >
-                        <OptionSelect label="바닥 타일/마루" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} />
-                        <OptionSelect label="우드 소재" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} />
-                        <OptionSelect label="메탈 포인트" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} />
-                        <OptionSelect label="벽 소재/컬러" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} />
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="flex flex-col overflow-hidden">
+                        <OptionSelect label="바닥 타일/마루" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} theme="green" />
+                        <OptionSelect label="우드 소재" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} theme="green" />
+                        <OptionSelect label="메탈 포인트" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} theme="green" />
+                        <OptionSelect label="벽 소재/컬러" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} theme="green" />
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -355,80 +319,62 @@ export default function App() {
               </div>
             </section>
 
-            {/* Camera & Shot Card */}
-            <section className="ios-bento-card">
-              <div className="flex flex-col">
-                <div className="flex justify-between items-center mb-6 px-1">
-                  <p className="ios-option-label m-0">텍스트/로고 제거 (Remove Text/Logo)</p>
-                  <button 
-                    onClick={() => setRemoveText(!removeText)}
-                    className={`relative w-12 h-6 rounded-full transition-colors border-none cursor-pointer ${removeText ? 'bg-black' : 'bg-gray-300'}`}
-                  >
+            {/* ⚙️ 카메라 섹션 */}
+            <section>
+              <h2 className="ios-section-title">카메라 (Camera)</h2>
+              <div className="ios-bento-card">
+                <div className="flex justify-between items-center mb-8 px-1">
+                  <p className="ios-option-label m-0">텍스트/로고 제거</p>
+                  <button onClick={() => setRemoveText(!removeText)} className={`relative w-12 h-6 rounded-full transition-colors border-none cursor-pointer ${removeText ? 'bg-[#007AFF]' : 'bg-gray-300'}`}>
                     <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${removeText ? 'translate-x-6' : ''}`} />
                   </button>
                 </div>
-                
-                <OptionSelect label="카메라 구도 (Camera Angle)" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} />
+                <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
+              </div>
+            </section>
+
+            {/* 🎨 스타일 섹션 */}
+            <section>
+              <h2 className="ios-section-title">스타일 (Style)</h2>
+              <div className="ios-bento-card">
                 <OptionSelect 
-                  label="연출 샷 스타일 (Shot Style - 다중 선택)" 
+                  label="연출 샷 스타일 (다중 선택)" 
                   value={config.shotStyle} 
                   onChange={(v) => handleConfigChange('shotStyle', v)} 
                   options={OPTIONS_DATA.shotStyle} 
                   multiSelect={true}
+                  theme="blue"
                 />
               </div>
             </section>
 
-            {/* Final Action Button (Bento Box) */}
-            <div className="mb-8">
+            {/* Action Area */}
+            <div className="pt-4 pb-20">
               <button 
                 onClick={generatePrompt}
                 disabled={isGenerating}
                 className="w-full ios-black-btn ios-interact flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
-                style={{ borderRadius: '9999px', padding: '20px' }}
+                style={{ borderRadius: '9999px', padding: '22px', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}
               >
                 <Wand2 className="w-5 h-5 text-white" />
-                <span className="text-[16px] font-black">{isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}</span>
+                <span className="text-[17px] font-black">{isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}</span>
               </button>
-            </div>
 
-            {/* Result Section */}
-            {generatedPrompt && (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="space-y-6"
-              >
-                <PromptOutput prompt={generatedPrompt} />
-                
-                <div className="ios-bento-card mt-6">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={templateName}
-                      onChange={(e) => setTemplateName(e.target.value)}
-                      placeholder="Enter preset name..."
-                      className="flex-1 px-4 py-3 bg-[#F2F2F7] rounded-xl border-none outline-none focus:ring-2 focus:ring-black font-medium text-[15px]"
-                    />
-                    <button
-                      onClick={handleSaveTemplate}
-                      className="bg-black text-white px-6 py-3 rounded-xl flex items-center justify-center transition-colors border-none cursor-pointer ios-interact"
-                    >
-                      <Save className="w-5 h-5" />
-                    </button>
+              {generatedPrompt && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12 space-y-6">
+                  <PromptOutput prompt={generatedPrompt} />
+                  <div className="ios-bento-card">
+                    <div className="flex gap-2">
+                      <input type="text" value={templateName} onChange={(e) => setTemplateName(e.target.value)} placeholder="Preset name..." className="flex-1 px-4 py-4 bg-[#F2F2F7] rounded-2xl border-none outline-none focus:ring-2 focus:ring-black font-medium text-[15px]" />
+                      <button onClick={handleSaveTemplate} className="bg-black text-white px-8 py-4 rounded-2xl flex items-center justify-center ios-interact border-none"><Save className="w-5 h-5" /></button>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            )}
+                </motion.div>
+              )}
+            </div>
           </motion.div>
         ) : (
-          <motion.div 
-            key="library"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            className="space-y-6"
-          >
+          <motion.div key="library" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-6">
             <div className="flex justify-between items-center px-2 mb-6">
               <h2 className="text-[40px] font-black text-black tracking-tight leading-none mb-1">Library</h2>
               <button 

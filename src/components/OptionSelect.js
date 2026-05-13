@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function OptionSelect({ label, value, onChange, options, icon: Icon, multiSelect = false }) {
+export default function OptionSelect({ label, value, onChange, options, icon: Icon, multiSelect = false, theme = 'blue' }) {
   const isSelected = (opt) => {
     if (multiSelect) {
       return Array.isArray(value) && value.includes(opt);
@@ -22,10 +22,8 @@ export default function OptionSelect({ label, value, onChange, options, icon: Ic
   };
 
   return (
-    <div className="flex flex-col mb-6">
-      <div className="ios-option-label">
-        {label}
-      </div>
+    <div className="flex flex-col mb-8">
+      {label && <label className="ios-option-label">{label}</label>}
       <div className="flex flex-wrap" style={{ gap: '10px' }}>
         {options.map((opt) => {
           const active = isSelected(opt);
@@ -33,13 +31,13 @@ export default function OptionSelect({ label, value, onChange, options, icon: Ic
             <button
               key={opt}
               onClick={() => handleClick(opt)}
-              className={`rounded-full text-[14px] font-medium transition-all border-none cursor-pointer ios-interact ${
+              className={`rounded-full text-[13px] font-medium transition-all border-none cursor-pointer ios-interact ${
                 active 
-                  ? 'ios-selected-pill' 
-                  : 'bg-[#E9E9EB] text-black hover:bg-[#D1D1D6]'
+                  ? `ios-selected-pill theme-${theme}` 
+                  : 'bg-[#E9E9EB] text-[#3A3A3C] hover:bg-[#D1D1D6]'
               }`}
               style={{ 
-                padding: '10px 18px',
+                padding: '8px 16px',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',

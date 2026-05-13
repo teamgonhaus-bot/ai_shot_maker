@@ -10,6 +10,9 @@
   --text-muted: #AEAEB2;
   --color-orange: #FF9500;
   --color-orange-dark: #E67E00;
+  --color-red: #FF3B30;
+  --color-green: #34C759;
+  --color-blue: #007AFF;
 }
 
 * {
@@ -54,7 +57,7 @@ body {
   cursor: pointer;
 }
 .ios-interact:active {
-  transform: scale(0.97);
+  transform: scale(0.92);
 }
 
 /* Card Style for Sections */
@@ -103,28 +106,38 @@ body {
   background-color: rgba(0,0,0,0.05);
 }
 
-/* Premium Selection State */
-.ios-selected-pill {
-  background-color: var(--color-orange) !important;
-  color: white !important;
-  box-shadow: 
-    inset 0 2px 4px rgba(0,0,0,0.2),
-    0 2px 4px rgba(255, 149, 0, 0.3) !important;
-  transform: translateY(1px);
-}
-
-.ios-selected-pill:active {
-  transform: translateY(2px) scale(0.98);
+/* Section & Label Styling */
+.ios-section-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #000000;
+  margin-top: 40px;
+  margin-bottom: 24px;
+  padding-left: 4px;
+  border-left: 4px solid #000;
+  line-height: 1;
 }
 
 .ios-option-label {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
-  color: #8E8E93;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 8px;
+  color: #000000;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+  display: block;
 }
+
+/* Premium Selection Themes */
+.ios-selected-pill.theme-red { background-color: var(--color-red) !important; box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3) !important; }
+.ios-selected-pill.theme-green { background-color: var(--color-green) !important; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3) !important; }
+.ios-selected-pill.theme-blue { background-color: var(--color-blue) !important; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3) !important; }
+
+.ios-selected-pill {
+  color: white !important;
+  transform: translateY(0);
+}
+
 
 /* Added Utilities */
 .rounded-full {
