@@ -171,30 +171,32 @@ export default function App() {
   };
 
   return (
-    <div className="app-container">
+    <div className="app-container ios-bg-main min-h-screen pb-12">
       {/* Header Section */}
-      <header className="app-header pt-6">
-        <h1 className="text-5xl font-black text-black tracking-tight mb-2">Create</h1>
-        <p className="text-sm font-semibold text-slate-500 uppercase tracking-widest">AI Prompt Dashboard</p>
+      <header className="app-header pt-4">
+        <h1 className="text-[40px] font-black text-black tracking-tight leading-none mb-1">Create</h1>
+        <div className="ios-divider mt-2">
+          <p className="text-sm font-semibold text-gray-500 uppercase tracking-widest pb-3">AI Prompt Dashboard</p>
+        </div>
       </header>
 
       {/* Navigation (Horizontal Scroll Cards) */}
-      <div className="mb-8 flex gap-4 overflow-x-auto hide-scrollbar snap-x px-2 pb-4">
+      <div className="mb-10 flex gap-5 overflow-x-auto hide-scrollbar snap-x px-2 pb-4">
         <div 
-          className={`min-w-[280px] p-6 rounded-[32px] snap-center cursor-pointer transition-all ${activeTab === 'home' ? 'bg-black text-white shadow-xl' : 'bg-white text-black shadow-sm'}`} 
+          className={`min-w-[260px] p-6 ios-rounded-2xl snap-center cursor-pointer transition-all ${activeTab === 'home' ? 'ios-bg-black text-white ios-shadow-lg scale-100' : 'ios-bg-card text-black ios-shadow scale-95'}`} 
           onClick={() => setActiveTab('home')}
         >
-          <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mb-12">
+          <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-10 ${activeTab === 'home' ? 'bg-white/20' : 'ios-bg-main'}`}>
             <Zap className={`w-6 h-6 ${activeTab === 'home' ? 'text-white' : 'text-black'}`} />
           </div>
           <p className="text-2xl font-black leading-tight">Start New<br/>Creation</p>
         </div>
         
         <div 
-          className={`min-w-[280px] p-6 rounded-[32px] snap-center cursor-pointer transition-all ${activeTab === 'library' ? 'bg-black text-white shadow-xl' : 'bg-white text-black shadow-sm'}`} 
+          className={`min-w-[260px] p-6 ios-rounded-2xl snap-center cursor-pointer transition-all ${activeTab === 'library' ? 'ios-bg-black text-white ios-shadow-lg scale-100' : 'ios-bg-card text-black ios-shadow scale-95'}`} 
           onClick={() => setActiveTab('library')}
         >
-          <div className="w-12 h-12 rounded-full bg-black/5 flex items-center justify-center mb-12">
+          <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-10 ${activeTab === 'library' ? 'bg-white/20' : 'ios-bg-main'}`}>
             <LayoutTemplate className={`w-6 h-6 ${activeTab === 'library' ? 'text-white' : 'text-black'}`} />
           </div>
           <p className="text-2xl font-black leading-tight">My Saved<br/>Library</p>
@@ -211,16 +213,18 @@ export default function App() {
             className="space-y-6"
           >
             {/* Core Subject Card */}
-            <section className="bg-white p-6 rounded-[32px] shadow-sm">
-              <span className="inline-block px-3 py-1 bg-[#F2F2F7] rounded-full text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-6">Core Subject</span>
+            <section className="ios-bg-card p-6 ios-rounded-2xl ios-shadow">
+              <div className="ios-divider">
+                <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest pb-2 block">Core Subject</span>
+              </div>
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Main Concept</p>
+                  <p className="text-[12px] font-bold text-gray-500 uppercase tracking-widest pl-1">Main Concept</p>
                   <textarea
                     value={productDesc}
                     onChange={(e) => setProductDesc(e.target.value)}
                     placeholder="Describe your scene (e.g., minimalist coffee table)"
-                    className="w-full p-5 bg-[#F2F2F7] rounded-[24px] border-none outline-none focus:ring-2 focus:ring-black text-[15px] font-medium transition-all"
+                    className="w-full p-5 ios-bg-main ios-rounded-xl border-none outline-none focus:ring-2 focus:ring-black text-[15px] font-semibold transition-all"
                     rows={3}
                   />
                 </div>
@@ -233,9 +237,11 @@ export default function App() {
               <motion.section 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white p-6 rounded-[32px] shadow-sm"
+                className="ios-bg-card p-6 ios-rounded-2xl ios-shadow"
               >
-                <span className="inline-block px-3 py-1 bg-[#F2F2F7] rounded-full text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-6">Human Staging</span>
+                <div className="ios-divider">
+                  <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest pb-2 block">Human Staging</span>
+                </div>
                 <div className="space-y-6">
                   <div className="grid-cols-2">
                     <OptionSelect label="Gender" value={config.subjectGender} onChange={(v) => handleConfigChange('subjectGender', v)} options={OPTIONS_DATA.subjectGender} />
@@ -248,8 +254,10 @@ export default function App() {
             )}
 
             {/* Environment Card */}
-            <section className="bg-white p-6 rounded-[32px] shadow-sm">
-              <span className="inline-block px-3 py-1 bg-[#F2F2F7] rounded-full text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-6">Environment</span>
+            <section className="ios-bg-card p-6 ios-rounded-2xl ios-shadow">
+              <div className="ios-divider">
+                <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest pb-2 block">Environment</span>
+              </div>
               <div className="space-y-6">
                 <div className="grid-cols-2">
                   <OptionSelect label="Space Type" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} />
@@ -260,14 +268,14 @@ export default function App() {
                   <OptionSelect label="Lighting" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} />
                 </div>
 
-                <div className="p-5 bg-[#F2F2F7] rounded-[24px]">
+                <div className="p-5 ios-bg-main ios-rounded-xl">
                   <div className="flex justify-between items-center mb-4">
-                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Material Details</p>
+                    <p className="text-[12px] font-bold text-gray-500 uppercase tracking-widest pl-1">Material Details</p>
                     <button 
                       onClick={() => setUseDetailMaterial(!useDetailMaterial)}
-                      className={`relative w-12 h-6 rounded-full transition-colors ${useDetailMaterial ? 'bg-black' : 'bg-slate-300'}`}
+                      className={`relative w-12 h-6 ios-rounded-full transition-colors ${useDetailMaterial ? 'ios-bg-black' : 'bg-gray-300'}`}
                     >
-                      <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${useDetailMaterial ? 'translate-x-6' : ''}`} />
+                      <div className={`absolute top-1 left-1 w-4 h-4 ios-bg-card ios-rounded-full transition-transform ${useDetailMaterial ? 'translate-x-6' : ''}`} />
                     </button>
                   </div>
                   <AnimatePresence>
@@ -290,21 +298,23 @@ export default function App() {
             </section>
 
             {/* Status Window */}
-            <section className="bg-black text-white p-6 rounded-[32px] shadow-lg">
-              <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-[11px] font-bold text-white uppercase tracking-wider mb-4">Selected Options</span>
-              <div className="flex flex-wrap gap-2 text-[13px] font-semibold">
+            <section className="ios-bg-black text-white p-6 ios-rounded-2xl ios-shadow-lg">
+              <div className="ios-divider border-white/20">
+                <span className="text-[12px] font-bold text-white uppercase tracking-widest pb-2 block">Selected Options</span>
+              </div>
+              <div className="flex flex-wrap gap-2 text-[14px] font-semibold">
                 {Object.entries(config).filter(([k, v]) => v !== "선택안함" && v !== "없음").map(([k, v]) => (
-                  <span key={k} className="px-3 py-1.5 bg-white/10 rounded-full text-white">
+                  <span key={k} className="px-4 py-2 bg-white/10 ios-rounded-full text-white">
                     {v}
                   </span>
                 ))}
                 {productDesc && (
-                  <span className="px-3 py-1.5 bg-white/10 rounded-full text-white">
+                  <span className="px-4 py-2 bg-white/10 ios-rounded-full text-white">
                     "{productDesc}"
                   </span>
                 )}
                 {Object.values(config).every(v => v === "선택안함" || v === "없음") && !productDesc && (
-                  <span className="text-slate-400">No options selected yet.</span>
+                  <span className="text-gray-400">No options selected yet.</span>
                 )}
               </div>
             </section>
@@ -314,10 +324,10 @@ export default function App() {
               <button 
                 onClick={generatePrompt}
                 disabled={isGenerating}
-                className="col-span-full py-8 px-6 bg-black text-white rounded-[32px] text-xl font-black shadow-xl hover:scale-[1.02] transition-all flex flex-col items-center justify-center gap-4 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="col-span-full py-8 px-6 ios-bg-black text-white ios-rounded-2xl text-[22px] font-black ios-shadow-lg hover:scale-[1.02] transition-all flex flex-col items-center justify-center gap-4 disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                  <Wand2 className="w-6 h-6 text-white" />
+                <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center">
+                  <Wand2 className="w-7 h-7 text-white" />
                 </div>
                 {isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}
               </button>
@@ -332,19 +342,21 @@ export default function App() {
               >
                 <PromptOutput prompt={generatedPrompt} />
                 
-                <div className="bg-white p-6 rounded-[32px] shadow-sm">
-                  <span className="inline-block px-3 py-1 bg-[#F2F2F7] rounded-full text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-6">Library Save</span>
+                <div className="ios-bg-card p-6 ios-rounded-2xl ios-shadow">
+                  <div className="ios-divider">
+                    <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest pb-2 block">Library Save</span>
+                  </div>
                   <div className="flex gap-3">
                     <input
                       type="text"
                       value={templateName}
                       onChange={(e) => setTemplateName(e.target.value)}
                       placeholder="Enter preset name..."
-                      className="flex-1 p-4 bg-[#F2F2F7] rounded-[20px] border-none outline-none focus:ring-2 focus:ring-black font-medium"
+                      className="flex-1 p-4 ios-bg-main ios-rounded-xl border-none outline-none focus:ring-2 focus:ring-black font-semibold text-[15px]"
                     />
                     <button
                       onClick={handleSaveTemplate}
-                      className="p-4 bg-black text-white rounded-[20px] shadow-md hover:scale-105 transition-all"
+                      className="p-4 ios-bg-black text-white ios-rounded-xl ios-shadow hover:scale-105 transition-all"
                     >
                       <Save className="w-6 h-6" />
                     </button>
@@ -361,21 +373,21 @@ export default function App() {
             exit={{ opacity: 0, x: 20 }}
             className="space-y-6"
           >
-            <div className="flex justify-between items-center px-2 mb-4">
-              <h2 className="text-3xl font-black uppercase">Library</h2>
+            <div className="flex justify-between items-center px-2 mb-6">
+              <h2 className="text-[40px] font-black text-black tracking-tight leading-none mb-1">Library</h2>
               <button 
                 onClick={() => setActiveTab('home')}
-                className="p-3 bg-white rounded-full shadow-sm"
+                className="p-3 ios-bg-card ios-rounded-full ios-shadow"
               >
-                <X className="w-5 h-5 text-slate-400" />
+                <X className="w-6 h-6 text-black" />
               </button>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {savedTemplates.length === 0 ? (
-                <div className="col-span-full py-20 text-center bg-white rounded-[40px] shadow-sm">
-                  <LayoutTemplate className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                  <p className="text-slate-400 font-bold">Your library is empty</p>
+                <div className="col-span-full py-20 text-center ios-bg-card ios-rounded-2xl ios-shadow">
+                  <LayoutTemplate className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 font-bold">Your library is empty</p>
                 </div>
               ) : (
                 savedTemplates.map(template => (

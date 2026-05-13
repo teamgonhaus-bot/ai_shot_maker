@@ -2,24 +2,26 @@ import React from 'react';
 
 export default function OptionSelect({ label, value, onChange, options, icon: Icon }) {
   return (
-    <div className="space-y-3">
-      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">
-        {label}
-      </p>
-      <div className="flex flex-wrap gap-2">
+    <div className="space-y-4">
+      <div className="ios-divider">
+        <p className="text-[12px] font-bold text-gray-500 uppercase tracking-widest pb-2">
+          {label}
+        </p>
+      </div>
+      <div className="flex flex-wrap gap-3">
         {options.map((opt) => {
           const isSelected = value === opt;
           return (
             <button
               key={opt}
               onClick={() => onChange(opt)}
-              className={`relative px-4 py-2.5 rounded-[20px] text-[13px] font-semibold transition-all duration-300 ${
+              className={`relative px-5 py-3 ios-rounded-xl text-[14px] font-semibold transition-all duration-300 ${
                 isSelected 
-                  ? 'bg-black text-white shadow-md scale-105' 
-                  : 'bg-[#F2F2F7] text-slate-600 hover:bg-[#E5E5EA]'
+                  ? 'ios-bg-black text-white ios-shadow-lg scale-105' 
+                  : 'ios-bg-main text-black hover:ios-bg-card ios-shadow'
               }`}
             >
-              <span className="relative z-10 flex items-center gap-1.5">
+              <span className="relative z-10 flex items-center gap-2">
                 {Icon && <Icon className="w-4 h-4" />} {opt}
               </span>
             </button>

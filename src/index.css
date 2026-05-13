@@ -214,3 +214,23 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 1rem;
 }
+
+/* Guaranteed iOS Styles (Bypassing Tailwind JIT issues) */
+.ios-bg-main { background-color: #F2F2F7; }
+.ios-bg-card { background-color: #FFFFFF; }
+.ios-bg-dark { background-color: #1C1C1E; }
+.ios-bg-black { background-color: #000000; }
+.ios-text-gray { color: #8E8E93; }
+
+.ios-rounded-lg { border-radius: 16px; }
+.ios-rounded-xl { border-radius: 24px; }
+.ios-rounded-2xl { border-radius: 32px; }
+.ios-rounded-full { border-radius: 9999px; }
+
+.ios-shadow { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); }
+.ios-shadow-lg { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); }
+
+.ios-divider {
+  border-bottom: 1px solid #E5E5EA;
+  margin-bottom: 1.5rem;
+}
