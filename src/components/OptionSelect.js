@@ -33,12 +33,18 @@ export default function OptionSelect({ label, value, onChange, options, icon: Ic
             <button
               key={opt}
               onClick={() => handleClick(opt)}
-              className={`rounded-full text-[14px] font-medium flex items-center justify-center transition-all border-none cursor-pointer ios-interact ${
+              className={`rounded-full text-[14px] font-medium transition-all border-none cursor-pointer ios-interact ${
                 active 
                   ? 'ios-selected-pill' 
                   : 'bg-[#E9E9EB] text-black hover:bg-[#D1D1D6]'
               }`}
-              style={{ padding: '10px 18px' }}
+              style={{ 
+                padding: '10px 18px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minWidth: 'fit-content'
+              }}
             >
               <span className="flex items-center gap-2">
                 {Icon && <Icon className="w-4 h-4" />} {opt}
