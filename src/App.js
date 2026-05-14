@@ -3,8 +3,9 @@ import {
   Wand2, LayoutTemplate, X 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { db } from './firebase';
-import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { db, auth } from './firebase';
+import { collection, addDoc, deleteDoc, doc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { signInAnonymously, signOut } from 'firebase/auth';
 
 // Modular Components
 import OptionSelect from './components/OptionSelect';
@@ -114,6 +115,7 @@ export default function App() {
   const [savedTemplates, setSavedTemplates] = useState([]);
   const [templateName, setTemplateName] = useState("");
   const [isSaved, setIsSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [isAdmin, setIsAdmin] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -133,32 +135,22 @@ export default function App() {
     const savedText = localStorage.getItem('shotmaker_removeText_v13');
     if (savedText) setRemoveText(savedText === 'true');
 
-    // 2. Firebase Real-time Sync
-    try {
-      const q = query(collection(db, "templates"), orderBy("createdAt", "desc"));
-      const unsubscribe = onSnapshot(q, (snapshot) => {
+    // 2. Firebase Initial Load (One-time fetch as requested)
+    const fetchTemplates = async () => {
+      try {
+        const q = query(collection(db, "templates"), orderBy("createdAt", "desc"));
+        const snapshot = await getDocs(q);
         const templates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        console.log(`✅ Firebase Synced: ${templates.length} templates loaded.`);
+        console.log(`✅ Firebase Loaded: ${templates.length} templates loaded.`);
         setSavedTemplates(templates);
+      } catch (error) {
+        console.error("❌ Firebase load error:", error);
+      } finally {
         setIsLoading(false);
-      }, (error) => {
-        console.error("❌ Firebase sync error:", error);
-        setIsLoading(false);
-      });
+      }
+    };
 
-      // 3. Safety Fallback
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 2000);
-
-      return () => {
-        unsubscribe();
-        clearTimeout(timer);
-      };
-    } catch (e) {
-      console.error("❌ Firebase initialization failed:", e);
-      setIsLoading(false);
-    }
+    fetchTemplates();
   }, []);
 
   useEffect(() => {
@@ -178,6 +170,7 @@ export default function App() {
       }
       return next;
     });
+    setIsSaved(false); // Reset complete state on option change
   };
 
   const hashPassword = async (password) => {
@@ -192,16 +185,27 @@ export default function App() {
     if (!pwd) return;
     const hashed = await hashPassword(pwd);
     if (hashed === process.env.REACT_APP_ADMIN_PWD_HASH) {
-      setIsAdmin(true);
-      localStorage.setItem('shotmaker_is_admin', 'true');
+      try {
+        await signInAnonymously(auth);
+        setIsAdmin(true);
+        localStorage.setItem('shotmaker_is_admin', 'true');
+      } catch (error) {
+        console.error("Firebase Auth Error:", error);
+        alert("인증 실패: " + error.message);
+      }
     } else {
       alert("암호가 일치하지 않습니다.");
     }
   };
 
-  const handleLogout = () => {
-    setIsAdmin(false);
-    localStorage.removeItem('shotmaker_is_admin');
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setIsAdmin(false);
+      localStorage.removeItem('shotmaker_is_admin');
+    } catch (error) {
+      console.error("Logout Error:", error);
+    }
   };
 
   const handleSaveTemplate = async () => {
@@ -210,6 +214,8 @@ export default function App() {
       return;
     }
     if (!templateName || !generatedPrompt) return;
+    
+    setIsSaving(true);
     console.log(`💾 Attempting to save template: "${templateName}"...`);
     try {
       const newTemplate = {
@@ -218,7 +224,7 @@ export default function App() {
         config: config,
         useDetailMaterial,
         removeText,
-        createdAt: new Date(),
+        createdAt: serverTimestamp(),
         thumbnailColor: ['#FF3B30', '#34C759', '#AF52DE', '#FF9500', '#007AFF'][Math.floor(Math.random() * 5)]
       };
       
@@ -226,18 +232,19 @@ export default function App() {
       console.log(`✅ Template saved successfully with ID: ${docRef.id}`);
       
       // Immediate local state update for zero-latency UI
-      setSavedTemplates(prev => [{ id: docRef.id, ...newTemplate }, ...prev]);
+      setSavedTemplates(prev => [{ id: docRef.id, ...newTemplate, createdAt: new Date() }, ...prev]);
       
       setIsSaved(true);
       setShowToast(true);
       setTimeout(() => {
-        setIsSaved(false);
         setShowToast(false);
-      }, 2000);
+      }, 3000);
       setTemplateName("");
     } catch (e) {
-      console.error("❌ Error saving template:", e);
-      alert("Save failed. Check console for details.");
+      console.error("Firebase Save Error:", e);
+      alert("저장 실패: " + e.message);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -329,7 +336,7 @@ export default function App() {
             exit={{ opacity: 0, y: -20 }}
             className="ios-toast"
           >
-            라이브러리에 저장되었습니다!
+            라이브러리에 저장 완료!
           </motion.div>
         )}
       </AnimatePresence>
@@ -484,9 +491,10 @@ export default function App() {
                       />
                       <button 
                         onClick={handleSaveTemplate} 
+                        disabled={isSaving}
                         className={`save-btn ${isSaved ? 'saved' : ''}`}
                       >
-                        {isSaved ? 'Saved ✓' : 'Save'}
+                        {isSaving ? '저장 중...' : isSaved ? 'Complete ✓' : 'Save'}
                       </button>
                     </div>
                   </div>
