@@ -118,33 +118,34 @@ export default function App() {
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    const loadSavedData = async () => {
-      // LocalStorage Sync
-      const savedConfig = localStorage.getItem('shotmaker_config_v12');
-      if (savedConfig) setConfig(JSON.parse(savedConfig));
-      
-      const savedMat = localStorage.getItem('shotmaker_useDetailMaterial_v12');
-      if (savedMat) setUseDetailMaterial(savedMat === 'true');
-      
-      const savedText = localStorage.getItem('shotmaker_removeText_v12');
-      if (savedText) setRemoveText(savedText === 'true');
+    // 1. LocalStorage Sync (Instant)
+    const savedConfig = localStorage.getItem('shotmaker_config_v12');
+    if (savedConfig) setConfig(JSON.parse(savedConfig));
+    const savedMat = localStorage.getItem('shotmaker_useDetailMaterial_v12');
+    if (savedMat) setUseDetailMaterial(savedMat === 'true');
+    const savedText = localStorage.getItem('shotmaker_removeText_v12');
+    if (savedText) setRemoveText(savedText === 'true');
 
-      // Firebase Fetch (Initial)
-      try {
-        const q = query(collection(db, "templates"), orderBy("createdAt", "desc"));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-          const templates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          setSavedTemplates(templates);
-          setIsLoading(false);
-        });
-        return () => unsubscribe();
-      } catch (error) {
-        console.error("Firebase sync error:", error);
-        setIsLoading(false);
-      }
+    // 2. Firebase Real-time Sync
+    const q = query(collection(db, "templates"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const templates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setSavedTemplates(templates);
+      setIsLoading(false); // Success load
+    }, (error) => {
+      console.error("Firebase sync error:", error);
+      setIsLoading(false); // Load even on error
+    });
+
+    // 3. Safety Fallback (Ensure app loads even if Firebase is slow/blocked)
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => {
+      unsubscribe();
+      clearTimeout(timer);
     };
-
-    loadSavedData();
   }, []);
 
   useEffect(() => {
