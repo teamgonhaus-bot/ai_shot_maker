@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trash2 } from 'lucide-react';
+import { Trash2, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function TemplateCard({ template, onLoad, onDelete }) {
@@ -9,33 +9,34 @@ export default function TemplateCard({ template, onLoad, onDelete }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="ios-bento-card flex flex-col justify-between"
-      style={{ padding: '16px', minHeight: '160px', marginBottom: '0' }}
+      style={{ padding: '16px', minHeight: '140px', marginBottom: '0' }}
     >
-      <div className="flex-1 mb-4">
+      <div className="flex-1">
         <div className="flex items-center gap-2 mb-2">
-          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: template.thumbnailColor || '#000' }} />
-          <h4 className="font-bold text-[15px] text-black line-clamp-1">
+          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: template.thumbnailColor || '#000' }} />
+          <h4 className="font-bold text-[14px] text-black line-clamp-1">
             {template.name}
           </h4>
         </div>
-        <p className="text-[12px] font-medium text-gray-400 line-clamp-3 leading-relaxed">
+        <p className="text-[11px] font-medium text-gray-400 line-clamp-3 leading-relaxed">
           {template.prompt}
         </p>
       </div>
 
-      <div className="flex gap-2 pt-2 border-t border-gray-50">
+      <div className="flex justify-end gap-2 pt-3">
         <button
           onClick={() => onLoad(template)}
-          className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-black text-[12px] font-bold rounded-xl transition-all border-none cursor-pointer ios-interact"
+          className="w-8 h-8 flex items-center justify-center bg-[#F2F2F7] hover:bg-black hover:text-white text-black rounded-full transition-all border-none cursor-pointer ios-interact"
+          title="Load"
         >
-          Load
+          <ArrowRight className="w-4 h-4" />
         </button>
         <button
           onClick={(e) => {
             e.stopPropagation();
             onDelete(template.id);
           }}
-          className="px-3 py-2 bg-gray-50 hover:bg-red-50 text-red-500 rounded-xl transition-all border-none cursor-pointer ios-interact"
+          className="w-8 h-8 flex items-center justify-center bg-[#F2F2F7] hover:bg-red-50 text-red-500 rounded-full transition-all border-none cursor-pointer ios-interact"
           title="Delete"
         >
           <Trash2 className="w-4 h-4" />

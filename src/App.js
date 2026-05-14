@@ -118,39 +118,40 @@ export default function App() {
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    const loadSavedData = () => {
-      const savedConfig = localStorage.getItem('shotmaker_config_v11');
+    const loadSavedData = async () => {
+      // LocalStorage Sync
+      const savedConfig = localStorage.getItem('shotmaker_config_v12');
       if (savedConfig) setConfig(JSON.parse(savedConfig));
       
-      const savedMat = localStorage.getItem('shotmaker_useDetailMaterial_v11');
+      const savedMat = localStorage.getItem('shotmaker_useDetailMaterial_v12');
       if (savedMat) setUseDetailMaterial(savedMat === 'true');
       
-      const savedText = localStorage.getItem('shotmaker_removeText_v11');
+      const savedText = localStorage.getItem('shotmaker_removeText_v12');
       if (savedText) setRemoveText(savedText === 'true');
 
-      // Set loading false after states are synced
-      setTimeout(() => setIsLoading(false), 200);
+      // Firebase Fetch (Initial)
+      try {
+        const q = query(collection(db, "templates"), orderBy("createdAt", "desc"));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+          const templates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setSavedTemplates(templates);
+          setIsLoading(false);
+        });
+        return () => unsubscribe();
+      } catch (error) {
+        console.error("Firebase sync error:", error);
+        setIsLoading(false);
+      }
     };
 
     loadSavedData();
-
-    // Firebase Snapshot
-    const q = query(collection(db, "templates"), orderBy("createdAt", "desc"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const templates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setSavedTemplates(templates);
-    }, (error) => {
-      console.error("Firebase snapshot error:", error);
-    });
-
-    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     if (!isLoading) {
-      localStorage.setItem('shotmaker_config_v11', JSON.stringify(config));
-      localStorage.setItem('shotmaker_useDetailMaterial_v11', useDetailMaterial);
-      localStorage.setItem('shotmaker_removeText_v11', removeText);
+      localStorage.setItem('shotmaker_config_v12', JSON.stringify(config));
+      localStorage.setItem('shotmaker_useDetailMaterial_v12', useDetailMaterial);
+      localStorage.setItem('shotmaker_removeText_v12', removeText);
     }
   }, [config, useDetailMaterial, removeText, isLoading]);
 
@@ -168,7 +169,7 @@ export default function App() {
   const handleSaveTemplate = async () => {
     if (!templateName || !generatedPrompt) return;
     try {
-      await addDoc(collection(db, "templates"), {
+      const newTemplate = {
         name: templateName,
         prompt: generatedPrompt,
         config: config,
@@ -176,7 +177,13 @@ export default function App() {
         removeText,
         createdAt: new Date(),
         thumbnailColor: ['#FF3B30', '#34C759', '#AF52DE', '#FF9500', '#007AFF'][Math.floor(Math.random() * 5)]
-      });
+      };
+      
+      const docRef = await addDoc(collection(db, "templates"), newTemplate);
+      
+      // Immediate local state update for zero-latency UI
+      setSavedTemplates(prev => [{ id: docRef.id, ...newTemplate }, ...prev]);
+      
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 1500);
       setTemplateName("");
@@ -397,11 +404,11 @@ export default function App() {
                         value={templateName} 
                         onChange={(e) => setTemplateName(e.target.value)} 
                         placeholder="Enter preset name..." 
-                        className="flex-1 px-4 py-4 bg-[#F2F2F7] rounded-2xl border-none outline-none focus:ring-1 focus:ring-black font-medium text-[15px]" 
+                        className="flex-1 px-4 py-3 bg-[#F2F2F7] rounded-xl border-none outline-none focus:ring-1 focus:ring-black font-medium text-[14px]" 
                       />
                       <button 
                         onClick={handleSaveTemplate} 
-                        className={`transition-all duration-300 px-8 py-4 rounded-2xl flex items-center justify-center ios-interact border-none font-bold text-[15px] ${isSaved ? 'bg-green-500 text-white' : 'bg-black text-white'}`}
+                        className={`transition-all duration-300 px-6 py-3 rounded-xl flex items-center justify-center ios-interact border-none font-bold text-[14px] h-[44px] ${isSaved ? 'bg-green-500 text-white' : 'bg-black text-white'}`}
                       >
                         {isSaved ? 'Saved ✓' : 'Save'}
                       </button>
@@ -412,33 +419,29 @@ export default function App() {
             </div>
           </motion.div>
         ) : (
-          <motion.div key="library" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-6">
-            <div className="flex justify-between items-center px-2 mb-6">
-              <h2 className="text-[40px] font-black text-black tracking-tight leading-none mb-1">Library</h2>
-              <button 
-                onClick={() => setActiveTab('home')}
-                className="ios-white-btn ios-interact p-3 flex items-center justify-center rounded-full"
-                style={{ padding: '12px' }}
-              >
-                <X className="w-6 h-6 text-black" />
-              </button>
-            </div>
+          <motion.div key="library" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-6 relative">
+            <button className="ios-library-close" onClick={() => setActiveTab('home')}>
+              <X className="w-4 h-4" />
+            </button>
+            <h2 className="ios-section-title">Library</h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {savedTemplates.length === 0 ? (
-                <div className="col-span-full py-20 text-center ios-bg-card ios-rounded-2xl ios-shadow flex flex-col items-center justify-center">
-                  <LayoutTemplate className="w-12 h-12 text-gray-300 mb-4" />
-                  <p className="text-gray-500 font-bold m-0">Your library is empty</p>
+            <div className="ios-library-grid">
+              {savedTemplates.map(template => (
+                <TemplateCard 
+                  key={template.id} 
+                  template={template} 
+                  onLoad={(t) => {
+                    handleLoadTemplate(t);
+                    setActiveTab('home');
+                  }} 
+                  onDelete={handleDeleteTemplate} 
+                />
+              ))}
+              {savedTemplates.length === 0 && (
+                <div className="col-span-2 text-center py-20 bg-white rounded-3xl ios-shadow">
+                  <LayoutTemplate className="w-12 h-12 text-gray-200 mb-4 mx-auto" />
+                  <p className="text-gray-400 font-bold m-0">Your library is empty</p>
                 </div>
-              ) : (
-                savedTemplates.map(template => (
-                  <TemplateCard 
-                    key={template.id} 
-                    template={template} 
-                    onLoad={handleLoadTemplate} 
-                    onDelete={handleDeleteTemplate} 
-                  />
-                ))
               )}
             </div>
           </motion.div>
@@ -446,7 +449,7 @@ export default function App() {
       </AnimatePresence>
 
       <footer className="ios-footer">
-        v0.11 · AI Shot Maker
+        v0.12 · AI Shot Maker
       </footer>
       <div className="h-12"></div>
     </div>

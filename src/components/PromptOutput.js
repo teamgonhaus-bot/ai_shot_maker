@@ -17,24 +17,24 @@ export default function PromptOutput({ prompt }) {
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="ios-bento-card w-full relative overflow-hidden"
+      className="ios-bento-card w-full relative"
+      style={{ padding: '24px' }}
     >
-      <div className="flex flex-col relative z-10">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-[12px] font-bold text-gray-400 uppercase tracking-widest">
-            Final Result
-          </span>
-          <button
-            onClick={handleCopy}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full transition-all text-[12px] font-bold border-none cursor-pointer ios-interact ${
-              copied ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-            {copied ? 'Copied!' : 'Copy'}
-          </button>
-        </div>
-        <p className="text-[15px] font-medium text-black leading-[1.8] p-5 bg-[#F9F9F9] rounded-2xl border border-gray-100 m-0">
+      <button
+        onClick={handleCopy}
+        className={`absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all text-[11px] font-bold border-none cursor-pointer ios-interact z-20 ${
+          copied ? 'bg-black text-white' : 'bg-[#F2F2F7] text-black hover:bg-[#E5E5EA]'
+        }`}
+      >
+        {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+        {copied ? 'Copied!' : 'Copy'}
+      </button>
+
+      <div className="flex flex-col relative z-10 pr-12">
+        <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">
+          Final Result
+        </span>
+        <p className="text-[15px] font-medium text-black leading-[1.6] m-0 pr-4">
           {prompt}
         </p>
       </div>

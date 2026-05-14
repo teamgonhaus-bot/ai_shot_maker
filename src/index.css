@@ -63,11 +63,43 @@ body {
 /* Card Style for Sections */
 .ios-bento-card {
   background-color: #FFFFFF;
-  border-radius: 24px;
+  border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   border: none;
   margin-bottom: 16px;
+  position: relative;
+}
+
+/* Library Grid Layout (v0.12) */
+.ios-library-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.ios-library-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F2F2F7;
+  color: #000000;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  z-index: 50;
+}
+
+.ios-library-close:hover {
+  background: #E5E5EA;
+  transform: rotate(90deg);
 }
 
 /* Action Button */
