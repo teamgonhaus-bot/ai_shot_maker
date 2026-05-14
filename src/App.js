@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Save, Wand2, LayoutTemplate, X 
+  Wand2, LayoutTemplate, X 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from './firebase';
