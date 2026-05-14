@@ -118,41 +118,49 @@ export default function App() {
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
+    console.log("🚀 Initializing Shot Maker v0.13 Studio...");
+    
     // 1. LocalStorage Sync (Instant)
-    const savedConfig = localStorage.getItem('shotmaker_config_v12');
+    const savedConfig = localStorage.getItem('shotmaker_config_v13');
     if (savedConfig) setConfig(JSON.parse(savedConfig));
-    const savedMat = localStorage.getItem('shotmaker_useDetailMaterial_v12');
+    const savedMat = localStorage.getItem('shotmaker_useDetailMaterial_v13');
     if (savedMat) setUseDetailMaterial(savedMat === 'true');
-    const savedText = localStorage.getItem('shotmaker_removeText_v12');
+    const savedText = localStorage.getItem('shotmaker_removeText_v13');
     if (savedText) setRemoveText(savedText === 'true');
 
     // 2. Firebase Real-time Sync
-    const q = query(collection(db, "templates"), orderBy("createdAt", "desc"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const templates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setSavedTemplates(templates);
-      setIsLoading(false); // Success load
-    }, (error) => {
-      console.error("Firebase sync error:", error);
-      setIsLoading(false); // Load even on error
-    });
+    try {
+      const q = query(collection(db, "templates"), orderBy("createdAt", "desc"));
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const templates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        console.log(`✅ Firebase Synced: ${templates.length} templates loaded.`);
+        setSavedTemplates(templates);
+        setIsLoading(false);
+      }, (error) => {
+        console.error("❌ Firebase sync error:", error);
+        setIsLoading(false);
+      });
 
-    // 3. Safety Fallback (Ensure app loads even if Firebase is slow/blocked)
-    const timer = setTimeout(() => {
+      // 3. Safety Fallback
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 2000);
+
+      return () => {
+        unsubscribe();
+        clearTimeout(timer);
+      };
+    } catch (e) {
+      console.error("❌ Firebase initialization failed:", e);
       setIsLoading(false);
-    }, 2000);
-
-    return () => {
-      unsubscribe();
-      clearTimeout(timer);
-    };
+    }
   }, []);
 
   useEffect(() => {
     if (!isLoading) {
-      localStorage.setItem('shotmaker_config_v12', JSON.stringify(config));
-      localStorage.setItem('shotmaker_useDetailMaterial_v12', useDetailMaterial);
-      localStorage.setItem('shotmaker_removeText_v12', removeText);
+      localStorage.setItem('shotmaker_config_v13', JSON.stringify(config));
+      localStorage.setItem('shotmaker_useDetailMaterial_v13', useDetailMaterial);
+      localStorage.setItem('shotmaker_removeText_v13', removeText);
     }
   }, [config, useDetailMaterial, removeText, isLoading]);
 
@@ -169,6 +177,7 @@ export default function App() {
 
   const handleSaveTemplate = async () => {
     if (!templateName || !generatedPrompt) return;
+    console.log(`💾 Attempting to save template: "${templateName}"...`);
     try {
       const newTemplate = {
         name: templateName,
@@ -181,6 +190,7 @@ export default function App() {
       };
       
       const docRef = await addDoc(collection(db, "templates"), newTemplate);
+      console.log(`✅ Template saved successfully with ID: ${docRef.id}`);
       
       // Immediate local state update for zero-latency UI
       setSavedTemplates(prev => [{ id: docRef.id, ...newTemplate }, ...prev]);
@@ -189,7 +199,8 @@ export default function App() {
       setTimeout(() => setIsSaved(false), 1500);
       setTemplateName("");
     } catch (e) {
-      console.error("Error saving template:", e);
+      console.error("❌ Error saving template:", e);
+      alert("Save failed. Check console for details.");
     }
   };
 
@@ -269,14 +280,14 @@ export default function App() {
 
   return (
     <div className="app-container">
-      <header className="flex justify-between items-center mb-8 px-1">
+      <header className="flex justify-between items-center mb-10 px-4">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <h1 className="text-2xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest m-0">Advanced Prompt Studio</p>
         </div>
-        <div className="flex gap-1.5 bg-gray-200/50 p-1 rounded-full">
-          <button className={`ios-pill ios-interact ${activeTab === 'home' ? 'bg-black text-white shadow-none border-none' : 'bg-transparent text-gray-500 shadow-none border-none'}`} style={{ padding: '6px 14px' }} onClick={() => setActiveTab('home')}>Create</button>
-          <button className={`ios-pill ios-interact ${activeTab === 'library' ? 'bg-black text-white shadow-none border-none' : 'bg-transparent text-gray-500 shadow-none border-none'}`} style={{ padding: '6px 14px' }} onClick={() => setActiveTab('library')}>Library</button>
+        <div className="flex gap-1.5 bg-white ios-shadow p-1.5 rounded-full">
+          <button className={`ios-pill ios-interact ${activeTab === 'home' ? 'bg-black text-white' : 'bg-transparent text-gray-500 border-none shadow-none'}`} style={{ padding: '6px 14px' }} onClick={() => setActiveTab('home')}>Create</button>
+          <button className={`ios-pill ios-interact ${activeTab === 'library' ? 'bg-black text-white' : 'bg-transparent text-gray-500 border-none shadow-none'}`} style={{ padding: '6px 14px' }} onClick={() => setActiveTab('library')}>Library</button>
         </div>
       </header>
 
@@ -396,20 +407,22 @@ export default function App() {
               </button>
 
               {generatedPrompt && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-8 space-y-6">
+                <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} className="mt-12 space-y-8">
                   <PromptOutput prompt={generatedPrompt} />
+                  
                   <div className="ios-bento-card">
-                    <div className="flex gap-2">
+                    <div className="ios-option-label mb-3">Save Preset</div>
+                    <div className="flex items-center bg-[#F2F2F7] rounded-2xl p-2 gap-2">
                       <input 
                         type="text" 
                         value={templateName} 
                         onChange={(e) => setTemplateName(e.target.value)} 
-                        placeholder="Enter preset name..." 
-                        className="flex-1 px-4 py-3 bg-[#F2F2F7] rounded-xl border-none outline-none focus:ring-1 focus:ring-black font-medium text-[14px]" 
+                        placeholder="Preset name..." 
+                        className="flex-1 px-3 py-2 bg-transparent border-none outline-none font-medium text-[14px]" 
                       />
                       <button 
                         onClick={handleSaveTemplate} 
-                        className={`transition-all duration-300 px-6 py-3 rounded-xl flex items-center justify-center ios-interact border-none font-bold text-[14px] h-[44px] ${isSaved ? 'bg-green-500 text-white' : 'bg-black text-white'}`}
+                        className={`transition-all duration-300 px-6 py-2.5 rounded-xl flex items-center justify-center ios-interact border-none font-bold text-[13px] ${isSaved ? 'bg-green-500 text-white' : 'bg-black text-white'}`}
                       >
                         {isSaved ? 'Saved ✓' : 'Save'}
                       </button>
@@ -450,7 +463,7 @@ export default function App() {
       </AnimatePresence>
 
       <footer className="ios-footer">
-        v0.12 · AI Shot Maker
+        v0.13 · AI Shot Maker
       </footer>
       <div className="h-12"></div>
     </div>
