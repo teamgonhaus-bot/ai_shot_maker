@@ -20,21 +20,21 @@ export default function PromptOutput({ prompt }) {
       className="ios-bento-card w-full relative overflow-hidden"
     >
       <div className="flex flex-col relative z-10">
-        <div className="flex items-center justify-between mb-[12px]">
-          <span className="text-[13px] font-semibold text-gray-400 uppercase tracking-widest m-0">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-[12px] font-bold text-gray-400 uppercase tracking-widest">
             Final Result
           </span>
           <button
             onClick={handleCopy}
-            className={`flex items-center justify-center p-2 rounded-full transition-colors border-none cursor-pointer ios-interact ${
-              copied ? 'bg-[#E9E9EB] text-green-600' : 'bg-[#E9E9EB] text-gray-600 hover:bg-[#D1D1D6]'
+            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full transition-all text-[12px] font-bold border-none cursor-pointer ios-interact ${
+              copied ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
-            title="Copy to clipboard"
           >
-            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+            {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? 'Copied!' : 'Copy'}
           </button>
         </div>
-        <p className="text-[15px] font-medium text-black leading-relaxed p-4 bg-[#F2F2F7] rounded-xl border-none m-0">
+        <p className="text-[15px] font-medium text-black leading-[1.8] p-5 bg-[#F9F9F9] rounded-2xl border border-gray-100 m-0">
           {prompt}
         </p>
       </div>

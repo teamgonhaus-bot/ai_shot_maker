@@ -8,12 +8,11 @@
   --text-primary: #000000;
   --text-secondary: #8E8E93;
   --text-muted: #AEAEB2;
-  --color-orange: #FF9500;
-  --color-orange-dark: #E67E00;
   --color-red: #FF3B30;
   --color-green: #34C759;
-  --color-blue: #007AFF;
   --color-purple: #AF52DE;
+  --color-border: #E5E5EA;
+  --color-bg-light: #F9F9F9;
 }
 
 * {
@@ -134,35 +133,54 @@ body {
 }
 
 /* Premium Selection Themes */
-.ios-selected-pill.theme-red { background-color: var(--color-red) !important; box-shadow: 0 4px 10px rgba(255, 59, 48, 0.2) !important; }
-.ios-selected-pill.theme-green { background-color: var(--color-green) !important; box-shadow: 0 4px 10px rgba(52, 199, 89, 0.2) !important; }
-.ios-selected-pill.theme-blue { background-color: var(--color-blue) !important; box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2) !important; }
-.ios-selected-pill.theme-purple { background-color: var(--color-purple) !important; box-shadow: 0 4px 10px rgba(175, 82, 222, 0.2) !important; }
+.ios-selected-pill.theme-red { background-color: var(--color-red) !important; color: white !important; box-shadow: 0 4px 10px rgba(255, 59, 48, 0.2) !important; border: none !important; }
+.ios-selected-pill.theme-green { background-color: var(--color-green) !important; color: white !important; box-shadow: 0 4px 10px rgba(52, 199, 89, 0.2) !important; border: none !important; }
+.ios-selected-pill.theme-purple { background-color: var(--color-purple) !important; color: white !important; box-shadow: 0 4px 10px rgba(175, 82, 222, 0.2) !important; border: none !important; }
 
 .ios-selected-pill {
-  color: white !important;
   transform: translateY(-1px);
 }
 
-/* Slim Sophisticated Pill Button */
+/* Slim Sophisticated Capsule Button (v0.11) */
 .ios-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 12px;
+  padding: 5px 12px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500; /* Medium weight */
   border-radius: 9999px;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: none;
   cursor: pointer;
-  background-color: #FFFFFF;
-  color: #1C1C1E;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  background-color: var(--color-bg-light);
+  color: #3A3A3C;
+  border: 1px solid var(--color-border);
 }
 
 .ios-pill:active {
   transform: scale(0.95);
+}
+
+/* Section & Label Styling */
+.ios-section-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #000000;
+  margin-top: 32px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.ios-option-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #000000; /* Pure Black */
+  margin-bottom: 8px; /* 8px gap as requested */
+  display: block;
+}
+
+.ios-option-group {
+  margin-bottom: 24px; /* 24px gap between groups as requested */
 }
 
 /* Toggle Switch Styles */
@@ -170,7 +188,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  padding: 8px 0;
 }
 
 .ios-switch {

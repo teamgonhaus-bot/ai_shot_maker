@@ -34,6 +34,11 @@ export default function OptionSelect({ label, value, onChange, options, icon: Ic
               className={`ios-pill ios-interact ${
                 active ? `ios-selected-pill theme-${theme}` : ''
               }`}
+              style={{
+                paddingTop: '6px',
+                paddingBottom: '6px',
+                minWidth: '60px'
+              }}
             >
               <span className="flex items-center gap-1.5">
                 {Icon && <Icon className="w-3.5 h-3.5" />} {opt}

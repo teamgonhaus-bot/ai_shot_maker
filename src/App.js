@@ -113,39 +113,44 @@ export default function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [savedTemplates, setSavedTemplates] = useState([]);
   const [templateName, setTemplateName] = useState("");
+  const [isSaved, setIsSaved] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
     const loadSavedData = () => {
-      const savedConfig = localStorage.getItem('shotmaker_config');
+      const savedConfig = localStorage.getItem('shotmaker_config_v11');
       if (savedConfig) setConfig(JSON.parse(savedConfig));
       
-      const savedMat = localStorage.getItem('shotmaker_useDetailMaterial');
+      const savedMat = localStorage.getItem('shotmaker_useDetailMaterial_v11');
       if (savedMat) setUseDetailMaterial(savedMat === 'true');
       
-      const savedText = localStorage.getItem('shotmaker_removeText');
+      const savedText = localStorage.getItem('shotmaker_removeText_v11');
       if (savedText) setRemoveText(savedText === 'true');
 
       // Set loading false after states are synced
-      setTimeout(() => setIsLoading(false), 300);
+      setTimeout(() => setIsLoading(false), 200);
     };
 
     loadSavedData();
 
+    // Firebase Snapshot
     const q = query(collection(db, "templates"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const templates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setSavedTemplates(templates);
+    }, (error) => {
+      console.error("Firebase snapshot error:", error);
     });
+
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     if (!isLoading) {
-      localStorage.setItem('shotmaker_config', JSON.stringify(config));
-      localStorage.setItem('shotmaker_useDetailMaterial', useDetailMaterial);
-      localStorage.setItem('shotmaker_removeText', removeText);
+      localStorage.setItem('shotmaker_config_v11', JSON.stringify(config));
+      localStorage.setItem('shotmaker_useDetailMaterial_v11', useDetailMaterial);
+      localStorage.setItem('shotmaker_removeText_v11', removeText);
     }
   }, [config, useDetailMaterial, removeText, isLoading]);
 
@@ -170,8 +175,10 @@ export default function App() {
         useDetailMaterial,
         removeText,
         createdAt: new Date(),
-        thumbnailColor: ['#7C3AED', '#FACC15', '#18181B', '#BEF264', '#EF4444'][Math.floor(Math.random() * 5)]
+        thumbnailColor: ['#FF3B30', '#34C759', '#AF52DE', '#FF9500', '#007AFF'][Math.floor(Math.random() * 5)]
       });
+      setIsSaved(true);
+      setTimeout(() => setIsSaved(false), 1500);
       setTemplateName("");
     } catch (e) {
       console.error("Error saving template:", e);
@@ -254,14 +261,14 @@ export default function App() {
 
   return (
     <div className="app-container">
-      <header className="flex justify-between items-center mb-8">
+      <header className="flex justify-between items-center mb-8 px-1">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <h1 className="text-2xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest m-0">Advanced Prompt Studio</p>
         </div>
         <div className="flex gap-1.5 bg-gray-200/50 p-1 rounded-full">
-          <button className={`ios-pill ios-interact ${activeTab === 'home' ? 'bg-black text-white' : 'bg-transparent text-gray-500'}`} style={{ padding: '6px 14px' }} onClick={() => setActiveTab('home')}>Create</button>
-          <button className={`ios-pill ios-interact ${activeTab === 'library' ? 'bg-black text-white' : 'bg-transparent text-gray-500'}`} style={{ padding: '6px 14px' }} onClick={() => setActiveTab('library')}>Library</button>
+          <button className={`ios-pill ios-interact ${activeTab === 'home' ? 'bg-black text-white shadow-none border-none' : 'bg-transparent text-gray-500 shadow-none border-none'}`} style={{ padding: '6px 14px' }} onClick={() => setActiveTab('home')}>Create</button>
+          <button className={`ios-pill ios-interact ${activeTab === 'library' ? 'bg-black text-white shadow-none border-none' : 'bg-transparent text-gray-500 shadow-none border-none'}`} style={{ padding: '6px 14px' }} onClick={() => setActiveTab('library')}>Library</button>
         </div>
       </header>
 
@@ -269,9 +276,9 @@ export default function App() {
         {activeTab === 'home' ? (
           <motion.div key="home" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-12">
             
-            {/* 👤 인물 섹션 */}
+            {/* 👤 [인물] 섹션 */}
             <section>
-              <h2 className="ios-section-title" style={{ marginTop: '24px' }}>인물 (Subject)</h2>
+              <h2 className="ios-section-title" style={{ marginTop: '24px' }}>[인물]</h2>
               <div className="ios-bento-card" style={{ padding: '20px' }}>
                 <OptionSelect label="인원" value={config.subjectNum} onChange={(v) => handleConfigChange('subjectNum', v)} options={OPTIONS_DATA.subjectNum} theme="red" />
                 {config.subjectNum !== "없음" && (
@@ -293,9 +300,9 @@ export default function App() {
               </div>
             </section>
 
-            {/* 🏠 공간 섹션 */}
+            {/* 🏠 [공간] 섹션 */}
             <section>
-              <h2 className="ios-section-title">공간 (Space)</h2>
+              <h2 className="ios-section-title">[공간]</h2>
               <div className="ios-bento-card">
                 <OptionSelect label="공간 종류" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} theme="green" />
                 <OptionSelect label="세부 공간" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} theme="green" />
@@ -323,9 +330,9 @@ export default function App() {
               </div>
             </section>
 
-            {/* ⚙️ 카메라 섹션 */}
+            {/* ⚙️ [카메라] 섹션 */}
             <section>
-              <h2 className="ios-section-title" style={{ marginTop: '24px' }}>카메라 (Camera)</h2>
+              <h2 className="ios-section-title" style={{ marginTop: '24px' }}>[카메라]</h2>
               <div className="ios-bento-card" style={{ padding: '20px' }}>
                 <div className="mb-4 border-b border-gray-100">
                   <IOSToggle 
@@ -335,13 +342,13 @@ export default function App() {
                     activeColor="#AF52DE"
                   />
                 </div>
-                <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
+                <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="purple" />
               </div>
             </section>
 
-            {/* 🎨 스타일 섹션 */}
+            {/* 🎨 [스타일] 섹션 */}
             <section>
-              <h2 className="ios-section-title">스타일 (Style)</h2>
+              <h2 className="ios-section-title">[스타일]</h2>
               <div className="ios-bento-card">
                 <OptionSelect 
                   label="연출 샷 스타일 (다중 선택)" 
@@ -381,12 +388,23 @@ export default function App() {
               </button>
 
               {generatedPrompt && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12 space-y-6">
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-8 space-y-6">
                   <PromptOutput prompt={generatedPrompt} />
                   <div className="ios-bento-card">
                     <div className="flex gap-2">
-                      <input type="text" value={templateName} onChange={(e) => setTemplateName(e.target.value)} placeholder="Preset name..." className="flex-1 px-4 py-4 bg-[#F2F2F7] rounded-2xl border-none outline-none focus:ring-2 focus:ring-black font-medium text-[15px]" />
-                      <button onClick={handleSaveTemplate} className="bg-black text-white px-8 py-4 rounded-2xl flex items-center justify-center ios-interact border-none"><Save className="w-5 h-5" /></button>
+                      <input 
+                        type="text" 
+                        value={templateName} 
+                        onChange={(e) => setTemplateName(e.target.value)} 
+                        placeholder="Enter preset name..." 
+                        className="flex-1 px-4 py-4 bg-[#F2F2F7] rounded-2xl border-none outline-none focus:ring-1 focus:ring-black font-medium text-[15px]" 
+                      />
+                      <button 
+                        onClick={handleSaveTemplate} 
+                        className={`transition-all duration-300 px-8 py-4 rounded-2xl flex items-center justify-center ios-interact border-none font-bold text-[15px] ${isSaved ? 'bg-green-500 text-white' : 'bg-black text-white'}`}
+                      >
+                        {isSaved ? 'Saved ✓' : 'Save'}
+                      </button>
                     </div>
                   </div>
                 </motion.div>
@@ -428,7 +446,7 @@ export default function App() {
       </AnimatePresence>
 
       <footer className="ios-footer">
-        v0.1 · AI Shot Maker
+        v0.11 · AI Shot Maker
       </footer>
       <div className="h-12"></div>
     </div>
