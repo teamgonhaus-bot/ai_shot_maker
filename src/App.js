@@ -364,69 +364,88 @@ export default function App() {
     }
     setIsImageGenerating(true);
     setGeneratedImage(null);
-    try {
-      const ratioMap = {
-        "1:1 (Square)": "1:1",
-        "16:9 (Widescreen)": "16:9",
-        "4:3 (Standard)": "4:3",
-        "3:4 (Portrait)": "3:4"
-      };
-      const apiRatio = ratioMap[config.aspectRatio] || "1:1";
 
-      // Nano Banana 2 (gemini-3.1-flash-image-preview) - Official REST API
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": googleApiKey
-          },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{ text: `${promptToUse}. Aspect ratio: ${apiRatio}.` }]
-            }],
-            generationConfig: {
-              responseModalities: ["TEXT", "IMAGE"]
-            }
-          })
+    const ratioMap = {
+      "1:1 (Square)": "1:1",
+      "16:9 (Widescreen)": "16:9",
+      "4:3 (Standard)": "4:3",
+      "3:4 (Portrait)": "3:4"
+    };
+    const apiRatio = ratioMap[config.aspectRatio] || "1:1";
+
+    const requestBody = {
+      contents: [{
+        parts: [{ text: `${promptToUse}. Aspect ratio: ${apiRatio}.` }]
+      }],
+      generationConfig: {
+        responseModalities: ["TEXT", "IMAGE"]
+      }
+    };
+
+    const MAX_RETRIES = 3;
+    let lastError = null;
+
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        // Gemini 2.5 Flash Image (Nano Banana) - Stable Production Model
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": googleApiKey
+            },
+            body: JSON.stringify(requestBody)
+          }
+        );
+
+        if (res.status === 429) {
+          // Rate limited — wait and retry with exponential backoff
+          const waitSec = Math.pow(2, attempt + 1); // 2s, 4s, 8s
+          console.warn(`⏳ 429 Rate Limited. Retrying in ${waitSec}s... (attempt ${attempt + 1}/${MAX_RETRIES})`);
+          await new Promise(r => setTimeout(r, waitSec * 1000));
+          continue;
         }
-      );
 
-      if (!res.ok) {
-        const errData = await res.json().catch(() => null);
-        const status = res.status;
-        let msg = `HTTP ${status}`;
-        if (status === 403) msg = "권한 부족 (403 Forbidden). API 키 또는 프로젝트 설정을 확인하세요.";
-        else if (status === 429) msg = "API 할당량 초과 (429 Too Many Requests). 잠시 후 다시 시도하세요.";
-        else if (status === 400) msg = "잘못된 요청 (400 Bad Request). 프롬프트를 확인하세요.";
-        else if (errData?.error?.message) msg = errData.error.message;
-        console.error("API Error Detail:", errData);
-        throw new Error(msg);
-      }
-
-      const data = await res.json();
-      // Parse Nano Banana 2 response: candidates[0].content.parts[].inlineData
-      const parts = data.candidates?.[0]?.content?.parts || [];
-      let imageFound = false;
-      for (const part of parts) {
-        if (part.inlineData) {
-          const mimeType = part.inlineData.mimeType || "image/png";
-          setGeneratedImage(`data:${mimeType};base64,${part.inlineData.data}`);
-          imageFound = true;
-          break;
+        if (!res.ok) {
+          const errData = await res.json().catch(() => null);
+          const status = res.status;
+          let msg = `HTTP ${status}`;
+          if (status === 403) msg = "권한 부족 (403 Forbidden). API 키 또는 프로젝트 설정을 확인하세요.";
+          else if (status === 400) msg = "잘못된 요청 (400 Bad Request). 프롬프트를 확인하세요.";
+          else if (errData?.error?.message) msg = errData.error.message;
+          console.error("API Error Detail:", errData);
+          throw new Error(msg);
         }
+
+        const data = await res.json();
+        const parts = data.candidates?.[0]?.content?.parts || [];
+        let imageFound = false;
+        for (const part of parts) {
+          if (part.inlineData) {
+            const mimeType = part.inlineData.mimeType || "image/png";
+            setGeneratedImage(`data:${mimeType};base64,${part.inlineData.data}`);
+            imageFound = true;
+            break;
+          }
+        }
+        if (!imageFound) {
+          console.error("No image in response", data);
+          alert("이미지 생성 실패: 응답에 이미지가 포함되지 않았습니다.");
+        }
+        setIsImageGenerating(false);
+        return; // Success — exit the retry loop
+      } catch (e) {
+        lastError = e;
+        console.error(`Attempt ${attempt + 1} failed:`, e);
       }
-      if (!imageFound) {
-        console.error("No image in response", data);
-        alert("이미지 생성 실패: 응답에 이미지가 포함되지 않았습니다.");
-      }
-    } catch (e) {
-      console.error("Nano Banana 2 API Error:", e);
-      alert(`이미지 생성 오류: ${e.message}`);
-    } finally {
-      setIsImageGenerating(false);
     }
+
+    // All retries exhausted
+    console.error("All retries failed:", lastError);
+    alert(`이미지 생성 오류: ${lastError?.message || "알 수 없는 오류"}`);
+    setIsImageGenerating(false);
   };
 
   const simulateUpscale = () => {
