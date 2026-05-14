@@ -131,6 +131,7 @@ export default function App() {
   const [isImageGenerating, setIsImageGenerating] = useState(false);
   const [isUpscaling, setIsUpscaling] = useState(false);
   const [imageCooldown, setImageCooldown] = useState(false);
+  const [cooldownTime, setCooldownTime] = useState(0);
   const [activeCategory, setActiveCategory] = useState('subject');
 
   // Initial Data Load & Persistence Sync
@@ -171,6 +172,14 @@ export default function App() {
 
     fetchTemplates();
   }, []);
+
+  // ⏱️ Cooldown Timer Logic
+  useEffect(() => {
+    if (cooldownTime > 0) {
+      const timer = setTimeout(() => setCooldownTime(prev => prev - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldownTime]);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -366,8 +375,8 @@ export default function App() {
       triggerToast("API 키가 설정되지 않았습니다.");
       return;
     }
-    if (imageCooldown) {
-      triggerToast("잠시 후 다시 시도해주세요. (쿨다운 중)");
+    if (cooldownTime > 0) {
+      triggerToast(`${cooldownTime}초 후에 다시 시도해주세요.`);
       return;
     }
     const promptToUse = prompt || generatedPrompt;
@@ -376,96 +385,71 @@ export default function App() {
       return;
     }
 
-    // 15-second cooldown to strictly manage rate limits
-    setImageCooldown(true);
-    setTimeout(() => setImageCooldown(false), 15000);
-
+    // Set 40-second cooldown to strictly manage free tier rate limits (RPM)
+    setCooldownTime(40);
     setIsImageGenerating(true);
 
-    const ratioMap = {
-      "1:1 (Square)": "1:1",
-      "16:9 (Widescreen)": "16:9",
-      "4:3 (Standard)": "4:3",
-      "3:4 (Portrait)": "3:4"
-    };
-    const apiRatio = ratioMap[config.aspectRatio] || "1:1";
-
-    const MAX_RETRIES = 2;
-    let lastError = null;
-
-    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-      try {
-        // Use URL parameter for auth as it's often more stable for beta endpoints
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${googleApiKey}`;
-        
-        const res = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{ text: promptToUse }]
-            }],
-            generationConfig: {
-              responseModalities: ["IMAGE"],
-              imageConfig: {
-                aspectRatio: apiRatio
-              }
-            }
-          })
-        });
-
-        if (res.status === 429) {
-          const waitMs = (attempt + 1) * 5000;
-          console.warn(`⏳ [429] Rate limited. Retrying in ${waitMs/1000}s...`);
-          await new Promise(r => setTimeout(r, waitMs));
-          continue;
-        }
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          console.error("❌ API Error Response:", data);
-          throw new Error(data.error?.message || `HTTP ${res.status}`);
-        }
-
-        const parts = data.candidates?.[0]?.content?.parts || [];
-        let imageFound = false;
-        
-        for (const part of parts) {
-          if (part.inlineData) {
-            const mimeType = part.inlineData.mimeType || "image/png";
-            setGeneratedImage(`data:${mimeType};base64,${part.inlineData.data}`);
-            imageFound = true;
-            break;
+    try {
+      // Use URL parameter for auth as it's often more stable for beta endpoints
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${googleApiKey}`;
+      
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{ text: promptToUse }]
+          }],
+          generationConfig: {
+            responseModalities: ["IMAGE"]
+            // Minimal payload to reduce overhead
           }
-        }
-        
-        if (!imageFound) {
-          const finishReason = data.candidates?.[0]?.finishReason;
-          console.error("⚠️ No image in response. Data:", data);
-          if (finishReason === 'SAFETY') {
-            throw new Error("보안 정책(Safety)으로 인해 이미지가 차단되었습니다.");
-          } else if (finishReason === 'RECITATION') {
-            throw new Error("저작권 보호(Recitation)로 인해 이미지가 차단되었습니다.");
-          } else {
-            throw new Error(finishReason ? `생성 중단됨 (${finishReason})` : "이미지 데이터를 찾을 수 없습니다.");
-          }
-        }
+        })
+      });
 
-        setIsImageGenerating(false);
-        return; // Success!
-
-      } catch (e) {
-        lastError = e;
-        console.error(`🔴 Attempt ${attempt + 1} failed:`, e);
+      if (res.status === 429) {
+        throw new Error("API 할당량 초과. 약 1분 후 다시 시도해주세요.");
       }
-    }
 
-    // All retries failed
-    setIsImageGenerating(false);
-    triggerToast(`생성 오류: ${lastError?.message || "네트워크 상태를 확인해주세요."}`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error("❌ API Error Response:", data);
+        throw new Error(data.error?.message || `HTTP ${res.status}`);
+      }
+
+      const parts = data.candidates?.[0]?.content?.parts || [];
+      let imageFound = false;
+      
+      for (const part of parts) {
+        if (part.inlineData) {
+          const mimeType = part.inlineData.mimeType || "image/png";
+          setGeneratedImage(`data:${mimeType};base64,${part.inlineData.data}`);
+          imageFound = true;
+          break;
+        }
+      }
+      
+      if (!imageFound) {
+        const finishReason = data.candidates?.[0]?.finishReason;
+        console.error("⚠️ No image in response. Data:", data);
+        if (finishReason === 'SAFETY') {
+          throw new Error("보안 정책(Safety)으로 인해 이미지가 차단되었습니다.");
+        } else if (finishReason === 'RECITATION') {
+          throw new Error("저작권 보호(Recitation)로 인해 이미지가 차단되었습니다.");
+        } else {
+          throw new Error(finishReason ? `생성 중단됨 (${finishReason})` : "이미지 데이터를 찾을 수 없습니다.");
+        }
+      }
+
+    } catch (e) {
+      console.error("🔴 Image Generation Error:", e);
+      triggerToast(`오류: ${e.message}`);
+    } finally {
+      setIsImageGenerating(false);
+    }
   };
 
   const simulateUpscale = () => {
@@ -708,12 +692,19 @@ export default function App() {
               {generatedPrompt && googleApiKey && (
                 <button 
                   onClick={() => generateImageFromGoogle()}
-                  disabled={isImageGenerating || imageCooldown}
+                  disabled={isImageGenerating || cooldownTime > 0}
                   className="generate-btn"
-                  style={{ marginTop: '12px', background: (isImageGenerating || imageCooldown) ? '#48484A' : '#1C1C1E' }}
+                  style={{ 
+                    marginTop: '12px', 
+                    background: (isImageGenerating || cooldownTime > 0) ? '#48484A' : '#1C1C1E',
+                    cursor: (isImageGenerating || cooldownTime > 0) ? 'not-allowed' : 'pointer'
+                  }}
                 >  
                   <ImageIcon className="w-5 h-5 text-white" />
-                  <span>{isImageGenerating ? 'GENERATING IMAGE...' : imageCooldown ? 'COOLDOWN...' : 'GENERATE IMAGE'}</span>
+                  <span>
+                    {isImageGenerating ? 'GENERATING IMAGE...' : 
+                     cooldownTime > 0 ? `COOLDOWN (${cooldownTime}s)` : 'GENERATE IMAGE'}
+                  </span>
                 </button>
               )}
 
