@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Wand2, LayoutTemplate, X 
+  Wand2, LayoutTemplate, X, Image as ImageIcon 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db, auth } from './firebase';
@@ -346,18 +346,22 @@ export default function App() {
 
       const finalPrompt = parts.join(", ");
       setGeneratedPrompt(finalPrompt);
+      setGeneratedImage(null);
       setIsGenerating(false);
-      
-      // Call Google API if key exists
-      if (googleApiKey) {
-        generateImageFromGoogle(finalPrompt);
-      }
-      
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }, 800);
   };
 
   const generateImageFromGoogle = async (prompt) => {
+    if (!googleApiKey) {
+      alert("API 키가 설정되지 않았습니다. Settings에서 키를 입력해주세요.");
+      return;
+    }
+    const promptToUse = prompt || generatedPrompt;
+    if (!promptToUse) {
+      alert("먼저 프롬프트를 생성해주세요.");
+      return;
+    }
     setIsImageGenerating(true);
     setGeneratedImage(null);
     try {
@@ -369,25 +373,57 @@ export default function App() {
       };
       const apiRatio = ratioMap[config.aspectRatio] || "1:1";
 
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${googleApiKey}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          instances: [{ prompt: prompt }],
-          parameters: { sampleCount: 1, aspectRatio: apiRatio }
-        })
-      });
-      
+      // Nano Banana 2 (gemini-3.1-flash-image-preview) - Official REST API
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": googleApiKey
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: `${promptToUse}. Aspect ratio: ${apiRatio}.` }]
+            }],
+            generationConfig: {
+              responseModalities: ["TEXT", "IMAGE"]
+            }
+          })
+        }
+      );
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null);
+        const status = res.status;
+        let msg = `HTTP ${status}`;
+        if (status === 403) msg = "권한 부족 (403 Forbidden). API 키 또는 프로젝트 설정을 확인하세요.";
+        else if (status === 429) msg = "API 할당량 초과 (429 Too Many Requests). 잠시 후 다시 시도하세요.";
+        else if (status === 400) msg = "잘못된 요청 (400 Bad Request). 프롬프트를 확인하세요.";
+        else if (errData?.error?.message) msg = errData.error.message;
+        console.error("API Error Detail:", errData);
+        throw new Error(msg);
+      }
+
       const data = await res.json();
-      if (data.predictions && data.predictions.length > 0) {
-        setGeneratedImage(`data:image/jpeg;base64,${data.predictions[0].bytesBase64Encoded}`);
-      } else {
-        console.error("Image generation failed", data);
-        alert("이미지 생성 실패. API 키나 할당량을 확인하세요.");
+      // Parse Nano Banana 2 response: candidates[0].content.parts[].inlineData
+      const parts = data.candidates?.[0]?.content?.parts || [];
+      let imageFound = false;
+      for (const part of parts) {
+        if (part.inlineData) {
+          const mimeType = part.inlineData.mimeType || "image/png";
+          setGeneratedImage(`data:${mimeType};base64,${part.inlineData.data}`);
+          imageFound = true;
+          break;
+        }
+      }
+      if (!imageFound) {
+        console.error("No image in response", data);
+        alert("이미지 생성 실패: 응답에 이미지가 포함되지 않았습니다.");
       }
     } catch (e) {
-      console.error("API Error", e);
-      alert("API 오류가 발생했습니다.");
+      console.error("Nano Banana 2 API Error:", e);
+      alert(`이미지 생성 오류: ${e.message}`);
     } finally {
       setIsImageGenerating(false);
     }
@@ -396,11 +432,8 @@ export default function App() {
   const simulateUpscale = () => {
     if (!generatedImage) return;
     setIsUpscaling(true);
-    // Simulate a 2s delay for upscale processing
     setTimeout(() => {
       setIsUpscaling(false);
-      // In a real app, this would replace generatedImage with a higher res version.
-      // For now, we will just inform the user and add a CSS class or visual indicator.
       alert("2x Upscale Complete! (Simulated for Demo)");
     }, 2000);
   };
@@ -409,7 +442,7 @@ export default function App() {
     if (!generatedImage) return;
     const a = document.createElement("a");
     a.href = generatedImage;
-    a.download = `shotmaker_${Date.now()}.jpg`;
+    a.download = `shotmaker_${Date.now()}.png`;
     a.click();
   };
 
@@ -430,23 +463,25 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Settings Modal */}
+      {/* Settings Modal (Admin Only) */}
       <AnimatePresence>
-        {isSettingsOpen && (
+        {isSettingsOpen && isAdmin && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="settings-modal-overlay"
+            onClick={() => setIsSettingsOpen(false)}
           >
             <motion.div 
               initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}
               className="settings-modal"
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="settings-header">
                 <h3>Settings</h3>
                 <button onClick={() => setIsSettingsOpen(false)} className="close-btn"><X size={20}/></button>
               </div>
               <div className="settings-body">
-                <label>Google Gemini API Key</label>
+                <label>Google AI API Key (Nano Banana 2)</label>
                 <input 
                   type="password" 
                   value={googleApiKey}
@@ -457,7 +492,7 @@ export default function App() {
                   placeholder="AIzaSy..."
                   className="settings-input"
                 />
-                <p className="settings-hint">Used for Imagen 3 image generation. Stored locally.</p>
+                <p className="settings-hint">Nano Banana 2 (gemini-3.1-flash-image-preview) 이미지 생성에 사용됩니다. 브라우저에 안전하게 저장됩니다.</p>
               </div>
             </motion.div>
           </motion.div>
@@ -467,7 +502,7 @@ export default function App() {
       <header className="app-header">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <h1 className="text-2xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest m-0">v0.3 Professional Studio</p>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest m-0">v0.3 Powered by Nano Banana 2</p>
         </div>
         <div className="flex items-center gap-3">
           <button 
@@ -478,14 +513,16 @@ export default function App() {
           >
             {isDarkMode ? '☀️' : '🌙'}
           </button>
-          <button 
-            onClick={() => setIsSettingsOpen(true)}
-            className="ios-card-icon-btn"
-            title="Settings"
-            style={{ width: '30px', height: '30px', fontSize: '14px' }}
-          >
-            ⚙️
-          </button>
+          {isAdmin && (
+            <button 
+              onClick={() => setIsSettingsOpen(true)}
+              className="ios-card-icon-btn"
+              title="Settings (Admin)"
+              style={{ width: '30px', height: '30px', fontSize: '14px' }}
+            >
+              ⚙️
+            </button>
+          )}
           <div className="header-nav">
             <button className={`header-nav-btn ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>Create</button>
             <button className={`header-nav-btn ${activeTab === 'library' ? 'active' : ''}`} onClick={() => setActiveTab('library')}>Library</button>
@@ -615,20 +652,37 @@ export default function App() {
                 <span>{isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}</span>
               </button>
 
+              {generatedPrompt && googleApiKey && (
+                <button 
+                  onClick={() => generateImageFromGoogle()}
+                  disabled={isImageGenerating}
+                  className="generate-btn"
+                  style={{ marginTop: '12px', background: '#1C1C1E' }}
+                >
+                  <ImageIcon className="w-5 h-5 text-white" />
+                  <span>{isImageGenerating ? 'GENERATING IMAGE...' : 'GENERATE IMAGE (via Nano Banana 2)'}</span>
+                </button>
+              )}
+
               {isImageGenerating && (
                 <div className="result-card" style={{ marginTop: '32px', minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <div className="skeleton-pulse"></div>
-                  <p style={{ color: '#8E8E93', fontWeight: 600, zIndex: 1, position: 'relative' }}>Generating High-Res Image...</p>
+                  <p style={{ color: '#8E8E93', fontWeight: 600, zIndex: 1, position: 'relative' }}>Nano Banana 2 이미지 생성 중...</p>
                 </div>
               )}
 
               {!isImageGenerating && generatedPrompt && (
                 <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} className="mt-12 space-y-8">
                   
-                  {googleApiKey && generatedImage ? (
-                    <div className="result-card" style={{ padding: '0', overflow: 'hidden', position: 'relative' }}>
+                  {generatedImage ? (
+                    <div className="result-card image-result-card" style={{ padding: '0', overflow: 'hidden', position: 'relative' }}>
                       <img src={generatedImage} alt="Generated output" className="w-full h-auto object-cover" style={{ display: 'block' }} />
                       
+                      {/* Prompt tooltip on hover */}
+                      <div className="image-prompt-tooltip">
+                        <p>{generatedPrompt.length > 120 ? generatedPrompt.slice(0, 120) + '...' : generatedPrompt}</p>
+                      </div>
+
                       {isUpscaling && (
                         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', color: 'white', fontWeight: 'bold', letterSpacing: '0.1em', zIndex: 10 }}>
                           UPSCALING...
@@ -702,7 +756,7 @@ export default function App() {
       </AnimatePresence>
 
       <footer className="ios-footer">
-        v0.3 - Professional Studio · AI Shot Maker
+        v0.3 - Powered by Nano Banana 2 · AI Shot Maker
       </footer>
       <div className="h-12"></div>
     </div>
