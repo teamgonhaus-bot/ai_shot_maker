@@ -132,6 +132,11 @@ export default function App() {
   const [isUpscaling, setIsUpscaling] = useState(false);
   const [cooldownTime, setCooldownTime] = useState(0);
   const [activeCategory, setActiveCategory] = useState('subject');
+  
+  // Image-to-Image & Lightbox states
+  const [refImage, setRefImage] = useState(null); // { mimeType, data }
+  const [useImageRef, setUseImageRef] = useState(false);
+  const [lightboxImage, setLightboxImage] = useState(null);
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
@@ -397,9 +402,19 @@ export default function App() {
       };
       const apiRatio = ratioMap[config.aspectRatio] || "1:1";
 
-      // Use URL parameter for auth as it's often more stable for beta endpoints
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${googleApiKey}`;
       
+      // Construct parts for multimodal input
+      const parts = [{ text: promptToUse }];
+      if (useImageRef && refImage) {
+        parts.push({
+          inlineData: {
+            mimeType: refImage.mimeType,
+            data: refImage.data
+          }
+        });
+      }
+
       const res = await fetch(url, {
         method: "POST",
         headers: {
@@ -407,7 +422,7 @@ export default function App() {
         },
         body: JSON.stringify({
           contents: [{
-            parts: [{ text: promptToUse }]
+            parts: parts
           }],
           generationConfig: {
             responseModalities: ["IMAGE"],
@@ -429,10 +444,10 @@ export default function App() {
         throw new Error(data.error?.message || `HTTP ${res.status}`);
       }
 
-      const parts = data.candidates?.[0]?.content?.parts || [];
+      const responseParts = data.candidates?.[0]?.content?.parts || [];
       let imageFound = false;
       
-      for (const part of parts) {
+      for (const part of responseParts) {
         if (part.inlineData) {
           const mimeType = part.inlineData.mimeType || "image/png";
           setGeneratedImage(`data:${mimeType};base64,${part.inlineData.data}`);
@@ -482,6 +497,31 @@ export default function App() {
 
   return (
     <div className="app-container">
+      {/* 🖼️ Lightbox Modal */}
+      <AnimatePresence>
+        {lightboxImage && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="ios-lightbox"
+            onClick={() => setLightboxImage(null)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="ios-lightbox-content"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img src={lightboxImage} alt="Fullscreen" className="ios-lightbox-img" />
+              <button className="ios-lightbox-close" onClick={() => setLightboxImage(null)}>✕</button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="ios-toast-container">
       <AnimatePresence>
         {showToast && (
           <motion.div 
@@ -494,6 +534,7 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
 
       {/* Settings Modal (Admin Only) */}
       <AnimatePresence>
@@ -642,13 +683,66 @@ export default function App() {
                 <motion.section key="camera" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                   <h2 className="ios-section-title">[카메라]</h2>
                   <div className="ios-bento-card" style={{ padding: '20px' }}>
-                    <div className="mb-4 border-b border-gray-100">
+                    <div className="mb-4 space-y-4">
                       <IOSToggle 
-                        label="텍스트/로고 제거" 
-                        isOn={removeText} 
-                        onToggle={() => setRemoveText(!removeText)} 
-                        activeColor="#AF52DE"
+                        label="이미지 참조 모드 (Image-to-Image)" 
+                        isOn={useImageRef} 
+                        onToggle={() => setUseImageRef(!useImageRef)} 
+                        activeColor="#007AFF"
                       />
+                      
+                      {useImageRef && (
+                        <div className="ios-upload-zone">
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            id="ref-image-upload" 
+                            className="hidden" 
+                            onChange={(e) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setRefImage({
+                                    mimeType: file.type,
+                                    data: reader.result.split(',')[1]
+                                  });
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
+                          {!refImage ? (
+                            <label htmlFor="ref-image-upload" className="ios-upload-placeholder">
+                              <span className="text-2xl mb-1">📸</span>
+                              <span className="text-xs font-semibold text-gray-500">참조 이미지 업로드</span>
+                            </label>
+                          ) : (
+                            <div className="relative group">
+                              <img 
+                                src={`data:${refImage.mimeType};base64,${refImage.data}`} 
+                                alt="Ref Preview" 
+                                className="ios-upload-preview"
+                              />
+                              <button 
+                                onClick={() => setRefImage(null)}
+                                className="ios-upload-remove-btn"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="border-t border-gray-100 pt-4">
+                        <IOSToggle 
+                          label="텍스트/로고 제거" 
+                          isOn={removeText} 
+                          onToggle={() => setRemoveText(!removeText)} 
+                          activeColor="#AF52DE"
+                        />
+                      </div>
                     </div>
                     <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="purple" />
                     <OptionSelect label="이미지 비율 (Aspect Ratio)" value={config.aspectRatio} onChange={(v) => handleConfigChange('aspectRatio', v)} options={OPTIONS_DATA.aspectRatio} theme="purple" />
@@ -728,8 +822,13 @@ export default function App() {
                 <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} className="mt-12 space-y-8">
                   
                   {generatedImage ? (
-                    <div className="result-card image-result-card" style={{ padding: '0', overflow: 'hidden', position: 'relative' }}>
-                      <img src={generatedImage} alt="Generated output" className="w-full h-auto object-cover" style={{ display: 'block' }} />
+                    <div className="image-result-card relative group">
+                      <img 
+                        src={generatedImage} 
+                        alt="Generated" 
+                        className="w-full h-auto cursor-zoom-in" 
+                        onClick={() => setLightboxImage(generatedImage)}
+                      />
                       
                       {/* Prompt tooltip on hover */}
                       <div className="image-prompt-tooltip">
