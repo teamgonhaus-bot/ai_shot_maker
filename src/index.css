@@ -726,3 +726,29 @@ body.dark-mode .ios-library-close { background: #3A3A3C !important; color: #FFF 
 .image-result-card:hover .image-prompt-tooltip {
   opacity: 1 !important;
 }
+
+/* =============================================
+   iOS TOAST NOTIFICATION
+   ============================================= */
+.ios-toast {
+  position: fixed !important;
+  top: 24px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: rgba(28, 28, 30, 0.9) !important;
+  backdrop-filter: blur(20px) !important;
+  color: #FFFFFF !important;
+  padding: 12px 24px !important;
+  border-radius: 100px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  z-index: 1000000 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
+}
+
+body.dark-mode .ios-toast {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #000000 !important;
+}

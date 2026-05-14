@@ -121,6 +121,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [isAdmin, setIsAdmin] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   // v0.3 Features
   const [googleApiKey, setGoogleApiKey] = useState("");
@@ -129,6 +130,7 @@ export default function App() {
   const [generatedImage, setGeneratedImage] = useState(null);
   const [isImageGenerating, setIsImageGenerating] = useState(false);
   const [isUpscaling, setIsUpscaling] = useState(false);
+  const [imageCooldown, setImageCooldown] = useState(false);
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
@@ -214,12 +216,13 @@ export default function App() {
         await signInAnonymously(auth);
         setIsAdmin(true);
         localStorage.setItem('shotmaker_is_admin', 'true');
+        triggerToast("관리자 로그인 성공");
       } catch (error) {
         console.error("Firebase Auth Error:", error);
-        alert("인증 실패: " + error.message);
+        triggerToast("인증 실패: " + error.message);
       }
     } else {
-      alert("암호가 일치하지 않습니다.");
+      triggerToast("암호가 일치하지 않습니다.");
     }
   };
 
@@ -235,7 +238,7 @@ export default function App() {
 
   const handleSaveTemplate = async () => {
     if (!isAdmin) {
-      alert("저장 권한이 없습니다. 관리자로 로그인해주세요.");
+      triggerToast("저장 권한이 없습니다.");
       return;
     }
     if (!templateName || !generatedPrompt) return;
@@ -261,14 +264,11 @@ export default function App() {
       setSavedTemplates(prev => [{ id: docRef.id, ...newTemplate, createdAt: new Date() }, ...prev]);
       
       setIsSaved(true);
-      setShowToast(true);
-      setTimeout(() => {
-        setShowToast(false);
-      }, 3000);
+      triggerToast("라이브러리에 저장 완료!");
       setTemplateName("");
     } catch (e) {
       console.error("Firebase Save Error:", e);
-      alert("저장 실패: " + e.message);
+      triggerToast("저장 실패: " + e.message);
     } finally {
       setIsSaving(false);
     }
@@ -276,13 +276,15 @@ export default function App() {
 
   const handleDeleteTemplate = async (id) => {
     if (!isAdmin) {
-      alert("삭제 권한이 없습니다. 관리자로 로그인해주세요.");
+      triggerToast("삭제 권한이 없습니다.");
       return;
     }
     try {
       await deleteDoc(doc(db, "templates", id));
+      triggerToast("템플릿이 삭제되었습니다.");
     } catch (e) {
       console.error("Error deleting template:", e);
+      triggerToast("삭제 오류가 발생했습니다.");
     }
   };
 
@@ -352,100 +354,94 @@ export default function App() {
     }, 800);
   };
 
+  const triggerToast = (msg) => {
+    setToastMessage(msg);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 4000);
+  };
+
   const generateImageFromGoogle = async (prompt) => {
     if (!googleApiKey) {
-      alert("API 키가 설정되지 않았습니다. Settings에서 키를 입력해주세요.");
+      triggerToast("API 키가 설정되지 않았습니다.");
+      return;
+    }
+    if (imageCooldown) {
+      triggerToast("잠시 후 다시 시도해주세요. (쿨다운 중)");
       return;
     }
     const promptToUse = prompt || generatedPrompt;
     if (!promptToUse) {
-      alert("먼저 프롬프트를 생성해주세요.");
+      triggerToast("먼저 프롬프트를 생성해주세요.");
       return;
     }
+
+    // Activate 10-second cooldown to prevent rapid re-clicks
+    setImageCooldown(true);
+    setTimeout(() => setImageCooldown(false), 10000);
+
     setIsImageGenerating(true);
-    setGeneratedImage(null);
+    // Do NOT clear generatedImage — protect previous result until new one arrives
 
-    const ratioMap = {
-      "1:1 (Square)": "1:1",
-      "16:9 (Widescreen)": "16:9",
-      "4:3 (Standard)": "4:3",
-      "3:4 (Portrait)": "3:4"
-    };
-    const apiRatio = ratioMap[config.aspectRatio] || "1:1";
-
-    const requestBody = {
-      contents: [{
-        parts: [{ text: `${promptToUse}. Aspect ratio: ${apiRatio}.` }]
-      }],
-      generationConfig: {
-        responseModalities: ["TEXT", "IMAGE"]
-      }
-    };
-
-    const MAX_RETRIES = 3;
-    let lastError = null;
-
-    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-      try {
-        // Gemini 2.5 Flash Image (Nano Banana) - Stable Production Model
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-goog-api-key": googleApiKey
-            },
-            body: JSON.stringify(requestBody)
-          }
-        );
-
-        if (res.status === 429) {
-          // Rate limited — wait and retry with exponential backoff
-          const waitSec = Math.pow(2, attempt + 1); // 2s, 4s, 8s
-          console.warn(`⏳ 429 Rate Limited. Retrying in ${waitSec}s... (attempt ${attempt + 1}/${MAX_RETRIES})`);
-          await new Promise(r => setTimeout(r, waitSec * 1000));
-          continue;
+    try {
+      // Minimal payload — only prompt text, no extra config
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": googleApiKey
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: promptToUse }]
+            }]
+          })
         }
+      );
 
-        if (!res.ok) {
-          const errData = await res.json().catch(() => null);
-          const status = res.status;
-          let msg = `HTTP ${status}`;
-          if (status === 403) msg = "권한 부족 (403 Forbidden). API 키 또는 프로젝트 설정을 확인하세요.";
-          else if (status === 400) msg = "잘못된 요청 (400 Bad Request). 프롬프트를 확인하세요.";
-          else if (errData?.error?.message) msg = errData.error.message;
-          console.error("API Error Detail:", errData);
-          throw new Error(msg);
-        }
-
-        const data = await res.json();
-        const parts = data.candidates?.[0]?.content?.parts || [];
-        let imageFound = false;
-        for (const part of parts) {
-          if (part.inlineData) {
-            const mimeType = part.inlineData.mimeType || "image/png";
-            setGeneratedImage(`data:${mimeType};base64,${part.inlineData.data}`);
-            imageFound = true;
-            break;
-          }
-        }
-        if (!imageFound) {
-          console.error("No image in response", data);
-          alert("이미지 생성 실패: 응답에 이미지가 포함되지 않았습니다.");
-        }
+      // 429 — NO auto-retry, show toast and stop
+      if (res.status === 429) {
+        console.error("429 Rate Limit hit");
+        triggerToast("구글 API 무료 할당량 초과 또는 과부하입니다. 30초 후 다시 시도해주세요.");
         setIsImageGenerating(false);
-        return; // Success — exit the retry loop
-      } catch (e) {
-        lastError = e;
-        console.error(`Attempt ${attempt + 1} failed:`, e);
+        return;
       }
-    }
 
-    // All retries exhausted
-    console.error("All retries failed:", lastError);
-    alert(`이미지 생성 오류: ${lastError?.message || "알 수 없는 오류"}`);
-    setIsImageGenerating(false);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null);
+        const status = res.status;
+        let msg = `HTTP ${status}`;
+        if (status === 403) msg = "권한 부족 (403). API 키를 확인하세요.";
+        else if (status === 400) msg = "잘못된 요청 (400). 프롬프트를 확인하세요.";
+        else if (errData?.error?.message) msg = errData.error.message;
+        console.error("API Error:", status, errData);
+        triggerToast(`오류: ${msg}`);
+        setIsImageGenerating(false);
+        return;
+      }
+
+      const data = await res.json();
+      const parts = data.candidates?.[0]?.content?.parts || [];
+      let imageFound = false;
+      for (const part of parts) {
+        if (part.inlineData) {
+          const mimeType = part.inlineData.mimeType || "image/png";
+          setGeneratedImage(`data:${mimeType};base64,${part.inlineData.data}`);
+          imageFound = true;
+          break;
+        }
+      }
+      if (!imageFound) {
+        console.error("No image in response", data);
+        triggerToast("이미지 생성 실패: 응답에 이미지가 없습니다.");
+      }
+    } catch (e) {
+      console.error("API Network Error:", e);
+      triggerToast(`네트워크 오류: ${e.message}`);
+    } finally {
+      setIsImageGenerating(false);
+    }
   };
 
   const simulateUpscale = () => {
@@ -477,7 +473,7 @@ export default function App() {
             exit={{ opacity: 0, y: -20 }}
             className="ios-toast"
           >
-            라이브러리에 저장 완료!
+            {toastMessage}
           </motion.div>
         )}
       </AnimatePresence>
@@ -511,7 +507,7 @@ export default function App() {
                   placeholder="AIzaSy..."
                   className="settings-input"
                 />
-                <p className="settings-hint">Nano Banana 2 (gemini-3.1-flash-image-preview) 이미지 생성에 사용됩니다. 브라우저에 안전하게 저장됩니다.</p>
+                <p className="settings-hint">Nano Banana (gemini-2.5-flash-image) 이미지 생성에 사용됩니다. 브라우저에 안전하게 저장됩니다.</p>
               </div>
             </motion.div>
           </motion.div>
@@ -674,12 +670,12 @@ export default function App() {
               {generatedPrompt && googleApiKey && (
                 <button 
                   onClick={() => generateImageFromGoogle()}
-                  disabled={isImageGenerating}
+                  disabled={isImageGenerating || imageCooldown}
                   className="generate-btn"
-                  style={{ marginTop: '12px', background: '#1C1C1E' }}
-                >
+                  style={{ marginTop: '12px', background: (isImageGenerating || imageCooldown) ? '#48484A' : '#1C1C1E' }}
+                >  
                   <ImageIcon className="w-5 h-5 text-white" />
-                  <span>{isImageGenerating ? 'GENERATING IMAGE...' : 'GENERATE IMAGE (via Nano Banana 2)'}</span>
+                  <span>{isImageGenerating ? 'GENERATING IMAGE...' : imageCooldown ? 'COOLDOWN...' : 'GENERATE IMAGE'}</span>
                 </button>
               )}
 
