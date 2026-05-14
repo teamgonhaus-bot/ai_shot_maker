@@ -375,72 +375,100 @@ export default function App() {
       return;
     }
 
-    // Activate 10-second cooldown to prevent rapid re-clicks
+    // 15-second cooldown to strictly manage rate limits
     setImageCooldown(true);
-    setTimeout(() => setImageCooldown(false), 10000);
+    setTimeout(() => setImageCooldown(false), 15000);
 
     setIsImageGenerating(true);
-    // Do NOT clear generatedImage — protect previous result until new one arrives
 
-    try {
-      // Minimal payload — only prompt text, no extra config
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": googleApiKey
-          },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{ text: promptToUse }]
-            }]
-          })
-        }
-      );
+    const ratioMap = {
+      "1:1 (Square)": "1:1",
+      "16:9 (Widescreen)": "16:9",
+      "4:3 (Standard)": "4:3",
+      "3:4 (Portrait)": "3:4"
+    };
+    const apiRatio = ratioMap[config.aspectRatio] || "1:1";
 
-      // 429 — NO auto-retry, show toast and stop
-      if (res.status === 429) {
-        console.error("429 Rate Limit hit");
-        triggerToast("구글 API 무료 할당량 초과 또는 과부하입니다. 30초 후 다시 시도해주세요.");
-        setIsImageGenerating(false);
-        return;
-      }
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => null);
-        const status = res.status;
-        let msg = `HTTP ${status}`;
-        if (status === 403) msg = "권한 부족 (403). API 키를 확인하세요.";
-        else if (status === 400) msg = "잘못된 요청 (400). 프롬프트를 확인하세요.";
-        else if (errData?.error?.message) msg = errData.error.message;
-        console.error("API Error:", status, errData);
-        triggerToast(`오류: ${msg}`);
-        setIsImageGenerating(false);
-        return;
-      }
-
-      const data = await res.json();
-      const parts = data.candidates?.[0]?.content?.parts || [];
-      let imageFound = false;
-      for (const part of parts) {
-        if (part.inlineData) {
-          const mimeType = part.inlineData.mimeType || "image/png";
-          setGeneratedImage(`data:${mimeType};base64,${part.inlineData.data}`);
-          imageFound = true;
-          break;
+    const requestBody = {
+      contents: [{
+        parts: [{ text: promptToUse }]
+      }],
+      generationConfig: {
+        response_modalities: ["IMAGE"],
+        image_config: {
+          aspect_ratio: apiRatio
         }
       }
-      if (!imageFound) {
-        console.error("No image in response", data);
-        triggerToast("이미지 생성 실패: 응답에 이미지가 없습니다.");
+    };
+
+    const MAX_RETRIES = 3;
+    let lastError = null;
+
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": googleApiKey
+            },
+            body: JSON.stringify(requestBody)
+          }
+        );
+
+        if (res.status === 429) {
+          // Exponential backoff: 3s, 6s, 12s
+          const waitMs = Math.pow(2, attempt) * 3000;
+          console.warn(`[429] Rate limited. Retrying in ${waitMs/1000}s... (Attempt ${attempt + 1}/${MAX_RETRIES})`);
+          await new Promise(r => setTimeout(r, waitMs));
+          continue;
+        }
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => null);
+          const status = res.status;
+          let msg = `HTTP ${status}`;
+          if (status === 403) msg = "권한 부족 (403). API 키를 확인하세요.";
+          else if (status === 400) msg = "잘못된 요청 (400). 파라미터를 확인하세요.";
+          else if (errData?.error?.message) msg = errData.error.message;
+          throw new Error(msg);
+        }
+
+        const data = await res.json();
+        const parts = data.candidates?.[0]?.content?.parts || [];
+        let imageFound = false;
+        for (const part of parts) {
+          if (part.inlineData) {
+            const mimeType = part.inlineData.mimeType || "image/png";
+            setGeneratedImage(`data:${mimeType};base64,${part.inlineData.data}`);
+            imageFound = true;
+            break;
+          }
+        }
+        
+        if (!imageFound) {
+          console.error("No image in response", data);
+          triggerToast("이미지 생성 실패: 응답에 이미지가 없습니다.");
+        }
+        setIsImageGenerating(false);
+        return; // Success!
+
+      } catch (e) {
+        lastError = e;
+        console.error(`Attempt ${attempt + 1} failed:`, e);
+        if (attempt === MAX_RETRIES - 1) break;
       }
-    } catch (e) {
-      console.error("API Network Error:", e);
-      triggerToast(`네트워크 오류: ${e.message}`);
-    } finally {
-      setIsImageGenerating(false);
+    }
+
+    // All retries failed
+    setIsImageGenerating(false);
+    const errorMsg = lastError?.message || "알 수 없는 오류";
+    if (errorMsg.includes("429")) {
+      triggerToast("구글 API 할당량을 모두 소모했습니다. 잠시 후 또는 내일 다시 시도해주세요.");
+    } else {
+      triggerToast(`오류: ${errorMsg}`);
     }
   };
 
