@@ -115,11 +115,16 @@ export default function App() {
   const [templateName, setTemplateName] = useState("");
   const [isSaved, setIsSaved] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
     console.log("🚀 Initializing Shot Maker v0.13 Studio...");
     
+    const storedAdmin = localStorage.getItem('shotmaker_is_admin');
+    if (storedAdmin === 'true') setIsAdmin(true);
+
     // 1. LocalStorage Sync (Instant)
     const savedConfig = localStorage.getItem('shotmaker_config_v13');
     if (savedConfig) setConfig(JSON.parse(savedConfig));
@@ -175,7 +180,35 @@ export default function App() {
     });
   };
 
+  const hashPassword = async (password) => {
+    const msgBuffer = new TextEncoder().encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  };
+
+  const handleLogin = async () => {
+    const pwd = window.prompt("관리자 암호를 입력하세요:");
+    if (!pwd) return;
+    const hashed = await hashPassword(pwd);
+    if (hashed === process.env.REACT_APP_ADMIN_PWD_HASH) {
+      setIsAdmin(true);
+      localStorage.setItem('shotmaker_is_admin', 'true');
+    } else {
+      alert("암호가 일치하지 않습니다.");
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAdmin(false);
+    localStorage.removeItem('shotmaker_is_admin');
+  };
+
   const handleSaveTemplate = async () => {
+    if (!isAdmin) {
+      alert("저장 권한이 없습니다. 관리자로 로그인해주세요.");
+      return;
+    }
     if (!templateName || !generatedPrompt) return;
     console.log(`💾 Attempting to save template: "${templateName}"...`);
     try {
@@ -196,7 +229,11 @@ export default function App() {
       setSavedTemplates(prev => [{ id: docRef.id, ...newTemplate }, ...prev]);
       
       setIsSaved(true);
-      setTimeout(() => setIsSaved(false), 1500);
+      setShowToast(true);
+      setTimeout(() => {
+        setIsSaved(false);
+        setShowToast(false);
+      }, 2000);
       setTemplateName("");
     } catch (e) {
       console.error("❌ Error saving template:", e);
@@ -205,6 +242,10 @@ export default function App() {
   };
 
   const handleDeleteTemplate = async (id) => {
+    if (!isAdmin) {
+      alert("삭제 권한이 없습니다. 관리자로 로그인해주세요.");
+      return;
+    }
     try {
       await deleteDoc(doc(db, "templates", id));
     } catch (e) {
@@ -280,14 +321,36 @@ export default function App() {
 
   return (
     <div className="app-container">
+      <AnimatePresence>
+        {showToast && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="ios-toast"
+          >
+            라이브러리에 저장되었습니다!
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <header className="app-header">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <h1 className="text-2xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest m-0">Advanced Prompt Studio</p>
         </div>
-        <div className="header-nav">
-          <button className={`header-nav-btn ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>Create</button>
-          <button className={`header-nav-btn ${activeTab === 'library' ? 'active' : ''}`} onClick={() => setActiveTab('library')}>Library</button>
+        <div className="flex items-center gap-3">
+          <div className="header-nav">
+            <button className={`header-nav-btn ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>Create</button>
+            <button className={`header-nav-btn ${activeTab === 'library' ? 'active' : ''}`} onClick={() => setActiveTab('library')}>Library</button>
+          </div>
+          <button 
+            onClick={isAdmin ? handleLogout : handleLogin}
+            className="ios-pill"
+            style={{ padding: '8px 14px', fontSize: '12px', fontWeight: 'bold' }}
+          >
+            {isAdmin ? 'Logout' : 'Login'}
+          </button>
         </div>
       </header>
 
