@@ -390,56 +390,49 @@ export default function App() {
     };
     const apiRatio = ratioMap[config.aspectRatio] || "1:1";
 
-    const requestBody = {
-      contents: [{
-        parts: [{ text: promptToUse }]
-      }],
-      generationConfig: {
-        responseModalities: ["IMAGE"],
-        imageConfig: {
-          aspectRatio: apiRatio
-        }
-      }
-    };
-
-    const MAX_RETRIES = 3;
+    const MAX_RETRIES = 2;
     let lastError = null;
 
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-goog-api-key": googleApiKey
-            },
-            body: JSON.stringify(requestBody)
-          }
-        );
+        // Use URL parameter for auth as it's often more stable for beta endpoints
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${googleApiKey}`;
+        
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: promptToUse }]
+            }],
+            generationConfig: {
+              responseModalities: ["IMAGE"],
+              imageConfig: {
+                aspectRatio: apiRatio
+              }
+            }
+          })
+        });
 
         if (res.status === 429) {
-          // Exponential backoff: 3s, 6s, 12s
-          const waitMs = Math.pow(2, attempt) * 3000;
-          console.warn(`[429] Rate limited. Retrying in ${waitMs/1000}s... (Attempt ${attempt + 1}/${MAX_RETRIES})`);
+          const waitMs = (attempt + 1) * 5000;
+          console.warn(`⏳ [429] Rate limited. Retrying in ${waitMs/1000}s...`);
           await new Promise(r => setTimeout(r, waitMs));
           continue;
         }
 
+        const data = await res.json();
+
         if (!res.ok) {
-          const errData = await res.json().catch(() => null);
-          const status = res.status;
-          let msg = `HTTP ${status}`;
-          if (status === 403) msg = "권한 부족 (403). API 키를 확인하세요.";
-          else if (status === 400) msg = "잘못된 요청 (400). 파라미터를 확인하세요.";
-          else if (errData?.error?.message) msg = errData.error.message;
-          throw new Error(msg);
+          console.error("❌ API Error Response:", data);
+          throw new Error(data.error?.message || `HTTP ${res.status}`);
         }
 
-        const data = await res.json();
         const parts = data.candidates?.[0]?.content?.parts || [];
         let imageFound = false;
+        
         for (const part of parts) {
           if (part.inlineData) {
             const mimeType = part.inlineData.mimeType || "image/png";
@@ -450,34 +443,29 @@ export default function App() {
         }
         
         if (!imageFound) {
-          console.error("No image in response", data);
           const finishReason = data.candidates?.[0]?.finishReason;
+          console.error("⚠️ No image in response. Data:", data);
           if (finishReason === 'SAFETY') {
-            triggerToast("보안 정책(Safety)으로 인해 이미지가 생성되지 않았습니다.");
+            throw new Error("보안 정책(Safety)으로 인해 이미지가 차단되었습니다.");
           } else if (finishReason === 'RECITATION') {
-            triggerToast("저작권 보호(Recitation)로 인해 이미지가 생성되지 않았습니다.");
+            throw new Error("저작권 보호(Recitation)로 인해 이미지가 차단되었습니다.");
           } else {
-            triggerToast("이미지 생성 실패: 응답에 이미지가 없습니다.");
+            throw new Error(finishReason ? `생성 중단됨 (${finishReason})` : "이미지 데이터를 찾을 수 없습니다.");
           }
         }
+
         setIsImageGenerating(false);
         return; // Success!
 
       } catch (e) {
         lastError = e;
-        console.error(`Attempt ${attempt + 1} failed:`, e);
-        if (attempt === MAX_RETRIES - 1) break;
+        console.error(`🔴 Attempt ${attempt + 1} failed:`, e);
       }
     }
 
     // All retries failed
     setIsImageGenerating(false);
-    const errorMsg = lastError?.message || lastError?.toString() || "알 수 없는 오류";
-    if (errorMsg.includes("429")) {
-      triggerToast("구글 API 할당량을 모두 소모했습니다. 잠시 후 또는 내일 다시 시도해주세요.");
-    } else {
-      triggerToast(`오류: ${errorMsg}`);
-    }
+    triggerToast(`생성 오류: ${lastError?.message || "네트워크 상태를 확인해주세요."}`);
   };
 
   const simulateUpscale = () => {
