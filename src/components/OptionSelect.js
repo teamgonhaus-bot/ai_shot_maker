@@ -32,7 +32,7 @@ export default function OptionSelect({ label, value, onChange, options, icon: Ic
               key={opt}
               onClick={() => handleClick(opt)}
               className={`ios-pill ios-interact ${
-                active ? `ios-selected-pill theme-${theme}` : ''
+                active ? `selected-${theme}` : ''
               }`}
               style={{
                 paddingTop: '6px',

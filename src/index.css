@@ -1,10 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+/* =============================================
+   RESET & BASE
+   ============================================= */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 :root {
   --bg-main: #F2F2F7;
   --bg-card: #FFFFFF;
   --color-black: #000000;
-  
   --text-primary: #000000;
   --text-secondary: #8E8E93;
   --text-muted: #AEAEB2;
@@ -12,262 +20,483 @@
   --color-green: #34C759;
   --color-purple: #AF52DE;
   --color-border: #E5E5EA;
-  --color-bg-light: #F9F9F9;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  --color-bg-light: #F2F2F7;
 }
 
 body {
-  background-color: var(--bg-main);
-  color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #F2F2F7;
+  color: #000000;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.01em;
 }
 
-/* Layout System */
+/* =============================================
+   LAYOUT
+   ============================================= */
 .app-container {
   max-width: 600px;
   margin: 0 auto;
-  padding: 24px 16px;
+  padding: 32px 20px 80px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Base Utilities */
-.text-bold { font-weight: 700; }
-.text-black { font-weight: 900; }
-
-.w-full { width: 100%; }
-
-/* Guaranteed iOS Styles */
-.ios-bg-main { background-color: #F2F2F7; }
-.ios-bg-card { background-color: #FFFFFF; border: none; }
-.ios-bg-black { background-color: #000000; }
-.ios-text-gray { color: #8E8E93; }
-
-/* Interactive Animation - scale down on click */
-.ios-interact {
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-.ios-interact:active {
-  transform: scale(0.92);
-}
-
-/* Card Style for Sections */
-.ios-bento-card {
-  background-color: #FFFFFF;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  border: none;
-  margin-bottom: 16px;
-  position: relative;
-}
-
-/* Library Grid Layout (v0.12) */
-.ios-library-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  padding: 8px 0;
-}
-
-.ios-library-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #F2F2F7;
-  color: #000000;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-  z-index: 50;
-}
-
-.ios-library-close:hover {
-  background: #E5E5EA;
-  transform: rotate(90deg);
-}
-
-/* Action Button */
-.ios-black-btn {
-  background-color: #000000;
-  color: #FFFFFF;
-  border-radius: 16px;
-  padding: 16px;
-  transition: all 0.2s ease;
-  border: none;
-  width: 100%;
-}
-
-.ios-black-pill {
-  background-color: #000000;
-  color: #FFFFFF;
-  border-radius: 9999px;
-  padding: 8px 16px;
-  transition: all 0.2s ease;
-  border: none;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.ios-white-pill {
-  background-color: transparent;
-  color: #8E8E93;
-  border-radius: 9999px;
-  padding: 8px 16px;
-  transition: all 0.2s ease;
-  border: none;
-  font-size: 13px;
-  font-weight: 700;
-}
-.ios-white-pill:hover {
-  background-color: rgba(0,0,0,0.05);
-}
-
-/* Section & Label Styling */
-.ios-section-title {
-  font-size: 22px;
-  font-weight: 800;
-  color: #000000;
-  margin-top: 40px;
-  margin-bottom: 24px;
-  padding-left: 4px;
-  border-left: 4px solid #000;
-  line-height: 1;
-}
-
-.ios-option-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #000000;
-  text-transform: none;
-  letter-spacing: -0.01em;
-  margin-bottom: 8px;
-  display: block;
-}
-
-.ios-option-group {
-  margin-bottom: 24px;
-}
-
-/* Premium Selection Themes */
-.ios-selected-pill.theme-red { background-color: var(--color-red) !important; color: white !important; box-shadow: 0 4px 10px rgba(255, 59, 48, 0.2) !important; border: none !important; }
-.ios-selected-pill.theme-green { background-color: var(--color-green) !important; color: white !important; box-shadow: 0 4px 10px rgba(52, 199, 89, 0.2) !important; border: none !important; }
-.ios-selected-pill.theme-purple { background-color: var(--color-purple) !important; color: white !important; box-shadow: 0 4px 10px rgba(175, 82, 222, 0.2) !important; border: none !important; }
-
-.ios-selected-pill {
-  transform: translateY(-1px);
-}
-
-/* Slim Sophisticated Capsule Button (v0.11) */
-.ios-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px 12px;
-  font-size: 13px;
-  font-weight: 500; /* Medium weight */
-  border-radius: 9999px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  background-color: var(--color-bg-light);
-  color: #3A3A3C;
-  border: 1px solid var(--color-border);
-}
-
-.ios-pill:active {
-  transform: scale(0.95);
-}
-
-/* Section & Label Styling */
-.ios-section-title {
-  font-size: 18px;
-  font-weight: 800;
-  color: #000000;
-  margin-top: 32px;
-  margin-bottom: 16px;
-  display: block;
-}
-
-.ios-option-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #000000; /* Pure Black */
-  margin-bottom: 8px; /* 8px gap as requested */
-  display: block;
-}
-
-.ios-option-group {
-  margin-bottom: 24px; /* 24px gap between groups as requested */
-}
-
-/* Toggle Switch Styles */
-.ios-toggle-row {
+/* =============================================
+   HEADER
+   ============================================= */
+.app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
+  margin-bottom: 40px;
+  padding: 0 4px;
 }
 
-.ios-switch {
-  position: relative;
-  width: 42px;
-  height: 24px;
+.header-brand h1 {
+  font-size: 26px;
+  font-weight: 900;
+  color: #000000;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin: 0;
+}
+
+.header-brand p {
+  font-size: 10px;
+  font-weight: 700;
+  color: #AEAEB2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 4px 0 0 0;
+}
+
+.header-nav {
+  display: flex;
+  gap: 6px;
+  background: #FFFFFF;
+  padding: 6px;
   border-radius: 9999px;
-  transition: background-color 0.2s ease;
-  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.header-nav-btn {
+  padding: 7px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 9999px;
   border: none;
-  outline: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+  letter-spacing: -0.01em;
 }
 
-.ios-switch-handle {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 20px;
-  height: 20px;
-  background-color: white;
-  border-radius: 9999px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+.header-nav-btn:active {
+  transform: scale(0.94);
 }
 
-/* Summary Panel */
+.header-nav-btn.active {
+  background-color: #000000;
+  color: #FFFFFF;
+}
+
+.header-nav-btn.inactive {
+  background-color: transparent;
+  color: #8E8E93;
+}
+
+.header-nav-btn.inactive:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* =============================================
+   SECTION TITLES
+   ============================================= */
+.ios-section-title {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: #000000 !important;
+  margin-top: 32px !important;
+  margin-bottom: 12px !important;
+  padding-left: 12px !important;
+  border-left: 4px solid #000000 !important;
+  line-height: 1 !important;
+  display: block !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* =============================================
+   CARDS
+   ============================================= */
+.ios-bento-card {
+  background-color: #FFFFFF !important;
+  border-radius: 20px !important;
+  padding: 20px !important;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06) !important;
+  border: none !important;
+  margin-bottom: 12px !important;
+  position: relative !important;
+}
+
+/* =============================================
+   OPTION LABEL
+   ============================================= */
+.ios-option-label {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #8E8E93 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  margin-bottom: 10px !important;
+  display: block !important;
+}
+
+.ios-option-group {
+  margin-bottom: 20px !important;
+}
+
+/* =============================================
+   OPTION BUTTONS (PILLS)
+   ============================================= */
+.ios-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 6px 14px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 9999px !important;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer !important;
+  background-color: #F2F2F7 !important;
+  color: #3A3A3C !important;
+  border: none !important;
+  font-family: inherit !important;
+}
+
+.ios-pill:active {
+  transform: scale(0.93) !important;
+}
+
+/* Selected state themes */
+.ios-pill.selected-red {
+  background-color: #FF3B30 !important;
+  color: #FFFFFF !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+.ios-pill.selected-green {
+  background-color: #34C759 !important;
+  color: #FFFFFF !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+.ios-pill.selected-purple {
+  background-color: #AF52DE !important;
+  color: #FFFFFF !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* =============================================
+   CARD ICON BUTTON
+   ============================================= */
+.ios-card-icon-btn {
+  width: 34px !important;
+  height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: #F2F2F7 !important;
+  color: #000000 !important;
+  border-radius: 50% !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.ios-card-icon-btn:hover {
+  background-color: #E5E5EA !important;
+}
+
+.ios-card-icon-btn:active {
+  transform: scale(0.9) !important;
+}
+
+/* =============================================
+   GENERATE BUTTON
+   ============================================= */
+.generate-btn {
+  width: 100% !important;
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  padding: 20px 24px !important;
+  font-size: 16px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.04em !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  font-family: inherit !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18) !important;
+}
+
+.generate-btn:active {
+  transform: scale(0.97) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+}
+
+.generate-btn:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+/* =============================================
+   RESULT CARD (Final Result)
+   ============================================= */
+.result-card {
+  background-color: #FFFFFF !important;
+  border-radius: 20px !important;
+  padding: 24px !important;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06) !important;
+  border: none !important;
+  position: relative !important;
+  margin-top: 28px !important;  /* 28px gap from generate button */
+}
+
+.result-card-label {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: #AEAEB2 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.14em !important;
+  margin-bottom: 12px !important;
+  display: block !important;
+}
+
+.result-card-text {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #000000 !important;
+  line-height: 1.65 !important;
+  margin: 0 !important;
+  padding-right: 8px !important;
+}
+
+/* Copy button - absolute top-right inside card */
+.copy-btn {
+  position: absolute !important;
+  top: 16px !important;
+  right: 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 6px 14px !important;
+  background-color: #F2F2F7 !important;
+  color: #000000 !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.18s ease !important;
+  font-family: inherit !important;
+  z-index: 10 !important;
+}
+
+.copy-btn:hover {
+  background-color: #E5E5EA !important;
+}
+
+.copy-btn:active {
+  transform: scale(0.93) !important;
+}
+
+.copy-btn.copied {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* =============================================
+   SAVE BAR
+   ============================================= */
+.save-card {
+  background-color: #FFFFFF !important;
+  border-radius: 20px !important;
+  padding: 20px !important;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06) !important;
+  border: none !important;
+  margin-top: 16px !important;
+}
+
+.save-card-label {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #8E8E93 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  margin-bottom: 12px !important;
+  display: block !important;
+}
+
+.save-bar {
+  display: flex !important;
+  align-items: center !important;
+  background-color: #F2F2F7 !important;
+  border-radius: 14px !important;
+  padding: 6px 6px 6px 16px !important;
+  gap: 8px !important;
+}
+
+.save-input {
+  flex: 1 !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #000000 !important;
+  font-family: inherit !important;
+  padding: 6px 0 !important;
+}
+
+.save-input::placeholder {
+  color: #AEAEB2 !important;
+}
+
+.save-btn {
+  padding: 10px 22px !important;
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  font-family: inherit !important;
+  white-space: nowrap !important;
+}
+
+.save-btn:hover {
+  background-color: #1a1a1a !important;
+  transform: translateY(-1px) !important;
+}
+
+.save-btn:active {
+  transform: scale(0.94) !important;
+}
+
+.save-btn.saved {
+  background-color: #34C759 !important;
+}
+
+/* =============================================
+   SUMMARY PANEL
+   ============================================= */
 .ios-summary-panel {
-  background-color: #FFFFFF;
-  border-radius: 20px;
-  padding: 16px;
-  margin-bottom: 24px;
-  border: 1px solid rgba(0,0,0,0.05);
+  background-color: #FFFFFF !important;
+  border-radius: 16px !important;
+  padding: 14px 16px !important;
+  margin-bottom: 20px !important;
+  border: 1px solid rgba(0, 0, 0, 0.04) !important;
 }
 
 .ios-summary-tag {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 600;
-  color: #8E8E93;
-  background-color: #F2F2F7;
-  padding: 4px 10px;
-  border-radius: 6px;
-  margin-right: 6px;
-  margin-bottom: 6px;
+  display: inline-block !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #8E8E93 !important;
+  background-color: #F2F2F7 !important;
+  padding: 4px 10px !important;
+  border-radius: 6px !important;
+  margin-right: 5px !important;
+  margin-bottom: 5px !important;
 }
 
-/* Loading Overlay */
+/* =============================================
+   TOGGLE SWITCH
+   ============================================= */
+.ios-toggle-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 10px 0 !important;
+}
+
+.ios-toggle-label {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #000000 !important;
+}
+
+.ios-switch {
+  position: relative !important;
+  width: 44px !important;
+  height: 26px !important;
+  border-radius: 9999px !important;
+  transition: background-color 0.22s ease !important;
+  cursor: pointer !important;
+  border: none !important;
+  outline: none !important;
+  flex-shrink: 0 !important;
+}
+
+.ios-switch-handle {
+  position: absolute !important;
+  top: 3px !important;
+  left: 3px !important;
+  width: 20px !important;
+  height: 20px !important;
+  background-color: #FFFFFF !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* =============================================
+   LIBRARY GRID
+   ============================================= */
+.ios-library-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 14px !important;
+  padding: 4px 0 !important;
+}
+
+.ios-library-close {
+  position: absolute !important;
+  top: -12px !important;
+  right: 0 !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #F2F2F7 !important;
+  color: #000000 !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  border: none !important;
+  z-index: 50 !important;
+}
+
+.ios-library-close:hover {
+  background: #E5E5EA !important;
+  transform: rotate(90deg) !important;
+}
+
+/* =============================================
+   LOADING SCREEN
+   ============================================= */
 .ios-loading-screen {
   position: fixed;
   inset: 0;
@@ -277,26 +506,32 @@ body {
   justify-content: center;
   z-index: 9999;
   font-weight: 700;
+  font-size: 15px;
   color: #8E8E93;
+  font-family: 'Outfit', sans-serif;
 }
 
+/* =============================================
+   FOOTER
+   ============================================= */
 .ios-footer {
-  text-align: center;
-  padding: 24px 0;
-  font-size: 10px;
-  font-weight: 600;
-  color: #C7C7CC;
+  text-align: center !important;
+  padding: 32px 0 8px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  color: #C7C7CC !important;
+  letter-spacing: 0.05em !important;
 }
 
-
-
-/* Added Utilities */
-.rounded-full {
-  border-radius: 9999px !important;
-}
-
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.flex-wrap { flex-wrap: wrap; }
-.items-center { align-items: center; }
-.justify-center { justify-content: center; }
+/* =============================================
+   UTILITY FLEX HELPERS (no Tailwind needed)
+   ============================================= */
+.flex { display: flex !important; }
+.flex-col { flex-direction: column !important; }
+.flex-wrap { flex-wrap: wrap !important; }
+.items-center { align-items: center !important; }
+.justify-center { justify-content: center !important; }
+.justify-between { justify-content: space-between !important; }
+.w-full { width: 100% !important; }
+.relative { position: relative !important; }
+.overflow-hidden { overflow: hidden !important; }

@@ -280,14 +280,14 @@ export default function App() {
 
   return (
     <div className="app-container">
-      <header className="flex justify-between items-center mb-10 px-4">
+      <header className="app-header">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <h1 className="text-2xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest m-0">Advanced Prompt Studio</p>
         </div>
-        <div className="flex gap-1.5 bg-white ios-shadow p-1.5 rounded-full">
-          <button className={`ios-pill ios-interact ${activeTab === 'home' ? 'bg-black text-white' : 'bg-transparent text-gray-500 border-none shadow-none'}`} style={{ padding: '6px 14px' }} onClick={() => setActiveTab('home')}>Create</button>
-          <button className={`ios-pill ios-interact ${activeTab === 'library' ? 'bg-black text-white' : 'bg-transparent text-gray-500 border-none shadow-none'}`} style={{ padding: '6px 14px' }} onClick={() => setActiveTab('library')}>Library</button>
+        <div className="header-nav">
+          <button className={`header-nav-btn ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>Create</button>
+          <button className={`header-nav-btn ${activeTab === 'library' ? 'active' : ''}`} onClick={() => setActiveTab('library')}>Library</button>
         </div>
       </header>
 
@@ -399,30 +399,29 @@ export default function App() {
               <button 
                 onClick={generatePrompt}
                 disabled={isGenerating}
-                className="w-full ios-black-btn ios-interact flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
-                style={{ borderRadius: '9999px', padding: '20px', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}
+                className="generate-btn"
               >
                 <Wand2 className="w-5 h-5 text-white" />
-                <span className="text-[17px] font-black">{isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}</span>
+                <span>{isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}</span>
               </button>
 
               {generatedPrompt && (
                 <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} className="mt-12 space-y-8">
                   <PromptOutput prompt={generatedPrompt} />
                   
-                  <div className="ios-bento-card">
+                  <div className="save-card">
                     <div className="ios-option-label mb-3">Save Preset</div>
-                    <div className="flex items-center bg-[#F2F2F7] rounded-2xl p-2 gap-2">
+                    <div className="save-bar">
                       <input 
                         type="text" 
                         value={templateName} 
                         onChange={(e) => setTemplateName(e.target.value)} 
                         placeholder="Preset name..." 
-                        className="flex-1 px-3 py-2 bg-transparent border-none outline-none font-medium text-[14px]" 
+                        className="save-input" 
                       />
                       <button 
                         onClick={handleSaveTemplate} 
-                        className={`transition-all duration-300 px-6 py-2.5 rounded-xl flex items-center justify-center ios-interact border-none font-bold text-[13px] ${isSaved ? 'bg-green-500 text-white' : 'bg-black text-white'}`}
+                        className={`save-btn ${isSaved ? 'saved' : ''}`}
                       >
                         {isSaved ? 'Saved ✓' : 'Save'}
                       </button>
@@ -435,7 +434,7 @@ export default function App() {
         ) : (
           <motion.div key="library" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-6 relative">
             <button className="ios-library-close" onClick={() => setActiveTab('home')}>
-              <X className="w-4 h-4" />
+              <X size={18} strokeWidth={1.5} />
             </button>
             <h2 className="ios-section-title">Library</h2>
             

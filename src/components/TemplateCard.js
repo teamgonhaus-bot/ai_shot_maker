@@ -12,34 +12,34 @@ export default function TemplateCard({ template, onLoad, onDelete }) {
       style={{ padding: '16px', minHeight: '140px', marginBottom: '0' }}
     >
       <div className="flex-1">
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-3">
           <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: template.thumbnailColor || '#000' }} />
           <h4 className="font-bold text-[14px] text-black line-clamp-1">
             {template.name}
           </h4>
         </div>
-        <p className="text-[11px] font-medium text-gray-400 line-clamp-3 leading-relaxed">
+        <p className="text-[13px] font-medium text-gray-400 line-clamp-3 leading-relaxed mt-2">
           {template.prompt}
         </p>
       </div>
 
-      <div className="flex justify-end gap-2 pt-3">
+      <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 mt-2">
         <button
           onClick={() => onLoad(template)}
-          className="w-8 h-8 flex items-center justify-center bg-[#F2F2F7] hover:bg-black hover:text-white text-black rounded-full transition-all border-none cursor-pointer ios-interact"
+          className="ios-card-icon-btn"
           title="Load"
         >
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight size={16} strokeWidth={2} />
         </button>
         <button
           onClick={(e) => {
             e.stopPropagation();
             onDelete(template.id);
           }}
-          className="w-8 h-8 flex items-center justify-center bg-[#F2F2F7] hover:bg-red-50 text-red-500 rounded-full transition-all border-none cursor-pointer ios-interact"
+          className="ios-card-icon-btn"
           title="Delete"
         >
-          <Trash2 className="w-4 h-4" />
+          <Trash2 size={16} strokeWidth={2} />
         </button>
       </div>
     </motion.div>
