@@ -384,11 +384,19 @@ export default function App() {
       return;
     }
 
-    // Set 40-second cooldown to strictly manage free tier rate limits (RPM)
-    setCooldownTime(40);
+    // Reduced cooldown to 5 seconds for paid/billing-enabled users
+    setCooldownTime(5);
     setIsImageGenerating(true);
 
     try {
+      const ratioMap = {
+        "1:1 (Square)": "1:1",
+        "16:9 (Widescreen)": "16:9",
+        "4:3 (Standard)": "4:3",
+        "3:4 (Portrait)": "3:4"
+      };
+      const apiRatio = ratioMap[config.aspectRatio] || "1:1";
+
       // Use URL parameter for auth as it's often more stable for beta endpoints
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${googleApiKey}`;
       
@@ -402,8 +410,10 @@ export default function App() {
             parts: [{ text: promptToUse }]
           }],
           generationConfig: {
-            responseModalities: ["IMAGE"]
-            // Minimal payload to reduce overhead
+            responseModalities: ["IMAGE"],
+            imageConfig: {
+              aspectRatio: apiRatio
+            }
           }
         })
       });
