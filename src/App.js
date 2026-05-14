@@ -130,7 +130,6 @@ export default function App() {
   const [generatedImage, setGeneratedImage] = useState(null);
   const [isImageGenerating, setIsImageGenerating] = useState(false);
   const [isUpscaling, setIsUpscaling] = useState(false);
-  const [imageCooldown, setImageCooldown] = useState(false);
   const [cooldownTime, setCooldownTime] = useState(0);
   const [activeCategory, setActiveCategory] = useState('subject');
 
