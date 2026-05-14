@@ -131,6 +131,7 @@ export default function App() {
   const [isImageGenerating, setIsImageGenerating] = useState(false);
   const [isUpscaling, setIsUpscaling] = useState(false);
   const [imageCooldown, setImageCooldown] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('subject');
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
@@ -394,9 +395,9 @@ export default function App() {
         parts: [{ text: promptToUse }]
       }],
       generationConfig: {
-        response_modalities: ["IMAGE"],
-        image_config: {
-          aspect_ratio: apiRatio
+        responseModalities: ["IMAGE"],
+        imageConfig: {
+          aspectRatio: apiRatio
         }
       }
     };
@@ -450,7 +451,14 @@ export default function App() {
         
         if (!imageFound) {
           console.error("No image in response", data);
-          triggerToast("이미지 생성 실패: 응답에 이미지가 없습니다.");
+          const finishReason = data.candidates?.[0]?.finishReason;
+          if (finishReason === 'SAFETY') {
+            triggerToast("보안 정책(Safety)으로 인해 이미지가 생성되지 않았습니다.");
+          } else if (finishReason === 'RECITATION') {
+            triggerToast("저작권 보호(Recitation)로 인해 이미지가 생성되지 않았습니다.");
+          } else {
+            triggerToast("이미지 생성 실패: 응답에 이미지가 없습니다.");
+          }
         }
         setIsImageGenerating(false);
         return; // Success!
@@ -464,7 +472,7 @@ export default function App() {
 
     // All retries failed
     setIsImageGenerating(false);
-    const errorMsg = lastError?.message || "알 수 없는 오류";
+    const errorMsg = lastError?.message || lastError?.toString() || "알 수 없는 오류";
     if (errorMsg.includes("429")) {
       triggerToast("구글 API 할당량을 모두 소모했습니다. 잠시 후 또는 내일 다시 시도해주세요.");
     } else {
@@ -584,91 +592,105 @@ export default function App() {
         {activeTab === 'home' ? (
           <motion.div key="home" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-12">
             
-            {/* 👤 [인물] 섹션 */}
-            <section>
-              <h2 className="ios-section-title" style={{ marginTop: '24px' }}>[인물]</h2>
-              <div className="ios-bento-card" style={{ padding: '20px' }}>
-                <OptionSelect label="인원" value={config.subjectNum} onChange={(v) => handleConfigChange('subjectNum', v)} options={OPTIONS_DATA.subjectNum} theme="red" />
-                {config.subjectNum !== "없음" && (
-                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
-                    <OptionSelect label="성별" value={config.subjectGender} onChange={(v) => handleConfigChange('subjectGender', v)} options={OPTIONS_DATA.subjectGender} theme="red" />
-                    <OptionSelect label="연령대" value={config.subjectAge} onChange={(v) => handleConfigChange('subjectAge', v)} options={OPTIONS_DATA.subjectAge} theme="red" />
-                    <OptionSelect label="지역/인종" value={config.subjectRegion} onChange={(v) => handleConfigChange('subjectRegion', v)} options={OPTIONS_DATA.subjectRegion} theme="red" />
-                    <OptionSelect label="옷 스타일" value={config.subjectClothesStyle} onChange={(v) => handleConfigChange('subjectClothesStyle', v)} options={OPTIONS_DATA.subjectClothesStyle} theme="red" />
-                    <OptionSelect 
-                      label="옷 종류" 
-                      value={config.subjectClothesType} 
-                      onChange={(v) => handleConfigChange('subjectClothesType', v)} 
-                      options={config.subjectGender === '여성' ? OPTIONS_DATA.subjectClothesType.female : OPTIONS_DATA.subjectClothesType.others} 
-                      theme="red"
-                    />
-                    <OptionSelect label="헤어 스타일" value={config.subjectHair} onChange={(v) => handleConfigChange('subjectHair', v)} options={OPTIONS_DATA.subjectHair} theme="red" />
-                  </motion.div>
-                )}
-              </div>
-            </section>
+            {/* Category Tabs */}
+            <div className="ios-category-tabs">
+              <button className={`category-tab ${activeCategory === 'subject' ? 'active' : ''}`} onClick={() => setActiveCategory('subject')}>인물</button>
+              <button className={`category-tab ${activeCategory === 'space' ? 'active' : ''}`} onClick={() => setActiveCategory('space')}>공간</button>
+              <button className={`category-tab ${activeCategory === 'camera' ? 'active' : ''}`} onClick={() => setActiveCategory('camera')}>카메라</button>
+              <button className={`category-tab ${activeCategory === 'style' ? 'active' : ''}`} onClick={() => setActiveCategory('style')}>스타일</button>
+            </div>
 
-            {/* 🏠 [공간] 섹션 */}
-            <section>
-              <h2 className="ios-section-title">[공간]</h2>
-              <div className="ios-bento-card">
-                <OptionSelect label="공간 종류" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} theme="green" />
-                <OptionSelect label="세부 공간" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} theme="green" />
-                <OptionSelect label="인테리어 양식" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} theme="green" />
-                <OptionSelect label="조명" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="green" />
-                
-                <div className="mt-4 border-t border-gray-100">
-                  <IOSToggle 
-                    label="세부 소재 및 컬러 (Materials)" 
-                    isOn={useDetailMaterial} 
-                    onToggle={() => setUseDetailMaterial(!useDetailMaterial)} 
-                    activeColor="#34C759"
-                  />
-                  <AnimatePresence>
-                    {useDetailMaterial && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="flex flex-col overflow-hidden">
-                        <OptionSelect label="바닥 타일/마루" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} theme="green" />
-                        <OptionSelect label="우드 소재" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} theme="green" />
-                        <OptionSelect label="메탈 포인트" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} theme="green" />
-                        <OptionSelect label="벽 소재/컬러" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} theme="green" />
-                      </motion.div>
+            <AnimatePresence mode="wait">
+              {activeCategory === 'subject' && (
+                <motion.section key="subject" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                  <h2 className="ios-section-title">[인물]</h2>
+                  <div className="ios-bento-card" style={{ padding: '20px' }}>
+                    <OptionSelect label="인원" value={config.subjectNum} onChange={(v) => handleConfigChange('subjectNum', v)} options={OPTIONS_DATA.subjectNum} theme="red" />
+                    {config.subjectNum !== "없음" && (
+                      <div className="mt-2 space-y-1">
+                        <OptionSelect label="성별" value={config.subjectGender} onChange={(v) => handleConfigChange('subjectGender', v)} options={OPTIONS_DATA.subjectGender} theme="red" />
+                        <OptionSelect label="연령대" value={config.subjectAge} onChange={(v) => handleConfigChange('subjectAge', v)} options={OPTIONS_DATA.subjectAge} theme="red" />
+                        <OptionSelect label="지역/인종" value={config.subjectRegion} onChange={(v) => handleConfigChange('subjectRegion', v)} options={OPTIONS_DATA.subjectRegion} theme="red" />
+                        <OptionSelect label="옷 스타일" value={config.subjectClothesStyle} onChange={(v) => handleConfigChange('subjectClothesStyle', v)} options={OPTIONS_DATA.subjectClothesStyle} theme="red" />
+                        <OptionSelect 
+                          label="옷 종류" 
+                          value={config.subjectClothesType} 
+                          onChange={(v) => handleConfigChange('subjectClothesType', v)} 
+                          options={config.subjectGender === '여성' ? OPTIONS_DATA.subjectClothesType.female : OPTIONS_DATA.subjectClothesType.others} 
+                          theme="red"
+                        />
+                        <OptionSelect label="헤어 스타일" value={config.subjectHair} onChange={(v) => handleConfigChange('subjectHair', v)} options={OPTIONS_DATA.subjectHair} theme="red" />
+                      </div>
                     )}
-                  </AnimatePresence>
-                </div>
-              </div>
-            </section>
+                  </div>
+                </motion.section>
+              )}
 
-            {/* ⚙️ [카메라] 섹션 */}
-            <section>
-              <h2 className="ios-section-title" style={{ marginTop: '24px' }}>[카메라]</h2>
-              <div className="ios-bento-card" style={{ padding: '20px' }}>
-                <div className="mb-4 border-b border-gray-100">
-                  <IOSToggle 
-                    label="텍스트/로고 제거" 
-                    isOn={removeText} 
-                    onToggle={() => setRemoveText(!removeText)} 
-                    activeColor="#AF52DE"
-                  />
-                </div>
-                <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="purple" />
-                <OptionSelect label="이미지 비율 (Aspect Ratio)" value={config.aspectRatio} onChange={(v) => handleConfigChange('aspectRatio', v)} options={OPTIONS_DATA.aspectRatio} theme="purple" />
-              </div>
-            </section>
+              {activeCategory === 'space' && (
+                <motion.section key="space" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                  <h2 className="ios-section-title">[공간]</h2>
+                  <div className="ios-bento-card">
+                    <OptionSelect label="공간 종류" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} theme="green" />
+                    <OptionSelect label="세부 공간" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} theme="green" />
+                    <OptionSelect label="인테리어 양식" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} theme="green" />
+                    <OptionSelect label="조명" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="green" />
+                    
+                    <div className="mt-4 border-t border-gray-100">
+                      <IOSToggle 
+                        label="세부 소재 및 컬러 (Materials)" 
+                        isOn={useDetailMaterial} 
+                        onToggle={() => setUseDetailMaterial(!useDetailMaterial)} 
+                        activeColor="#34C759"
+                      />
+                      <AnimatePresence>
+                        {useDetailMaterial && (
+                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="flex flex-col overflow-hidden">
+                            <OptionSelect label="바닥 타일/마루" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} theme="green" />
+                            <OptionSelect label="우드 소재" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} theme="green" />
+                            <OptionSelect label="메탈 포인트" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} theme="green" />
+                            <OptionSelect label="벽 소재/컬러" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} theme="green" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                </motion.section>
+              )}
 
-            {/* 🎨 [스타일] 섹션 */}
-            <section>
-              <h2 className="ios-section-title">[스타일]</h2>
-              <div className="ios-bento-card">
-                <OptionSelect 
-                  label="연출 샷 스타일 (다중 선택)" 
-                  value={config.shotStyle} 
-                  onChange={(v) => handleConfigChange('shotStyle', v)} 
-                  options={OPTIONS_DATA.shotStyle} 
-                  multiSelect={true}
-                  theme="purple"
-                />
-              </div>
-            </section>
+              {activeCategory === 'camera' && (
+                <motion.section key="camera" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                  <h2 className="ios-section-title">[카메라]</h2>
+                  <div className="ios-bento-card" style={{ padding: '20px' }}>
+                    <div className="mb-4 border-b border-gray-100">
+                      <IOSToggle 
+                        label="텍스트/로고 제거" 
+                        isOn={removeText} 
+                        onToggle={() => setRemoveText(!removeText)} 
+                        activeColor="#AF52DE"
+                      />
+                    </div>
+                    <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="purple" />
+                    <OptionSelect label="이미지 비율 (Aspect Ratio)" value={config.aspectRatio} onChange={(v) => handleConfigChange('aspectRatio', v)} options={OPTIONS_DATA.aspectRatio} theme="purple" />
+                  </div>
+                </motion.section>
+              )}
+
+              {activeCategory === 'style' && (
+                <motion.section key="style" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                  <h2 className="ios-section-title">[스타일]</h2>
+                  <div className="ios-bento-card">
+                    <OptionSelect 
+                      label="연출 샷 스타일 (다중 선택)" 
+                      value={config.shotStyle} 
+                      onChange={(v) => handleConfigChange('shotStyle', v)} 
+                      options={OPTIONS_DATA.shotStyle} 
+                      multiSelect={true}
+                      theme="purple"
+                    />
+                  </div>
+                </motion.section>
+              )}
+            </AnimatePresence>
 
             {/* Action Area with Summary Panel */}
             <div className="pt-4 pb-20">

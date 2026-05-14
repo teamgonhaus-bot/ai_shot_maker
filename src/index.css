@@ -752,3 +752,43 @@ body.dark-mode .ios-toast {
   background: rgba(255, 255, 255, 0.9) !important;
   color: #000000 !important;
 }
+
+/* =============================================
+   iOS CATEGORY TABS (Segmented Control)
+   ============================================= */
+.ios-category-tabs {
+  display: flex !important;
+  background: #E5E5EA !important;
+  padding: 2px !important;
+  border-radius: 12px !important;
+  margin: 16px 0 !important;
+  gap: 2px !important;
+}
+
+.category-tab {
+  flex: 1 !important;
+  padding: 8px 0 !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #8E8E93 !important;
+  background: transparent !important;
+  border: none !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.category-tab.active {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12), 0 3px 1px rgba(0,0,0,0.04) !important;
+}
+
+body.dark-mode .ios-category-tabs {
+  background: #1C1C1E !important;
+}
+
+body.dark-mode .category-tab.active {
+  background: #3A3A3C !important;
+  color: #FFFFFF !important;
+}
