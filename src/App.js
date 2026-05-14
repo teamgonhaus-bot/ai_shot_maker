@@ -84,7 +84,8 @@ const OPTIONS_DATA = {
   shotStyle: [
     "컬러블로킹", "네거티브 스페이스", "하드 섀도우", "톤온톤-모노크로매틱", "플랫 레이", "매크로-디테일", "와비사비-어스톤", "모션 캡쳐-동적 연출", 
     "인테리어 잡지 샷(사실적)", "와이드 건축/공간 샷", "인테리어 비네트(코너)", "라이프스타일 인테리어", "클로즈업 디테일", "심도 얕은 샷(아웃포커싱)"
-  ]
+  ],
+  aspectRatio: ["1:1 (Square)", "16:9 (Widescreen)", "4:3 (Standard)", "3:4 (Portrait)"]
 };
 
 export default function App() {
@@ -106,7 +107,8 @@ export default function App() {
     detailMetal: "황동(브라스)",
     detailWall: "화이트 페인트",
     cameraAngle: "선택안함",
-    shotStyle: []
+    shotStyle: [],
+    aspectRatio: "1:1 (Square)"
   });
   const [useDetailMaterial, setUseDetailMaterial] = useState(false);
   const [removeText, setRemoveText] = useState(true);
@@ -120,12 +122,26 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
+  // v0.3 Features
+  const [googleApiKey, setGoogleApiKey] = useState("");
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState(null);
+  const [isImageGenerating, setIsImageGenerating] = useState(false);
+  const [isUpscaling, setIsUpscaling] = useState(false);
+
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.13 Studio...");
+    console.log("🚀 Initializing Shot Maker v0.3 Professional Studio...");
     
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
+
+    const storedKey = localStorage.getItem('shotmaker_api_key');
+    if (storedKey) setGoogleApiKey(storedKey);
+
+    const storedTheme = localStorage.getItem('shotmaker_dark_mode');
+    if (storedTheme === 'true') setIsDarkMode(true);
 
     // 1. LocalStorage Sync (Instant)
     const savedConfig = localStorage.getItem('shotmaker_config_v13');
@@ -152,6 +168,15 @@ export default function App() {
 
     fetchTemplates();
   }, []);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+    localStorage.setItem('shotmaker_dark_mode', isDarkMode);
+  }, [isDarkMode]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -225,7 +250,8 @@ export default function App() {
         useDetailMaterial,
         removeText,
         createdAt: serverTimestamp(),
-        thumbnailColor: ['#FF3B30', '#34C759', '#AF52DE', '#FF9500', '#007AFF'][Math.floor(Math.random() * 5)]
+        thumbnailColor: ['#FF3B30', '#34C759', '#AF52DE', '#FF9500', '#007AFF'][Math.floor(Math.random() * 5)],
+        previewImage: generatedImage || null
       };
       
       const docRef = await addDoc(collection(db, "templates"), newTemplate);
@@ -318,10 +344,73 @@ export default function App() {
       if (removeText) parts.push("textless, no text, no watermarks, clear image");
       parts.push("8k resolution, highly detailed, masterpiece, photorealistic, interior design magazine cover");
 
-      setGeneratedPrompt(parts.join(", "));
+      const finalPrompt = parts.join(", ");
+      setGeneratedPrompt(finalPrompt);
       setIsGenerating(false);
+      
+      // Call Google API if key exists
+      if (googleApiKey) {
+        generateImageFromGoogle(finalPrompt);
+      }
+      
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }, 800);
+  };
+
+  const generateImageFromGoogle = async (prompt) => {
+    setIsImageGenerating(true);
+    setGeneratedImage(null);
+    try {
+      const ratioMap = {
+        "1:1 (Square)": "1:1",
+        "16:9 (Widescreen)": "16:9",
+        "4:3 (Standard)": "4:3",
+        "3:4 (Portrait)": "3:4"
+      };
+      const apiRatio = ratioMap[config.aspectRatio] || "1:1";
+
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${googleApiKey}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          instances: [{ prompt: prompt }],
+          parameters: { sampleCount: 1, aspectRatio: apiRatio }
+        })
+      });
+      
+      const data = await res.json();
+      if (data.predictions && data.predictions.length > 0) {
+        setGeneratedImage(`data:image/jpeg;base64,${data.predictions[0].bytesBase64Encoded}`);
+      } else {
+        console.error("Image generation failed", data);
+        alert("이미지 생성 실패. API 키나 할당량을 확인하세요.");
+      }
+    } catch (e) {
+      console.error("API Error", e);
+      alert("API 오류가 발생했습니다.");
+    } finally {
+      setIsImageGenerating(false);
+    }
+  };
+
+  const simulateUpscale = () => {
+    if (!generatedImage) return;
+    setIsUpscaling(true);
+    // Simulate a 2s delay for upscale processing
+    setTimeout(() => {
+      setIsUpscaling(false);
+      // In a real app, this would replace generatedImage with a higher res version.
+      // For now, we will just inform the user and add a CSS class or visual indicator.
+      alert("2x Upscale Complete! (Simulated for Demo)");
+    }, 2000);
+  };
+
+  const handleDownload = () => {
+    if (!generatedImage) return;
+    const a = document.createElement("a");
+    a.href = generatedImage;
+    a.download = `shotmaker_${Date.now()}.jpg`;
+    a.click();
   };
 
   if (isLoading) return <div className="ios-loading-screen">Loading Studio...</div>;
@@ -341,12 +430,62 @@ export default function App() {
         )}
       </AnimatePresence>
 
+      {/* Settings Modal */}
+      <AnimatePresence>
+        {isSettingsOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="settings-modal-overlay"
+          >
+            <motion.div 
+              initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}
+              className="settings-modal"
+            >
+              <div className="settings-header">
+                <h3>Settings</h3>
+                <button onClick={() => setIsSettingsOpen(false)} className="close-btn"><X size={20}/></button>
+              </div>
+              <div className="settings-body">
+                <label>Google Gemini API Key</label>
+                <input 
+                  type="password" 
+                  value={googleApiKey}
+                  onChange={(e) => {
+                    setGoogleApiKey(e.target.value);
+                    localStorage.setItem('shotmaker_api_key', e.target.value);
+                  }}
+                  placeholder="AIzaSy..."
+                  className="settings-input"
+                />
+                <p className="settings-hint">Used for Imagen 3 image generation. Stored locally.</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <header className="app-header">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <h1 className="text-2xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest m-0">Advanced Prompt Studio</p>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest m-0">v0.3 Professional Studio</p>
         </div>
         <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            className="ios-card-icon-btn"
+            title="Toggle Dark Mode"
+            style={{ width: '30px', height: '30px', fontSize: '14px' }}
+          >
+            {isDarkMode ? '☀️' : '🌙'}
+          </button>
+          <button 
+            onClick={() => setIsSettingsOpen(true)}
+            className="ios-card-icon-btn"
+            title="Settings"
+            style={{ width: '30px', height: '30px', fontSize: '14px' }}
+          >
+            ⚙️
+          </button>
           <div className="header-nav">
             <button className={`header-nav-btn ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>Create</button>
             <button className={`header-nav-btn ${activeTab === 'library' ? 'active' : ''}`} onClick={() => setActiveTab('library')}>Library</button>
@@ -432,6 +571,7 @@ export default function App() {
                   />
                 </div>
                 <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="purple" />
+                <OptionSelect label="이미지 비율 (Aspect Ratio)" value={config.aspectRatio} onChange={(v) => handleConfigChange('aspectRatio', v)} options={OPTIONS_DATA.aspectRatio} theme="purple" />
               </div>
             </section>
 
@@ -475,8 +615,37 @@ export default function App() {
                 <span>{isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}</span>
               </button>
 
-              {generatedPrompt && (
+              {isImageGenerating && (
+                <div className="result-card" style={{ marginTop: '32px', minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div className="skeleton-pulse"></div>
+                  <p style={{ color: '#8E8E93', fontWeight: 600, zIndex: 1, position: 'relative' }}>Generating High-Res Image...</p>
+                </div>
+              )}
+
+              {!isImageGenerating && generatedPrompt && (
                 <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} className="mt-12 space-y-8">
+                  
+                  {googleApiKey && generatedImage ? (
+                    <div className="result-card" style={{ padding: '0', overflow: 'hidden', position: 'relative' }}>
+                      <img src={generatedImage} alt="Generated output" className="w-full h-auto object-cover" style={{ display: 'block' }} />
+                      
+                      {isUpscaling && (
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', color: 'white', fontWeight: 'bold', letterSpacing: '0.1em', zIndex: 10 }}>
+                          UPSCALING...
+                        </div>
+                      )}
+                      
+                      <div style={{ position: 'absolute', bottom: '16px', right: '16px', display: 'flex', gap: '8px', zIndex: 20 }}>
+                        <button onClick={simulateUpscale} className="ios-pill" style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', backdropFilter: 'blur(10px)' }}>
+                          2x Upscale
+                        </button>
+                        <button onClick={handleDownload} className="ios-pill" style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', backdropFilter: 'blur(10px)' }}>
+                          Download
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+
                   <PromptOutput prompt={generatedPrompt} />
                   
                   <div className="save-card">
@@ -533,7 +702,7 @@ export default function App() {
       </AnimatePresence>
 
       <footer className="ios-footer">
-        v0.13 · AI Shot Maker
+        v0.3 - Professional Studio · AI Shot Maker
       </footer>
       <div className="h-12"></div>
     </div>

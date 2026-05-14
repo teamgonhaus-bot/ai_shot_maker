@@ -558,3 +558,139 @@ body {
 .w-full { width: 100% !important; }
 .relative { position: relative !important; }
 .overflow-hidden { overflow: hidden !important; }
+
+/* =============================================
+   SKELETON LOADER
+   ============================================= */
+.skeleton-container {
+  position: relative !important;
+  overflow: hidden !important;
+  background-color: #F2F2F7 !important;
+  border-radius: 20px !important;
+}
+
+.skeleton-pulse {
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(90deg, #F2F2F7 25%, #E5E5EA 50%, #F2F2F7 75%) !important;
+  background-size: 200% 100% !important;
+  animation: loading-skeleton 1.5s infinite linear !important;
+}
+
+@keyframes loading-skeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* =============================================
+   SETTINGS MODAL
+   ============================================= */
+.settings-modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(4px) !important;
+  z-index: 99999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.settings-modal {
+  background: #FFFFFF !important;
+  border-radius: 24px !important;
+  width: 90% !important;
+  max-width: 400px !important;
+  padding: 24px !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2) !important;
+}
+
+.settings-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 20px !important;
+}
+
+.settings-header h3 {
+  margin: 0 !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: #000 !important;
+}
+
+.settings-input {
+  width: 100% !important;
+  padding: 12px 16px !important;
+  border-radius: 12px !important;
+  border: 1px solid #E5E5EA !important;
+  background: #F2F2F7 !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  margin-top: 8px !important;
+  outline: none !important;
+}
+
+.settings-hint {
+  font-size: 11px !important;
+  color: #8E8E93 !important;
+  margin-top: 8px !important;
+}
+
+.close-btn {
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  color: #8E8E93 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* =============================================
+   DARK MODE OVERRIDES
+   ============================================= */
+body.dark-mode {
+  background-color: #1C1C1E !important;
+  color: #FFFFFF !important;
+}
+
+body.dark-mode .ios-bento-card,
+body.dark-mode .result-card,
+body.dark-mode .save-card,
+body.dark-mode .ios-summary-panel,
+body.dark-mode .settings-modal,
+body.dark-mode .header-nav {
+  background-color: #2C2C2E !important;
+  border-color: #3A3A3C !important;
+}
+
+body.dark-mode .ios-section-title,
+body.dark-mode .header-brand h1,
+body.dark-mode .ios-toggle-label,
+body.dark-mode .result-card-text,
+body.dark-mode .save-input,
+body.dark-mode .settings-header h3,
+body.dark-mode .settings-body label {
+  color: #FFFFFF !important;
+}
+
+body.dark-mode .ios-pill,
+body.dark-mode .ios-card-icon-btn,
+body.dark-mode .save-bar,
+body.dark-mode .ios-summary-tag,
+body.dark-mode .settings-input {
+  background-color: #3A3A3C !important;
+  color: #FFFFFF !important;
+  border-color: #48484A !important;
+}
+
+body.dark-mode .ios-pill.selected-red { background-color: #FF453A !important; color: #FFF !important; }
+body.dark-mode .ios-pill.selected-green { background-color: #32D74B !important; color: #FFF !important; }
+body.dark-mode .ios-pill.selected-purple { background-color: #BF5AF2 !important; color: #FFF !important; }
+
+body.dark-mode .header-nav-btn { color: #8E8E93 !important; background: transparent !important; }
+body.dark-mode .header-nav-btn.active { background-color: #3A3A3C !important; color: #FFFFFF !important; }
+
+body.dark-mode .skeleton-container { background-color: #2C2C2E !important; }
+body.dark-mode .skeleton-pulse { background: linear-gradient(90deg, #2C2C2E 25%, #3A3A3C 50%, #2C2C2E 75%) !important; background-size: 200% 100% !important; }
