@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Trash2, ArrowRight, ChevronDown, ChevronUp, FolderInput } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export default function TemplateCard({ template, onLoad, onDelete, onMoveRequest, categories }) {
   const [isExpanded, setIsExpanded] = useState(false);
