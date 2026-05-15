@@ -3,6 +3,7 @@ import {
   Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { InferenceClient } from "@huggingface/inference";
 import { db, auth } from './firebase';
 import { collection, addDoc, deleteDoc, updateDoc, doc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { signInAnonymously, signOut } from 'firebase/auth';
@@ -442,32 +443,16 @@ export default function App() {
         setIsImageGenerating(false);
         return;
       }
-      console.log("🚀 Calling HF Inference API (FLUX.1-schnell)...");
+      console.log("🚀 Generating via InferenceClient + nscale (FLUX.1-schnell)...");
+      const client = new InferenceClient(hfToken.trim());
 
-      const response = await fetch(
-        "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
-        {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${hfToken.trim()}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            inputs: promptToUse,
-            parameters: { num_inference_steps: 4 }
-          })
-        }
-      );
+      const blob = await client.textToImage({
+        provider: "nscale",
+        model: "black-forest-labs/FLUX.1-schnell",
+        inputs: promptToUse,
+        parameters: { num_inference_steps: 4 },
+      });
 
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        console.error("❌ HF API Error:", response.status, errData);
-        if (response.status === 401) throw new Error("401: 토큰 권한을 확인하세요 (Inference 권한 필요)");
-        if (response.status === 503) throw new Error("503: 모델 로딩 중... 잠시 후 다시 시도하세요");
-        throw new Error(errData.error || `HTTP ${response.status}`);
-      }
-
-      const blob = await response.blob();
       const imageUrl = URL.createObjectURL(blob);
       setGeneratedImage(imageUrl);
       triggerToast("Hugging Face (FLUX.1) 생성 성공!");
