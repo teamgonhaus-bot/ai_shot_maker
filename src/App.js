@@ -49,9 +49,9 @@ const DICTIONARY = {
   interiorStyle: { "선택안함": "", "미드센추리 모던": "mid-century modern style", "모던 미니멀": "modern minimal style", "내추럴 우드": "natural wood interior style", "젠 스타일": "Zen-inspired style", "인더스트리얼": "industrial style", "스칸디나비안": "Scandinavian style", "플랜테리어": "planterior style with many indoor plants" },
   light: { "선택안함": "", "자연광": "natural sunlight", "시네마틱": "cinematic dramatic lighting", "스튜디오 조명": "professional studio softbox lighting", "무드등": "soft mood lighting" },
 
-  detailFloor: { "밝은 우드 마루": "light wood flooring", "어두운 우드 마루": "dark walnut wood flooring", "테라조 타일": "modern terrazzo tile floor", "대리석": "premium marble flooring", "콘크리트": "polished concrete floor", "조약돌 바닥": "pebble stone floor", "자갈 바닥": "gravel floor" },
-  detailWood: { "오크(참나무)": "natural oak wood textures", "월넛(호두나무)": "rich walnut wood details", "자작나무": "birch wood accents", "티크": "premium teak wood" },
-  detailMetal: { "황동(브라스)": "brushed brass metal points", "크롬/실버": "polished chrome silver accents", "무광 블랙": "matte black metal frames", "로즈골드": "elegant rose gold details" },
+  detailFloor: { "밝은 우드 마루": "light wood flooring", "어두운 우드 마루": "dark walnut wood flooring", "테라조 타일": "modern terrazzo tile floor", "대리석": "premium marble flooring", "콘크리트": "polished concrete floor", "조약돌 바닥": "pebble stone floor", "자갈 바닥": "gravel floor", "카펫": "with cozy carpet texture", "포세린타일": "with polished porcelain tiles", "에폭시": "with industrial epoxy flooring" },
+  detailWood: { "오크(참나무)": "natural oak wood textures", "월넛(호두나무)": "rich walnut wood details", "자작나무": "birch wood accents", "티크": "premium teak wood", "애쉬": "with natural ash wood grain", "마호가니": "with rich mahogany wood finish", "미송": "with clean pine wood textures", "OBS": "with rugged OSB textures", "합판": "with minimalist plywood details" },
+  detailMetal: { "황동(브라스)": "brushed brass metal points", "크롬/실버": "polished chrome silver accents", "무광 블랙": "matte black metal frames", "유광 블랙": "with polished glossy black metal", "로즈골드": "elegant rose gold details" },
 
   cameraAngle: { "선택안함": "", "정면": "frontal shot", "하이앵글": "high-angle shot", "로우앵글": "low-angle shot", "아이레벨": "eye-level shot", "클로즈업": "close-up shot", "버드아이 뷰": "bird's eye view", "웜즈아이 뷰": "worm's eye view", "더치 앵글": "dutch angle shot", "초광각": "ultra-wide angle shot", "망원 샷": "telephoto lens shot", "풀 샷": "full body shot", "드론 샷": "aerial drone shot" },
   shotStyle: {
@@ -1070,8 +1070,6 @@ export default function App() {
                     <OptionSelect label="공간 종류" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} theme="green" />
                     <OptionSelect label="세부 공간" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} theme="green" />
                     <OptionSelect label="인테리어 양식" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} theme="green" />
-                    <OptionSelect label="조명" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="green" />
-
                     <div className="mt-4 border-t border-gray-100">
                       <OptionSelect label="국가/지역 (Country)" value={config.country} onChange={(v) => handleConfigChange('country', v)} options={OPTIONS_DATA.country} theme="green" />
                       
@@ -1088,38 +1086,6 @@ export default function App() {
                             <OptionSelect label="우드 소재" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} theme="green" />
                             <OptionSelect label="메탈 소재" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} theme="green" />
                             <OptionSelect label="벽 소재/마감" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} theme="green" />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-
-                    <div className="mt-4 border-t border-gray-100 pt-4">
-                      <IOSToggle
-                        label="조명 활성화"
-                        isOn={config.useLight}
-                        onToggle={() => handleConfigChange('useLight', !config.useLight)}
-                        activeColor="#FFD60A"
-                      />
-                      <AnimatePresence>
-                        {config.useLight && (
-                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                            <OptionSelect label="조명 스타일" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="yellow" />
-                            <div className="p-4 bg-gray-50 dark:bg-zinc-800 rounded-2xl mt-2">
-                              <div className="flex justify-between items-center mb-2">
-                                <label className="text-[11px] font-black text-gray-400 uppercase tracking-wider">Brightness (밝기)</label>
-                                <span className="text-[11px] font-black text-[#FFD60A]">{config.brightness}</span>
-                              </div>
-                              <input
-                                type="range"
-                                min="0.1"
-                                max="2.0"
-                                step="0.1"
-                                value={config.brightness}
-                                onChange={(e) => handleConfigChange('brightness', parseFloat(e.target.value))}
-                                className="w-full h-1 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer"
-                                style={{ accentColor: '#FFD60A' }}
-                              />
-                            </div>
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -1230,16 +1196,9 @@ export default function App() {
                         </div>
                       )}
 
-                      <div className="border-t border-gray-100 pt-4">
-                        <IOSToggle
-                          label="텍스트/로고 제거"
-                          isOn={removeText}
-                          onToggle={() => setRemoveText(!removeText)}
-                          activeColor="#AF52DE"
-                        />
                       </div>
                     </div>
-                    <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="purple" />
+                    <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
                   </div>
                 </motion.section>
               )}
@@ -1247,7 +1206,7 @@ export default function App() {
 
               {activeCategory === 'style' && (
                 <motion.section key="style" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                  <h2 className="ios-section-title">[스타일]</h2>
+                  <h2 className="ios-section-title">[스타일 & 조명]</h2>
                   <div className="ios-bento-card">
                     <OptionSelect
                       label="연출 샷 스타일 (다중 선택)"
@@ -1257,6 +1216,47 @@ export default function App() {
                       multiSelect={true}
                       theme="purple"
                     />
+
+                    <div className="mt-4 border-t border-gray-100 pt-4">
+                      <IOSToggle
+                        label="조명 밝기(Lighting Brightness)"
+                        isOn={config.useLight}
+                        onToggle={() => handleConfigChange('useLight', !config.useLight)}
+                        activeColor="#FFD60A"
+                      />
+                      <AnimatePresence>
+                        {config.useLight && (
+                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                            <OptionSelect label="조명 스타일" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="yellow" />
+                            <div className="p-4 bg-gray-50 dark:bg-zinc-800 rounded-2xl mt-2">
+                              <div className="flex justify-between items-center mb-2">
+                                <label className="text-[11px] font-black text-gray-400 uppercase tracking-wider">Brightness (밝기)</label>
+                                <span className="text-[11px] font-black text-[#FFD60A]">{config.brightness}</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0.1"
+                                max="2.0"
+                                step="0.1"
+                                value={config.brightness}
+                                onChange={(e) => handleConfigChange('brightness', parseFloat(e.target.value))}
+                                className="w-full h-1 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer"
+                                style={{ accentColor: '#FFD60A' }}
+                              />
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    <div className="mt-4 border-t border-gray-100 pt-4">
+                      <IOSToggle
+                        label="텍스트/로고 제거"
+                        isOn={removeText}
+                        onToggle={() => setRemoveText(!removeText)}
+                        activeColor="#AF52DE"
+                      />
+                    </div>
                   </div>
                 </motion.section>
               )}
@@ -1274,8 +1274,9 @@ export default function App() {
                     // Category Color Mapping
                     let color = '#8E8E93'; // Default Gray
                     if (key.startsWith('subject')) color = '#FF3B30'; // Red for Subject
-                    if (key.startsWith('space') || key === 'interiorStyle' || key === 'country') color = '#34C759'; // Green for Space/Style
-                    if (key.startsWith('camera') || key === 'shotStyle') color = '#007AFF'; // Blue for Camera (v0.45 Fix)
+                    if (key.startsWith('space') || key === 'interiorStyle' || key === 'country') color = '#34C759'; // Green for Space
+                    if (key.startsWith('camera')) color = '#007AFF'; // Blue for Camera
+                    if (key === 'shotStyle') color = '#AF52DE'; // Purple for Style
                     if (key === 'light') color = '#FFD60A'; // Yellow for Light
 
                     if (Array.isArray(val)) {
