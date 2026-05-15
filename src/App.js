@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut 
+import {
+  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { InferenceClient } from "@huggingface/inference";
@@ -20,15 +20,15 @@ const DICTIONARY = {
   subjectAge: { "선택안함": "", "10대": "teenager", "20대": "in their 20s", "30대": "in their 30s", "40대": "in their 40s", "중장년": "middle-aged" },
   subjectRegion: { "선택안함": "", "한국": "Korean", "일본": "Japanese", "북유럽": "Northern European", "북미": "North American" },
   subjectClothesStyle: { "선택안함": "", "캐주얼": "casual style", "비즈니스": "business style", "스트릿": "streetwear style", "미니멀": "minimalist style", "포멀/정장": "formal suit style" },
-  subjectClothesType: { 
-    "선택안함": "", "기본 스커트": "wearing a basic skirt", "미니스커트": "wearing a miniskirt", "롱스커트": "wearing a long skirt", 
-    "긴바지": "wearing long pants", "반바지": "wearing shorts", "원피스": "wearing a dress", 
-    "아웃도어": "wearing outdoor apparel", "스포츠 복장": "wearing sportswear" 
+  subjectClothesType: {
+    "선택안함": "", "기본 스커트": "wearing a basic skirt", "미니스커트": "wearing a miniskirt", "롱스커트": "wearing a long skirt",
+    "긴바지": "wearing long pants", "반바지": "wearing shorts", "원피스": "wearing a dress",
+    "아웃도어": "wearing outdoor apparel", "스포츠 복장": "wearing sportswear"
   },
   subjectHair: { "선택안함": "", "긴머리": "with long hair", "짧은머리": "with short hair", "단발": "with bob hair", "펌": "with permed hair", "염색": "with dyed hair", "묶은머리": "with tied hair" },
-  
+
   spaceType: { "스튜디오": "a professional studio environment", "오피스": "a modern office space", "홈": "a cozy home interior", "리테일": "a retail commercial space", "라운지": "a luxury lounge area", "야외": "an outdoor setting" },
-  spaceDetail: { 
+  spaceDetail: {
     "단색 배경": "with a solid color background", "인테리어 세트장": "within a designed interior set",
     "사무실": "in a standard office setup", "회의실": "in a formal meeting room", "중역실": "in an executive office suite", "오피스 라운지": "in a relaxed office lounge",
     "리빙": "in a living room area", "다이닝": "in a dining room setting", "룸": "in a private room",
@@ -38,19 +38,19 @@ const DICTIONARY = {
   },
   interiorStyle: { "선택안함": "", "미드센추리 모던": "mid-century modern style", "모던 미니멀": "modern minimal style", "내추럴 우드": "natural wood interior style", "젠 스타일": "Zen-inspired style", "인더스트리얼": "industrial style", "스칸디나비안": "Scandinavian style" },
   light: { "선택안함": "", "자연광": "natural sunlight", "시네마틱": "cinematic dramatic lighting", "스튜디오 조명": "professional studio softbox lighting", "무드등": "soft mood lighting" },
-  
+
   detailFloor: { "밝은 우드 마루": "light wood flooring", "어두운 우드 마루": "dark walnut wood flooring", "테라조 타일": "modern terrazzo tile floor", "대리석": "premium marble flooring", "콘크리트": "polished concrete floor", "조약돌 바닥": "pebble stone floor", "자갈 바닥": "gravel floor" },
   detailWood: { "오크(참나무)": "natural oak wood textures", "월넛(호두나무)": "rich walnut wood details", "자작나무": "birch wood accents", "티크": "premium teak wood" },
   detailMetal: { "황동(브라스)": "brushed brass metal points", "크롬/실버": "polished chrome silver accents", "무광 블랙": "matte black metal frames", "로즈골드": "elegant rose gold details" },
   detailWall: { "화이트 페인트": "clean white painted walls", "노출 콘크리트": "exposed raw concrete walls", "웨인스코팅": "elegant wainscoted walls", "파스텔톤 벽지": "soft pastel wallpaper", "붉은 벽돌": "rustic red brick walls" },
-  
+
   cameraAngle: { "선택안함": "", "정면": "frontal shot", "하이앵글": "high-angle shot", "로우앵글": "low-angle shot", "아이레벨": "eye-level shot", "클로즈업": "close-up shot", "버드아이 뷰": "bird's eye view", "웜즈아이 뷰": "worm's eye view", "더치 앵글": "dutch angle shot", "초광각": "ultra-wide angle shot", "망원 샷": "telephoto lens shot", "풀 샷": "full body shot", "드론 샷": "aerial drone shot" },
   shotStyle: {
-    "컬러블로킹": "color blocking aesthetic", "네거티브 스페이스": "negative space composition", "하드 섀도우": "hard shadows", 
-    "톤온톤-모노크로매틱": "tone-on-tone monochromatic palette", "플랫 레이": "flat lay perspective", "매크로-디테일": "macro detail shot", 
-    "와비사비-어스톤": "wabi-sabi earth tone aesthetic", "모션 캡쳐-동적 연출": "motion capture dynamic pose", 
-    "인테리어 잡지 샷(사실적)": "realistic interior magazine photography", "와이드 건축/공간 샷": "wide architectural space shot", 
-    "인테리어 비네트(코너)": "interior vignette corner shot", "라이프스타일 인테리어": "lifestyle interior scene", 
+    "컬러블로킹": "color blocking aesthetic", "네거티브 스페이스": "negative space composition", "하드 섀도우": "hard shadows",
+    "톤온톤-모노크로매틱": "tone-on-tone monochromatic palette", "플랫 레이": "flat lay perspective", "매크로-디테일": "macro detail shot",
+    "와비사비-어스톤": "wabi-sabi earth tone aesthetic", "모션 캡쳐-동적 연출": "motion capture dynamic pose",
+    "인테리어 잡지 샷(사실적)": "realistic interior magazine photography", "와이드 건축/공간 샷": "wide architectural space shot",
+    "인테리어 비네트(코너)": "interior vignette corner shot", "라이프스타일 인테리어": "lifestyle interior scene",
     "클로즈업 디테일": "close-up detail focus", "심도 얕은 샷(아웃포커싱)": "shallow depth of field with bokeh"
   }
 };
@@ -83,7 +83,7 @@ const OPTIONS_DATA = {
   detailWall: ["화이트 페인트", "노출 콘크리트", "웨인스코팅", "파스텔톤 벽지", "붉은 벽돌"],
   cameraAngle: ["선택안함", "정면", "하이앵글", "로우앵글", "아이레벨", "클로즈업", "버드아이 뷰", "웜즈아이 뷰", "더치 앵글", "초광각", "망원 샷", "풀 샷", "드론 샷"],
   shotStyle: [
-    "컬러블로킹", "네거티브 스페이스", "하드 섀도우", "톤온톤-모노크로매틱", "플랫 레이", "매크로-디테일", "와비사비-어스톤", "모션 캡쳐-동적 연출", 
+    "컬러블로킹", "네거티브 스페이스", "하드 섀도우", "톤온톤-모노크로매틱", "플랫 레이", "매크로-디테일", "와비사비-어스톤", "모션 캡쳐-동적 연출",
     "인테리어 잡지 샷(사실적)", "와이드 건축/공간 샷", "인테리어 비네트(코너)", "라이프스타일 인테리어", "클로즈업 디테일", "심도 얕은 샷(아웃포커싱)"
   ],
   aspectRatio: ["1:1 (Square)", "16:9 (Widescreen)", "4:3 (Standard)", "3:4 (Portrait)"]
@@ -133,7 +133,7 @@ export default function App() {
   const [isUpscaling, setIsUpscaling] = useState(false);
   const [cooldownTime, setCooldownTime] = useState(0);
   const [activeCategory, setActiveCategory] = useState('subject');
-  
+
   // Image-to-Image & Lightbox states
   const [refImage, setRefImage] = useState(null); // { mimeType, data }
   const [useImageRef, setUseImageRef] = useState(false);
@@ -148,7 +148,7 @@ export default function App() {
   // Initial Data Load & Persistence Sync
   useEffect(() => {
     console.log("🚀 Initializing Shot Maker v0.3 Professional Studio...");
-    
+
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
 
@@ -268,7 +268,7 @@ export default function App() {
       return;
     }
     if (!templateName || !generatedPrompt) return;
-    
+
     setIsSaving(true);
     console.log(`💾 Attempting to save template: "${templateName}"...`);
     try {
@@ -282,13 +282,13 @@ export default function App() {
         thumbnailColor: ['#FF3B30', '#34C759', '#AF52DE', '#FF9500', '#007AFF'][Math.floor(Math.random() * 5)],
         previewImage: generatedImage || null
       };
-      
+
       const docRef = await addDoc(collection(db, "templates"), newTemplate);
       console.log(`✅ Template saved successfully with ID: ${docRef.id}`);
-      
+
       // Immediate local state update for zero-latency UI
       setSavedTemplates(prev => [{ id: docRef.id, ...newTemplate, createdAt: new Date() }, ...prev]);
-      
+
       setIsSaved(true);
       triggerToast("라이브러리에 저장 완료!");
       setTemplateName("");
@@ -324,13 +324,13 @@ export default function App() {
       await updateDoc(templateRef, {
         "config.spaceType": newCategory
       });
-      
-      setSavedTemplates(prev => prev.map(t => 
-        t.id === templateId 
-          ? { ...t, config: { ...t.config, spaceType: newCategory } } 
+
+      setSavedTemplates(prev => prev.map(t =>
+        t.id === templateId
+          ? { ...t, config: { ...t.config, spaceType: newCategory } }
           : t
       ));
-      
+
       triggerToast(`'${newCategory}' 탭으로 이동되었습니다.`);
     } catch (e) {
       console.error("Error moving template:", e);
@@ -351,21 +351,21 @@ export default function App() {
     setTimeout(() => {
       const parts = [];
       let subjectStr = "a high-end masterpiece";
-      
+
       if (config.subjectNum !== "없음") {
         const traits = [];
         if (config.subjectAge !== "선택안함") traits.push(DICTIONARY.subjectAge[config.subjectAge]);
         if (config.subjectGender !== "선택안함") traits.push(DICTIONARY.subjectGender[config.subjectGender]);
         if (config.subjectRegion !== "선택안함") traits.push(DICTIONARY.subjectRegion[config.subjectRegion]);
-        
+
         let humanStr = DICTIONARY.subjectNum[config.subjectNum];
         if (traits.length > 0) humanStr += ` (${traits.join(", ")})`;
-        
+
         const details = [];
         if (config.subjectHair !== "선택안함") details.push(DICTIONARY.subjectHair[config.subjectHair]);
         if (config.subjectClothesStyle !== "선택안함") details.push(DICTIONARY.subjectClothesStyle[config.subjectClothesStyle]);
         if (config.subjectClothesType !== "선택안함") details.push(DICTIONARY.subjectClothesType[config.subjectClothesType]);
-        
+
         if (details.length > 0) humanStr += ` ${details.join(", ")}`;
         parts.push(`featuring ${humanStr} posing naturally`);
       } else {
@@ -421,7 +421,7 @@ export default function App() {
   const generateImageFromSD = async (prompt) => {
     // 1. Validation & Fallback for Token
     const hfToken = sdApiKey?.trim() || process.env.REACT_APP_HF_TOKEN;
-    
+
     if (!hfToken) {
       triggerToast("Hugging Face API 토큰이 설정되지 않았습니다.");
       return;
@@ -434,12 +434,12 @@ export default function App() {
 
     setCooldownTime(5);
     setIsImageGenerating(true);
-    
+
     try {
       console.log("🚀 Generating with Hugging Face Inference (FLUX.1-schnell via nscale)...");
       // InferenceClient instance creation
-      const client = new InferenceClient(hfToken);
-      
+      const client = new InferenceClient(process.env.HF_TOKEN);
+
       const blob = await client.textToImage({
         model: 'black-forest-labs/FLUX.1-schnell',
         inputs: promptToUse,
@@ -449,13 +449,13 @@ export default function App() {
         }
       });
 
-      const imageUrl = URL.createObjectURL(blob); 
+      const imageUrl = URL.createObjectURL(blob);
       setGeneratedImage(imageUrl);
       triggerToast("Hugging Face (FLUX.1) 생성 성공!");
     } catch (e) {
       console.error("SD Generation Error:", e);
       const errorMsg = e.message?.toLowerCase() || "";
-      
+
       if (errorMsg.includes('401') || errorMsg.includes('unauthorized')) {
         triggerToast("토큰 권한 확인이 필요합니다 (401 Unauthorized)");
       } else if (errorMsg.includes('503') || errorMsg.includes('loading')) {
@@ -499,7 +499,7 @@ export default function App() {
       const apiRatio = ratioMap[config.aspectRatio] || "1:1";
 
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${googleApiKey}`;
-      
+
       // Construct parts for multimodal input
       const parts = [{ text: promptToUse }];
       if (useImageRef && refImage) {
@@ -542,7 +542,7 @@ export default function App() {
 
       const responseParts = data.candidates?.[0]?.content?.parts || [];
       let imageFound = false;
-      
+
       for (const part of responseParts) {
         if (part.inlineData) {
           const mimeType = part.inlineData.mimeType || "image/png";
@@ -551,7 +551,7 @@ export default function App() {
           break;
         }
       }
-      
+
       if (!imageFound) {
         const finishReason = data.candidates?.[0]?.finishReason;
         console.error("⚠️ No image in response. Data:", data);
@@ -596,14 +596,14 @@ export default function App() {
       {/* 🖼️ Lightbox Modal */}
       <AnimatePresence>
         {lightboxImage && (
-          <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="ios-lightbox"
             onClick={() => setLightboxImage(null)}
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -618,41 +618,41 @@ export default function App() {
       </AnimatePresence>
 
       <div className="ios-toast-container">
-      <AnimatePresence>
-        {showToast && (
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="ios-toast"
-          >
-            {toastMessage}
-          </motion.div>
-        )}
-      </AnimatePresence>
+        <AnimatePresence>
+          {showToast && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="ios-toast"
+            >
+              {toastMessage}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* 📦 Move to Tab Modal */}
       <AnimatePresence>
         {moveTarget && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="settings-modal-overlay"
             style={{ zIndex: 200000 }}
             onClick={() => setMoveTarget(null)}
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }}
               className="settings-modal"
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-[22px] font-black text-black dark:text-white mb-2 text-center tracking-tight">Move to Tab</h3>
               <p className="text-[13px] font-bold text-gray-400 mb-8 text-center">이동할 카테고리를 선택하세요</p>
-              
+
               <div className="modal-pill-grid">
                 {OPTIONS_DATA.spaceType.map(space => (
-                  <button 
-                    key={space} 
+                  <button
+                    key={space}
                     onClick={() => {
                       handleMoveTemplate(moveTarget.id, space);
                       setMoveTarget(null);
@@ -663,8 +663,8 @@ export default function App() {
                   </button>
                 ))}
               </div>
-              
-              <button 
+
+              <button
                 onClick={() => setMoveTarget(null)}
                 className="cancel-pill-btn"
               >
@@ -678,19 +678,19 @@ export default function App() {
       {/* Settings Modal */}
       <AnimatePresence>
         {isSettingsOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="settings-modal-overlay"
             onClick={() => setIsSettingsOpen(false)}
           >
-            <motion.div 
+            <motion.div
               initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}
               className="settings-modal"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="settings-header">
                 <h3>Settings</h3>
-                <button onClick={() => setIsSettingsOpen(false)} className="close-btn"><X size={20}/></button>
+                <button onClick={() => setIsSettingsOpen(false)} className="close-btn"><X size={20} /></button>
               </div>
               <div className="settings-body space-y-4">
                 {/* Dark Mode */}
@@ -699,10 +699,10 @@ export default function App() {
                     <label className="settings-prop-label">다크 모드</label>
                     <p className="settings-desc-text">앱 테마를 어둡게 변경합니다.</p>
                   </div>
-                  <IOSToggle 
+                  <IOSToggle
                     label=""
-                    isOn={isDarkMode} 
-                    onToggle={() => setIsDarkMode(!isDarkMode)} 
+                    isOn={isDarkMode}
+                    onToggle={() => setIsDarkMode(!isDarkMode)}
                     activeColor="#000000"
                   />
                 </div>
@@ -711,8 +711,8 @@ export default function App() {
                 <div className="pb-4 border-b border-gray-100 dark:border-gray-800">
                   <label className="settings-prop-label">기본 이미지 비율</label>
                   <p className="settings-desc-text mb-4">생성될 이미지의 기본 가로세로 비율을 설정합니다.</p>
-                  <select 
-                    value={config.aspectRatio} 
+                  <select
+                    value={config.aspectRatio}
                     onChange={(e) => handleConfigChange('aspectRatio', e.target.value)}
                     className="settings-input"
                   >
@@ -726,17 +726,17 @@ export default function App() {
                 <div className="pt-8 mt-2 border-t border-gray-100 dark:border-gray-800">
                   <label className="settings-prop-label">Generate API</label>
                   <p className="settings-desc-text mb-8">사용할 이미지 생성 AI 엔진을 선택하세요.</p>
-                  
+
                   {/* Google Gemini Row */}
-                  <div 
+                  <div
                     className={`engine-row ${selectedApi === 'google' ? 'active' : 'inactive'} ${!isAdmin ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'}`}
-                    onClick={() => { 
+                    onClick={() => {
                       if (!isAdmin) {
                         triggerToast("관리자 로그인이 필요합니다.");
                         return;
                       }
-                      setSelectedApi('google'); 
-                      localStorage.setItem('shotmaker_selected_api', 'google'); 
+                      setSelectedApi('google');
+                      localStorage.setItem('shotmaker_selected_api', 'google');
                     }}
                   >
                     <div className="engine-label">
@@ -745,8 +745,8 @@ export default function App() {
                         <span className="font-black text-[0.85rem] text-black dark:text-white leading-none">Google AI</span>
                       </div>
                     </div>
-                    <input 
-                      type="password" 
+                    <input
+                      type="password"
                       value={googleApiKey}
                       onChange={(e) => {
                         if (!isAdmin) return;
@@ -761,15 +761,15 @@ export default function App() {
                   </div>
 
                   {/* Stable Diffusion Row */}
-                  <div 
+                  <div
                     className={`engine-row ${selectedApi === 'stable-diffusion' ? 'active' : 'inactive'} ${!isAdmin ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'}`}
-                    onClick={() => { 
+                    onClick={() => {
                       if (!isAdmin) {
                         triggerToast("관리자 로그인이 필요합니다.");
                         return;
                       }
-                      setSelectedApi('stable-diffusion'); 
-                      localStorage.setItem('shotmaker_selected_api', 'stable-diffusion'); 
+                      setSelectedApi('stable-diffusion');
+                      localStorage.setItem('shotmaker_selected_api', 'stable-diffusion');
                     }}
                   >
                     <div className="engine-label" style={{ width: '160px' }}>
@@ -779,8 +779,8 @@ export default function App() {
                         <span className="text-[9px] font-bold text-gray-400 mt-1">(FLUX.1)</span>
                       </div>
                     </div>
-                    <input 
-                      type="password" 
+                    <input
+                      type="password"
                       value={sdApiKey}
                       onChange={(e) => {
                         if (!isAdmin) return;
@@ -801,18 +801,18 @@ export default function App() {
       </AnimatePresence>
 
       <div className="ios-toast-container">
-      <AnimatePresence>
-        {showToast && (
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="ios-toast"
-          >
-            {toastMessage}
-          </motion.div>
-        )}
-      </AnimatePresence>
+        <AnimatePresence>
+          {showToast && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="ios-toast"
+            >
+              {toastMessage}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <header className="app-header">
@@ -823,7 +823,7 @@ export default function App() {
             <button className={`header-nav-btn ${activeTab === 'library' ? 'active' : 'inactive'}`} onClick={() => setActiveTab('library')}>Library</button>
           </div>
           <div className="relative">
-            <button 
+            <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className={`ios-card-icon-btn ${isMenuOpen ? 'active' : ''}`}
               title="Menu"
@@ -835,17 +835,17 @@ export default function App() {
             <AnimatePresence>
               {isMenuOpen && (
                 <>
-                  <div 
+                  <div
                     className="menu-overlay"
                     onClick={() => setIsMenuOpen(false)}
                   />
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: -10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
                     className="header-dropdown"
                   >
-                    <button 
+                    <button
                       onClick={() => { setIsSettingsOpen(true); setIsMenuOpen(false); }}
                       className="dropdown-item"
                     >
@@ -853,11 +853,11 @@ export default function App() {
                       <span>Settings</span>
                     </button>
                     <div className="dropdown-divider" />
-                    <button 
-                      onClick={() => { 
-                        if (isAdmin) handleLogout(); 
-                        else handleLogin(); 
-                        setIsMenuOpen(false); 
+                    <button
+                      onClick={() => {
+                        if (isAdmin) handleLogout();
+                        else handleLogin();
+                        setIsMenuOpen(false);
                       }}
                       className="dropdown-item"
                     >
@@ -875,7 +875,7 @@ export default function App() {
       <AnimatePresence mode="wait">
         {activeTab === 'home' ? (
           <motion.div key="home" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-12">
-            
+
             {/* Category Tabs */}
             <div className="ios-category-tabs">
               <button className={`category-tab ${activeCategory === 'subject' ? 'active' : ''}`} onClick={() => setActiveCategory('subject')}>인물</button>
@@ -896,11 +896,11 @@ export default function App() {
                         <OptionSelect label="연령대" value={config.subjectAge} onChange={(v) => handleConfigChange('subjectAge', v)} options={OPTIONS_DATA.subjectAge} theme="red" />
                         <OptionSelect label="지역/인종" value={config.subjectRegion} onChange={(v) => handleConfigChange('subjectRegion', v)} options={OPTIONS_DATA.subjectRegion} theme="red" />
                         <OptionSelect label="옷 스타일" value={config.subjectClothesStyle} onChange={(v) => handleConfigChange('subjectClothesStyle', v)} options={OPTIONS_DATA.subjectClothesStyle} theme="red" />
-                        <OptionSelect 
-                          label="옷 종류" 
-                          value={config.subjectClothesType} 
-                          onChange={(v) => handleConfigChange('subjectClothesType', v)} 
-                          options={config.subjectGender === '여성' ? OPTIONS_DATA.subjectClothesType.female : OPTIONS_DATA.subjectClothesType.others} 
+                        <OptionSelect
+                          label="옷 종류"
+                          value={config.subjectClothesType}
+                          onChange={(v) => handleConfigChange('subjectClothesType', v)}
+                          options={config.subjectGender === '여성' ? OPTIONS_DATA.subjectClothesType.female : OPTIONS_DATA.subjectClothesType.others}
                           theme="red"
                         />
                         <OptionSelect label="헤어 스타일" value={config.subjectHair} onChange={(v) => handleConfigChange('subjectHair', v)} options={OPTIONS_DATA.subjectHair} theme="red" />
@@ -918,12 +918,12 @@ export default function App() {
                     <OptionSelect label="세부 공간" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} theme="green" />
                     <OptionSelect label="인테리어 양식" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} theme="green" />
                     <OptionSelect label="조명" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="green" />
-                    
+
                     <div className="mt-4 border-t border-gray-100">
-                      <IOSToggle 
-                        label="세부 소재 및 컬러 (Materials)" 
-                        isOn={useDetailMaterial} 
-                        onToggle={() => setUseDetailMaterial(!useDetailMaterial)} 
+                      <IOSToggle
+                        label="세부 소재 및 컬러 (Materials)"
+                        isOn={useDetailMaterial}
+                        onToggle={() => setUseDetailMaterial(!useDetailMaterial)}
                         activeColor="#34C759"
                       />
                       <AnimatePresence>
@@ -946,15 +946,15 @@ export default function App() {
                   <h2 className="ios-section-title">[카메라]</h2>
                   <div className="ios-bento-card" style={{ padding: '20px' }}>
                     <div className="mb-4 space-y-4">
-                      <IOSToggle 
-                        label="이미지 참조 모드 (Image-to-Image)" 
-                        isOn={useImageRef} 
-                        onToggle={() => setUseImageRef(!useImageRef)} 
+                      <IOSToggle
+                        label="이미지 참조 모드 (Image-to-Image)"
+                        isOn={useImageRef}
+                        onToggle={() => setUseImageRef(!useImageRef)}
                         activeColor="#007AFF"
                       />
-                      
+
                       {useImageRef && (
-                        <div 
+                        <div
                           className={`ios-upload-zone ${isDragging ? 'dragging' : ''}`}
                           onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                           onDragLeave={() => setIsDragging(false)}
@@ -974,11 +974,11 @@ export default function App() {
                             }
                           }}
                         >
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            id="ref-image-upload" 
-                            className="hidden" 
+                          <input
+                            type="file"
+                            accept="image/*"
+                            id="ref-image-upload"
+                            className="hidden"
                             onChange={(e) => {
                               const file = e.target.files[0];
                               if (file) {
@@ -1003,12 +1003,12 @@ export default function App() {
                             </label>
                           ) : (
                             <div className="relative group w-full flex justify-center">
-                              <img 
-                                src={`data:${refImage.mimeType};base64,${refImage.data}`} 
-                                alt="Ref Preview" 
+                              <img
+                                src={`data:${refImage.mimeType};base64,${refImage.data}`}
+                                alt="Ref Preview"
                                 className="ios-upload-preview"
                               />
-                              <button 
+                              <button
                                 onClick={() => setRefImage(null)}
                                 className="ios-upload-remove-btn"
                               >
@@ -1020,10 +1020,10 @@ export default function App() {
                       )}
 
                       <div className="border-t border-gray-100 pt-4">
-                        <IOSToggle 
-                          label="텍스트/로고 제거" 
-                          isOn={removeText} 
-                          onToggle={() => setRemoveText(!removeText)} 
+                        <IOSToggle
+                          label="텍스트/로고 제거"
+                          isOn={removeText}
+                          onToggle={() => setRemoveText(!removeText)}
                           activeColor="#AF52DE"
                         />
                       </div>
@@ -1037,11 +1037,11 @@ export default function App() {
                 <motion.section key="style" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                   <h2 className="ios-section-title">[스타일]</h2>
                   <div className="ios-bento-card">
-                    <OptionSelect 
-                      label="연출 샷 스타일 (다중 선택)" 
-                      value={config.shotStyle} 
-                      onChange={(v) => handleConfigChange('shotStyle', v)} 
-                      options={OPTIONS_DATA.shotStyle} 
+                    <OptionSelect
+                      label="연출 샷 스타일 (다중 선택)"
+                      value={config.shotStyle}
+                      onChange={(v) => handleConfigChange('shotStyle', v)}
+                      options={OPTIONS_DATA.shotStyle}
                       multiSelect={true}
                       theme="purple"
                     />
@@ -1066,7 +1066,7 @@ export default function App() {
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={generatePrompt}
                 disabled={isGenerating}
                 className="generate-btn"
@@ -1076,7 +1076,7 @@ export default function App() {
               </button>
 
               {generatedPrompt && (selectedApi === 'google' ? googleApiKey : sdApiKey) && (
-                <button 
+                <button
                   onClick={() => {
                     if (!isAdmin) {
                       triggerToast("이미지 생성은 관리자 권한이 필요합니다.");
@@ -1086,17 +1086,17 @@ export default function App() {
                   }}
                   disabled={isImageGenerating || cooldownTime > 0}
                   className="generate-btn"
-                  style={{ 
-                    marginTop: '12px', 
+                  style={{
+                    marginTop: '12px',
                     background: (!isAdmin || isImageGenerating || cooldownTime > 0) ? '#48484A' : '#1C1C1E',
                     cursor: (!isAdmin || isImageGenerating || cooldownTime > 0) ? 'not-allowed' : 'pointer',
                     opacity: !isAdmin ? 0.7 : 1
                   }}
-                >  
+                >
                   <ImageIcon className="w-5 h-5 text-white" />
                   <span>
-                    {isImageGenerating ? (selectedApi === 'google' ? 'GENERATING WITH GEMINI...' : 'GENERATING WITH FLUX.1...') : 
-                     cooldownTime > 0 ? `COOLDOWN (${cooldownTime}s)` : `GENERATE WITH ${selectedApi === 'google' ? 'GOOGLE AI' : 'HUGGING FACE'}`}
+                    {isImageGenerating ? (selectedApi === 'google' ? 'GENERATING WITH GEMINI...' : 'GENERATING WITH FLUX.1...') :
+                      cooldownTime > 0 ? `COOLDOWN (${cooldownTime}s)` : `GENERATE WITH ${selectedApi === 'google' ? 'GOOGLE AI' : 'HUGGING FACE'}`}
                   </span>
                 </button>
               )}
@@ -1115,7 +1115,7 @@ export default function App() {
 
               {!isImageGenerating && generatedPrompt && (
                 <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} className="mt-12 space-y-8">
-                  
+
                   <div className="flex flex-col items-center mb-[-16px]">
                     <h3 className="text-[15px] font-black text-black dark:text-white tracking-tight">
                       {selectedApi === 'google' ? 'Google AI Image Generation' : 'Hugging Face (FLUX.1) Generation'}
@@ -1125,13 +1125,13 @@ export default function App() {
 
                   {generatedImage ? (
                     <div className="image-result-card relative group">
-                      <img 
-                        src={generatedImage} 
-                        alt="Generated" 
-                        className="w-full h-auto cursor-zoom-in" 
+                      <img
+                        src={generatedImage}
+                        alt="Generated"
+                        className="w-full h-auto cursor-zoom-in"
                         onClick={() => setLightboxImage(generatedImage)}
                       />
-                      
+
                       {/* Prompt tooltip on hover */}
                       <div className="image-prompt-tooltip">
                         <p>{generatedPrompt.length > 120 ? generatedPrompt.slice(0, 120) + '...' : generatedPrompt}</p>
@@ -1142,7 +1142,7 @@ export default function App() {
                           UPSCALING...
                         </div>
                       )}
-                      
+
                       <div style={{ position: 'absolute', bottom: '16px', right: '16px', display: 'flex', gap: '8px', zIndex: 20 }}>
                         <button onClick={simulateUpscale} className="ios-pill" style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', backdropFilter: 'blur(10px)' }}>
                           2x Upscale
@@ -1155,19 +1155,19 @@ export default function App() {
                   ) : null}
 
                   <PromptOutput prompt={generatedPrompt} />
-                  
+
                   <div className="save-card">
                     <div className="ios-option-label mb-3">Save Preset</div>
                     <div className="save-bar">
-                      <input 
-                        type="text" 
-                        value={templateName} 
-                        onChange={(e) => setTemplateName(e.target.value)} 
-                        placeholder="Preset name..." 
-                        className="save-input" 
+                      <input
+                        type="text"
+                        value={templateName}
+                        onChange={(e) => setTemplateName(e.target.value)}
+                        placeholder="Preset name..."
+                        className="save-input"
                       />
-                      <button 
-                        onClick={handleSaveTemplate} 
+                      <button
+                        onClick={handleSaveTemplate}
                         disabled={isSaving}
                         className={`save-btn ${isSaved ? 'saved' : ''}`}
                       >
@@ -1185,13 +1185,13 @@ export default function App() {
               <X size={18} strokeWidth={1.5} />
             </button>
             <h2 className="ios-section-title">Library</h2>
-            
+
             <div className="ios-category-tabs" style={{ marginTop: '0', marginBottom: '16px', overflowX: 'auto', whiteSpace: 'nowrap', padding: '4px' }}>
               <button className={`category-tab ${libraryFilter === '전체' ? 'active' : ''}`} style={{ padding: '8px 12px' }} onClick={() => setLibraryFilter('전체')}>전체</button>
               {OPTIONS_DATA.spaceType.map(space => (
-                <button 
-                  key={space} 
-                  className={`category-tab ${libraryFilter === space ? 'active' : ''}`} 
+                <button
+                  key={space}
+                  className={`category-tab ${libraryFilter === space ? 'active' : ''}`}
                   style={{ padding: '8px 12px' }}
                   onClick={() => setLibraryFilter(space)}
                 >
@@ -1202,14 +1202,14 @@ export default function App() {
 
             <div className="ios-library-grid">
               {(libraryFilter === '전체' ? savedTemplates : savedTemplates.filter(t => t.config?.spaceType === libraryFilter)).map(template => (
-                <TemplateCard 
-                  key={template.id} 
-                  template={template} 
+                <TemplateCard
+                  key={template.id}
+                  template={template}
                   onLoad={(t) => {
                     handleLoadTemplate(t);
                     setActiveTab('home');
-                  }} 
-                  onDelete={handleDeleteTemplate} 
+                  }}
+                  onDelete={handleDeleteTemplate}
                   onMoveRequest={(t) => setMoveTarget(t)}
                   categories={OPTIONS_DATA.spaceType}
                 />
