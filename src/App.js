@@ -3,6 +3,7 @@ import {
   Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { HfInference } from "@huggingface/inference";
 import { db, auth } from './firebase';
 import { collection, addDoc, deleteDoc, updateDoc, doc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { signInAnonymously, signOut } from 'firebase/auth';
@@ -432,31 +433,28 @@ export default function App() {
     setIsImageGenerating(true);
     
     try {
-      console.log("🚀 Generating with Stable Diffusion (v0.4 Stable Logic)...");
-      const response = await fetch(
-        "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5",
-        {
-          headers: { 
-            "Authorization": `Bearer ${sdApiKey}`
-          },
-          method: "POST",
-          body: JSON.stringify({ inputs: promptToUse }),
-        }
-      );
-
-      if (response.status === 503) {
-        throw new Error('Model is loading (30s)... Please try again in 30 seconds.');
-      }
-
-      if (!response.ok) throw new Error('Network response was not ok');
+      console.log("🚀 Generating with Hugging Face Inference Library (v0.4 Stable)...");
+      const hf = new HfInference(sdApiKey);
       
-      const blob = await response.blob(); 
+      const blob = await hf.textToImage({
+        model: 'runwayml/stable-diffusion-v1-5',
+        inputs: promptToUse,
+        headers: { 
+          "use_cache": "false",
+          "wait_for_model": "true"
+        }
+      });
+
       const imageUrl = URL.createObjectURL(blob); 
       setGeneratedImage(imageUrl);
-      triggerToast("SD 이미지 생성 완료!");
+      triggerToast("Hugging Face 이미지 생성 완료!");
     } catch (e) {
-      console.error("SD API Error:", e);
-      triggerToast(`SD 오류: ${e.message}`);
+      console.error("SD Generation Error:", e);
+      if (e.message?.includes('503') || e.message?.includes('loading')) {
+        triggerToast("모델 로딩 중 (30s)... 잠시 후 다시 시도해 주세요.");
+      } else {
+        triggerToast(`SD 오류: ${e.message}`);
+      }
     } finally {
       setIsImageGenerating(false);
     }
@@ -688,8 +686,8 @@ export default function App() {
                 {/* Dark Mode */}
                 <div className="flex justify-between items-center pb-4 border-b border-gray-100">
                   <div>
-                    <label className="text-[14px] font-bold text-black block mb-1">다크 모드</label>
-                    <p className="text-[11px] text-gray-500 m-0">앱 테마를 어둡게 변경합니다.</p>
+                    <label className="settings-prop-label">다크 모드</label>
+                    <p className="settings-desc-text">앱 테마를 어둡게 변경합니다.</p>
                   </div>
                   <IOSToggle 
                     label=""
@@ -700,8 +698,9 @@ export default function App() {
                 </div>
 
                 {/* Aspect Ratio */}
-                <div className="pb-8 border-b border-gray-100">
-                  <label className="text-[14px] font-bold text-black block mb-2">기본 이미지 비율</label>
+                <div className="pb-10 border-b border-gray-100">
+                  <label className="settings-prop-label">기본 이미지 비율</label>
+                  <p className="settings-desc-text mb-4">생성될 이미지의 기본 가로세로 비율을 설정합니다.</p>
                   <select 
                     value={config.aspectRatio} 
                     onChange={(e) => handleConfigChange('aspectRatio', e.target.value)}
@@ -714,8 +713,8 @@ export default function App() {
                 </div>
 
                 {/* Image Generation Engine */}
-                <div className="pt-6 border-t border-gray-100 dark:border-gray-800">
-                  <label className="text-[16px] font-black text-black dark:text-white block mb-6">Generation Engine & API Configuration</label>
+                <div className="pt-10 border-t border-gray-100 dark:border-gray-800">
+                  <label className="text-[18px] font-black text-black dark:text-white block mb-8 tracking-tight">Generation Engine & API Configuration</label>
                   
                   {/* Google Gemini Row */}
                   <div 
@@ -724,7 +723,10 @@ export default function App() {
                   >
                     <div className="engine-label">
                       <div className="engine-radio" />
-                      <span className="font-black text-[15px] text-black dark:text-white">Google AI</span>
+                      <div className="flex flex-col">
+                        <span className="font-black text-[14px] text-black dark:text-white leading-none">GOOGLE AI</span>
+                        <span className="text-[10px] font-bold text-gray-400 mt-1">GEMINI 2.5 FLASH</span>
+                      </div>
                     </div>
                     <input 
                       type="password" 
@@ -748,7 +750,10 @@ export default function App() {
                   >
                     <div className="engine-label">
                       <div className="engine-radio" />
-                      <span className="font-black text-[15px] text-black dark:text-white">SD (HF)</span>
+                      <div className="flex flex-col">
+                        <span className="font-black text-[14px] text-black dark:text-white leading-none">HUGGING FACE</span>
+                        <span className="text-[10px] font-bold text-gray-400 mt-1">STABLE DIFFUSION</span>
+                      </div>
                     </div>
                     <input 
                       type="password" 
