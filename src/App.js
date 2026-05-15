@@ -631,14 +631,14 @@ export default function App() {
             onClick={() => setMoveTarget(null)}
           >
             <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              className="ios-modal-card p-6 w-[320px]"
+              initial={{ scale: 0.95, opacity: 0, y: 10 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              className="bg-white dark:bg-[#1C1C1E] rounded-[28px] p-8 w-[340px] shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-lg font-bold text-black mb-1 text-center">Move to Tab</h3>
-              <p className="text-xs text-gray-400 mb-6 text-center">이동할 탭을 선택하세요</p>
+              <h3 className="text-[18px] font-extrabold text-black dark:text-white mb-2 text-center">Move to Tab</h3>
+              <p className="text-[13px] font-medium text-gray-400 mb-8 text-center">이 템플릿을 어느 탭으로 이동할까요?</p>
               
-              <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-3 mb-8">
                 {OPTIONS_DATA.spaceType.map(space => (
                   <button 
                     key={space} 
@@ -646,7 +646,7 @@ export default function App() {
                       handleMoveTemplate(moveTarget.id, space);
                       setMoveTarget(null);
                     }}
-                    className={`ios-pill px-2 py-3 text-[13px] font-bold ${moveTarget.config?.spaceType === space ? 'bg-black text-white' : 'bg-gray-100 text-gray-600'}`}
+                    className={`px-4 py-3.5 rounded-full text-[14px] font-bold transition-all ${moveTarget.config?.spaceType === space ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-[#F2F2F7] text-[#8E8E93] hover:bg-[#E5E5EA] dark:bg-[#2C2C2E] dark:hover:bg-[#3A3A3C]'}`}
                   >
                     {space}
                   </button>
@@ -655,9 +655,9 @@ export default function App() {
               
               <button 
                 onClick={() => setMoveTarget(null)}
-                className="w-full mt-6 py-3 text-sm font-bold text-gray-400 hover:text-black transition-colors"
+                className="w-full px-4 py-3.5 rounded-full bg-white border border-gray-200 text-gray-500 text-[14px] font-bold hover:bg-gray-50 transition-colors dark:bg-[#1C1C1E] dark:border-[#3A3A3C] dark:text-gray-400 dark:hover:bg-[#2C2C2E]"
               >
-                취소
+                Cancel
               </button>
             </motion.div>
           </motion.div>
@@ -710,56 +710,47 @@ export default function App() {
                   </select>
                 </div>
 
-                {/* API Key */}
-                <div>
-                  <label className="text-[14px] font-bold text-black block mb-2 flex items-center">
-                    Google AI API Key
-                    {!isAdmin && <span className="ml-2 text-red-500 text-xs font-normal">🔒 로그인이 필요합니다</span>}
-                  </label>
-                  <input 
-                    type="password" 
-                    value={googleApiKey}
-                    onChange={(e) => {
-                      if (!isAdmin) return;
-                      setGoogleApiKey(e.target.value);
-                      localStorage.setItem('shotmaker_api_key', e.target.value);
-                    }}
-                    placeholder={isAdmin ? "AIzaSy..." : "관리자 로그인 후 입력 가능"}
-                    className="settings-input"
-                    readOnly={!isAdmin}
-                    style={{ opacity: isAdmin ? 1 : 0.6, cursor: isAdmin ? 'text' : 'not-allowed', marginTop: '4px' }}
-                  />
-                  <p className="settings-hint mt-2">Nano Banana (gemini-2.5-flash-image) 생성용 키입니다.</p>
-                </div>
-
-                {/* API Selector */}
+                {/* Image Generation Engine */}
                 <div className="pt-4 border-t border-gray-100">
-                  <label className="text-[14px] font-bold text-black block mb-3">Image Generation Engine</label>
-                  <div className="grid grid-cols-2 gap-3">
+                  <label className="text-[14px] font-bold text-black block mb-4">Image Generation Engine</label>
+                  
+                  {/* Google Gemini */}
+                  <div className={`flex items-center gap-3 p-3 rounded-[16px] border mb-3 transition-all duration-300 ${selectedApi === 'google' ? 'border-black bg-white shadow-sm dark:bg-[#1C1C1E] dark:border-white' : 'border-transparent bg-gray-50 dark:bg-[#2C2C2E] opacity-50 grayscale'}`}>
                     <button 
                       onClick={() => { setSelectedApi('google'); localStorage.setItem('shotmaker_selected_api', 'google'); }}
-                      className={`engine-card ${selectedApi === 'google' ? 'active' : ''}`}
+                      className="flex-shrink-0 flex items-center gap-2 outline-none"
                     >
-                      <div className="text-[11px] font-bold opacity-50 mb-1">GOOGLE</div>
-                      <div className="text-[13px] font-extrabold">Gemini 2.5</div>
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${selectedApi === 'google' ? 'border-black dark:border-white' : 'border-gray-400'}`}>
+                        {selectedApi === 'google' && <div className="w-2 h-2 bg-black dark:bg-white rounded-full" />}
+                      </div>
+                      <span className="font-bold text-[13px] text-black dark:text-white w-[85px] text-left">Google</span>
                     </button>
+                    <input 
+                      type="password" 
+                      value={googleApiKey}
+                      onChange={(e) => {
+                        if (!isAdmin) return;
+                        setGoogleApiKey(e.target.value);
+                        localStorage.setItem('shotmaker_api_key', e.target.value);
+                      }}
+                      placeholder={isAdmin ? "API Key..." : "로그인 필요"}
+                      className="flex-1 bg-gray-100 dark:bg-[#3A3A3C] rounded-xl px-3 py-2.5 text-[12px] border-none outline-none focus:ring-1 focus:ring-black dark:focus:ring-white text-black dark:text-white"
+                      readOnly={!isAdmin || selectedApi !== 'google'}
+                      style={{ cursor: (!isAdmin || selectedApi !== 'google') ? 'not-allowed' : 'text' }}
+                    />
+                  </div>
+
+                  {/* Stable Diffusion */}
+                  <div className={`flex items-center gap-3 p-3 rounded-[16px] border transition-all duration-300 ${selectedApi === 'stable-diffusion' ? 'border-black bg-white shadow-sm dark:bg-[#1C1C1E] dark:border-white' : 'border-transparent bg-gray-50 dark:bg-[#2C2C2E] opacity-50 grayscale'}`}>
                     <button 
                       onClick={() => { setSelectedApi('stable-diffusion'); localStorage.setItem('shotmaker_selected_api', 'stable-diffusion'); }}
-                      className={`engine-card ${selectedApi === 'stable-diffusion' ? 'active' : ''}`}
+                      className="flex-shrink-0 flex items-center gap-2 outline-none"
                     >
-                      <div className="text-[11px] font-bold opacity-50 mb-1">STABLE</div>
-                      <div className="text-[13px] font-extrabold">Diffusion 1.5</div>
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${selectedApi === 'stable-diffusion' ? 'border-black dark:border-white' : 'border-gray-400'}`}>
+                        {selectedApi === 'stable-diffusion' && <div className="w-2 h-2 bg-black dark:bg-white rounded-full" />}
+                      </div>
+                      <span className="font-bold text-[13px] text-black dark:text-white w-[85px] text-left">Stable Diff.</span>
                     </button>
-                  </div>
-                </div>
-
-                {/* SD API Key */}
-                {selectedApi === 'stable-diffusion' && (
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                    <label className="text-[14px] font-bold text-black block mb-2 flex items-center">
-                      Stable Diffusion API Key
-                      {!isAdmin && <span className="ml-2 text-red-500 text-xs font-normal">🔒 로그인이 필요합니다</span>}
-                    </label>
                     <input 
                       type="password" 
                       value={sdApiKey}
@@ -768,57 +759,33 @@ export default function App() {
                         setSdApiKey(e.target.value);
                         localStorage.setItem('shotmaker_sd_api_key', e.target.value);
                       }}
-                      placeholder={isAdmin ? "Bearer ..." : "관리자 로그인 후 입력 가능"}
-                      className="settings-input"
-                      readOnly={!isAdmin}
-                      style={{ opacity: isAdmin ? 1 : 0.6, cursor: isAdmin ? 'text' : 'not-allowed' }}
+                      placeholder={isAdmin ? "HF Token..." : "로그인 필요"}
+                      className="flex-1 bg-gray-100 dark:bg-[#3A3A3C] rounded-xl px-3 py-2.5 text-[12px] border-none outline-none focus:ring-1 focus:ring-black dark:focus:ring-white text-black dark:text-white"
+                      readOnly={!isAdmin || selectedApi !== 'stable-diffusion'}
+                      style={{ cursor: (!isAdmin || selectedApi !== 'stable-diffusion') ? 'not-allowed' : 'text' }}
                     />
-                    <p className="settings-hint mt-2">Hugging Face 또는 커스텀 SD 엔드포인트용 키입니다.</p>
-                  </motion.div>
-                )}
+                  </div>
+                </div>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Header Menu Dropdown */}
+      <div className="ios-toast-container">
       <AnimatePresence>
-        {isMenuOpen && (
-          <>
-            <div 
-              className="menu-overlay"
-              onClick={() => setIsMenuOpen(false)}
-            />
-            <motion.div 
-              initial={{ opacity: 0, y: -10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              className="header-dropdown"
-            >
-              <button 
-                onClick={() => { setIsSettingsOpen(true); setIsMenuOpen(false); }}
-                className="dropdown-item"
-              >
-                <Settings size={18} />
-                <span>Settings</span>
-              </button>
-              <div className="dropdown-divider" />
-              <button 
-                onClick={() => { 
-                  if (isAdmin) handleLogout(); 
-                  else handleLogin(); 
-                  setIsMenuOpen(false); 
-                }}
-                className="dropdown-item"
-              >
-                {isAdmin ? <LogOut size={18} /> : <LogIn size={18} />}
-                <span>{isAdmin ? 'Logout' : 'Login'}</span>
-              </button>
-            </motion.div>
-          </>
+        {showToast && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="ios-toast"
+          >
+            {toastMessage}
+          </motion.div>
         )}
       </AnimatePresence>
+      </div>
 
       <header className="app-header">
         <h1 className="text-2xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
@@ -836,6 +803,43 @@ export default function App() {
             >
               <Menu size={22} />
             </button>
+            {/* Header Menu Dropdown */}
+            <AnimatePresence>
+              {isMenuOpen && (
+                <>
+                  <div 
+                    className="menu-overlay"
+                    onClick={() => setIsMenuOpen(false)}
+                  />
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    className="header-dropdown"
+                  >
+                    <button 
+                      onClick={() => { setIsSettingsOpen(true); setIsMenuOpen(false); }}
+                      className="dropdown-item"
+                    >
+                      <Settings size={18} />
+                      <span>Settings</span>
+                    </button>
+                    <div className="dropdown-divider" />
+                    <button 
+                      onClick={() => { 
+                        if (isAdmin) handleLogout(); 
+                        else handleLogin(); 
+                        setIsMenuOpen(false); 
+                      }}
+                      className="dropdown-item"
+                    >
+                      {isAdmin ? <LogOut size={18} /> : <LogIn size={18} />}
+                      <span>{isAdmin ? 'Logout' : 'Login'}</span>
+                    </button>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </header>
@@ -1056,7 +1060,7 @@ export default function App() {
                 >  
                   <ImageIcon className="w-5 h-5 text-white" />
                   <span>
-                    {isImageGenerating ? `GENERATING WITH ${selectedApi === 'google' ? 'GEMINI' : 'SD'}...` : 
+                    {isImageGenerating ? (selectedApi === 'google' ? 'GENERATING WITH GEMINI...' : 'Stable Diffusion (Hugging Face) generating...') : 
                      cooldownTime > 0 ? `COOLDOWN (${cooldownTime}s)` : `GENERATE WITH ${selectedApi === 'google' ? 'GEMINI' : 'STABLE DIFFUSION'}`}
                   </span>
                 </button>

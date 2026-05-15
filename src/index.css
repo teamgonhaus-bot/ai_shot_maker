@@ -674,8 +674,8 @@ body {
 
 .header-dropdown {
   position: absolute !important;
-  top: 70px !important;
-  right: 24px !important;
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
   width: 200px !important;
   background: #FFFFFF !important;
   border-radius: 18px !important;
