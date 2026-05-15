@@ -655,6 +655,96 @@ body {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.close-btn:hover {
+  color: #000000 !important;
+  transform: rotate(90deg) !important;
+}
+
+/* =============================================
+   DRAWER MENU
+   ============================================= */
+.drawer-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(4px) !important;
+  z-index: 100000 !important;
+}
+
+.drawer-panel {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 280px !important;
+  background: #FFFFFF !important;
+  z-index: 100001 !important;
+  padding: 24px !important;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+body.dark-mode .drawer-panel {
+  background: #1C1C1E !important;
+  color: #FFFFFF !important;
+}
+
+.drawer-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 32px !important;
+}
+
+.drawer-header h3 {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  margin: 0 !important;
+}
+
+.drawer-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  padding: 14px 16px !important;
+  width: 100% !important;
+  background: #F2F2F7 !important;
+  border: none !important;
+  border-radius: 12px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #000000 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  margin-bottom: 12px !important;
+}
+
+body.dark-mode .drawer-item {
+  background: #2C2C2E !important;
+  color: #FFFFFF !important;
+}
+
+.drawer-item:hover {
+  background: #E5E5EA !important;
+  transform: translateX(-4px) !important;
+}
+
+body.dark-mode .drawer-item:hover {
+  background: #3A3A3C !important;
+}
+
+.drawer-divider {
+  height: 1px !important;
+  background: #E5E5EA !important;
+  margin: 12px 0 !important;
+}
+
+body.dark-mode .drawer-divider {
+  background: #3A3A3C !important;
 }
 
 /* =============================================
@@ -831,6 +921,12 @@ body.dark-mode .category-tab.active {
   transform: scale(1.02) !important;
 }
 
+.ios-upload-zone.dragging {
+  border-color: #007AFF !important;
+  background: #E5E5EA !important;
+  transform: scale(1.02) !important;
+}
+
 body.dark-mode .ios-upload-zone {
   background: #1C1C1E !important;
   border-color: #3A3A3C !important;
@@ -849,32 +945,49 @@ body.dark-mode .ios-upload-zone.dragging {
   cursor: pointer !important;
   width: 100% !important;
   height: 100% !important;
+  text-align: center !important;
+}
+
+.upload-main-text {
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: #000000 !important;
+  margin-bottom: 2px !important;
+}
+
+body.dark-mode .upload-main-text {
+  color: #FFFFFF !important;
+}
+
+.upload-sub-text {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #8E8E93 !important;
+  margin-bottom: 16px !important;
 }
 
 .ios-upload-capsule {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background: #FFFFFF !important;
-  border: 1px solid #E5E5EA !important;
+  background: #000000 !important;
+  color: #FFFFFF !important;
   border-radius: 9999px !important;
-  padding: 8px 20px !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+  padding: 10px 24px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
   transition: all 0.2s ease !important;
+}
+
+body.dark-mode .ios-upload-capsule {
+  background: #FFFFFF !important;
+  color: #000000 !important;
 }
 
 .ios-upload-zone:hover .ios-upload-capsule {
   transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
-}
-
-body.dark-mode .ios-upload-capsule {
-  background: #2C2C2E !important;
-  border-color: #3A3A3C !important;
-}
-
-body.dark-mode .ios-upload-capsule .text-gray-700 {
-  color: #FFFFFF !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2) !important;
 }
 
 .ios-upload-preview {

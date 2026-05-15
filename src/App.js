@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Wand2, LayoutTemplate, X, Image as ImageIcon 
+  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, FolderInput 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db, auth } from './firebase';
-import { collection, addDoc, deleteDoc, doc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, updateDoc, doc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { signInAnonymously, signOut } from 'firebase/auth';
 
 // Modular Components
@@ -139,6 +139,7 @@ export default function App() {
   const [lightboxImage, setLightboxImage] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [libraryFilter, setLibraryFilter] = useState('전체');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
@@ -301,6 +302,30 @@ export default function App() {
     } catch (e) {
       console.error("Error deleting template:", e);
       triggerToast("삭제 오류가 발생했습니다.");
+    }
+  };
+
+  const handleMoveTemplate = async (templateId, newCategory) => {
+    if (!isAdmin) {
+      triggerToast("권한이 없습니다.");
+      return;
+    }
+    try {
+      const templateRef = doc(db, "templates", templateId);
+      await updateDoc(templateRef, {
+        "config.spaceType": newCategory
+      });
+      
+      setSavedTemplates(prev => prev.map(t => 
+        t.id === templateId 
+          ? { ...t, config: { ...t.config, spaceType: newCategory } } 
+          : t
+      ));
+      
+      triggerToast(`'${newCategory}' 탭으로 이동되었습니다.`);
+    } catch (e) {
+      console.error("Error moving template:", e);
+      triggerToast("이동 오류가 발생했습니다.");
     }
   };
 
@@ -611,6 +636,50 @@ export default function App() {
         )}
       </AnimatePresence>
 
+      {/* Drawer Menu */}
+      <AnimatePresence>
+        {isDrawerOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="drawer-overlay"
+              onClick={() => setIsDrawerOpen(false)}
+            />
+            <motion.div 
+              initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="drawer-panel"
+            >
+              <div className="drawer-header">
+                <h3>Menu</h3>
+                <button onClick={() => setIsDrawerOpen(false)} className="close-btn"><X size={24}/></button>
+              </div>
+              <div className="drawer-body">
+                <button 
+                  onClick={() => { setIsSettingsOpen(true); setIsDrawerOpen(false); }}
+                  className="drawer-item"
+                >
+                  <Settings size={20} />
+                  <span>Settings</span>
+                </button>
+                <div className="drawer-divider" />
+                <button 
+                  onClick={() => { 
+                    if (isAdmin) handleLogout(); 
+                    else handleLogin(); 
+                    setIsDrawerOpen(false); 
+                  }}
+                  className="drawer-item"
+                >
+                  {isAdmin ? <LogOut size={20} /> : <LogIn size={20} />}
+                  <span>{isAdmin ? 'Logout' : 'Login'}</span>
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       <header className="app-header">
         <h1 className="text-2xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
         <div className="flex items-center gap-3">
@@ -619,19 +688,12 @@ export default function App() {
             <button className={`header-nav-btn ${activeTab === 'library' ? 'active' : 'inactive'}`} onClick={() => setActiveTab('library')}>Library</button>
           </div>
           <button 
-            onClick={() => setIsSettingsOpen(true)}
+            onClick={() => setIsDrawerOpen(true)}
             className="ios-card-icon-btn"
-            title="Settings"
-            style={{ width: '30px', height: '30px', fontSize: '14px' }}
+            title="Menu"
+            style={{ width: '36px', height: '36px' }}
           >
-            ⚙️
-          </button>
-          <button 
-            onClick={isAdmin ? handleLogout : handleLogin}
-            className="ios-pill"
-            style={{ padding: '8px 14px', fontSize: '12px', fontWeight: 'bold' }}
-          >
-            {isAdmin ? 'Logout' : 'Login'}
+            <Menu size={22} />
           </button>
         </div>
       </header>
@@ -759,11 +821,11 @@ export default function App() {
                           />
                           {!refImage ? (
                             <label htmlFor="ref-image-upload" className="ios-upload-placeholder">
+                              <div className="upload-main-text">Image Upload</div>
+                              <div className="upload-sub-text">Drag & Drop</div>
                               <div className="ios-upload-capsule">
-                                <span className="text-xl mr-2">📸</span>
-                                <span className="text-sm font-bold text-gray-700">참조 이미지 업로드</span>
+                                <span>참조 이미지 업로드</span>
                               </div>
-                              <p className="text-[10px] text-gray-400 mt-3 font-semibold">또는 여기에 이미지를 드래그 & 드롭하세요</p>
                             </label>
                           ) : (
                             <div className="relative group w-full flex justify-center">
@@ -955,6 +1017,8 @@ export default function App() {
                     setActiveTab('home');
                   }} 
                   onDelete={handleDeleteTemplate} 
+                  onMove={handleMoveTemplate}
+                  categories={OPTIONS_DATA.spaceType}
                 />
               ))}
               {(libraryFilter === '전체' ? savedTemplates : savedTemplates.filter(t => t.config?.spaceType === libraryFilter)).length === 0 && (
