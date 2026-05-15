@@ -14,6 +14,15 @@ import IOSToggle from './components/IOSToggle';
 import PromptOutput from './components/PromptOutput';
 import TemplateCard from './components/TemplateCard';
 
+/**
+ * [ROLE: AI/React Senior Engineer]
+ * Face Distortion (얼굴 일그러짐) 방지 고품질 렌더링 프롬프트 헬퍼
+ */
+const enhancePrompt = (prompt) => {
+  const qualitySuffix = ", highly detailed face, sharp focus, 8k resolution, perfect symmetry, masterpiece, photorealistic, intricate facial features";
+  return `${prompt}${qualitySuffix}`;
+};
+
 const DICTIONARY = {
   subjectNum: { "없음": "", "혼자": "a single person", "다수": "a group of people" },
   subjectGender: { "선택안함": "", "여성": "female", "남성": "male", "혼성": "mixed gender" },
@@ -144,6 +153,7 @@ export default function App() {
   const [selectedApi, setSelectedApi] = useState("google");
   const [sdApiKey, setSdApiKey] = useState("");
   const [moveTarget, setMoveTarget] = useState(null);
+  const [img2imgStrength, setImg2imgStrength] = useState(0.65); // [INSTRUCTION] Img2Img 강도 상태 분리
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
@@ -419,51 +429,92 @@ export default function App() {
   };
 
   const generateImageFromSD = async (prompt) => {
-    // 1. Validation & Fallback for Token
     const hfToken = sdApiKey?.trim() || process.env.REACT_APP_HF_TOKEN;
 
     if (!hfToken) {
       triggerToast("Hugging Face API 토큰이 설정되지 않았습니다.");
       return;
     }
-    const promptToUse = prompt || generatedPrompt;
-    if (!promptToUse) {
+    const rawPrompt = prompt || generatedPrompt;
+    if (!rawPrompt) {
       triggerToast("먼저 프롬프트를 생성해주세요.");
       return;
     }
 
+    // [INSTRUCTION 2] 얼굴 일그러짐 방지 프롬프트 주입
+    const promptToUse = enhancePrompt(rawPrompt);
+
     setCooldownTime(5);
     setIsImageGenerating(true);
 
-    try {
-      console.log("🚀 Validating HF Token...");
-      if (!hfToken || hfToken.length < 10) {
-        console.error("❌ Invalid HF Token.");
-        triggerToast("유효하지 않은 API 토큰입니다.");
-        setIsImageGenerating(false);
-        return;
+    let retryCount = 0;
+    const maxRetries = 3;
+
+    const executeInference = async () => {
+      try {
+        console.log(`🚀 Generating via InferenceClient (FLUX.1-dev)... Retry: ${retryCount}`);
+        const client = new InferenceClient(hfToken.trim());
+
+        let blob;
+        // [INSTRUCTION 1] Text-to-Image와 Image-to-Image 분기 처리
+        if (useImageRef && refImage) {
+          console.log("🎨 Attempting Image-to-Image with Flux.1...");
+          // Base64 데이터를 Blob으로 변환하거나 직접 전달
+          const imageBlob = await (await fetch(`data:${refImage.mimeType};base64,${refImage.data}`)).blob();
+
+          blob = await client.imageToImage({
+            model: "black-forest-labs/FLUX.1-dev", // 고품질 dev 모델 권장
+            inputs: {
+              image: imageBlob,
+              prompt: promptToUse,
+            },
+            parameters: {
+              // [INSTRUCTION 3] Image-to-Image 파라미터 최적화
+              strength: img2imgStrength,
+              // [INSTRUCTION 2] Flux.1 Schnell 최적화된 4스텝 설정
+              num_inference_steps: 4,
+              width: 1024,
+              height: 1024,
+            },
+          });
+        } else {
+          console.log("📝 Attempting Text-to-Image with Flux.1...");
+          blob = await client.textToImage({
+            model: "black-forest-labs/FLUX.1-dev",
+            inputs: promptToUse,
+            parameters: {
+              num_inference_steps: 4,
+              width: 1024,
+              height: 1024,
+            },
+          });
+        }
+
+        const imageUrl = URL.createObjectURL(blob);
+        setGeneratedImage(imageUrl);
+        triggerToast("Hugging Face (FLUX.1) 생성 성공!");
+      } catch (e) {
+        const errorMsg = e.message?.toLowerCase() || "";
+        
+        // [INSTRUCTION 4] Model Loading (503) 발생 시 자동 재시도
+        if ((errorMsg.includes('503') || errorMsg.includes('loading')) && retryCount < maxRetries) {
+          retryCount++;
+          console.warn(`⚠️ Model loading. Retrying... (${retryCount}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          return executeInference();
+        }
+        throw e;
       }
-      console.log("🚀 Generating via InferenceClient + nscale (FLUX.1-schnell)...");
-      const client = new InferenceClient(hfToken.trim());
+    };
 
-      const blob = await client.textToImage({
-        provider: "nscale",
-        model: "black-forest-labs/FLUX.1-schnell",
-        inputs: promptToUse,
-        parameters: { num_inference_steps: 4 },
-      });
-
-      const imageUrl = URL.createObjectURL(blob);
-      setGeneratedImage(imageUrl);
-      triggerToast("Hugging Face (FLUX.1) 생성 성공!");
+    try {
+      await executeInference();
     } catch (e) {
       console.error("SD Generation Error:", e);
       const errorMsg = e.message?.toLowerCase() || "";
 
       if (errorMsg.includes('401') || errorMsg.includes('unauthorized')) {
         triggerToast("토큰 권한 확인이 필요합니다 (401 Unauthorized)");
-      } else if (errorMsg.includes('503') || errorMsg.includes('loading')) {
-        triggerToast("모델 로딩 중... 잠시 후 다시 시도해 주세요.");
       } else if (errorMsg.includes('403')) {
         triggerToast("토큰 권한(Inference)이 부족합니다.");
       } else {
@@ -913,46 +964,96 @@ export default function App() {
               )}
 
               {activeCategory === 'space' && (
-                <motion.section key="space" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                  <h2 className="ios-section-title">[공간]</h2>
-                  <div className="ios-bento-card">
-                    <OptionSelect label="공간 종류" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} theme="green" />
-                    <OptionSelect label="세부 공간" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} theme="green" />
-                    <OptionSelect label="인테리어 양식" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} theme="green" />
-                    <OptionSelect label="조명" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="green" />
+                <motion.section key="space" initia                      {useImageRef && (
+                        <div className="space-y-4">
+                          <div
+                            className={`ios-upload-zone ${isDragging ? 'dragging' : ''}`}
+                            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                            onDragLeave={() => setIsDragging(false)}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              setIsDragging(false);
+                              const file = e.dataTransfer.files[0];
+                              if (file && file.type.startsWith('image/')) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setRefImage({
+                                    mimeType: file.type,
+                                    data: reader.result.split(',')[1]
+                                  });
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          >
+                            <input
+                              type="file"
+                              accept="image/*"
+                              id="ref-image-upload"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onloadend = () => {
+                                    setRefImage({
+                                      mimeType: file.type,
+                                      data: reader.result.split(',')[1]
+                                    });
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                            />
+                            {!refImage ? (
+                              <label htmlFor="ref-image-upload" className="ios-upload-placeholder">
+                                <div className="upload-main-text">Image Upload</div>
+                                <div className="upload-sub-text">Drag & Drop</div>
+                                <div className="ios-upload-capsule">
+                                  <span>파일 선택</span>
+                                </div>
+                              </label>
+                            ) : (
+                              <div className="relative group w-full flex justify-center">
+                                <img
+                                  src={`data:${refImage.mimeType};base64,${refImage.data}`}
+                                  alt="Ref Preview"
+                                  className="ios-upload-preview"
+                                />
+                                <button
+                                  onClick={() => setRefImage(null)}
+                                  className="ios-upload-remove-btn"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            )}
+                          </div>
 
-                    <div className="mt-4 border-t border-gray-100">
-                      <IOSToggle
-                        label="세부 소재 및 컬러 (Materials)"
-                        isOn={useDetailMaterial}
-                        onToggle={() => setUseDetailMaterial(!useDetailMaterial)}
-                        activeColor="#34C759"
-                      />
-                      <AnimatePresence>
-                        {useDetailMaterial && (
-                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="flex flex-col overflow-hidden">
-                            <OptionSelect label="바닥 타일/마루" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} theme="green" />
-                            <OptionSelect label="우드 소재" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} theme="green" />
-                            <OptionSelect label="메탈 포인트" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} theme="green" />
-                            <OptionSelect label="벽 소재/컬러" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} theme="green" />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </div>
-                </motion.section>
-              )}
-
-              {activeCategory === 'camera' && (
-                <motion.section key="camera" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                  <h2 className="ios-section-title">[카메라]</h2>
-                  <div className="ios-bento-card" style={{ padding: '20px' }}>
-                    <div className="mb-4 space-y-4">
-                      <IOSToggle
-                        label="이미지 참조 모드 (Image-to-Image)"
-                        isOn={useImageRef}
-                        onToggle={() => setUseImageRef(!useImageRef)}
-                        activeColor="#007AFF"
+                          {/* [INSTRUCTION 3] Img2Img Strength Slider UI */}
+                          <div className="p-4 bg-gray-50 dark:bg-zinc-800 rounded-2xl border border-gray-100 dark:border-zinc-700">
+                            <div className="flex justify-between items-center mb-2">
+                              <label className="text-[11px] font-black text-gray-400 uppercase tracking-wider">Strength (변형 강도)</label>
+                              <span className="text-[11px] font-black text-[var(--current-theme)]">{img2imgStrength}</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="0.1"
+                              max="0.95"
+                              step="0.05"
+                              value={img2imgStrength}
+                              onChange={(e) => setImg2imgStrength(parseFloat(e.target.value))}
+                              className="w-full h-1 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer"
+                              style={{ accentColor: '#007AFF' }}
+                            />
+                            <div className="flex justify-between mt-1">
+                              <span className="text-[9px] font-bold text-gray-300">ORIGIN</span>
+                              <span className="text-[9px] font-bold text-gray-300">CREATIVE</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+veColor="#007AFF"
                       />
 
                       {useImageRef && (
@@ -1230,7 +1331,7 @@ export default function App() {
       </AnimatePresence>
 
       <footer className="ios-footer">
-        v0.4 Stable | Developed by Gony
+        v0.43 Stable | Developed by Gony
       </footer>
       <div className="h-12"></div>
     </div>

@@ -1,6 +1,6 @@
 {
   "name": "ai_shot_maker",
-  "version": "0.1.0",
+  "version": "0.4.3",
   "private": true,
   "dependencies": {
     "@huggingface/inference": "^4.13.15",
