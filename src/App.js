@@ -3,7 +3,6 @@ import {
   Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { InferenceClient } from "@huggingface/inference";
 import { db, auth } from './firebase';
 import { collection, addDoc, deleteDoc, updateDoc, doc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { signInAnonymously, signOut } from 'firebase/auth';
