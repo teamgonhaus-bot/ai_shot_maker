@@ -30,19 +30,6 @@ export default function TemplateCard({ template, onLoad, onDelete, onRename, onM
             <h4 className="font-bold text-[14px] text-black line-clamp-1">
               {template.name}
             </h4>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                const newName = window.prompt("새로운 이름을 입력하세요:", template.name);
-                if (newName && newName !== template.name) {
-                  onRename(template.id, newName);
-                }
-              }}
-              className="p-1 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-black"
-              title="Rename"
-            >
-              <Edit2 size={12} />
-            </button>
           </div>
           <button 
             onClick={() => onMoveRequest(template)}
@@ -87,6 +74,16 @@ export default function TemplateCard({ template, onLoad, onDelete, onRename, onM
             title="Delete"
           >
             <Trash2 size={16} strokeWidth={2} />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onRename(template.id, template.name);
+            }}
+            className="ios-card-icon-btn"
+            title="Rename"
+          >
+            <Edit2 size={16} strokeWidth={2} />
           </button>
         </div>
 

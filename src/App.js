@@ -45,7 +45,8 @@ const DICTIONARY = {
     "호텔 라운지": "in a luxury hotel lounge", "공항 라운지": "in a premium airport lounge",
     "도심": "in a bustling city urban environment", "자연": "surrounded by natural scenery", "테라스": "on a scenic terrace"
   },
-  interiorStyle: { "선택안함": "", "미드센추리 모던": "mid-century modern style", "모던 미니멀": "modern minimal style", "내추럴 우드": "natural wood interior style", "젠 스타일": "Zen-inspired style", "인더스트리얼": "industrial style", "스칸디나비안": "Scandinavian style" },
+  detailWall: { "화이트 페인트": "clean white painted walls", "노출 콘크리트": "exposed raw concrete walls", "웨인스코팅": "elegant wainscoted walls", "파스텔톤 벽지": "soft pastel wallpaper", "붉은 벽돌": "rustic red brick walls", "세라믹타일": "ceramic tiled walls", "패널": "paneled walls", "템바보드": "tambour board walls", "원목패널": "solid wood paneled walls", "스틸패널": "steel paneled walls", "스톤패널": "stone paneled walls" },
+  interiorStyle: { "선택안함": "", "미드센추리 모던": "mid-century modern style", "모던 미니멀": "modern minimal style", "내추럴 우드": "natural wood interior style", "젠 스타일": "Zen-inspired style", "인더스트리얼": "industrial style", "스칸디나비안": "Scandinavian style", "플랜테리어": "planterior style with many indoor plants" },
   light: { "선택안함": "", "자연광": "natural sunlight", "시네마틱": "cinematic dramatic lighting", "스튜디오 조명": "professional studio softbox lighting", "무드등": "soft mood lighting" },
 
   detailFloor: { "밝은 우드 마루": "light wood flooring", "어두운 우드 마루": "dark walnut wood flooring", "테라조 타일": "modern terrazzo tile floor", "대리석": "premium marble flooring", "콘크리트": "polished concrete floor", "조약돌 바닥": "pebble stone floor", "자갈 바닥": "gravel floor" },
@@ -78,14 +79,14 @@ const OPTIONS_DATA = {
   subjectHair: ["선택안함", "긴머리", "짧은머리", "단발", "펌", "염색", "묶은머리"],
   spaceType: ["스튜디오", "오피스", "홈", "리테일", "라운지", "야외"],
   spaceDetail: {
-    "스튜디오": ["단색 배경", "인테리어 세트장"],
-    "오피스": ["사무실", "회의실", "중역실", "오피스 라운지"],
+    "스튜디오": ["단색 배경", "인테리어 세트장", "그라데이션 배경", "쇼케이스"],
+    "오피스": ["사무실", "회의실", "중역실", "오피스 라운지", "트레이닝룸", "공유오피스"],
     "홈": ["리빙", "다이닝", "룸", "워크룸", "베드룸", "테라스"],
-    "리테일": ["카페", "식당", "쇼룸", "로비", "쇼핑몰", "박람회", "갤러리"],
-    "라운지": ["호텔 라운지", "공항 라운지"],
+    "리테일": ["카페", "식당", "쇼룸", "로비", "쇼핑몰", "박람회", "갤러리", "도서관", "강의실"],
+    "라운지": ["호텔 라운지", "공항 라운지", "쇼핑몰라운지", "쇼케이스 라운지"],
     "야외": ["도심", "자연", "테라스", "공원", "강가", "쇼핑가", "힙한곳"]
   },
-  interiorStyle: ["선택안함", "미드센추리 모던", "모던 미니멀", "내추럴 우드", "젠 스타일", "인더스트리얼", "스칸디나비안"],
+  interiorStyle: ["선택안함", "미드센추리 모던", "모던 미니멀", "내추럴 우드", "젠 스타일", "인더스트리얼", "스칸디나비안", "플랜테리어"],
   light: ["선택안함", "자연광", "시네마틱", "스튜디오 조명", "무드등"],
   detailFloor: ["밝은 우드 마루", "어두운 우드 마루", "테라조 타일", "대리석", "콘크리트", "조약돌 바닥", "자갈 바닥", "카펫", "포세린타일", "에폭시"],
   detailWood: ["오크(참나무)", "월넛(호두나무)", "자작나무", "티크", "애쉬", "마호가니", "미송", "OBS", "합판"],
@@ -160,6 +161,10 @@ export default function App() {
   const [sdApiKey, setSdApiKey] = useState("");
   const [moveTarget, setMoveTarget] = useState(null);
   const [img2imgStrength, setImg2imgStrength] = useState(0.65); // [INSTRUCTION] Img2Img 강도 상태 분리
+
+  // Rename Modal State
+  const [renameTarget, setRenameTarget] = useState(null); // { id, name }
+  const [newPresetName, setNewPresetName] = useState("");
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
@@ -759,6 +764,57 @@ export default function App() {
         )}
       </AnimatePresence>
 
+      {/* 🏷️ Rename Preset Modal — v0.44 Pill Design */}
+      <AnimatePresence>
+        {renameTarget && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="settings-modal-overlay"
+            style={{ zIndex: 200000 }}
+            onClick={() => setRenameTarget(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="settings-modal"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-[22px] font-black text-black dark:text-white mb-2 text-center tracking-tight">Rename Preset</h3>
+              <p className="text-[13px] font-bold text-gray-400 mb-8 text-center">새로운 프리셋 이름을 입력하세요</p>
+
+              <div className="flex flex-col gap-4 w-full">
+                <input
+                  type="text"
+                  value={newPresetName}
+                  onChange={(e) => setNewPresetName(e.target.value)}
+                  placeholder="Enter new name..."
+                  className="save-input w-full"
+                  autoFocus
+                />
+                
+                <div className="flex gap-3 mt-4">
+                  <button
+                    onClick={() => setRenameTarget(null)}
+                    className="cancel-pill-btn flex-1"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleRenameTemplate(renameTarget.id, newPresetName);
+                      setRenameTarget(null);
+                    }}
+                    className="save-btn flex-1"
+                    style={{ background: 'var(--current-theme)', color: 'white' }}
+                  >
+                    Update
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Settings Modal */}
       <AnimatePresence>
         {isSettingsOpen && (
@@ -1262,9 +1318,6 @@ export default function App() {
               {isImageGenerating && (
                 <div className="result-card" style={{ marginTop: '32px', minHeight: '300px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                   <div className="skeleton-pulse"></div>
-                  <h3 className="text-[14px] font-black mb-2 z-10 text-black dark:text-white">
-                    {selectedApi === 'google' ? 'Google AI Image Generation' : 'Hugging Face (FLUX.1) Generation'}
-                  </h3>
                   <p style={{ color: '#8E8E93', fontSize: '12px', fontWeight: 600, zIndex: 1, position: 'relative' }}>
                     {selectedApi === 'google' ? 'Generating with Gemini...' : 'Generating with FLUX.1...'}
                   </p>
@@ -1275,9 +1328,6 @@ export default function App() {
                 <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} className="mt-12 space-y-8">
 
                   <div className="flex flex-col items-center mb-[-16px]">
-                    <h3 className="text-[15px] font-black text-black dark:text-white tracking-tight">
-                      {selectedApi === 'google' ? 'Google AI Image Generation' : 'Hugging Face (FLUX.1) Generation'}
-                    </h3>
                     <div className="w-8 h-1 bg-black dark:bg-white rounded-full mt-1 opacity-10"></div>
                   </div>
 
@@ -1368,7 +1418,10 @@ export default function App() {
                     setActiveTab('home');
                   }}
                   onDelete={handleDeleteTemplate}
-                  onRename={handleRenameTemplate}
+                  onRename={(id, name) => {
+                    setRenameTarget({ id, name });
+                    setNewPresetName(name);
+                  }}
                   onMoveRequest={(t) => setMoveTarget(t)}
                   categories={OPTIONS_DATA.spaceType}
                 />
@@ -1385,7 +1438,7 @@ export default function App() {
       </AnimatePresence>
 
       <footer className="ios-footer">
-        v0.43 Stable | Developed by Gony
+        v0.44 Stable | Developed by Gony
       </footer>
       <div className="h-12"></div>
     </div>
