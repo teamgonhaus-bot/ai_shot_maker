@@ -765,7 +765,7 @@ body.dark-mode .engine-card {
 .engine-card.active {
   background: #FFFFFF !important;
   border-color: #000000 !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08), inset 0 0 12px rgba(0,0,0,0.04) !important;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12), inset 0 0 15px rgba(0,0,0,0.05) !important;
   color: #000000 !important;
   transform: scale(1.02);
 }
@@ -774,7 +774,7 @@ body.dark-mode .engine-card.active {
   background: #1C1C1E !important;
   border-color: #FFFFFF !important;
   color: #FFFFFF !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3), inset 0 0 12px rgba(255,255,255,0.05) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 0 15px rgba(255,255,255,0.08) !important;
 }
 
 .settings-input {

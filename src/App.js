@@ -437,7 +437,7 @@ export default function App() {
         "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5",
         {
           headers: { 
-            Authorization: `Bearer ${sdApiKey}`,
+            "Authorization": `Bearer ${sdApiKey}`,
             "Content-Type": "application/json"
           },
           method: "POST",
@@ -446,8 +446,11 @@ export default function App() {
       );
 
       if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.error || `HTTP ${response.status}`);
+        // SD API errors often return JSON, but if the user wants purely blob handling
+        // we should still try to get the error message if possible.
+        // However, the priority is successful image output.
+        const errorText = await response.text();
+        throw new Error(errorText || `HTTP ${response.status}`);
       }
 
       const blob = await response.blob();
@@ -634,14 +637,14 @@ export default function App() {
             onClick={() => setMoveTarget(null)}
           >
             <motion.div 
-              initial={{ scale: 0.95, opacity: 0, y: 10 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 10 }}
-              className="bg-white dark:bg-[#1C1C1E] rounded-[28px] p-8 w-[340px] shadow-2xl"
+              initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-white dark:bg-[#1C1C1E] rounded-[32px] p-10 w-[380px] shadow-2xl border border-gray-100 dark:border-gray-800"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-[18px] font-extrabold text-black dark:text-white mb-2 text-center">Move to Tab</h3>
-              <p className="text-[13px] font-medium text-gray-400 mb-8 text-center">이 템플릿을 어느 탭으로 이동할까요?</p>
+              <h3 className="text-[20px] font-black text-black dark:text-white mb-2 text-center tracking-tight">Move to Tab</h3>
+              <p className="text-[13px] font-bold text-gray-400 mb-8 text-center">이동할 카테고리를 선택하세요</p>
               
-              <div className="flex flex-col gap-3 mb-8">
+              <div className="flex flex-col gap-4 mb-10">
                 {OPTIONS_DATA.spaceType.map(space => (
                   <button 
                     key={space} 
@@ -649,7 +652,7 @@ export default function App() {
                       handleMoveTemplate(moveTarget.id, space);
                       setMoveTarget(null);
                     }}
-                    className={`px-4 py-3.5 rounded-full text-[14px] font-bold transition-all ${moveTarget.config?.spaceType === space ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-[#F2F2F7] text-[#8E8E93] hover:bg-[#E5E5EA] dark:bg-[#2C2C2E] dark:hover:bg-[#3A3A3C]'}`}
+                    className={`px-6 py-4 rounded-full text-[15px] font-black transition-all transform active:scale-95 ${moveTarget.config?.spaceType === space ? 'bg-black text-white dark:bg-white dark:text-black shadow-lg' : 'bg-[#F2F2F7] text-[#8E8E93] hover:bg-[#E5E5EA] dark:bg-[#2C2C2E] dark:hover:bg-[#3A3A3C]'}`}
                   >
                     {space}
                   </button>
@@ -658,7 +661,7 @@ export default function App() {
               
               <button 
                 onClick={() => setMoveTarget(null)}
-                className="w-full px-4 py-3.5 rounded-full bg-[#F2F2F7] text-[#8E8E93] text-[14px] font-bold hover:bg-[#E5E5EA] transition-colors dark:bg-[#2C2C2E] dark:text-gray-400 dark:hover:bg-[#3A3A3C]"
+                className="w-full px-6 py-4 rounded-full bg-[#E5E5EA] text-[#48484A] text-[15px] font-black hover:bg-gray-300 transition-colors dark:bg-[#3A3A3C] dark:text-gray-300 dark:hover:bg-[#48484A]"
               >
                 Cancel
               </button>
@@ -714,19 +717,19 @@ export default function App() {
                 </div>
 
                 {/* Image Generation Engine */}
-                <div className="pt-4 border-t border-gray-100">
-                  <label className="text-[14px] font-bold text-black block mb-4">Image Generation Engine</label>
+                <div className="pt-6 border-t border-gray-100">
+                  <label className="text-[15px] font-black text-black dark:text-white block mb-6">Generation Engine & API Configuration</label>
                   
-                  {/* Google Gemini */}
-                  <div className={`flex items-center gap-3 p-3 rounded-full border mb-4 transition-all duration-300 ${selectedApi === 'google' ? 'border-black bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08),inset_0_0_8px_rgba(0,0,0,0.05)] dark:bg-[#1C1C1E] dark:border-white' : 'border-transparent bg-gray-100 dark:bg-[#2C2C2E] opacity-40 grayscale pointer-events-none'}`}>
+                  {/* Google Gemini Row */}
+                  <div className={`flex items-center gap-4 p-4 rounded-[20px] border mb-6 transition-all duration-300 ${selectedApi === 'google' ? 'border-black bg-white shadow-xl dark:bg-[#1C1C1E] dark:border-white' : 'border-transparent bg-gray-50 dark:bg-[#2C2C2E] opacity-30 grayscale pointer-events-none'}`}>
                     <button 
                       onClick={() => { setSelectedApi('google'); localStorage.setItem('shotmaker_selected_api', 'google'); }}
-                      className="flex-shrink-0 flex items-center gap-2 outline-none"
+                      className="flex-shrink-0 flex items-center gap-3 w-[120px] outline-none"
                     >
-                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${selectedApi === 'google' ? 'border-black dark:border-white' : 'border-gray-400'}`}>
-                        {selectedApi === 'google' && <div className="w-2 h-2 bg-black dark:bg-white rounded-full" />}
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${selectedApi === 'google' ? 'border-black dark:border-white scale-110' : 'border-gray-300'}`}>
+                        {selectedApi === 'google' && <div className="w-2.5 h-2.5 bg-black dark:bg-white rounded-full" />}
                       </div>
-                      <span className="font-bold text-[13px] text-black dark:text-white w-[85px] text-left">Google</span>
+                      <span className="font-black text-[14px] text-black dark:text-white">Google AI</span>
                     </button>
                     <input 
                       type="password" 
@@ -736,23 +739,22 @@ export default function App() {
                         setGoogleApiKey(e.target.value);
                         localStorage.setItem('shotmaker_api_key', e.target.value);
                       }}
-                      placeholder={isAdmin ? "API Key..." : "로그인 필요"}
-                      className="flex-1 bg-[#F2F2F7] dark:bg-[#2C2C2E] rounded-full px-4 py-2 text-[12px] border-none outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-black dark:text-white shadow-sm"
+                      placeholder={isAdmin ? "Enter Gemini API Key..." : "🔒 Restricted"}
+                      className="flex-1 bg-[#F2F2F7] dark:bg-[#2C2C2E] rounded-full px-5 py-3 text-[13px] border-none outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-black dark:text-white shadow-inner font-bold"
                       readOnly={!isAdmin || selectedApi !== 'google'}
-                      style={{ cursor: (!isAdmin || selectedApi !== 'google') ? 'not-allowed' : 'text' }}
                     />
                   </div>
 
-                  {/* Stable Diffusion */}
-                  <div className={`flex items-center gap-3 p-3 rounded-full border transition-all duration-300 ${selectedApi === 'stable-diffusion' ? 'border-black bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08),inset_0_0_8px_rgba(0,0,0,0.05)] dark:bg-[#1C1C1E] dark:border-white' : 'border-transparent bg-gray-100 dark:bg-[#2C2C2E] opacity-40 grayscale pointer-events-none'}`}>
+                  {/* Stable Diffusion Row */}
+                  <div className={`flex items-center gap-4 p-4 rounded-[20px] border transition-all duration-300 ${selectedApi === 'stable-diffusion' ? 'border-black bg-white shadow-xl dark:bg-[#1C1C1E] dark:border-white' : 'border-transparent bg-gray-50 dark:bg-[#2C2C2E] opacity-30 grayscale pointer-events-none'}`}>
                     <button 
                       onClick={() => { setSelectedApi('stable-diffusion'); localStorage.setItem('shotmaker_selected_api', 'stable-diffusion'); }}
-                      className="flex-shrink-0 flex items-center gap-2 outline-none"
+                      className="flex-shrink-0 flex items-center gap-3 w-[120px] outline-none"
                     >
-                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${selectedApi === 'stable-diffusion' ? 'border-black dark:border-white' : 'border-gray-400'}`}>
-                        {selectedApi === 'stable-diffusion' && <div className="w-2 h-2 bg-black dark:bg-white rounded-full" />}
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${selectedApi === 'stable-diffusion' ? 'border-black dark:border-white scale-110' : 'border-gray-300'}`}>
+                        {selectedApi === 'stable-diffusion' && <div className="w-2.5 h-2.5 bg-black dark:bg-white rounded-full" />}
                       </div>
-                      <span className="font-bold text-[13px] text-black dark:text-white w-[85px] text-left">Stable Diff.</span>
+                      <span className="font-black text-[14px] text-black dark:text-white">SD (HF)</span>
                     </button>
                     <input 
                       type="password" 
@@ -762,10 +764,9 @@ export default function App() {
                         setSdApiKey(e.target.value);
                         localStorage.setItem('shotmaker_sd_api_key', e.target.value);
                       }}
-                      placeholder={isAdmin ? "HF Token..." : "로그인 필요"}
-                      className="flex-1 bg-[#F2F2F7] dark:bg-[#2C2C2E] rounded-full px-4 py-2 text-[12px] border-none outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-black dark:text-white shadow-sm"
+                      placeholder={isAdmin ? "Enter HF Token..." : "🔒 Restricted"}
+                      className="flex-1 bg-[#F2F2F7] dark:bg-[#2C2C2E] rounded-full px-5 py-3 text-[13px] border-none outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-black dark:text-white shadow-inner font-bold"
                       readOnly={!isAdmin || selectedApi !== 'stable-diffusion'}
-                      style={{ cursor: (!isAdmin || selectedApi !== 'stable-diffusion') ? 'not-allowed' : 'text' }}
                     />
                   </div>
                 </div>
