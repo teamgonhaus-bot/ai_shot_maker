@@ -142,6 +142,7 @@ export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedApi, setSelectedApi] = useState("google");
   const [sdApiKey, setSdApiKey] = useState("");
+  const [moveTarget, setMoveTarget] = useState(null);
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
@@ -431,13 +432,27 @@ export default function App() {
     setIsImageGenerating(true);
     
     try {
-      // Placeholder logic for SD API (Hugging Face style)
-      console.log("🚀 Generating with Stable Diffusion...");
-      // In a real scenario, this would be a fetch to an SD endpoint
-      // For now, we simulate success for the UI structure
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      triggerToast("SD API 엔드포인트 연동 준비 중입니다.");
+      console.log("🚀 Generating with Stable Diffusion (Hugging Face)...");
+      const response = await fetch(
+        "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5",
+        {
+          headers: { Authorization: `Bearer ${sdApiKey}` },
+          method: "POST",
+          body: JSON.stringify({ inputs: promptToUse }),
+        }
+      );
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || `HTTP ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const imageUrl = URL.createObjectURL(blob);
+      setGeneratedImage(imageUrl);
+      triggerToast("SD 이미지 생성 완료!");
     } catch (e) {
+      console.error("SD API Error:", e);
       triggerToast(`SD 오류: ${e.message}`);
     } finally {
       setIsImageGenerating(false);
@@ -606,6 +621,49 @@ export default function App() {
       </AnimatePresence>
       </div>
 
+      {/* 📦 Move to Tab Modal */}
+      <AnimatePresence>
+        {moveTarget && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="settings-modal-overlay"
+            style={{ zIndex: 200000 }}
+            onClick={() => setMoveTarget(null)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              className="ios-modal-card p-6 w-[320px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-lg font-bold text-black mb-1 text-center">Move to Tab</h3>
+              <p className="text-xs text-gray-400 mb-6 text-center">이동할 탭을 선택하세요</p>
+              
+              <div className="grid grid-cols-2 gap-3">
+                {OPTIONS_DATA.spaceType.map(space => (
+                  <button 
+                    key={space} 
+                    onClick={() => {
+                      handleMoveTemplate(moveTarget.id, space);
+                      setMoveTarget(null);
+                    }}
+                    className={`ios-pill px-2 py-3 text-[13px] font-bold ${moveTarget.config?.spaceType === space ? 'bg-black text-white' : 'bg-gray-100 text-gray-600'}`}
+                  >
+                    {space}
+                  </button>
+                ))}
+              </div>
+              
+              <button 
+                onClick={() => setMoveTarget(null)}
+                className="w-full mt-6 py-3 text-sm font-bold text-gray-400 hover:text-black transition-colors"
+              >
+                취소
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Settings Modal */}
       <AnimatePresence>
         {isSettingsOpen && (
@@ -677,18 +735,20 @@ export default function App() {
                 {/* API Selector */}
                 <div className="pt-4 border-t border-gray-100">
                   <label className="text-[14px] font-bold text-black block mb-3">Image Generation Engine</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-3">
                     <button 
                       onClick={() => { setSelectedApi('google'); localStorage.setItem('shotmaker_selected_api', 'google'); }}
-                      className={`ios-pill px-2 py-3 text-[12px] ${selectedApi === 'google' ? 'bg-black text-white' : 'bg-gray-100 text-gray-500'}`}
+                      className={`engine-card ${selectedApi === 'google' ? 'active' : ''}`}
                     >
-                      Google Gemini
+                      <div className="text-[11px] font-bold opacity-50 mb-1">GOOGLE</div>
+                      <div className="text-[13px] font-extrabold">Gemini 2.5</div>
                     </button>
                     <button 
                       onClick={() => { setSelectedApi('stable-diffusion'); localStorage.setItem('shotmaker_selected_api', 'stable-diffusion'); }}
-                      className={`ios-pill px-2 py-3 text-[12px] ${selectedApi === 'stable-diffusion' ? 'bg-black text-white' : 'bg-gray-100 text-gray-500'}`}
+                      className={`engine-card ${selectedApi === 'stable-diffusion' ? 'active' : ''}`}
                     >
-                      Stable Diffusion
+                      <div className="text-[11px] font-bold opacity-50 mb-1">STABLE</div>
+                      <div className="text-[13px] font-extrabold">Diffusion 1.5</div>
                     </button>
                   </div>
                 </div>
@@ -996,8 +1056,8 @@ export default function App() {
                 >  
                   <ImageIcon className="w-5 h-5 text-white" />
                   <span>
-                    {isImageGenerating ? 'GENERATING IMAGE...' : 
-                     cooldownTime > 0 ? `COOLDOWN (${cooldownTime}s)` : 'GENERATE IMAGE'}
+                    {isImageGenerating ? `GENERATING WITH ${selectedApi === 'google' ? 'GEMINI' : 'SD'}...` : 
+                     cooldownTime > 0 ? `COOLDOWN (${cooldownTime}s)` : `GENERATE WITH ${selectedApi === 'google' ? 'GEMINI' : 'STABLE DIFFUSION'}`}
                   </span>
                 </button>
               )}
@@ -1099,7 +1159,7 @@ export default function App() {
                     setActiveTab('home');
                   }} 
                   onDelete={handleDeleteTemplate} 
-                  onMove={handleMoveTemplate}
+                  onMoveRequest={(t) => setMoveTarget(t)}
                   categories={OPTIONS_DATA.spaceType}
                 />
               ))}

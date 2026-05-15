@@ -731,6 +731,51 @@ body.dark-mode .dropdown-divider {
 }
 
 /* =============================================
+   MODAL & ENGINE CARDS
+   ============================================= */
+.ios-modal-card {
+  background: #FFFFFF !important;
+  border-radius: 24px !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
+}
+
+body.dark-mode .ios-modal-card {
+  background: #1C1C1E !important;
+  color: #FFFFFF !important;
+}
+
+.engine-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px 8px !important;
+  background: #F2F2F7 !important;
+  border: 2px solid transparent !important;
+  border-radius: 16px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  color: #8E8E93 !important;
+}
+
+body.dark-mode .engine-card {
+  background: #2C2C2E !important;
+}
+
+.engine-card.active {
+  background: #FFFFFF !important;
+  border-color: #000000 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+  color: #000000 !important;
+}
+
+body.dark-mode .engine-card.active {
+  background: #3A3A3C !important;
+  border-color: #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+/* =============================================
    DARK MODE OVERRIDES
    ============================================= */
 body.dark-mode {
