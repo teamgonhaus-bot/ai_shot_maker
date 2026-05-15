@@ -436,7 +436,10 @@ export default function App() {
       const response = await fetch(
         "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5",
         {
-          headers: { Authorization: `Bearer ${sdApiKey}` },
+          headers: { 
+            Authorization: `Bearer ${sdApiKey}`,
+            "Content-Type": "application/json"
+          },
           method: "POST",
           body: JSON.stringify({ inputs: promptToUse }),
         }
@@ -655,7 +658,7 @@ export default function App() {
               
               <button 
                 onClick={() => setMoveTarget(null)}
-                className="w-full px-4 py-3.5 rounded-full bg-white border border-gray-200 text-gray-500 text-[14px] font-bold hover:bg-gray-50 transition-colors dark:bg-[#1C1C1E] dark:border-[#3A3A3C] dark:text-gray-400 dark:hover:bg-[#2C2C2E]"
+                className="w-full px-4 py-3.5 rounded-full bg-[#F2F2F7] text-[#8E8E93] text-[14px] font-bold hover:bg-[#E5E5EA] transition-colors dark:bg-[#2C2C2E] dark:text-gray-400 dark:hover:bg-[#3A3A3C]"
               >
                 Cancel
               </button>
@@ -715,7 +718,7 @@ export default function App() {
                   <label className="text-[14px] font-bold text-black block mb-4">Image Generation Engine</label>
                   
                   {/* Google Gemini */}
-                  <div className={`flex items-center gap-3 p-3 rounded-[16px] border mb-3 transition-all duration-300 ${selectedApi === 'google' ? 'border-black bg-white shadow-sm dark:bg-[#1C1C1E] dark:border-white' : 'border-transparent bg-gray-50 dark:bg-[#2C2C2E] opacity-50 grayscale'}`}>
+                  <div className={`flex items-center gap-3 p-3 rounded-full border mb-4 transition-all duration-300 ${selectedApi === 'google' ? 'border-black bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08),inset_0_0_8px_rgba(0,0,0,0.05)] dark:bg-[#1C1C1E] dark:border-white' : 'border-transparent bg-gray-100 dark:bg-[#2C2C2E] opacity-40 grayscale pointer-events-none'}`}>
                     <button 
                       onClick={() => { setSelectedApi('google'); localStorage.setItem('shotmaker_selected_api', 'google'); }}
                       className="flex-shrink-0 flex items-center gap-2 outline-none"
@@ -734,14 +737,14 @@ export default function App() {
                         localStorage.setItem('shotmaker_api_key', e.target.value);
                       }}
                       placeholder={isAdmin ? "API Key..." : "로그인 필요"}
-                      className="flex-1 bg-gray-100 dark:bg-[#3A3A3C] rounded-xl px-3 py-2.5 text-[12px] border-none outline-none focus:ring-1 focus:ring-black dark:focus:ring-white text-black dark:text-white"
+                      className="flex-1 bg-[#F2F2F7] dark:bg-[#2C2C2E] rounded-full px-4 py-2 text-[12px] border-none outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-black dark:text-white shadow-sm"
                       readOnly={!isAdmin || selectedApi !== 'google'}
                       style={{ cursor: (!isAdmin || selectedApi !== 'google') ? 'not-allowed' : 'text' }}
                     />
                   </div>
 
                   {/* Stable Diffusion */}
-                  <div className={`flex items-center gap-3 p-3 rounded-[16px] border transition-all duration-300 ${selectedApi === 'stable-diffusion' ? 'border-black bg-white shadow-sm dark:bg-[#1C1C1E] dark:border-white' : 'border-transparent bg-gray-50 dark:bg-[#2C2C2E] opacity-50 grayscale'}`}>
+                  <div className={`flex items-center gap-3 p-3 rounded-full border transition-all duration-300 ${selectedApi === 'stable-diffusion' ? 'border-black bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08),inset_0_0_8px_rgba(0,0,0,0.05)] dark:bg-[#1C1C1E] dark:border-white' : 'border-transparent bg-gray-100 dark:bg-[#2C2C2E] opacity-40 grayscale pointer-events-none'}`}>
                     <button 
                       onClick={() => { setSelectedApi('stable-diffusion'); localStorage.setItem('shotmaker_selected_api', 'stable-diffusion'); }}
                       className="flex-shrink-0 flex items-center gap-2 outline-none"
@@ -760,7 +763,7 @@ export default function App() {
                         localStorage.setItem('shotmaker_sd_api_key', e.target.value);
                       }}
                       placeholder={isAdmin ? "HF Token..." : "로그인 필요"}
-                      className="flex-1 bg-gray-100 dark:bg-[#3A3A3C] rounded-xl px-3 py-2.5 text-[12px] border-none outline-none focus:ring-1 focus:ring-black dark:focus:ring-white text-black dark:text-white"
+                      className="flex-1 bg-[#F2F2F7] dark:bg-[#2C2C2E] rounded-full px-4 py-2 text-[12px] border-none outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-black dark:text-white shadow-sm"
                       readOnly={!isAdmin || selectedApi !== 'stable-diffusion'}
                       style={{ cursor: (!isAdmin || selectedApi !== 'stable-diffusion') ? 'not-allowed' : 'text' }}
                     />
