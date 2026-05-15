@@ -139,7 +139,9 @@ export default function App() {
   const [lightboxImage, setLightboxImage] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [libraryFilter, setLibraryFilter] = useState('전체');
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [selectedApi, setSelectedApi] = useState("google");
+  const [sdApiKey, setSdApiKey] = useState("");
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
@@ -161,6 +163,11 @@ export default function App() {
     if (savedMat) setUseDetailMaterial(savedMat === 'true');
     const savedText = localStorage.getItem('shotmaker_removeText_v13');
     if (savedText) setRemoveText(savedText === 'true');
+
+    const storedApi = localStorage.getItem('shotmaker_selected_api');
+    if (storedApi) setSelectedApi(storedApi);
+    const storedSdKey = localStorage.getItem('shotmaker_sd_api_key');
+    if (storedSdKey) setSdApiKey(storedSdKey);
 
     // 2. Firebase Initial Load (One-time fetch as requested)
     const fetchTemplates = async () => {
@@ -401,6 +408,42 @@ export default function App() {
     setTimeout(() => setShowToast(false), 4000);
   };
 
+  const generateImage = async (prompt) => {
+    if (selectedApi === 'google') {
+      await generateImageFromGoogle(prompt);
+    } else {
+      await generateImageFromSD(prompt);
+    }
+  };
+
+  const generateImageFromSD = async (prompt) => {
+    if (!sdApiKey) {
+      triggerToast("SD API 키가 설정되지 않았습니다.");
+      return;
+    }
+    const promptToUse = prompt || generatedPrompt;
+    if (!promptToUse) {
+      triggerToast("먼저 프롬프트를 생성해주세요.");
+      return;
+    }
+
+    setCooldownTime(5);
+    setIsImageGenerating(true);
+    
+    try {
+      // Placeholder logic for SD API (Hugging Face style)
+      console.log("🚀 Generating with Stable Diffusion...");
+      // In a real scenario, this would be a fetch to an SD endpoint
+      // For now, we simulate success for the UI structure
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      triggerToast("SD API 엔드포인트 연동 준비 중입니다.");
+    } catch (e) {
+      triggerToast(`SD 오류: ${e.message}`);
+    } finally {
+      setIsImageGenerating(false);
+    }
+  };
+
   const generateImageFromGoogle = async (prompt) => {
     if (!googleApiKey) {
       triggerToast("API 키가 설정되지 않았습니다.");
@@ -630,51 +673,88 @@ export default function App() {
                   />
                   <p className="settings-hint mt-2">Nano Banana (gemini-2.5-flash-image) 생성용 키입니다.</p>
                 </div>
+
+                {/* API Selector */}
+                <div className="pt-4 border-t border-gray-100">
+                  <label className="text-[14px] font-bold text-black block mb-3">Image Generation Engine</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button 
+                      onClick={() => { setSelectedApi('google'); localStorage.setItem('shotmaker_selected_api', 'google'); }}
+                      className={`ios-pill px-2 py-3 text-[12px] ${selectedApi === 'google' ? 'bg-black text-white' : 'bg-gray-100 text-gray-500'}`}
+                    >
+                      Google Gemini
+                    </button>
+                    <button 
+                      onClick={() => { setSelectedApi('stable-diffusion'); localStorage.setItem('shotmaker_selected_api', 'stable-diffusion'); }}
+                      className={`ios-pill px-2 py-3 text-[12px] ${selectedApi === 'stable-diffusion' ? 'bg-black text-white' : 'bg-gray-100 text-gray-500'}`}
+                    >
+                      Stable Diffusion
+                    </button>
+                  </div>
+                </div>
+
+                {/* SD API Key */}
+                {selectedApi === 'stable-diffusion' && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                    <label className="text-[14px] font-bold text-black block mb-2 flex items-center">
+                      Stable Diffusion API Key
+                      {!isAdmin && <span className="ml-2 text-red-500 text-xs font-normal">🔒 로그인이 필요합니다</span>}
+                    </label>
+                    <input 
+                      type="password" 
+                      value={sdApiKey}
+                      onChange={(e) => {
+                        if (!isAdmin) return;
+                        setSdApiKey(e.target.value);
+                        localStorage.setItem('shotmaker_sd_api_key', e.target.value);
+                      }}
+                      placeholder={isAdmin ? "Bearer ..." : "관리자 로그인 후 입력 가능"}
+                      className="settings-input"
+                      readOnly={!isAdmin}
+                      style={{ opacity: isAdmin ? 1 : 0.6, cursor: isAdmin ? 'text' : 'not-allowed' }}
+                    />
+                    <p className="settings-hint mt-2">Hugging Face 또는 커스텀 SD 엔드포인트용 키입니다.</p>
+                  </motion.div>
+                )}
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Drawer Menu */}
+      {/* Header Menu Dropdown */}
       <AnimatePresence>
-        {isDrawerOpen && (
+        {isMenuOpen && (
           <>
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="drawer-overlay"
-              onClick={() => setIsDrawerOpen(false)}
+            <div 
+              className="menu-overlay"
+              onClick={() => setIsMenuOpen(false)}
             />
             <motion.div 
-              initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="drawer-panel"
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              className="header-dropdown"
             >
-              <div className="drawer-header">
-                <h3>Menu</h3>
-                <button onClick={() => setIsDrawerOpen(false)} className="close-btn"><X size={24}/></button>
-              </div>
-              <div className="drawer-body">
-                <button 
-                  onClick={() => { setIsSettingsOpen(true); setIsDrawerOpen(false); }}
-                  className="drawer-item"
-                >
-                  <Settings size={20} />
-                  <span>Settings</span>
-                </button>
-                <div className="drawer-divider" />
-                <button 
-                  onClick={() => { 
-                    if (isAdmin) handleLogout(); 
-                    else handleLogin(); 
-                    setIsDrawerOpen(false); 
-                  }}
-                  className="drawer-item"
-                >
-                  {isAdmin ? <LogOut size={20} /> : <LogIn size={20} />}
-                  <span>{isAdmin ? 'Logout' : 'Login'}</span>
-                </button>
-              </div>
+              <button 
+                onClick={() => { setIsSettingsOpen(true); setIsMenuOpen(false); }}
+                className="dropdown-item"
+              >
+                <Settings size={18} />
+                <span>Settings</span>
+              </button>
+              <div className="dropdown-divider" />
+              <button 
+                onClick={() => { 
+                  if (isAdmin) handleLogout(); 
+                  else handleLogin(); 
+                  setIsMenuOpen(false); 
+                }}
+                className="dropdown-item"
+              >
+                {isAdmin ? <LogOut size={18} /> : <LogIn size={18} />}
+                <span>{isAdmin ? 'Logout' : 'Login'}</span>
+              </button>
             </motion.div>
           </>
         )}
@@ -687,14 +767,16 @@ export default function App() {
             <button className={`header-nav-btn ${activeTab === 'home' ? 'active' : 'inactive'}`} onClick={() => setActiveTab('home')}>Create</button>
             <button className={`header-nav-btn ${activeTab === 'library' ? 'active' : 'inactive'}`} onClick={() => setActiveTab('library')}>Library</button>
           </div>
-          <button 
-            onClick={() => setIsDrawerOpen(true)}
-            className="ios-card-icon-btn"
-            title="Menu"
-            style={{ width: '36px', height: '36px' }}
-          >
-            <Menu size={22} />
-          </button>
+          <div className="relative">
+            <button 
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className={`ios-card-icon-btn ${isMenuOpen ? 'active' : ''}`}
+              title="Menu"
+              style={{ width: '36px', height: '36px' }}
+            >
+              <Menu size={22} />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -901,9 +983,9 @@ export default function App() {
                 <span>{isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}</span>
               </button>
 
-              {generatedPrompt && googleApiKey && (
+              {generatedPrompt && (selectedApi === 'google' ? googleApiKey : sdApiKey) && (
                 <button 
-                  onClick={() => generateImageFromGoogle()}
+                  onClick={() => generateImage()}
                   disabled={isImageGenerating || cooldownTime > 0}
                   className="generate-btn"
                   style={{ 

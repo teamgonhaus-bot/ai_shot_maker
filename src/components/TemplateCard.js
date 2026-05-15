@@ -35,8 +35,9 @@ export default function TemplateCard({ template, onLoad, onDelete, onMove, categ
           <div className="relative">
             <button 
               onClick={() => setShowMoveMenu(!showMoveMenu)}
-              className="p-1 text-gray-400 hover:text-black transition-colors"
+              className={`ios-card-icon-btn ${showMoveMenu ? 'active' : ''}`}
               title="Move to category"
+              style={{ width: '32px', height: '32px' }}
             >
               <FolderInput size={16} />
             </button>
@@ -48,9 +49,9 @@ export default function TemplateCard({ template, onLoad, onDelete, onMove, categ
                     initial={{ opacity: 0, scale: 0.95, y: -10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                    className="absolute right-0 top-8 w-32 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 overflow-hidden"
+                    className="absolute right-0 top-10 w-36 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 overflow-hidden"
                   >
-                    <p className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 mb-1">Move to</p>
+                    <p className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 mb-1">Move to tab</p>
                     {categories.map(cat => (
                       <button
                         key={cat}
@@ -68,13 +69,17 @@ export default function TemplateCard({ template, onLoad, onDelete, onMove, categ
         </div>
         
         <div className="relative">
-          <motion.p 
+          <motion.div 
             layout
-            className={`text-[13px] font-medium text-gray-400 leading-relaxed mt-1 ${!isExpanded ? 'line-clamp-3' : ''}`}
-            style={{ height: !isExpanded ? '60px' : 'auto' }}
+            initial={false}
+            animate={{ height: isExpanded ? 'auto' : '60px' }}
+            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            className="overflow-hidden"
           >
-            {template.prompt}
-          </motion.p>
+            <p className={`text-[13px] font-medium text-gray-400 leading-relaxed mt-1 ${!isExpanded ? 'line-clamp-3' : ''}`}>
+              {template.prompt}
+            </p>
+          </motion.div>
           
           {template.prompt && template.prompt.length > 80 && (
             <div className="flex justify-center mt-3">
@@ -83,7 +88,7 @@ export default function TemplateCard({ template, onLoad, onDelete, onMove, categ
                 className="ios-upload-capsule"
                 style={{ padding: '4px 12px', fontSize: '10px', height: 'auto', background: '#F2F2F7', color: '#8E8E93', border: 'none', boxShadow: 'none' }}
               >
-                <span>{isExpanded ? 'Close' : 'View All'}</span>
+                <span>{isExpanded ? 'Collapse' : 'View All'}</span>
                 {isExpanded ? <ChevronUp size={10} className="ml-1" /> : <ChevronDown size={10} className="ml-1" />}
               </button>
             </div>
