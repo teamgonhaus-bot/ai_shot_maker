@@ -437,11 +437,9 @@ export default function App() {
         "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5",
         {
           headers: { 
-            "Authorization": `Bearer ${sdApiKey}`,
-            "Content-Type": "application/json"
+            "Authorization": `Bearer ${sdApiKey}`
           },
           method: "POST",
-          mode: 'cors',
           body: JSON.stringify({ inputs: promptToUse }),
         }
       );
@@ -702,7 +700,7 @@ export default function App() {
                 </div>
 
                 {/* Aspect Ratio */}
-                <div className="pb-4 border-b border-gray-100">
+                <div className="pb-8 border-b border-gray-100">
                   <label className="text-[14px] font-bold text-black block mb-2">기본 이미지 비율</label>
                   <select 
                     value={config.aspectRatio} 
@@ -716,8 +714,8 @@ export default function App() {
                 </div>
 
                 {/* Image Generation Engine */}
-                <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
-                  <label className="text-[16px] font-black text-black dark:text-white block mb-4">Generation Engine & API Configuration</label>
+                <div className="pt-6 border-t border-gray-100 dark:border-gray-800">
+                  <label className="text-[16px] font-black text-black dark:text-white block mb-6">Generation Engine & API Configuration</label>
                   
                   {/* Google Gemini Row */}
                   <div 
@@ -738,8 +736,7 @@ export default function App() {
                       }}
                       onClick={(e) => e.stopPropagation()}
                       placeholder={isAdmin ? "Enter Gemini API Key..." : "🔒 Restricted"}
-                      className="settings-input"
-                      style={{ padding: '10px 18px', fontSize: '13px' }}
+                      className="settings-input settings-input-sm"
                       readOnly={!isAdmin}
                     />
                   </div>
@@ -763,8 +760,7 @@ export default function App() {
                       }}
                       onClick={(e) => e.stopPropagation()}
                       placeholder={isAdmin ? "Enter HF Token..." : "🔒 Restricted"}
-                      className="settings-input"
-                      style={{ padding: '10px 18px', fontSize: '13px' }}
+                      className="settings-input settings-input-sm"
                       readOnly={!isAdmin}
                     />
                   </div>

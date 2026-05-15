@@ -805,6 +805,13 @@ body.dark-mode .settings-input {
   box-shadow: inset 0 2px 5px rgba(0,0,0,0.2) !important;
 }
 
+.settings-input-sm {
+  padding: 10px 16px !important;
+  font-size: 13px !important;
+  height: 42px !important;
+  border-radius: 9999px !important;
+}
+
 .settings-input:focus {
   background: #FFFFFF !important;
   box-shadow: inset 0 2px 5px rgba(0,0,0,0.03), 0 8px 20px rgba(0,0,0,0.08) !important;
@@ -819,9 +826,9 @@ body.dark-mode .settings-input:focus {
   display: flex !important;
   align-items: center !important;
   gap: 16px !important;
-  padding: 14px 20px !important;
+  padding: 10px 16px !important;
   border-radius: 28px !important;
-  margin-bottom: 16px !important;
+  margin-bottom: 12px !important;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
   border: 2px solid transparent !important;
 }
