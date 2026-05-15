@@ -81,10 +81,19 @@ export default function TemplateCard({ template, onLoad, onDelete, onMoveRequest
           <button 
             onClick={() => setIsExpanded(!isExpanded)}
             className="ios-upload-capsule"
-            style={{ padding: '4px 12px', fontSize: '10px', height: 'auto', background: '#F2F2F7', color: '#8E8E93', border: 'none', boxShadow: 'none' }}
+            style={{ 
+              padding: '6px 12px', 
+              fontSize: '11px', 
+              height: 'auto', 
+              background: '#000', 
+              color: '#FFF', 
+              border: 'none', 
+              boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+              marginTop: '4px'
+            }}
           >
             <span>{isExpanded ? 'Close' : 'View All'}</span>
-            {isExpanded ? <ChevronUp size={10} className="ml-1" /> : <ChevronDown size={10} className="ml-1" />}
+            {isExpanded ? <ChevronUp size={11} className="ml-1" /> : <ChevronDown size={11} className="ml-1" />}
           </button>
         )}
       </div>

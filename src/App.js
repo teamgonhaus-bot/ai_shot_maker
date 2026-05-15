@@ -441,9 +441,14 @@ export default function App() {
             "Content-Type": "application/json"
           },
           method: "POST",
+          mode: 'cors',
           body: JSON.stringify({ inputs: promptToUse }),
         }
       );
+
+      if (response.status === 503) {
+        throw new Error('Model is loading (30s)... Please try again in 30 seconds.');
+      }
 
       if (!response.ok) throw new Error('Network response was not ok');
       
@@ -711,8 +716,8 @@ export default function App() {
                 </div>
 
                 {/* Image Generation Engine */}
-                <div className="pt-6 border-t border-gray-100 dark:border-gray-800">
-                  <label className="text-[16px] font-black text-black dark:text-white block mb-6">Generation Engine & API Configuration</label>
+                <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
+                  <label className="text-[16px] font-black text-black dark:text-white block mb-4">Generation Engine & API Configuration</label>
                   
                   {/* Google Gemini Row */}
                   <div 
@@ -734,6 +739,7 @@ export default function App() {
                       onClick={(e) => e.stopPropagation()}
                       placeholder={isAdmin ? "Enter Gemini API Key..." : "🔒 Restricted"}
                       className="settings-input"
+                      style={{ padding: '10px 18px', fontSize: '13px' }}
                       readOnly={!isAdmin}
                     />
                   </div>
@@ -758,6 +764,7 @@ export default function App() {
                       onClick={(e) => e.stopPropagation()}
                       placeholder={isAdmin ? "Enter HF Token..." : "🔒 Restricted"}
                       className="settings-input"
+                      style={{ padding: '10px 18px', fontSize: '13px' }}
                       readOnly={!isAdmin}
                     />
                   </div>

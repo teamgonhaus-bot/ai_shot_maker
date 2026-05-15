@@ -819,9 +819,9 @@ body.dark-mode .settings-input:focus {
   display: flex !important;
   align-items: center !important;
   gap: 16px !important;
-  padding: 20px !important;
+  padding: 14px 20px !important;
   border-radius: 28px !important;
-  margin-bottom: 24px !important;
+  margin-bottom: 16px !important;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
   border: 2px solid transparent !important;
 }
