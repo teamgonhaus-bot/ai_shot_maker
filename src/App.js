@@ -699,8 +699,8 @@ export default function App() {
                 <button onClick={() => setIsSettingsOpen(false)} className="close-btn"><X size={20} /></button>
               </div>
               <div className="settings-body space-y-4">
-                {/* Dark Mode */}
-                <div className="flex justify-between items-center pb-4 border-b border-gray-100">
+                {/* Dark Mode Section */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', paddingBottom: '28px', borderBottom: '1px solid #E5E5EA' }}>
                   <div>
                     <label className="settings-prop-label">다크 모드</label>
                     <p className="settings-desc-text">앱 테마를 어둡게 변경합니다.</p>
@@ -713,9 +713,10 @@ export default function App() {
                   />
                 </div>
 
-                <div className="pb-6 border-b border-gray-100 dark:border-gray-800">
+                {/* Aspect Ratio Section */}
+                <div style={{ paddingTop: '28px', paddingBottom: '28px', borderBottom: '1px solid #E5E5EA' }}>
                   <label className="settings-prop-label">기본 이미지 비율</label>
-                  <p className="settings-desc-text mb-5">생성될 이미지의 기본 가로세로 비율을 설정합니다.</p>
+                  <p className="settings-desc-text" style={{ marginBottom: '16px' }}>생성될 이미지의 기본 가로세로 비율을 설정합니다.</p>
                   <div className="flex flex-wrap gap-2">
                     {OPTIONS_DATA.aspectRatio.map(ratio => (
                       <button
@@ -730,10 +731,10 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Image Generation Engine Section Container */}
-                <div className="pt-10 mt-6 border-t border-gray-100 dark:border-gray-800">
+                {/* Generate API Section */}
+                <div style={{ paddingTop: '32px', marginTop: '4px' }}>
                   <label className="settings-prop-label">Generate API</label>
-                  <p className="settings-desc-text mb-8">사용할 이미지 생성 AI 엔진을 선택하세요.</p>
+                  <p className="settings-desc-text" style={{ marginBottom: '24px' }}>사용할 이미지 생성 AI 엔진을 선택하세요.</p>
 
                   {/* Google Gemini Row */}
                   <div
@@ -768,7 +769,7 @@ export default function App() {
                     />
                   </div>
 
-                  {/* Stable Diffusion Row */}
+                  {/* Hugging Face Row */}
                   <div
                     className={`engine-row ${selectedApi === 'stable-diffusion' ? 'active' : 'inactive'} ${!isAdmin ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'}`}
                     onClick={() => {
@@ -1074,8 +1075,8 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Unified Button Container with 20px gap */}
-              <div className="flex flex-col gap-5">
+              {/* Unified Button Container — flex-col with gap */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '8px' }}>
                 <button
                   onClick={generatePrompt}
                   disabled={isGenerating}
@@ -1095,7 +1096,7 @@ export default function App() {
                       generateImage();
                     }}
                     disabled={isImageGenerating || cooldownTime > 0}
-                    className="generate-btn w-full point-color"
+                    className={`generate-btn w-full${(!isAdmin || isImageGenerating || cooldownTime > 0) ? '' : ' point-color'}`}
                     style={{
                       background: (!isAdmin || isImageGenerating || cooldownTime > 0) ? '#48484A' : undefined,
                       cursor: (!isAdmin || isImageGenerating || cooldownTime > 0) ? 'not-allowed' : 'pointer',
