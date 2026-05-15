@@ -916,7 +916,7 @@ export default function App() {
                     >
                       {isAdmin ? <LogOut size={18} /> : <LogIn size={18} />}
                       <span>{isAdmin ? 'Logout' : 'Login'}</span>
-                    </button>
+                                        </button>
                   </motion.div>
                 </>
               )}
@@ -964,7 +964,49 @@ export default function App() {
               )}
 
               {activeCategory === 'space' && (
-                <motion.section key="space" initia                      {useImageRef && (
+                <motion.section key="space" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                  <h2 className="ios-section-title">[공간]</h2>
+                  <div className="ios-bento-card">
+                    <OptionSelect label="공간 종류" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} theme="green" />
+                    <OptionSelect label="세부 공간" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} theme="green" />
+                    <OptionSelect label="인테리어 양식" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} theme="green" />
+                    <OptionSelect label="조명" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="green" />
+
+                    <div className="mt-4 border-t border-gray-100">
+                      <IOSToggle
+                        label="세부 소재 및 컬러 (Materials)"
+                        isOn={useDetailMaterial}
+                        onToggle={() => setUseDetailMaterial(!useDetailMaterial)}
+                        activeColor="#34C759"
+                      />
+                      <AnimatePresence>
+                        {useDetailMaterial && (
+                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="flex flex-col overflow-hidden">
+                            <OptionSelect label="바닥 타일/마루" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} theme="green" />
+                            <OptionSelect label="우드 소재" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} theme="green" />
+                            <OptionSelect label="메탈 포인트" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} theme="green" />
+                            <OptionSelect label="벽 소재/컬러" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} theme="green" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                </motion.section>
+              )}
+
+              {activeCategory === 'camera' && (
+                <motion.section key="camera" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                  <h2 className="ios-section-title">[카메라]</h2>
+                  <div className="ios-bento-card" style={{ padding: '20px' }}>
+                    <div className="mb-4 space-y-4">
+                      <IOSToggle
+                        label="이미지 참조 모드 (Image-to-Image)"
+                        isOn={useImageRef}
+                        onToggle={() => setUseImageRef(!useImageRef)}
+                        activeColor="#007AFF"
+                      />
+
+                      {useImageRef && (
                         <div className="space-y-4">
                           <div
                             className={`ios-upload-zone ${isDragging ? 'dragging' : ''}`}
@@ -1053,74 +1095,6 @@ export default function App() {
                           </div>
                         </div>
                       )}
-veColor="#007AFF"
-                      />
-
-                      {useImageRef && (
-                        <div
-                          className={`ios-upload-zone ${isDragging ? 'dragging' : ''}`}
-                          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                          onDragLeave={() => setIsDragging(false)}
-                          onDrop={(e) => {
-                            e.preventDefault();
-                            setIsDragging(false);
-                            const file = e.dataTransfer.files[0];
-                            if (file && file.type.startsWith('image/')) {
-                              const reader = new FileReader();
-                              reader.onloadend = () => {
-                                setRefImage({
-                                  mimeType: file.type,
-                                  data: reader.result.split(',')[1]
-                                });
-                              };
-                              reader.readAsDataURL(file);
-                            }
-                          }}
-                        >
-                          <input
-                            type="file"
-                            accept="image/*"
-                            id="ref-image-upload"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files[0];
-                              if (file) {
-                                const reader = new FileReader();
-                                reader.onloadend = () => {
-                                  setRefImage({
-                                    mimeType: file.type,
-                                    data: reader.result.split(',')[1]
-                                  });
-                                };
-                                reader.readAsDataURL(file);
-                              }
-                            }}
-                          />
-                          {!refImage ? (
-                            <label htmlFor="ref-image-upload" className="ios-upload-placeholder">
-                              <div className="upload-main-text">Image Upload</div>
-                              <div className="upload-sub-text">Drag & Drop</div>
-                              <div className="ios-upload-capsule">
-                                <span>파일 선택</span>
-                              </div>
-                            </label>
-                          ) : (
-                            <div className="relative group w-full flex justify-center">
-                              <img
-                                src={`data:${refImage.mimeType};base64,${refImage.data}`}
-                                alt="Ref Preview"
-                                className="ios-upload-preview"
-                              />
-                              <button
-                                onClick={() => setRefImage(null)}
-                                className="ios-upload-remove-btn"
-                              >
-                                ✕
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
 
                       <div className="border-t border-gray-100 pt-4">
                         <IOSToggle
@@ -1135,6 +1109,7 @@ veColor="#007AFF"
                   </div>
                 </motion.section>
               )}
+
 
               {activeCategory === 'style' && (
                 <motion.section key="style" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
