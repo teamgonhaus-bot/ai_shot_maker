@@ -419,8 +419,11 @@ export default function App() {
   };
 
   const generateImageFromSD = async (prompt) => {
-    if (!sdApiKey) {
-      triggerToast("SD API 키가 설정되지 않았습니다.");
+    // 1. Validation & Fallback for Token
+    const hfToken = sdApiKey?.trim() || process.env.REACT_APP_HF_TOKEN;
+    
+    if (!hfToken) {
+      triggerToast("Hugging Face API 토큰이 설정되지 않았습니다.");
       return;
     }
     const promptToUse = prompt || generatedPrompt;
@@ -433,12 +436,16 @@ export default function App() {
     setIsImageGenerating(true);
     
     try {
-      console.log("🚀 Generating with Hugging Face Inference Library (v0.4 Stable)...");
-      const hf = new HfInference(sdApiKey?.trim());
+      console.log("🚀 Generating with Hugging Face Inference (FLUX.1-schnell)...");
+      // HfInference instance creation with explicit token
+      const hf = new HfInference(hfToken);
       
       const blob = await hf.textToImage({
         model: 'black-forest-labs/FLUX.1-schnell',
         inputs: promptToUse,
+        parameters: {
+          // Default inference, no specific provider mentioned as per request
+        },
         headers: { 
           "use_cache": "false",
           "wait_for_model": "true"
@@ -450,10 +457,14 @@ export default function App() {
       triggerToast("Hugging Face (FLUX.1) 생성 성공!");
     } catch (e) {
       console.error("SD Generation Error:", e);
-      if (e.message?.includes('401')) {
-        triggerToast("인증 오류 (401): 토큰이 올바르지 않거나 권한이 없습니다.");
-      } else if (e.message?.includes('503') || e.message?.includes('loading')) {
-        triggerToast("모델 로딩 중 (30s)... 잠시 후 다시 시도해 주세요.");
+      const errorMsg = e.message?.toLowerCase() || "";
+      
+      if (errorMsg.includes('401') || errorMsg.includes('unauthorized')) {
+        triggerToast("토큰 권한 확인이 필요합니다 (401 Unauthorized)");
+      } else if (errorMsg.includes('503') || errorMsg.includes('loading')) {
+        triggerToast("모델 로딩 중... 잠시 후 다시 시도해 주세요.");
+      } else if (errorMsg.includes('403')) {
+        triggerToast("토큰 권한(Inference)이 부족합니다.");
       } else {
         triggerToast(`Hugging Face 오류: ${e.message}`);
       }
@@ -700,7 +711,7 @@ export default function App() {
                 </div>
 
                 {/* Aspect Ratio */}
-                <div className="pb-10 border-b border-gray-100">
+                <div className="pb-8 border-b border-gray-100 dark:border-gray-800">
                   <label className="settings-prop-label">기본 이미지 비율</label>
                   <p className="settings-desc-text mb-4">생성될 이미지의 기본 가로세로 비율을 설정합니다.</p>
                   <select 
@@ -715,7 +726,7 @@ export default function App() {
                 </div>
 
                 {/* Image Generation Engine */}
-                <div className="pt-10 mt-6 border-t border-gray-100 dark:border-gray-800">
+                <div className="pt-8">
                   <label className="settings-prop-label">Generate API</label>
                   <p className="settings-desc-text mb-6">사용할 이미지 생성 AI 엔진을 선택하세요.</p>
                   
@@ -727,7 +738,7 @@ export default function App() {
                     <div className="engine-label">
                       <div className="engine-radio" />
                       <div className="flex flex-col">
-                        <span className="font-black text-[13px] text-black dark:text-white leading-none">Google AI</span>
+                        <span className="font-black text-[0.85rem] text-black dark:text-white leading-none">Google AI</span>
                       </div>
                     </div>
                     <input 
@@ -753,7 +764,7 @@ export default function App() {
                     <div className="engine-label" style={{ width: '160px' }}>
                       <div className="engine-radio" />
                       <div className="flex flex-col">
-                        <span className="font-black text-[13px] text-black dark:text-white leading-none">Hugging Face</span>
+                        <span className="font-black text-[0.85rem] text-black dark:text-white leading-none">Hugging Face</span>
                         <span className="text-[9px] font-bold text-gray-400 mt-1">(FLUX.1)</span>
                       </div>
                     </div>
@@ -1073,10 +1084,13 @@ export default function App() {
               )}
 
               {isImageGenerating && (
-                <div className="result-card" style={{ marginTop: '32px', minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="result-card" style={{ marginTop: '32px', minHeight: '300px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                   <div className="skeleton-pulse"></div>
-                  <p style={{ color: '#8E8E93', fontWeight: 600, zIndex: 1, position: 'relative' }}>
-                    {selectedApi === 'google' ? 'Google AI Generation...' : 'Hugging Face Generation...'}
+                  <h3 className="text-[14px] font-black mb-2 z-10 text-black dark:text-white">
+                    {selectedApi === 'google' ? 'Google AI Image Generation' : 'Hugging Face (FLUX.1) Generation'}
+                  </h3>
+                  <p style={{ color: '#8E8E93', fontSize: '12px', fontWeight: 600, zIndex: 1, position: 'relative' }}>
+                    {selectedApi === 'google' ? 'Generating with Gemini...' : 'Generating with FLUX.1...'}
                   </p>
                 </div>
               )}
@@ -1084,6 +1098,13 @@ export default function App() {
               {!isImageGenerating && generatedPrompt && (
                 <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} className="mt-12 space-y-8">
                   
+                  <div className="flex flex-col items-center mb-[-16px]">
+                    <h3 className="text-[15px] font-black text-black dark:text-white tracking-tight">
+                      {selectedApi === 'google' ? 'Google AI Image Generation' : 'Hugging Face (FLUX.1) Generation'}
+                    </h3>
+                    <div className="w-8 h-1 bg-black dark:bg-white rounded-full mt-1 opacity-10"></div>
+                  </div>
+
                   {generatedImage ? (
                     <div className="image-result-card relative group">
                       <img 
