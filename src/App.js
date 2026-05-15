@@ -61,7 +61,8 @@ const DICTIONARY = {
     "인테리어 잡지 샷(사실적)": "realistic interior magazine photography", "와이드 건축/공간 샷": "wide architectural space shot",
     "인테리어 비네트(코너)": "interior vignette corner shot", "라이프스타일 인테리어": "lifestyle interior scene",
     "클로즈업 디테일": "close-up detail focus", "심도 얕은 샷(아웃포커싱)": "shallow depth of field with bokeh"
-  }
+  },
+  country: { "선택안함": "", "한국": "Korea", "일본": "Japan", "동남아 휴양지": "Southeast Asia resort", "미국": "USA", "독일": "Germany", "이탈리아": "Italy" }
 };
 
 const OPTIONS_DATA = {
@@ -79,23 +80,24 @@ const OPTIONS_DATA = {
   spaceDetail: {
     "스튜디오": ["단색 배경", "인테리어 세트장"],
     "오피스": ["사무실", "회의실", "중역실", "오피스 라운지"],
-    "홈": ["리빙", "다이닝", "룸"],
-    "리테일": ["카페", "식당", "쇼룸"],
+    "홈": ["리빙", "다이닝", "룸", "워크룸", "베드룸", "테라스"],
+    "리테일": ["카페", "식당", "쇼룸", "로비", "쇼핑몰", "박람회", "갤러리"],
     "라운지": ["호텔 라운지", "공항 라운지"],
-    "야외": ["도심", "자연", "테라스"]
+    "야외": ["도심", "자연", "테라스", "공원", "강가", "쇼핑가", "힙한곳"]
   },
   interiorStyle: ["선택안함", "미드센추리 모던", "모던 미니멀", "내추럴 우드", "젠 스타일", "인더스트리얼", "스칸디나비안"],
   light: ["선택안함", "자연광", "시네마틱", "스튜디오 조명", "무드등"],
-  detailFloor: ["밝은 우드 마루", "어두운 우드 마루", "테라조 타일", "대리석", "콘크리트", "조약돌 바닥", "자갈 바닥"],
-  detailWood: ["오크(참나무)", "월넛(호두나무)", "자작나무", "티크"],
-  detailMetal: ["황동(브라스)", "크롬/실버", "무광 블랙", "로즈골드"],
-  detailWall: ["화이트 페인트", "노출 콘크리트", "웨인스코팅", "파스텔톤 벽지", "붉은 벽돌"],
+  detailFloor: ["밝은 우드 마루", "어두운 우드 마루", "테라조 타일", "대리석", "콘크리트", "조약돌 바닥", "자갈 바닥", "카펫", "포세린타일", "에폭시"],
+  detailWood: ["오크(참나무)", "월넛(호두나무)", "자작나무", "티크", "애쉬", "마호가니", "미송", "OBS", "합판"],
+  detailMetal: ["황동(브라스)", "크롬/실버", "무광 블랙", "유광 블랙", "로즈골드"],
+  detailWall: ["화이트 페인트", "노출 콘크리트", "웨인스코팅", "파스텔톤 벽지", "붉은 벽돌", "세라믹타일", "패널", "템바보드", "원목패널", "스틸패널", "스톤패널"],
   cameraAngle: ["선택안함", "정면", "하이앵글", "로우앵글", "아이레벨", "클로즈업", "버드아이 뷰", "웜즈아이 뷰", "더치 앵글", "초광각", "망원 샷", "풀 샷", "드론 샷"],
   shotStyle: [
     "컬러블로킹", "네거티브 스페이스", "하드 섀도우", "톤온톤-모노크로매틱", "플랫 레이", "매크로-디테일", "와비사비-어스톤", "모션 캡쳐-동적 연출",
     "인테리어 잡지 샷(사실적)", "와이드 건축/공간 샷", "인테리어 비네트(코너)", "라이프스타일 인테리어", "클로즈업 디테일", "심도 얕은 샷(아웃포커싱)"
   ],
-  aspectRatio: ["1:1 (Square)", "16:9 (Widescreen)", "4:3 (Standard)", "3:4 (Portrait)"]
+  aspectRatio: ["1:1 (Square)", "16:9 (Widescreen)", "4:3 (Standard)", "3:4 (Portrait)"],
+  country: ["선택안함", "한국", "일본", "동남아 휴양지", "미국", "독일", "이탈리아"]
 };
 
 export default function App() {
@@ -118,8 +120,12 @@ export default function App() {
     detailWall: "화이트 페인트",
     cameraAngle: "선택안함",
     shotStyle: [],
-    aspectRatio: "1:1 (Square)"
+    aspectRatio: "1:1 (Square)",
+    country: "선택안함",
+    brightness: 1.0,
+    useLight: true
   });
+  const [enableImageGeneration, setEnableImageGeneration] = useState(true);
   const [useDetailMaterial, setUseDetailMaterial] = useState(false);
   const [removeText, setRemoveText] = useState(true);
   const [generatedPrompt, setGeneratedPrompt] = useState("");
@@ -221,8 +227,9 @@ export default function App() {
       localStorage.setItem('shotmaker_config_v13', JSON.stringify(config));
       localStorage.setItem('shotmaker_useDetailMaterial_v13', useDetailMaterial);
       localStorage.setItem('shotmaker_removeText_v13', removeText);
+      localStorage.setItem('shotmaker_enableImageGeneration', enableImageGeneration);
     }
-  }, [config, useDetailMaterial, removeText, isLoading]);
+  }, [config, useDetailMaterial, removeText, enableImageGeneration, isLoading]);
 
   const handleConfigChange = (key, value) => {
     setConfig(prev => {
@@ -349,11 +356,30 @@ export default function App() {
   };
 
   const handleLoadTemplate = (template) => {
-    setConfig(template.config);
+    setConfig({
+      ...config, // Keep existing if missing in template
+      ...template.config
+    });
     setUseDetailMaterial(template.useDetailMaterial || false);
     setRemoveText(template.removeText !== undefined ? template.removeText : true);
     setGeneratedPrompt(template.prompt);
     setActiveTab('home');
+  };
+
+  const handleRenameTemplate = async (templateId, newName) => {
+    if (!isAdmin) {
+      triggerToast("수정 권한이 없습니다.");
+      return;
+    }
+    try {
+      const templateRef = doc(db, "templates", templateId);
+      await updateDoc(templateRef, { name: newName });
+      setSavedTemplates(prev => prev.map(t => t.id === templateId ? { ...t, name: newName } : t));
+      triggerToast("이름이 변경되었습니다.");
+    } catch (e) {
+      console.error("Error renaming template:", e);
+      triggerToast("변경 오류가 발생했습니다.");
+    }
   };
 
   const generatePrompt = () => {
@@ -384,6 +410,7 @@ export default function App() {
 
       let envStr = DICTIONARY.spaceType[config.spaceType];
       if (config.spaceDetail) envStr += `, ${DICTIONARY.spaceDetail[config.spaceDetail]}`;
+      if (config.country !== "선택안함") envStr += ` in ${DICTIONARY.country[config.country]}`;
       parts.push(`set in ${envStr}`);
       if (config.interiorStyle !== "선택안함") parts.push(`designed with ${DICTIONARY.interiorStyle[config.interiorStyle]}`);
 
@@ -397,7 +424,9 @@ export default function App() {
         parts.push(`highlighting ${materials.join(", ")}`);
       }
 
-      if (config.light !== "선택안함") parts.push(`illuminated by ${DICTIONARY.light[config.light]}`);
+      if (config.useLight && config.light !== "선택안함") {
+        parts.push(`illuminated by ${DICTIONARY.light[config.light]} with ${config.brightness} brightness`);
+      }
       if (config.cameraAngle !== "선택안함") parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
       if (config.shotStyle.length > 0) {
         const styles = config.shotStyle.map(s => DICTIONARY.shotStyle[s]);
@@ -762,6 +791,19 @@ export default function App() {
                   />
                 </div>
 
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '28px', borderBottom: '1px solid #E5E5EA' }}>
+                  <div>
+                    <label className="settings-prop-label">이미지 생성 기능</label>
+                    <p className="settings-desc-text">메인 화면에서 이미지 생성 버튼을 표시합니다.</p>
+                  </div>
+                  <IOSToggle
+                    label=""
+                    isOn={enableImageGeneration}
+                    onToggle={() => setEnableImageGeneration(!enableImageGeneration)}
+                    activeColor="#34C759"
+                  />
+                </div>
+
                 {/* Aspect Ratio Section */}
                 <div style={{ paddingTop: '28px', paddingBottom: '28px', borderBottom: '1px solid #E5E5EA' }}>
                   <label className="settings-prop-label">기본 이미지 비율</label>
@@ -973,6 +1015,8 @@ export default function App() {
                     <OptionSelect label="조명" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="green" />
 
                     <div className="mt-4 border-t border-gray-100">
+                      <OptionSelect label="국가/지역 (Country)" value={config.country} onChange={(v) => handleConfigChange('country', v)} options={OPTIONS_DATA.country} theme="green" />
+                      
                       <IOSToggle
                         label="세부 소재 및 컬러 (Materials)"
                         isOn={useDetailMaterial}
@@ -982,10 +1026,42 @@ export default function App() {
                       <AnimatePresence>
                         {useDetailMaterial && (
                           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="flex flex-col overflow-hidden">
-                            <OptionSelect label="바닥 타일/마루" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} theme="green" />
+                            <OptionSelect label="바닥 소재" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} theme="green" />
                             <OptionSelect label="우드 소재" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} theme="green" />
-                            <OptionSelect label="메탈 포인트" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} theme="green" />
-                            <OptionSelect label="벽 소재/컬러" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} theme="green" />
+                            <OptionSelect label="메탈 소재" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} theme="green" />
+                            <OptionSelect label="벽 소재/마감" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} theme="green" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    <div className="mt-4 border-t border-gray-100 pt-4">
+                      <IOSToggle
+                        label="조명 활성화"
+                        isOn={config.useLight}
+                        onToggle={() => handleConfigChange('useLight', !config.useLight)}
+                        activeColor="#FFD60A"
+                      />
+                      <AnimatePresence>
+                        {config.useLight && (
+                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                            <OptionSelect label="조명 스타일" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="yellow" />
+                            <div className="p-4 bg-gray-50 dark:bg-zinc-800 rounded-2xl mt-2">
+                              <div className="flex justify-between items-center mb-2">
+                                <label className="text-[11px] font-black text-gray-400 uppercase tracking-wider">Brightness (밝기)</label>
+                                <span className="text-[11px] font-black text-[#FFD60A]">{config.brightness}</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0.1"
+                                max="2.0"
+                                step="0.1"
+                                value={config.brightness}
+                                onChange={(e) => handleConfigChange('brightness', parseFloat(e.target.value))}
+                                className="w-full h-1 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer"
+                                style={{ accentColor: '#FFD60A' }}
+                              />
+                            </div>
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -1135,11 +1211,13 @@ export default function App() {
                 <div className="flex flex-wrap">
                   {Object.entries(config).map(([key, val]) => {
                     if (val === "선택안함" || val === "없음" || (Array.isArray(val) && val.length === 0)) return null;
+                    if (key === 'brightness' || key === 'useLight') return null; // Skip non-text values
                     if (Array.isArray(val)) {
                       return val.map(v => <span key={v} className="ios-summary-tag">{v}</span>);
                     }
                     return <span key={key} className="ios-summary-tag">{val}</span>;
                   })}
+                  {config.useLight && <span className="ios-summary-tag">조명: {config.brightness}</span>}
                   {removeText && <span className="ios-summary-tag">텍스트 제거</span>}
                 </div>
               </div>
@@ -1155,7 +1233,7 @@ export default function App() {
                   <span>{isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}</span>
                 </button>
 
-                {generatedPrompt && (selectedApi === 'google' ? googleApiKey : sdApiKey) && (
+                {generatedPrompt && (selectedApi === 'google' ? googleApiKey : sdApiKey) && enableImageGeneration && (
                   <button
                     onClick={() => {
                       if (!isAdmin) {
@@ -1290,6 +1368,7 @@ export default function App() {
                     setActiveTab('home');
                   }}
                   onDelete={handleDeleteTemplate}
+                  onRename={handleRenameTemplate}
                   onMoveRequest={(t) => setMoveTarget(t)}
                   categories={OPTIONS_DATA.spaceType}
                 />

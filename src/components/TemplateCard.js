@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Trash2, ArrowRight, ChevronDown, ChevronUp, FolderInput } from 'lucide-react';
+import { Trash2, ArrowRight, ChevronDown, ChevronUp, FolderInput, Edit2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export default function TemplateCard({ template, onLoad, onDelete, onMoveRequest, categories }) {
+export default function TemplateCard({ template, onLoad, onDelete, onRename, onMoveRequest, categories }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -30,6 +30,19 @@ export default function TemplateCard({ template, onLoad, onDelete, onMoveRequest
             <h4 className="font-bold text-[14px] text-black line-clamp-1">
               {template.name}
             </h4>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const newName = window.prompt("새로운 이름을 입력하세요:", template.name);
+                if (newName && newName !== template.name) {
+                  onRename(template.id, newName);
+                }
+              }}
+              className="p-1 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-black"
+              title="Rename"
+            >
+              <Edit2 size={12} />
+            </button>
           </div>
           <button 
             onClick={() => onMoveRequest(template)}
