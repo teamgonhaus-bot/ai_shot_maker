@@ -432,7 +432,7 @@ export default function App() {
     setIsImageGenerating(true);
     
     try {
-      console.log("🚀 Generating with Stable Diffusion (Blob Streaming)...");
+      console.log("🚀 Generating with Stable Diffusion (v0.4 Stable Logic)...");
       const response = await fetch(
         "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5",
         {
@@ -445,12 +445,10 @@ export default function App() {
         }
       );
 
-      if (!response.ok) {
-        throw new Error(`SD API Error: ${response.status}`);
-      }
-
-      const blob = await response.blob();
-      const imageUrl = URL.createObjectURL(blob);
+      if (!response.ok) throw new Error('Network response was not ok');
+      
+      const blob = await response.blob(); 
+      const imageUrl = URL.createObjectURL(blob); 
       setGeneratedImage(imageUrl);
       triggerToast("SD 이미지 생성 완료!");
     } catch (e) {
@@ -1177,7 +1175,7 @@ export default function App() {
       </AnimatePresence>
 
       <footer className="ios-footer">
-        v0.4 | Developed by Gony
+        v0.4 Stable | Developed by Gony
       </footer>
       <div className="h-12"></div>
     </div>
