@@ -3,7 +3,7 @@ import {
   Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HfInference } from "@huggingface/inference";
+import { InferenceClient } from "@huggingface/inference";
 import { db, auth } from './firebase';
 import { collection, addDoc, deleteDoc, updateDoc, doc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { signInAnonymously, signOut } from 'firebase/auth';
@@ -436,19 +436,16 @@ export default function App() {
     setIsImageGenerating(true);
     
     try {
-      console.log("🚀 Generating with Hugging Face Inference (FLUX.1-schnell)...");
-      // HfInference instance creation with explicit token
-      const hf = new HfInference(hfToken);
+      console.log("🚀 Generating with Hugging Face Inference (FLUX.1-schnell via nscale)...");
+      // InferenceClient instance creation
+      const client = new InferenceClient(hfToken);
       
-      const blob = await hf.textToImage({
+      const blob = await client.textToImage({
         model: 'black-forest-labs/FLUX.1-schnell',
         inputs: promptToUse,
+        provider: "nscale",
         parameters: {
-          // Default inference, no specific provider mentioned as per request
-        },
-        headers: { 
-          "use_cache": "false",
-          "wait_for_model": "true"
+          num_inference_steps: 5
         }
       });
 
