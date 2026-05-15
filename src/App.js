@@ -38,12 +38,12 @@ const DICTIONARY = {
 
   spaceType: { "스튜디오": "a professional studio environment", "오피스": "a modern office space", "홈": "a cozy home interior", "리테일": "a retail commercial space", "라운지": "a luxury lounge area", "야외": "an outdoor setting" },
   spaceDetail: {
-    "단색 배경": "with a solid color background", "인테리어 세트장": "within a designed interior set",
-    "사무실": "in a standard office setup", "회의실": "in a formal meeting room", "중역실": "in an executive office suite", "오피스 라운지": "in a relaxed office lounge",
-    "리빙": "in a living room area", "다이닝": "in a dining room setting", "룸": "in a private room",
-    "카페": "in a trendy cafe", "식당": "in a modern restaurant", "쇼룸": "in a premium showroom",
-    "호텔 라운지": "in a luxury hotel lounge", "공항 라운지": "in a premium airport lounge",
-    "도심": "in a bustling city urban environment", "자연": "surrounded by natural scenery", "테라스": "on a scenic terrace"
+    "단색 배경": "with a solid color background", "인테리어 세트장": "within a designed interior set", "그라데이션 배경": "with a gradient background", "쇼케이스": "in a showcase display area",
+    "사무실": "in a standard office setup", "회의실": "in a formal meeting room", "중역실": "in an executive office suite", "오피스 라운지": "in a relaxed office lounge", "트레이닝룸": "in a training or lecture room", "공유오피스": "in a modern coworking space",
+    "리빙": "in a living room area", "다이닝": "in a dining room setting", "룸": "in a private room", "워크룸": "in a dedicated workroom or study", "베드룸": "in a comfortable bedroom setting", "테라스": "on a scenic terrace",
+    "카페": "in a trendy cafe", "식당": "in a modern restaurant", "쇼룸": "in a premium showroom", "로비": "in a grand lobby area", "쇼핑몰": "in a bustling shopping mall", "박람회": "at a professional exhibition or fair", "갤러리": "in a minimalist art gallery", "도서관": "in a quiet library environment", "강의실": "in a modern classroom",
+    "호텔 라운지": "in a luxury hotel lounge", "공항 라운지": "in a premium airport lounge", "쇼핑몰라운지": "in a shopping mall lounge area", "쇼케이스 라운지": "in a showcase lounge area",
+    "도심": "in a bustling city urban environment", "자연": "surrounded by natural scenery", "공원": "in a public park", "강가": "by a scenic riverside", "쇼핑가": "on a busy shopping street", "힙한곳": "in a trendy, hip neighborhood"
   },
   detailWall: { "화이트 페인트": "clean white painted walls", "노출 콘크리트": "exposed raw concrete walls", "웨인스코팅": "elegant wainscoted walls", "파스텔톤 벽지": "soft pastel wallpaper", "붉은 벽돌": "rustic red brick walls", "세라믹타일": "ceramic tiled walls", "패널": "paneled walls", "템바보드": "tambour board walls", "원목패널": "solid wood paneled walls", "스틸패널": "steel paneled walls", "스톤패널": "stone paneled walls" },
   interiorStyle: { "선택안함": "", "미드센추리 모던": "mid-century modern style", "모던 미니멀": "modern minimal style", "내추럴 우드": "natural wood interior style", "젠 스타일": "Zen-inspired style", "인더스트리얼": "industrial style", "스칸디나비안": "Scandinavian style", "플랜테리어": "planterior style with many indoor plants" },
@@ -125,7 +125,7 @@ export default function App() {
     brightness: 1.0,
     useLight: true
   });
-  const [enableImageGeneration, setEnableImageGeneration] = useState(true);
+  const [enableImageGeneration, setEnableImageGeneration] = useState(false);
   const [useDetailMaterial, setUseDetailMaterial] = useState(false);
   const [removeText, setRemoveText] = useState(true);
   const [generatedPrompt, setGeneratedPrompt] = useState("");
@@ -190,6 +190,9 @@ export default function App() {
     if (storedApi) setSelectedApi(storedApi);
     const storedSdKey = localStorage.getItem('shotmaker_sd_api_key');
     if (storedSdKey) setSdApiKey(storedSdKey);
+
+    const storedGen = localStorage.getItem('shotmaker_enableImageGeneration');
+    if (storedGen !== null) setEnableImageGeneration(storedGen === 'true');
 
     // 2. Firebase Initial Load (One-time fetch as requested)
     const fetchTemplates = async () => {
@@ -1267,13 +1270,21 @@ export default function App() {
                   {Object.entries(config).map(([key, val]) => {
                     if (val === "선택안함" || val === "없음" || (Array.isArray(val) && val.length === 0)) return null;
                     if (key === 'brightness' || key === 'useLight') return null; // Skip non-text values
+
+                    // Category Color Mapping
+                    let color = '#8E8E93'; // Default Gray
+                    if (key.startsWith('subject')) color = '#FF3B30'; // Red for Subject
+                    if (key.startsWith('space') || key === 'interiorStyle' || key === 'country') color = '#34C759'; // Green for Space/Style
+                    if (key.startsWith('camera') || key === 'shotStyle') color = '#007AFF'; // Blue for Camera (v0.45 Fix)
+                    if (key === 'light') color = '#FFD60A'; // Yellow for Light
+
                     if (Array.isArray(val)) {
-                      return val.map(v => <span key={v} className="ios-summary-tag">{v}</span>);
+                      return val.map(v => <span key={v} className="ios-summary-tag" style={{ backgroundColor: color }}>{v}</span>);
                     }
-                    return <span key={key} className="ios-summary-tag">{val}</span>;
+                    return <span key={key} className="ios-summary-tag" style={{ backgroundColor: color }}>{val}</span>;
                   })}
-                  {config.useLight && <span className="ios-summary-tag">조명: {config.brightness}</span>}
-                  {removeText && <span className="ios-summary-tag">텍스트 제거</span>}
+                  {config.useLight && <span className="ios-summary-tag" style={{ backgroundColor: '#FFD60A' }}>조명: {config.brightness}</span>}
+                  {removeText && <span className="ios-summary-tag" style={{ backgroundColor: '#AF52DE' }}>텍스트 제거</span>}
                 </div>
               </div>
 
@@ -1437,7 +1448,7 @@ export default function App() {
       </AnimatePresence>
 
       <footer className="ios-footer">
-        v0.44 Stable | Developed by Gony
+        v0.45 Stable | Developed by Gony
       </footer>
       <div className="h-12"></div>
     </div>
