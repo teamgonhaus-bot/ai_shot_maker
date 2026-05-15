@@ -434,7 +434,7 @@ export default function App() {
     
     try {
       console.log("🚀 Generating with Hugging Face Inference Library (v0.4 Stable)...");
-      const hf = new HfInference(sdApiKey);
+      const hf = new HfInference(sdApiKey?.trim());
       
       const blob = await hf.textToImage({
         model: 'black-forest-labs/FLUX.1-schnell',
@@ -447,13 +447,15 @@ export default function App() {
 
       const imageUrl = URL.createObjectURL(blob); 
       setGeneratedImage(imageUrl);
-      triggerToast("Hugging Face 이미지 생성 완료!");
+      triggerToast("Hugging Face (FLUX.1) 생성 성공!");
     } catch (e) {
       console.error("SD Generation Error:", e);
-      if (e.message?.includes('503') || e.message?.includes('loading')) {
+      if (e.message?.includes('401')) {
+        triggerToast("인증 오류 (401): 토큰이 올바르지 않거나 권한이 없습니다.");
+      } else if (e.message?.includes('503') || e.message?.includes('loading')) {
         triggerToast("모델 로딩 중 (30s)... 잠시 후 다시 시도해 주세요.");
       } else {
-        triggerToast(`SD 오류: ${e.message}`);
+        triggerToast(`Hugging Face 오류: ${e.message}`);
       }
     } finally {
       setIsImageGenerating(false);
@@ -713,8 +715,9 @@ export default function App() {
                 </div>
 
                 {/* Image Generation Engine */}
-                <div className="pt-10 mt-4 border-t border-gray-100 dark:border-gray-800">
-                  <label className="text-[18px] font-black text-black dark:text-white block mb-8 tracking-tight">Generate API</label>
+                <div className="pt-10 mt-6 border-t border-gray-100 dark:border-gray-800">
+                  <label className="settings-prop-label">Generate API</label>
+                  <p className="settings-desc-text mb-6">사용할 이미지 생성 AI 엔진을 선택하세요.</p>
                   
                   {/* Google Gemini Row */}
                   <div 
@@ -724,7 +727,7 @@ export default function App() {
                     <div className="engine-label">
                       <div className="engine-radio" />
                       <div className="flex flex-col">
-                        <span className="font-black text-[14px] text-black dark:text-white leading-none">Google AI</span>
+                        <span className="font-black text-[13px] text-black dark:text-white leading-none">Google AI</span>
                       </div>
                     </div>
                     <input 
@@ -750,8 +753,8 @@ export default function App() {
                     <div className="engine-label" style={{ width: '160px' }}>
                       <div className="engine-radio" />
                       <div className="flex flex-col">
-                        <span className="font-black text-[14px] text-black dark:text-white leading-none">Hugging Face</span>
-                        <span className="text-[10px] font-bold text-gray-400 mt-1">(FLUX.1)</span>
+                        <span className="font-black text-[13px] text-black dark:text-white leading-none">Hugging Face</span>
+                        <span className="text-[9px] font-bold text-gray-400 mt-1">(FLUX.1)</span>
                       </div>
                     </div>
                     <input 
@@ -1063,8 +1066,8 @@ export default function App() {
                 >  
                   <ImageIcon className="w-5 h-5 text-white" />
                   <span>
-                    {isImageGenerating ? (selectedApi === 'google' ? 'GENERATING WITH GEMINI...' : 'Stable Diffusion (Hugging Face) generating...') : 
-                     cooldownTime > 0 ? `COOLDOWN (${cooldownTime}s)` : `GENERATE WITH ${selectedApi === 'google' ? 'GEMINI' : 'STABLE DIFFUSION'}`}
+                    {isImageGenerating ? (selectedApi === 'google' ? 'GENERATING WITH GEMINI...' : 'GENERATING WITH FLUX.1...') : 
+                     cooldownTime > 0 ? `COOLDOWN (${cooldownTime}s)` : `GENERATE WITH ${selectedApi === 'google' ? 'GOOGLE AI' : 'HUGGING FACE'}`}
                   </span>
                 </button>
               )}
@@ -1072,7 +1075,9 @@ export default function App() {
               {isImageGenerating && (
                 <div className="result-card" style={{ marginTop: '32px', minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <div className="skeleton-pulse"></div>
-                  <p style={{ color: '#8E8E93', fontWeight: 600, zIndex: 1, position: 'relative' }}>Nano Banana 2 이미지 생성 중...</p>
+                  <p style={{ color: '#8E8E93', fontWeight: 600, zIndex: 1, position: 'relative' }}>
+                    {selectedApi === 'google' ? 'Google AI Generation...' : 'Hugging Face Generation...'}
+                  </p>
                 </div>
               )}
 
