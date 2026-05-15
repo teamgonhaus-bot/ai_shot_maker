@@ -80,16 +80,18 @@ export default function TemplateCard({ template, onLoad, onDelete, onMoveRequest
         {template.prompt && template.prompt.length > 80 && (
           <button 
             onClick={() => setIsExpanded(!isExpanded)}
-            className="ios-upload-capsule"
+            className="flex items-center justify-center transition-transform active:scale-95"
             style={{ 
-              padding: '6px 12px', 
+              padding: '6px 14px', 
               fontSize: '11px', 
-              height: 'auto', 
-              background: '#000', 
-              color: '#FFF', 
+              fontWeight: '700',
+              borderRadius: '9999px',
+              background: '#000000', 
+              color: '#FFFFFF', 
               border: 'none', 
-              boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-              marginTop: '4px'
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              whiteSpace: 'nowrap',
+              cursor: 'pointer'
             }}
           >
             <span>{isExpanded ? 'Close' : 'View All'}</span>
