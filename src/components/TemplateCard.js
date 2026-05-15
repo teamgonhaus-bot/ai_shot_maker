@@ -1,8 +1,10 @@
-import React from 'react';
-import { Trash2, ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { Trash2, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function TemplateCard({ template, onLoad, onDelete }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   return (
     <motion.div
       layout
@@ -28,9 +30,27 @@ export default function TemplateCard({ template, onLoad, onDelete }) {
             {template.name}
           </h4>
         </div>
-        <p className="text-[13px] font-medium text-gray-400 line-clamp-3 leading-relaxed mt-2">
-          {template.prompt}
-        </p>
+        
+        <div 
+          className="cursor-pointer group" 
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <motion.p 
+            layout
+            className={`text-[13px] font-medium text-gray-400 leading-relaxed mt-2 ${!isExpanded ? 'line-clamp-3' : ''}`}
+          >
+            {template.prompt}
+          </motion.p>
+          {template.prompt && template.prompt.length > 80 && (
+            <div className="flex items-center gap-1 mt-2 text-[11px] font-bold text-gray-300 group-hover:text-gray-500 transition-colors">
+              {isExpanded ? (
+                <><ChevronUp size={12} /> <span>접기</span></>
+              ) : (
+                <><ChevronDown size={12} /> <span>전체 보기</span></>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex justify-end gap-3 pt-4 px-4 pb-4 border-t border-gray-100 mt-2">

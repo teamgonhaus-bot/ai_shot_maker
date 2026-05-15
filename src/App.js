@@ -137,6 +137,8 @@ export default function App() {
   const [refImage, setRefImage] = useState(null); // { mimeType, data }
   const [useImageRef, setUseImageRef] = useState(false);
   const [lightboxImage, setLightboxImage] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [libraryFilter, setLibraryFilter] = useState('전체');
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
@@ -536,9 +538,9 @@ export default function App() {
       </AnimatePresence>
       </div>
 
-      {/* Settings Modal (Admin Only) */}
+      {/* Settings Modal */}
       <AnimatePresence>
-        {isSettingsOpen && isAdmin && (
+        {isSettingsOpen && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="settings-modal-overlay"
@@ -553,19 +555,56 @@ export default function App() {
                 <h3>Settings</h3>
                 <button onClick={() => setIsSettingsOpen(false)} className="close-btn"><X size={20}/></button>
               </div>
-              <div className="settings-body">
-                <label>Google AI API Key (Nano Banana 2)</label>
-                <input 
-                  type="password" 
-                  value={googleApiKey}
-                  onChange={(e) => {
-                    setGoogleApiKey(e.target.value);
-                    localStorage.setItem('shotmaker_api_key', e.target.value);
-                  }}
-                  placeholder="AIzaSy..."
-                  className="settings-input"
-                />
-                <p className="settings-hint">Nano Banana (gemini-2.5-flash-image) 이미지 생성에 사용됩니다. 브라우저에 안전하게 저장됩니다.</p>
+              <div className="settings-body space-y-4">
+                {/* Dark Mode */}
+                <div className="flex justify-between items-center pb-4 border-b border-gray-100">
+                  <div>
+                    <label className="text-[14px] font-bold text-black block mb-1">다크 모드</label>
+                    <p className="text-[11px] text-gray-500 m-0">앱 테마를 어둡게 변경합니다.</p>
+                  </div>
+                  <IOSToggle 
+                    label=""
+                    isOn={isDarkMode} 
+                    onToggle={() => setIsDarkMode(!isDarkMode)} 
+                    activeColor="#000000"
+                  />
+                </div>
+
+                {/* Aspect Ratio */}
+                <div className="pb-4 border-b border-gray-100">
+                  <label className="text-[14px] font-bold text-black block mb-2">기본 이미지 비율</label>
+                  <select 
+                    value={config.aspectRatio} 
+                    onChange={(e) => handleConfigChange('aspectRatio', e.target.value)}
+                    className="settings-input"
+                  >
+                    {OPTIONS_DATA.aspectRatio.map(ratio => (
+                      <option key={ratio} value={ratio}>{ratio}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* API Key */}
+                <div>
+                  <label className="text-[14px] font-bold text-black block mb-2 flex items-center">
+                    Google AI API Key
+                    {!isAdmin && <span className="ml-2 text-red-500 text-xs font-normal">🔒 로그인이 필요합니다</span>}
+                  </label>
+                  <input 
+                    type="password" 
+                    value={googleApiKey}
+                    onChange={(e) => {
+                      if (!isAdmin) return;
+                      setGoogleApiKey(e.target.value);
+                      localStorage.setItem('shotmaker_api_key', e.target.value);
+                    }}
+                    placeholder={isAdmin ? "AIzaSy..." : "관리자 로그인 후 입력 가능"}
+                    className="settings-input"
+                    readOnly={!isAdmin}
+                    style={{ opacity: isAdmin ? 1 : 0.6, cursor: isAdmin ? 'text' : 'not-allowed', marginTop: '4px' }}
+                  />
+                  <p className="settings-hint mt-2">Nano Banana (gemini-2.5-flash-image) 생성용 키입니다.</p>
+                </div>
               </div>
             </motion.div>
           </motion.div>
@@ -573,33 +612,20 @@ export default function App() {
       </AnimatePresence>
 
       <header className="app-header">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          <h1 className="text-2xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest m-0">v0.3 Powered by Nano Banana 2</p>
-        </div>
+        <h1 className="text-2xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
         <div className="flex items-center gap-3">
+          <div className="header-nav">
+            <button className={`header-nav-btn ${activeTab === 'home' ? 'active' : 'inactive'}`} onClick={() => setActiveTab('home')}>Create</button>
+            <button className={`header-nav-btn ${activeTab === 'library' ? 'active' : 'inactive'}`} onClick={() => setActiveTab('library')}>Library</button>
+          </div>
           <button 
-            onClick={() => setIsDarkMode(!isDarkMode)}
+            onClick={() => setIsSettingsOpen(true)}
             className="ios-card-icon-btn"
-            title="Toggle Dark Mode"
+            title="Settings"
             style={{ width: '30px', height: '30px', fontSize: '14px' }}
           >
-            {isDarkMode ? '☀️' : '🌙'}
+            ⚙️
           </button>
-          {isAdmin && (
-            <button 
-              onClick={() => setIsSettingsOpen(true)}
-              className="ios-card-icon-btn"
-              title="Settings (Admin)"
-              style={{ width: '30px', height: '30px', fontSize: '14px' }}
-            >
-              ⚙️
-            </button>
-          )}
-          <div className="header-nav">
-            <button className={`header-nav-btn ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>Create</button>
-            <button className={`header-nav-btn ${activeTab === 'library' ? 'active' : ''}`} onClick={() => setActiveTab('library')}>Library</button>
-          </div>
           <button 
             onClick={isAdmin ? handleLogout : handleLogin}
             className="ios-pill"
@@ -692,7 +718,26 @@ export default function App() {
                       />
                       
                       {useImageRef && (
-                        <div className="ios-upload-zone">
+                        <div 
+                          className={`ios-upload-zone ${isDragging ? 'dragging' : ''}`}
+                          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                          onDragLeave={() => setIsDragging(false)}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            setIsDragging(false);
+                            const file = e.dataTransfer.files[0];
+                            if (file && file.type.startsWith('image/')) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                setRefImage({
+                                  mimeType: file.type,
+                                  data: reader.result.split(',')[1]
+                                });
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        >
                           <input 
                             type="file" 
                             accept="image/*" 
@@ -714,11 +759,14 @@ export default function App() {
                           />
                           {!refImage ? (
                             <label htmlFor="ref-image-upload" className="ios-upload-placeholder">
-                              <span className="text-2xl mb-1">📸</span>
-                              <span className="text-xs font-semibold text-gray-500">참조 이미지 업로드</span>
+                              <div className="ios-upload-capsule">
+                                <span className="text-xl mr-2">📸</span>
+                                <span className="text-sm font-bold text-gray-700">참조 이미지 업로드</span>
+                              </div>
+                              <p className="text-[10px] text-gray-400 mt-3 font-semibold">또는 여기에 이미지를 드래그 & 드롭하세요</p>
                             </label>
                           ) : (
-                            <div className="relative group">
+                            <div className="relative group w-full flex justify-center">
                               <img 
                                 src={`data:${refImage.mimeType};base64,${refImage.data}`} 
                                 alt="Ref Preview" 
@@ -745,7 +793,6 @@ export default function App() {
                       </div>
                     </div>
                     <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="purple" />
-                    <OptionSelect label="이미지 비율 (Aspect Ratio)" value={config.aspectRatio} onChange={(v) => handleConfigChange('aspectRatio', v)} options={OPTIONS_DATA.aspectRatio} theme="purple" />
                   </div>
                 </motion.section>
               )}
@@ -878,14 +925,28 @@ export default function App() {
             </div>
           </motion.div>
         ) : (
-          <motion.div key="library" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-6 relative">
+          <motion.div key="library" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-6 relative pb-20">
             <button className="ios-library-close" onClick={() => setActiveTab('home')}>
               <X size={18} strokeWidth={1.5} />
             </button>
             <h2 className="ios-section-title">Library</h2>
             
+            <div className="ios-category-tabs" style={{ marginTop: '0', marginBottom: '16px', overflowX: 'auto', whiteSpace: 'nowrap', padding: '4px' }}>
+              <button className={`category-tab ${libraryFilter === '전체' ? 'active' : ''}`} style={{ padding: '8px 12px' }} onClick={() => setLibraryFilter('전체')}>전체</button>
+              {OPTIONS_DATA.spaceType.map(space => (
+                <button 
+                  key={space} 
+                  className={`category-tab ${libraryFilter === space ? 'active' : ''}`} 
+                  style={{ padding: '8px 12px' }}
+                  onClick={() => setLibraryFilter(space)}
+                >
+                  {space}
+                </button>
+              ))}
+            </div>
+
             <div className="ios-library-grid">
-              {savedTemplates.map(template => (
+              {(libraryFilter === '전체' ? savedTemplates : savedTemplates.filter(t => t.config?.spaceType === libraryFilter)).map(template => (
                 <TemplateCard 
                   key={template.id} 
                   template={template} 
@@ -896,10 +957,10 @@ export default function App() {
                   onDelete={handleDeleteTemplate} 
                 />
               ))}
-              {savedTemplates.length === 0 && (
+              {(libraryFilter === '전체' ? savedTemplates : savedTemplates.filter(t => t.config?.spaceType === libraryFilter)).length === 0 && (
                 <div className="col-span-2 text-center py-20 bg-white rounded-3xl ios-shadow">
                   <LayoutTemplate className="w-12 h-12 text-gray-200 mb-4 mx-auto" />
-                  <p className="text-gray-400 font-bold m-0">Your library is empty</p>
+                  <p className="text-gray-400 font-bold m-0">No templates found</p>
                 </div>
               )}
             </div>
@@ -908,7 +969,7 @@ export default function App() {
       </AnimatePresence>
 
       <footer className="ios-footer">
-        v0.3 - Powered by Nano Banana 2 · AI Shot Maker
+        v0.4 | Developed by Gony
       </footer>
       <div className="h-12"></div>
     </div>
