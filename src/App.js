@@ -437,7 +437,7 @@ export default function App() {
       const hf = new HfInference(sdApiKey);
       
       const blob = await hf.textToImage({
-        model: 'runwayml/stable-diffusion-v1-5',
+        model: 'black-forest-labs/FLUX.1-schnell',
         inputs: promptToUse,
         headers: { 
           "use_cache": "false",
@@ -713,8 +713,8 @@ export default function App() {
                 </div>
 
                 {/* Image Generation Engine */}
-                <div className="pt-10 border-t border-gray-100 dark:border-gray-800">
-                  <label className="text-[18px] font-black text-black dark:text-white block mb-8 tracking-tight">Generation Engine & API Configuration</label>
+                <div className="pt-10 mt-4 border-t border-gray-100 dark:border-gray-800">
+                  <label className="text-[18px] font-black text-black dark:text-white block mb-8 tracking-tight">Generate API</label>
                   
                   {/* Google Gemini Row */}
                   <div 
@@ -724,8 +724,7 @@ export default function App() {
                     <div className="engine-label">
                       <div className="engine-radio" />
                       <div className="flex flex-col">
-                        <span className="font-black text-[14px] text-black dark:text-white leading-none">GOOGLE AI</span>
-                        <span className="text-[10px] font-bold text-gray-400 mt-1">GEMINI 2.5 FLASH</span>
+                        <span className="font-black text-[14px] text-black dark:text-white leading-none">Google AI</span>
                       </div>
                     </div>
                     <input 
@@ -748,11 +747,11 @@ export default function App() {
                     className={`engine-row ${selectedApi === 'stable-diffusion' ? 'active' : 'inactive'}`}
                     onClick={() => { setSelectedApi('stable-diffusion'); localStorage.setItem('shotmaker_selected_api', 'stable-diffusion'); }}
                   >
-                    <div className="engine-label">
+                    <div className="engine-label" style={{ width: '160px' }}>
                       <div className="engine-radio" />
                       <div className="flex flex-col">
-                        <span className="font-black text-[14px] text-black dark:text-white leading-none">HUGGING FACE</span>
-                        <span className="text-[10px] font-bold text-gray-400 mt-1">STABLE DIFFUSION</span>
+                        <span className="font-black text-[14px] text-black dark:text-white leading-none">Hugging Face</span>
+                        <span className="text-[10px] font-bold text-gray-400 mt-1">(FLUX.1)</span>
                       </div>
                     </div>
                     <input 

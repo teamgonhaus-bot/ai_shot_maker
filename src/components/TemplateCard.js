@@ -82,8 +82,8 @@ export default function TemplateCard({ template, onLoad, onDelete, onMoveRequest
             onClick={() => setIsExpanded(!isExpanded)}
             className="flex items-center justify-center transition-transform active:scale-95"
             style={{ 
-              padding: '6px 14px', 
-              fontSize: '11px', 
+              padding: '4px 10px', 
+              fontSize: '10px', 
               fontWeight: '700',
               borderRadius: '9999px',
               background: '#000000', 
@@ -91,11 +91,12 @@ export default function TemplateCard({ template, onLoad, onDelete, onMoveRequest
               border: 'none', 
               boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
               whiteSpace: 'nowrap',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              marginLeft: 'auto'
             }}
           >
             <span>{isExpanded ? 'Close' : 'View All'}</span>
-            {isExpanded ? <ChevronUp size={11} className="ml-1" /> : <ChevronDown size={11} className="ml-1" />}
+            {isExpanded ? <ChevronUp size={10} className="ml-1" /> : <ChevronDown size={10} className="ml-1" />}
           </button>
         )}
       </div>
