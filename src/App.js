@@ -711,7 +711,7 @@ export default function App() {
                 </div>
 
                 {/* Aspect Ratio */}
-                <div className="pb-8 border-b border-gray-100 dark:border-gray-800">
+                <div className="pb-4 border-b border-gray-100 dark:border-gray-800">
                   <label className="settings-prop-label">기본 이미지 비율</label>
                   <p className="settings-desc-text mb-4">생성될 이미지의 기본 가로세로 비율을 설정합니다.</p>
                   <select 
@@ -726,7 +726,7 @@ export default function App() {
                 </div>
 
                 {/* Image Generation Engine */}
-                <div className="pt-8">
+                <div className="pt-4">
                   <label className="settings-prop-label">Generate API</label>
                   <p className="settings-desc-text mb-6">사용할 이미지 생성 AI 엔진을 선택하세요.</p>
                   
