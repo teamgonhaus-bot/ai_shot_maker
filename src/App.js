@@ -436,25 +436,39 @@ export default function App() {
     setIsImageGenerating(true);
 
     try {
-      console.log("🚀 Validating HF Token and generating image...");
+      console.log("🚀 Validating HF Token...");
       if (!hfToken || hfToken.length < 10) {
-        console.error("❌ Invalid HF Token detected.");
+        console.error("❌ Invalid HF Token.");
         triggerToast("유효하지 않은 API 토큰입니다.");
         setIsImageGenerating(false);
         return;
       }
+      console.log("🚀 Calling HF Inference API (FLUX.1-schnell)...");
 
-      console.log("🚀 Generating with Hugging Face Inference (FLUX.1-schnell)...");
-      const client = new InferenceClient(hfToken.trim());
-      
-      const blob = await client.textToImage({
-        model: "black-forest-labs/FLUX.1-schnell",
-        inputs: promptToUse,
-        parameters: {
-          num_inference_steps: 4
+      const response = await fetch(
+        "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${hfToken.trim()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            inputs: promptToUse,
+            parameters: { num_inference_steps: 4 }
+          })
         }
-      });
+      );
 
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        console.error("❌ HF API Error:", response.status, errData);
+        if (response.status === 401) throw new Error("401: 토큰 권한을 확인하세요 (Inference 권한 필요)");
+        if (response.status === 503) throw new Error("503: 모델 로딩 중... 잠시 후 다시 시도하세요");
+        throw new Error(errData.error || `HTTP ${response.status}`);
+      }
+
+      const blob = await response.blob();
       const imageUrl = URL.createObjectURL(blob);
       setGeneratedImage(imageUrl);
       triggerToast("Hugging Face (FLUX.1) 생성 성공!");
@@ -717,13 +731,13 @@ export default function App() {
                 <div style={{ paddingTop: '28px', paddingBottom: '28px', borderBottom: '1px solid #E5E5EA' }}>
                   <label className="settings-prop-label">기본 이미지 비율</label>
                   <p className="settings-desc-text" style={{ marginBottom: '16px' }}>생성될 이미지의 기본 가로세로 비율을 설정합니다.</p>
-                  <div className="flex flex-wrap gap-2">
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                     {OPTIONS_DATA.aspectRatio.map(ratio => (
                       <button
                         key={ratio}
                         onClick={() => handleConfigChange('aspectRatio', ratio)}
                         className={`ios-pill-mini ${config.aspectRatio === ratio ? 'active' : ''}`}
-                        style={{ border: 'none', cursor: 'pointer' }}
+                        style={{ border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}
                       >
                         {ratio}
                       </button>
@@ -750,9 +764,7 @@ export default function App() {
                   >
                     <div className="engine-label">
                       <div className="engine-radio" />
-                      <div className="flex flex-col">
-                        <span className="font-black text-[0.8rem] text-black dark:text-white leading-none">Google AI</span>
-                      </div>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 900, color: 'inherit', whiteSpace: 'nowrap' }}>Google AI</span>
                     </div>
                     <input
                       type="password"
@@ -781,12 +793,9 @@ export default function App() {
                       localStorage.setItem('shotmaker_selected_api', 'stable-diffusion');
                     }}
                   >
-                    <div className="engine-label" style={{ width: '160px' }}>
+                    <div className="engine-label" style={{ width: 'auto', flexShrink: 0 }}>
                       <div className="engine-radio" />
-                      <div className="flex flex-col">
-                        <span className="font-black text-[0.8rem] text-black dark:text-white leading-none">Hugging Face</span>
-                        <span className="text-[9px] font-bold text-gray-400 mt-1">(FLUX.1)</span>
-                      </div>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 900, color: 'inherit', whiteSpace: 'nowrap' }}>Hugging Face</span>
                     </div>
                     <input
                       type="password"
