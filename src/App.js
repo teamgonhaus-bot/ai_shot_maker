@@ -1223,7 +1223,7 @@ export default function App() {
                       <AnimatePresence>
                         {config.useLight && (
                           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                            <OptionSelect label="조명 스타일" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="yellow" />
+                            <OptionSelect label="조명 스타일" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="purple" />
                             <div className="p-4 bg-gray-50 dark:bg-zinc-800 rounded-2xl mt-2">
                               <div className="flex justify-between items-center mb-2">
                                 <label className="text-[11px] font-black text-gray-400 uppercase tracking-wider">Brightness (밝기)</label>
@@ -1272,15 +1272,14 @@ export default function App() {
                     if (key.startsWith('subject')) color = '#FF3B30'; // Red for Subject
                     if (key.startsWith('space') || key === 'interiorStyle' || key === 'country') color = '#34C759'; // Green for Space
                     if (key.startsWith('camera')) color = '#007AFF'; // Blue for Camera
-                    if (key === 'shotStyle') color = '#AF52DE'; // Purple for Style
-                    if (key === 'light') color = '#FFD60A'; // Yellow for Light
+                    if (key === 'shotStyle' || key === 'light') color = '#AF52DE'; // Purple for Style (including Light)
 
                     if (Array.isArray(val)) {
                       return val.map(v => <span key={v} className="ios-summary-tag" style={{ backgroundColor: color }}>{v}</span>);
                     }
                     return <span key={key} className="ios-summary-tag" style={{ backgroundColor: color }}>{val}</span>;
                   })}
-                  {config.useLight && <span className="ios-summary-tag" style={{ backgroundColor: '#FFD60A' }}>조명: {config.brightness}</span>}
+                  {config.useLight && <span className="ios-summary-tag" style={{ backgroundColor: '#AF52DE' }}>조명: {config.brightness}</span>}
                   {removeText && <span className="ios-summary-tag" style={{ backgroundColor: '#AF52DE' }}>텍스트 제거</span>}
                 </div>
               </div>
