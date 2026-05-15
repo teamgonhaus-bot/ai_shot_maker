@@ -1172,7 +1172,6 @@ export default function App() {
                             )}
                           </div>
 
-                          {/* [INSTRUCTION 3] Img2Img Strength Slider UI */}
                           <div className="p-4 bg-gray-50 dark:bg-zinc-800 rounded-2xl border border-gray-100 dark:border-zinc-700">
                             <div className="flex justify-between items-center mb-2">
                               <label className="text-[11px] font-black text-gray-400 uppercase tracking-wider">Strength (변형 강도)</label>
@@ -1195,14 +1194,11 @@ export default function App() {
                           </div>
                         </div>
                       )}
-
-                      </div>
                     </div>
                     <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
                   </div>
                 </motion.section>
               )}
-
 
               {activeCategory === 'style' && (
                 <motion.section key="style" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
