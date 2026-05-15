@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, FolderInput 
+  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db, auth } from './firebase';
