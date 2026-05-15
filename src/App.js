@@ -441,11 +441,11 @@ export default function App() {
       const client = new InferenceClient(process.env.HF_TOKEN);
 
       const blob = await client.textToImage({
-        model: 'black-forest-labs/FLUX.1-schnell',
+        model: "black-forest-labs/FLUX.1-schnell",
         inputs: promptToUse,
         provider: "nscale",
         parameters: {
-          num_inference_steps: 5
+          num_inference_steps: 4
         }
       });
 
@@ -707,23 +707,24 @@ export default function App() {
                   />
                 </div>
 
-                {/* Aspect Ratio */}
-                <div className="pb-4 border-b border-gray-100 dark:border-gray-800">
+                <div className="pb-6 border-b border-gray-100 dark:border-gray-800">
                   <label className="settings-prop-label">기본 이미지 비율</label>
-                  <p className="settings-desc-text mb-4">생성될 이미지의 기본 가로세로 비율을 설정합니다.</p>
-                  <select
-                    value={config.aspectRatio}
-                    onChange={(e) => handleConfigChange('aspectRatio', e.target.value)}
-                    className="settings-input"
-                  >
+                  <p className="settings-desc-text mb-5">생성될 이미지의 기본 가로세로 비율을 설정합니다.</p>
+                  <div className="flex flex-wrap gap-2">
                     {OPTIONS_DATA.aspectRatio.map(ratio => (
-                      <option key={ratio} value={ratio}>{ratio}</option>
+                      <button
+                        key={ratio}
+                        onClick={() => handleConfigChange('aspectRatio', ratio)}
+                        className={`ios-pill-mini ${config.aspectRatio === ratio ? 'active' : ''}`}
+                        style={{ border: 'none', cursor: 'pointer' }}
+                      >
+                        {ratio}
+                      </button>
                     ))}
-                  </select>
+                  </div>
                 </div>
 
-                {/* Image Generation Engine */}
-                <div className="pt-8 mt-2 border-t border-gray-100 dark:border-gray-800">
+                <div className="pt-10 mt-4 border-t border-gray-100 dark:border-gray-800">
                   <label className="settings-prop-label">Generate API</label>
                   <p className="settings-desc-text mb-8">사용할 이미지 생성 AI 엔진을 선택하세요.</p>
 
@@ -742,7 +743,7 @@ export default function App() {
                     <div className="engine-label">
                       <div className="engine-radio" />
                       <div className="flex flex-col">
-                        <span className="font-black text-[0.85rem] text-black dark:text-white leading-none">Google AI</span>
+                        <span className="font-black text-[0.8rem] text-black dark:text-white leading-none">Google AI</span>
                       </div>
                     </div>
                     <input
@@ -775,7 +776,7 @@ export default function App() {
                     <div className="engine-label" style={{ width: '160px' }}>
                       <div className="engine-radio" />
                       <div className="flex flex-col">
-                        <span className="font-black text-[0.85rem] text-black dark:text-white leading-none">Hugging Face</span>
+                        <span className="font-black text-[0.8rem] text-black dark:text-white leading-none">Hugging Face</span>
                         <span className="text-[9px] font-bold text-gray-400 mt-1">(FLUX.1)</span>
                       </div>
                     </div>
@@ -1076,29 +1077,35 @@ export default function App() {
               </button>
 
               {generatedPrompt && (selectedApi === 'google' ? googleApiKey : sdApiKey) && (
-                <button
-                  onClick={() => {
-                    if (!isAdmin) {
-                      triggerToast("이미지 생성은 관리자 권한이 필요합니다.");
-                      return;
-                    }
-                    generateImage();
-                  }}
-                  disabled={isImageGenerating || cooldownTime > 0}
-                  className="generate-btn"
-                  style={{
-                    marginTop: '12px',
-                    background: (!isAdmin || isImageGenerating || cooldownTime > 0) ? '#48484A' : '#1C1C1E',
-                    cursor: (!isAdmin || isImageGenerating || cooldownTime > 0) ? 'not-allowed' : 'pointer',
-                    opacity: !isAdmin ? 0.7 : 1
-                  }}
-                >
-                  <ImageIcon className="w-5 h-5 text-white" />
-                  <span>
-                    {isImageGenerating ? (selectedApi === 'google' ? 'GENERATING WITH GEMINI...' : 'GENERATING WITH FLUX.1...') :
-                      cooldownTime > 0 ? `COOLDOWN (${cooldownTime}s)` : `GENERATE WITH ${selectedApi === 'google' ? 'GOOGLE AI' : 'HUGGING FACE'}`}
-                  </span>
-                </button>
+                <div className="flex flex-col items-center mt-3">
+                  <button
+                    onClick={() => {
+                      if (!isAdmin) {
+                        triggerToast("이미지 생성은 관리자 권한이 필요합니다.");
+                        return;
+                      }
+                      generateImage();
+                    }}
+                    disabled={isImageGenerating || cooldownTime > 0}
+                    className="generate-btn w-full"
+                    style={{
+                      background: (!isAdmin || isImageGenerating || cooldownTime > 0) ? '#48484A' : '#1C1C1E',
+                      cursor: (!isAdmin || isImageGenerating || cooldownTime > 0) ? 'not-allowed' : 'pointer',
+                      opacity: !isAdmin ? 0.7 : 1
+                    }}
+                  >
+                    <ImageIcon className="w-5 h-5 text-white" />
+                    <span>
+                      {isImageGenerating ? 'GENERATING...' :
+                        cooldownTime > 0 ? `COOLDOWN (${cooldownTime}s)` : 'GENERATE IMAGE'}
+                    </span>
+                  </button>
+                  <div className="mt-3 text-center">
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                      {selectedApi === 'google' ? 'Google AI Generation' : 'Hugging Face (FLUX.1) Generation'}
+                    </span>
+                  </div>
+                </div>
               )}
 
               {isImageGenerating && (

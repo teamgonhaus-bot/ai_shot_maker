@@ -1311,3 +1311,39 @@ body.dark-mode .ios-upload-capsule {
 .hidden {
   display: none !important;
 }
+
+/* =============================================
+   v0.4 NEW PILL MINI
+   ============================================= */
+.ios-pill-mini {
+  padding: 10px 18px !important;
+  border-radius: 9999px !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  background: #F2F2F7 !important;
+  color: #8E8E93 !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: none !important;
+}
+
+.ios-pill-mini.active {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
+  transform: translateY(-1px);
+}
+
+body.dark-mode .ios-pill-mini {
+  background: #2C2C2E !important;
+  color: #8E8E93 !important;
+}
+
+body.dark-mode .ios-pill-mini.active {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  box-shadow: 0 4px 15px rgba(255,255,255,0.2) !important;
+}
+
+.ios-pill-mini:active {
+  transform: scale(0.95);
+}
