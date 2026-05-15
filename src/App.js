@@ -436,14 +436,20 @@ export default function App() {
     setIsImageGenerating(true);
 
     try {
-      console.log("🚀 Generating with Hugging Face Inference (FLUX.1-schnell via nscale)...");
-      // InferenceClient instance creation
-      const client = new InferenceClient(process.env.HF_TOKEN);
+      console.log("🚀 Validating HF Token and generating image...");
+      if (!hfToken || hfToken.length < 10) {
+        console.error("❌ Invalid HF Token detected.");
+        triggerToast("유효하지 않은 API 토큰입니다.");
+        setIsImageGenerating(false);
+        return;
+      }
 
+      console.log("🚀 Generating with Hugging Face Inference (FLUX.1-schnell)...");
+      const client = new InferenceClient(hfToken.trim());
+      
       const blob = await client.textToImage({
         model: "black-forest-labs/FLUX.1-schnell",
         inputs: promptToUse,
-        provider: "nscale",
         parameters: {
           num_inference_steps: 4
         }
@@ -724,7 +730,8 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="pt-10 mt-4 border-t border-gray-100 dark:border-gray-800">
+                {/* Image Generation Engine Section Container */}
+                <div className="pt-10 mt-6 border-t border-gray-100 dark:border-gray-800">
                   <label className="settings-prop-label">Generate API</label>
                   <p className="settings-desc-text mb-8">사용할 이미지 생성 AI 엔진을 선택하세요.</p>
 
@@ -1067,17 +1074,18 @@ export default function App() {
                 </div>
               </div>
 
-              <button
-                onClick={generatePrompt}
-                disabled={isGenerating}
-                className="generate-btn"
-              >
-                <Wand2 className="w-5 h-5 text-white" />
-                <span>{isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}</span>
-              </button>
+              {/* Unified Button Container with 20px gap */}
+              <div className="flex flex-col gap-5">
+                <button
+                  onClick={generatePrompt}
+                  disabled={isGenerating}
+                  className="generate-btn"
+                >
+                  <Wand2 className="w-5 h-5 text-white" />
+                  <span>{isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}</span>
+                </button>
 
-              {generatedPrompt && (selectedApi === 'google' ? googleApiKey : sdApiKey) && (
-                <div className="flex flex-col items-center mt-3">
+                {generatedPrompt && (selectedApi === 'google' ? googleApiKey : sdApiKey) && (
                   <button
                     onClick={() => {
                       if (!isAdmin) {
@@ -1087,9 +1095,9 @@ export default function App() {
                       generateImage();
                     }}
                     disabled={isImageGenerating || cooldownTime > 0}
-                    className="generate-btn w-full"
+                    className="generate-btn w-full point-color"
                     style={{
-                      background: (!isAdmin || isImageGenerating || cooldownTime > 0) ? '#48484A' : '#1C1C1E',
+                      background: (!isAdmin || isImageGenerating || cooldownTime > 0) ? '#48484A' : undefined,
                       cursor: (!isAdmin || isImageGenerating || cooldownTime > 0) ? 'not-allowed' : 'pointer',
                       opacity: !isAdmin ? 0.7 : 1
                     }}
@@ -1100,13 +1108,8 @@ export default function App() {
                         cooldownTime > 0 ? `COOLDOWN (${cooldownTime}s)` : 'GENERATE IMAGE'}
                     </span>
                   </button>
-                  <div className="mt-3 text-center">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                      {selectedApi === 'google' ? 'Google AI Generation' : 'Hugging Face (FLUX.1) Generation'}
-                    </span>
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
 
               {isImageGenerating && (
                 <div className="result-card" style={{ marginTop: '32px', minHeight: '300px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>

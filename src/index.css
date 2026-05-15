@@ -1347,3 +1347,26 @@ body.dark-mode .ios-pill-mini.active {
 .ios-pill-mini:active {
   transform: scale(0.95);
 }
+
+/* =============================================
+   v0.42 POINT COLOR BUTTON
+   ============================================= */
+.generate-btn.point-color {
+  background: #1a2b4b !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 25px rgba(26, 43, 75, 0.25) !important;
+}
+
+.generate-btn.point-color:hover {
+  background: #243b66 !important;
+  box-shadow: 0 12px 30px rgba(26, 43, 75, 0.35) !important;
+}
+
+body.dark-mode .generate-btn.point-color {
+  background: #2C3E50 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+}
+
+.generate-btn.point-color:active {
+  transform: scale(0.96);
+}
