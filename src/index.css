@@ -1304,3 +1304,10 @@ body.dark-mode .ios-upload-capsule {
   align-items: center !important;
   justify-content: center !important;
 }
+
+/* =============================================
+   UTILITY
+   ============================================= */
+.hidden {
+  display: none !important;
+}

@@ -726,14 +726,21 @@ export default function App() {
                 </div>
 
                 {/* Image Generation Engine */}
-                <div className="pt-4">
+                <div className="pt-8 mt-2 border-t border-gray-100 dark:border-gray-800">
                   <label className="settings-prop-label">Generate API</label>
-                  <p className="settings-desc-text mb-6">사용할 이미지 생성 AI 엔진을 선택하세요.</p>
+                  <p className="settings-desc-text mb-8">사용할 이미지 생성 AI 엔진을 선택하세요.</p>
                   
                   {/* Google Gemini Row */}
                   <div 
-                    className={`engine-row ${selectedApi === 'google' ? 'active' : 'inactive'}`}
-                    onClick={() => { setSelectedApi('google'); localStorage.setItem('shotmaker_selected_api', 'google'); }}
+                    className={`engine-row ${selectedApi === 'google' ? 'active' : 'inactive'} ${!isAdmin ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'}`}
+                    onClick={() => { 
+                      if (!isAdmin) {
+                        triggerToast("관리자 로그인이 필요합니다.");
+                        return;
+                      }
+                      setSelectedApi('google'); 
+                      localStorage.setItem('shotmaker_selected_api', 'google'); 
+                    }}
                   >
                     <div className="engine-label">
                       <div className="engine-radio" />
@@ -758,8 +765,15 @@ export default function App() {
 
                   {/* Stable Diffusion Row */}
                   <div 
-                    className={`engine-row ${selectedApi === 'stable-diffusion' ? 'active' : 'inactive'}`}
-                    onClick={() => { setSelectedApi('stable-diffusion'); localStorage.setItem('shotmaker_selected_api', 'stable-diffusion'); }}
+                    className={`engine-row ${selectedApi === 'stable-diffusion' ? 'active' : 'inactive'} ${!isAdmin ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'}`}
+                    onClick={() => { 
+                      if (!isAdmin) {
+                        triggerToast("관리자 로그인이 필요합니다.");
+                        return;
+                      }
+                      setSelectedApi('stable-diffusion'); 
+                      localStorage.setItem('shotmaker_selected_api', 'stable-diffusion'); 
+                    }}
                   >
                     <div className="engine-label" style={{ width: '160px' }}>
                       <div className="engine-radio" />
@@ -987,7 +1001,7 @@ export default function App() {
                               <div className="upload-main-text">Image Upload</div>
                               <div className="upload-sub-text">Drag & Drop</div>
                               <div className="ios-upload-capsule">
-                                <span>참조 이미지 업로드</span>
+                                <span>파일 선택</span>
                               </div>
                             </label>
                           ) : (
@@ -1066,13 +1080,20 @@ export default function App() {
 
               {generatedPrompt && (selectedApi === 'google' ? googleApiKey : sdApiKey) && (
                 <button 
-                  onClick={() => generateImage()}
+                  onClick={() => {
+                    if (!isAdmin) {
+                      triggerToast("이미지 생성은 관리자 권한이 필요합니다.");
+                      return;
+                    }
+                    generateImage();
+                  }}
                   disabled={isImageGenerating || cooldownTime > 0}
                   className="generate-btn"
                   style={{ 
                     marginTop: '12px', 
-                    background: (isImageGenerating || cooldownTime > 0) ? '#48484A' : '#1C1C1E',
-                    cursor: (isImageGenerating || cooldownTime > 0) ? 'not-allowed' : 'pointer'
+                    background: (!isAdmin || isImageGenerating || cooldownTime > 0) ? '#48484A' : '#1C1C1E',
+                    cursor: (!isAdmin || isImageGenerating || cooldownTime > 0) ? 'not-allowed' : 'pointer',
+                    opacity: !isAdmin ? 0.7 : 1
                   }}
                 >  
                   <ImageIcon className="w-5 h-5 text-white" />
