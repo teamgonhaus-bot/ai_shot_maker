@@ -221,8 +221,8 @@ body {
    ============================================= */
 .template-grid {
   display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 12px !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 8px !important;
   margin-bottom: 24px !important;
 }
 
@@ -231,8 +231,8 @@ body {
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 16px 12px !important;
-  border-radius: 20px !important;
+  padding: 10px 4px !important;
+  border-radius: 14px !important;
   background-color: #FFFFFF !important;
   border: 1px solid rgba(0, 0, 0, 0.08) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
@@ -248,27 +248,31 @@ body {
 }
 
 .ios-smart-template-btn:hover {
-  border-color: rgba(0, 0, 0, 0.2) !important;
+  border-color: #D1D1D6 !important;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08) !important;
 }
 
 .ios-smart-template-btn.active {
-  background-color: #000000 !important;
-  border-color: #000000 !important;
+  background-color: #1C1C1E !important;
+  border-color: #1C1C1E !important;
   color: #FFFFFF !important;
 }
 
 .template-title {
-  font-size: 15px !important;
+  font-size: 12px !important;
   font-weight: 800 !important;
-  margin-bottom: 4px !important;
+  margin-bottom: 2px !important;
   letter-spacing: -0.01em !important;
+  text-align: center !important;
 }
 
 .template-desc {
-  font-size: 11px !important;
+  font-size: 9px !important;
   font-weight: 500 !important;
   color: #8E8E93 !important;
+  text-align: center !important;
+  line-height: 1.1 !important;
+  word-break: keep-all !important;
 }
 
 .ios-smart-template-btn.active .template-desc {

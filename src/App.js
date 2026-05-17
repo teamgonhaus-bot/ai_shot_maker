@@ -55,10 +55,10 @@ const DICTIONARY = {
   detailWood: { "오크(참나무)": "natural oak wood textures", "월넛(호두나무)": "rich walnut wood details", "자작나무": "birch wood accents", "티크": "premium teak wood", "애쉬": "with natural ash wood grain", "마호가니": "with rich mahogany wood finish", "미송": "with clean pine wood textures", "OBS": "with rugged OSB textures", "합판": "with minimalist plywood details" },
   detailMetal: { "황동(브라스)": "brushed brass metal points", "크롬/실버": "polished chrome silver accents", "무광 블랙": "matte black metal frames", "유광 블랙": "with polished glossy black metal", "로즈골드": "elegant rose gold details" },
 
+  copySpace: { "선택안함": "", "좌측 여백": "with ample empty copy space on the left side", "우측 여백": "with ample empty copy space on the right side" },
   cameraAngle: { "선택안함": "", "정면": "frontal shot", "미디움 샷": "medium shot", "하이앵글": "high-angle shot", "로우앵글": "low-angle shot", "아이레벨": "eye-level shot", "클로즈업": "close-up shot", "익스트림 클로즈업": "extreme close-up shot", "버드아이 뷰": "bird's eye view", "웜즈아이 뷰": "worm's eye view", "더치 앵글": "dutch angle shot", "초광각": "ultra-wide angle shot", "망원 샷": "telephoto lens shot", "풀 샷": "full body shot", "드론 샷": "aerial drone shot" },
   shotStyle: {
     "컬러블로킹": "color blocking aesthetic", "네거티브 스페이스": "negative space composition", "하드 섀도우": "hard shadows",
-    "카피스페이스 (좌측 여백)": "with empty copy space on the left", "카피스페이스 (우측 여백)": "with empty copy space on the right",
     "톤온톤-모노크로매틱": "tone-on-tone monochromatic palette", "플랫 레이": "flat lay perspective", "매크로-디테일": "macro detail shot",
     "와비사비-어스톤": "wabi-sabi earth tone aesthetic", "모션 캡쳐-동적 연출": "motion capture dynamic pose",
     "인테리어 잡지 샷(사실적)": "realistic interior magazine photography", "와이드 건축/공간 샷": "wide architectural space shot",
@@ -99,9 +99,10 @@ const OPTIONS_DATA = {
   detailWood: ["오크(참나무)", "월넛(호두나무)", "자작나무", "티크", "애쉬", "마호가니", "미송", "OBS", "합판"],
   detailMetal: ["황동(브라스)", "크롬/실버", "무광 블랙", "유광 블랙", "로즈골드"],
   detailWall: ["화이트 페인트", "노출 콘크리트", "웨인스코팅", "파스텔톤 벽지", "붉은 벽돌", "세라믹타일", "패널", "템바보드", "원목패널", "스틸패널", "스톤패널"],
+  copySpace: ["선택안함", "좌측 여백", "우측 여백"],
   cameraAngle: ["선택안함", "정면", "미디움 샷", "풀 샷", "하이앵글", "로우앵글", "아이레벨", "클로즈업", "익스트림 클로즈업", "버드아이 뷰", "웜즈아이 뷰", "더치 앵글", "초광각", "망원 샷", "드론 샷"],
   shotStyle: [
-    "컬러블로킹", "네거티브 스페이스", "하드 섀도우", "카피스페이스 (좌측 여백)", "카피스페이스 (우측 여백)", "톤온톤-모노크로매틱", "플랫 레이", "매크로-디테일", "와비사비-어스톤", "모션 캡쳐-동적 연출",
+    "컬러블로킹", "네거티브 스페이스", "하드 섀도우", "톤온톤-모노크로매틱", "플랫 레이", "매크로-디테일", "와비사비-어스톤", "모션 캡쳐-동적 연출",
     "인테리어 잡지 샷(사실적)", "와이드 건축/공간 샷", "인테리어 비네트(코너)", "라이프스타일 인테리어", "클로즈업 디테일", "심도 얕은 샷(아웃포커싱)"
   ],
   aspectRatio: ["1:1 (Square)", "16:9 (Widescreen)", "4:3 (Standard)", "3:4 (Portrait)", "4:5 (SNS)", "9:16 (Vertical)"],
@@ -133,6 +134,7 @@ export default function App() {
     detailMetal: "황동(브라스)",
     detailWall: "화이트 페인트",
     cameraAngle: "선택안함",
+    copySpace: "선택안함",
     shotStyle: [],
     aspectRatio: "1:1 (Square)",
     country: "선택안함",
@@ -272,17 +274,21 @@ export default function App() {
     let newConfig = { ...config };
     
     if (templateType === '타이틀씬') {
+      newConfig.subjectNum = '없음';
       newConfig.spaceType = '스튜디오';
       newConfig.spaceDetail = '그라데이션 배경';
       newConfig.cameraAngle = '풀 샷';
       newConfig.interiorStyle = '모던 미니멀';
     } else if (templateType === '디테일씬') {
+      newConfig.subjectNum = '없음';
       newConfig.spaceType = '스튜디오';
       newConfig.spaceDetail = '쇼케이스';
       newConfig.cameraAngle = '익스트림 클로즈업';
       newConfig.useLight = true;
       newConfig.light = '스포트라이트 조명';
     } else if (templateType === '인스타씬') {
+      if (newConfig.subjectNum === "없음") newConfig.subjectNum = "혼자";
+      newConfig.subjectAge = '20대';
       newConfig.aspectRatio = '1:1 (Square)';
       newConfig.spaceType = '야외';
       newConfig.spaceDetail = '힙한곳';
@@ -441,6 +447,17 @@ export default function App() {
     setIsGenerating(true);
     setTimeout(() => {
       const parts = [];
+      
+      if (activeTemplate === '타이틀씬') {
+        parts.push("Clean and organized studio style shot for title banner, product focus");
+      } else if (activeTemplate === '디테일씬') {
+        parts.push("Close-up detail shot highlighting texture of materials, product focus");
+      } else if (activeTemplate === '인스타씬') {
+        parts.push("Trendy Instagram snapshot style, emotional SNS aesthetic");
+      } else if (activeTemplate === '사용씬') {
+        parts.push("Commercial lifestyle usage scene emphasizing natural interaction in an everyday space");
+      }
+
       let subjectStr = "a high-end masterpiece";
 
       if (config.subjectNum !== "없음") {
@@ -511,6 +528,7 @@ export default function App() {
       if (config.useLight && config.light !== "선택안함") {
         parts.push(`illuminated by ${DICTIONARY.light[config.light]} with ${config.brightness} brightness`);
       }
+      if (config.copySpace && config.copySpace !== "선택안함") parts.push(DICTIONARY.copySpace[config.copySpace]);
       if (config.cameraAngle !== "선택안함") parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
       if (config.shotStyle.length > 0) {
         const styles = config.shotStyle.map(s => DICTIONARY.shotStyle[s]);
@@ -1325,6 +1343,7 @@ export default function App() {
                     </div>
                     <OptionSelect label="이미지 비율" value={config.aspectRatio} onChange={(v) => handleConfigChange('aspectRatio', v)} options={OPTIONS_DATA.aspectRatio} theme="blue" />
                     <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
+                    <OptionSelect label="화면 여백 (Copy Space)" value={config.copySpace || "선택안함"} onChange={(v) => handleConfigChange('copySpace', v)} options={OPTIONS_DATA.copySpace} theme="blue" />
                   </div>
                 </motion.section>
               )}
@@ -1580,7 +1599,7 @@ export default function App() {
       </AnimatePresence>
 
       <footer className="ios-footer">
-        v0.47 Stable | Developed by Gony
+        v0.48 Stable | Developed by Gony
       </footer>
       <div className="h-12"></div>
     </div>
