@@ -40,7 +40,7 @@ const DICTIONARY = {
 
   spaceType: { "스튜디오": "a professional studio environment", "오피스": "a modern office space", "홈": "a cozy home interior", "리테일": "a retail commercial space", "라운지": "a luxury lounge area", "야외": "an outdoor setting" },
   spaceDetail: {
-    "단색 배경": "with a solid color background", "인테리어 세트장": "within a designed interior set", "그라데이션 배경": "with a gradient background", "쇼케이스": "in a showcase display area",
+    "단색 배경": "with a solid color background", "인테리어 세트장": "within a designed interior set", "그라데이션 배경": "with a gradient background", "쇼케이스": "in a showcase display area", "크로마키 그린 배경": "with a chroma key green screen background",
     "사무실": "in a standard office setup", "회의실": "in a formal meeting room", "중역실": "in an executive office suite", "오피스 라운지": "in a relaxed office lounge", "트레이닝룸": "in a training or lecture room", "공유오피스": "in a modern coworking space",
     "리빙": "in a living room area", "다이닝": "in a dining room setting", "룸": "in a private room", "워크룸": "in a dedicated workroom or study", "베드룸": "in a comfortable bedroom setting", "테라스": "on a scenic terrace",
     "카페": "in a trendy cafe", "식당": "in a modern restaurant", "쇼룸": "in a premium showroom", "로비": "in a grand lobby area", "쇼핑몰": "in a bustling shopping mall", "박람회": "at a professional exhibition or fair", "갤러리": "in a minimalist art gallery", "도서관": "in a quiet library environment", "강의실": "in a modern classroom",
@@ -49,15 +49,16 @@ const DICTIONARY = {
   },
   detailWall: { "화이트 페인트": "clean white painted walls", "노출 콘크리트": "exposed raw concrete walls", "웨인스코팅": "elegant wainscoted walls", "파스텔톤 벽지": "soft pastel wallpaper", "붉은 벽돌": "rustic red brick walls", "세라믹타일": "ceramic tiled walls", "패널": "paneled walls", "템바보드": "tambour board walls", "원목패널": "solid wood paneled walls", "스틸패널": "steel paneled walls", "스톤패널": "stone paneled walls" },
   interiorStyle: { "선택안함": "", "미드센추리 모던": "mid-century modern style", "모던 미니멀": "modern minimal style", "내추럴 우드": "natural wood interior style", "젠 스타일": "Zen-inspired style", "인더스트리얼": "industrial style", "스칸디나비안": "Scandinavian style", "플랜테리어": "planterior style with many indoor plants" },
-  light: { "선택안함": "", "자연광": "natural sunlight", "시네마틱": "cinematic dramatic lighting", "스튜디오 조명": "professional studio softbox lighting", "무드등": "soft mood lighting" },
+  light: { "선택안함": "", "자연광": "natural sunlight", "시네마틱": "cinematic dramatic lighting", "스튜디오 조명": "professional studio softbox lighting", "스포트라이트 조명": "focused spotlight lighting", "무드등": "soft mood lighting" },
 
   detailFloor: { "밝은 우드 마루": "light wood flooring", "어두운 우드 마루": "dark walnut wood flooring", "테라조 타일": "modern terrazzo tile floor", "대리석": "premium marble flooring", "콘크리트": "polished concrete floor", "조약돌 바닥": "pebble stone floor", "자갈 바닥": "gravel floor", "카펫": "with cozy carpet texture", "포세린타일": "with polished porcelain tiles", "에폭시": "with industrial epoxy flooring" },
   detailWood: { "오크(참나무)": "natural oak wood textures", "월넛(호두나무)": "rich walnut wood details", "자작나무": "birch wood accents", "티크": "premium teak wood", "애쉬": "with natural ash wood grain", "마호가니": "with rich mahogany wood finish", "미송": "with clean pine wood textures", "OBS": "with rugged OSB textures", "합판": "with minimalist plywood details" },
   detailMetal: { "황동(브라스)": "brushed brass metal points", "크롬/실버": "polished chrome silver accents", "무광 블랙": "matte black metal frames", "유광 블랙": "with polished glossy black metal", "로즈골드": "elegant rose gold details" },
 
-  cameraAngle: { "선택안함": "", "정면": "frontal shot", "하이앵글": "high-angle shot", "로우앵글": "low-angle shot", "아이레벨": "eye-level shot", "클로즈업": "close-up shot", "버드아이 뷰": "bird's eye view", "웜즈아이 뷰": "worm's eye view", "더치 앵글": "dutch angle shot", "초광각": "ultra-wide angle shot", "망원 샷": "telephoto lens shot", "풀 샷": "full body shot", "드론 샷": "aerial drone shot" },
+  cameraAngle: { "선택안함": "", "정면": "frontal shot", "미디움 샷": "medium shot", "하이앵글": "high-angle shot", "로우앵글": "low-angle shot", "아이레벨": "eye-level shot", "클로즈업": "close-up shot", "익스트림 클로즈업": "extreme close-up shot", "버드아이 뷰": "bird's eye view", "웜즈아이 뷰": "worm's eye view", "더치 앵글": "dutch angle shot", "초광각": "ultra-wide angle shot", "망원 샷": "telephoto lens shot", "풀 샷": "full body shot", "드론 샷": "aerial drone shot" },
   shotStyle: {
     "컬러블로킹": "color blocking aesthetic", "네거티브 스페이스": "negative space composition", "하드 섀도우": "hard shadows",
+    "카피스페이스 (좌측 여백)": "with empty copy space on the left", "카피스페이스 (우측 여백)": "with empty copy space on the right",
     "톤온톤-모노크로매틱": "tone-on-tone monochromatic palette", "플랫 레이": "flat lay perspective", "매크로-디테일": "macro detail shot",
     "와비사비-어스톤": "wabi-sabi earth tone aesthetic", "모션 캡쳐-동적 연출": "motion capture dynamic pose",
     "인테리어 잡지 샷(사실적)": "realistic interior magazine photography", "와이드 건축/공간 샷": "wide architectural space shot",
@@ -85,7 +86,7 @@ const OPTIONS_DATA = {
   subjectHair: ["선택안함", "긴머리", "짧은머리", "단발", "펌", "염색", "묶은머리"],
   spaceType: ["스튜디오", "오피스", "홈", "리테일", "라운지", "야외"],
   spaceDetail: {
-    "스튜디오": ["단색 배경", "인테리어 세트장", "그라데이션 배경", "쇼케이스"],
+    "스튜디오": ["단색 배경", "인테리어 세트장", "그라데이션 배경", "쇼케이스", "크로마키 그린 배경"],
     "오피스": ["사무실", "회의실", "중역실", "오피스 라운지", "트레이닝룸", "공유오피스"],
     "홈": ["리빙", "다이닝", "룸", "워크룸", "베드룸", "테라스"],
     "리테일": ["카페", "식당", "쇼룸", "로비", "쇼핑몰", "박람회", "갤러리", "도서관", "강의실"],
@@ -93,17 +94,17 @@ const OPTIONS_DATA = {
     "야외": ["도심", "자연", "테라스", "공원", "강가", "쇼핑가", "힙한곳"]
   },
   interiorStyle: ["선택안함", "미드센추리 모던", "모던 미니멀", "내추럴 우드", "젠 스타일", "인더스트리얼", "스칸디나비안", "플랜테리어"],
-  light: ["선택안함", "자연광", "시네마틱", "스튜디오 조명", "무드등"],
+  light: ["선택안함", "자연광", "시네마틱", "스튜디오 조명", "스포트라이트 조명", "무드등"],
   detailFloor: ["밝은 우드 마루", "어두운 우드 마루", "테라조 타일", "대리석", "콘크리트", "조약돌 바닥", "자갈 바닥", "카펫", "포세린타일", "에폭시"],
   detailWood: ["오크(참나무)", "월넛(호두나무)", "자작나무", "티크", "애쉬", "마호가니", "미송", "OBS", "합판"],
   detailMetal: ["황동(브라스)", "크롬/실버", "무광 블랙", "유광 블랙", "로즈골드"],
   detailWall: ["화이트 페인트", "노출 콘크리트", "웨인스코팅", "파스텔톤 벽지", "붉은 벽돌", "세라믹타일", "패널", "템바보드", "원목패널", "스틸패널", "스톤패널"],
-  cameraAngle: ["선택안함", "정면", "하이앵글", "로우앵글", "아이레벨", "클로즈업", "버드아이 뷰", "웜즈아이 뷰", "더치 앵글", "초광각", "망원 샷", "풀 샷", "드론 샷"],
+  cameraAngle: ["선택안함", "정면", "미디움 샷", "풀 샷", "하이앵글", "로우앵글", "아이레벨", "클로즈업", "익스트림 클로즈업", "버드아이 뷰", "웜즈아이 뷰", "더치 앵글", "초광각", "망원 샷", "드론 샷"],
   shotStyle: [
-    "컬러블로킹", "네거티브 스페이스", "하드 섀도우", "톤온톤-모노크로매틱", "플랫 레이", "매크로-디테일", "와비사비-어스톤", "모션 캡쳐-동적 연출",
+    "컬러블로킹", "네거티브 스페이스", "하드 섀도우", "카피스페이스 (좌측 여백)", "카피스페이스 (우측 여백)", "톤온톤-모노크로매틱", "플랫 레이", "매크로-디테일", "와비사비-어스톤", "모션 캡쳐-동적 연출",
     "인테리어 잡지 샷(사실적)", "와이드 건축/공간 샷", "인테리어 비네트(코너)", "라이프스타일 인테리어", "클로즈업 디테일", "심도 얕은 샷(아웃포커싱)"
   ],
-  aspectRatio: ["1:1 (Square)", "16:9 (Widescreen)", "4:3 (Standard)", "3:4 (Portrait)"],
+  aspectRatio: ["1:1 (Square)", "16:9 (Widescreen)", "4:3 (Standard)", "3:4 (Portrait)", "4:5 (SNS)", "9:16 (Vertical)"],
   country: ["선택안함", "한국", "일본", "동남아 휴양지", "미국", "독일", "이탈리아"]
 };
 
@@ -161,6 +162,7 @@ export default function App() {
   const [isUpscaling, setIsUpscaling] = useState(false);
   const [cooldownTime, setCooldownTime] = useState(0);
   const [activeCategory, setActiveCategory] = useState('subject');
+  const [activeTemplate, setActiveTemplate] = useState(null);
 
   // Image-to-Image & Lightbox states
   const [refImage, setRefImage] = useState(null); // { mimeType, data }
@@ -252,6 +254,7 @@ export default function App() {
   }, [config, useDetailMaterial, removeText, enableImageGeneration, isLoading]);
 
   const handleConfigChange = (key, value) => {
+    setActiveTemplate(null);
     setConfig(prev => {
       const next = { ...prev, [key]: value };
       if (key === 'spaceType') next.spaceDetail = OPTIONS_DATA.spaceDetail[value][0];
@@ -262,6 +265,37 @@ export default function App() {
       return next;
     });
     setIsSaved(false); // Reset complete state on option change
+  };
+
+  const handleSmartTemplate = (templateType) => {
+    setActiveTemplate(templateType);
+    let newConfig = { ...config };
+    
+    if (templateType === '타이틀씬') {
+      newConfig.spaceType = '스튜디오';
+      newConfig.spaceDetail = '그라데이션 배경';
+      newConfig.cameraAngle = '풀 샷';
+      newConfig.interiorStyle = '모던 미니멀';
+    } else if (templateType === '디테일씬') {
+      newConfig.spaceType = '스튜디오';
+      newConfig.spaceDetail = '쇼케이스';
+      newConfig.cameraAngle = '익스트림 클로즈업';
+      newConfig.useLight = true;
+      newConfig.light = '스포트라이트 조명';
+    } else if (templateType === '인스타씬') {
+      newConfig.aspectRatio = '1:1 (Square)';
+      newConfig.spaceType = '야외';
+      newConfig.spaceDetail = '힙한곳';
+      newConfig.interiorStyle = '플랜테리어';
+    } else if (templateType === '사용씬') {
+      if (newConfig.subjectNum === "없음") newConfig.subjectNum = "혼자";
+      newConfig.spaceType = '홈';
+      newConfig.spaceDetail = '워크룸';
+      newConfig.cameraAngle = '미디움 샷';
+    }
+    
+    setConfig(newConfig);
+    setIsSaved(false);
   };
 
   const hashPassword = async (password) => {
@@ -628,7 +662,9 @@ export default function App() {
         "1:1 (Square)": "1:1",
         "16:9 (Widescreen)": "16:9",
         "4:3 (Standard)": "4:3",
-        "3:4 (Portrait)": "3:4"
+        "3:4 (Portrait)": "3:4",
+        "4:5 (SNS)": "4:5",
+        "9:16 (Vertical)": "9:16"
       };
       const apiRatio = ratioMap[config.aspectRatio] || "1:1";
 
@@ -905,24 +941,6 @@ export default function App() {
                   />
                 </div>
 
-                {/* Aspect Ratio Section */}
-                <div style={{ paddingTop: '28px', paddingBottom: '28px', borderBottom: '1px solid #E5E5EA' }}>
-                  <label className="settings-prop-label">기본 이미지 비율</label>
-                  <p className="settings-desc-text" style={{ marginBottom: '16px' }}>생성될 이미지의 기본 가로세로 비율을 설정합니다.</p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                    {OPTIONS_DATA.aspectRatio.map(ratio => (
-                      <button
-                        key={ratio}
-                        onClick={() => handleConfigChange('aspectRatio', ratio)}
-                        className={`ios-pill-mini ${config.aspectRatio === ratio ? 'active' : ''}`}
-                        style={{ border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}
-                      >
-                        {ratio}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
                 {/* Generate API Section */}
                 <div style={{ paddingTop: '32px', marginTop: '4px' }}>
                   <label className="settings-prop-label">Generate API</label>
@@ -1071,6 +1089,26 @@ export default function App() {
       <AnimatePresence mode="wait">
         {activeTab === 'home' ? (
           <motion.div key="home" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-12">
+
+            {/* Smart Templates */}
+            <div className="template-grid">
+              <button className={`ios-smart-template-btn ${activeTemplate === '타이틀씬' ? 'active' : ''}`} onClick={() => handleSmartTemplate('타이틀씬')}>
+                <div className="template-title">타이틀씬</div>
+                <div className="template-desc">스튜디오 + 그라데이션</div>
+              </button>
+              <button className={`ios-smart-template-btn ${activeTemplate === '디테일씬' ? 'active' : ''}`} onClick={() => handleSmartTemplate('디테일씬')}>
+                <div className="template-title">디테일씬</div>
+                <div className="template-desc">쇼케이스 + 클로즈업</div>
+              </button>
+              <button className={`ios-smart-template-btn ${activeTemplate === '인스타씬' ? 'active' : ''}`} onClick={() => handleSmartTemplate('인스타씬')}>
+                <div className="template-title">인스타씬</div>
+                <div className="template-desc">1:1 SNS + 플랜테리어</div>
+              </button>
+              <button className={`ios-smart-template-btn ${activeTemplate === '사용씬' ? 'active' : ''}`} onClick={() => handleSmartTemplate('사용씬')}>
+                <div className="template-title">사용씬</div>
+                <div className="template-desc">인물 포함 라이프스타일</div>
+              </button>
+            </div>
 
             {/* Category Tabs */}
             <div className="ios-category-tabs">
@@ -1285,6 +1323,7 @@ export default function App() {
                         </div>
                       )}
                     </div>
+                    <OptionSelect label="이미지 비율" value={config.aspectRatio} onChange={(v) => handleConfigChange('aspectRatio', v)} options={OPTIONS_DATA.aspectRatio} theme="blue" />
                     <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
                   </div>
                 </motion.section>
@@ -1541,7 +1580,7 @@ export default function App() {
       </AnimatePresence>
 
       <footer className="ios-footer">
-        v0.46 Stable | Developed by Gony
+        v0.47 Stable | Developed by Gony
       </footer>
       <div className="h-12"></div>
     </div>
