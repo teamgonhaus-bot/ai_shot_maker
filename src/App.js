@@ -28,11 +28,13 @@ const DICTIONARY = {
   subjectGender: { "선택안함": "", "여성": "female", "남성": "male", "혼성": "mixed gender" },
   subjectAge: { "선택안함": "", "10대": "teenager", "20대": "in their 20s", "30대": "in their 30s", "40대": "in their 40s", "중장년": "middle-aged" },
   subjectRegion: { "선택안함": "", "한국": "Korean", "일본": "Japanese", "북유럽": "Northern European", "북미": "North American" },
+  subjectAction: { "선택안함": "", "기본": "posing naturally", "차분함": "with a calm demeanor", "활발함": "with energetic and active movement", "공간에 어울리게": "interacting naturally with the surrounding space" },
   subjectClothesStyle: { "선택안함": "", "캐주얼": "casual style", "비즈니스": "business style", "스트릿": "streetwear style", "미니멀": "minimalist style", "포멀/정장": "formal suit style" },
-  subjectClothesType: {
-    "선택안함": "", "기본 스커트": "wearing a basic skirt", "미니스커트": "wearing a miniskirt", "롱스커트": "wearing a long skirt",
-    "긴바지": "wearing long pants", "반바지": "wearing shorts", "원피스": "wearing a dress",
-    "아웃도어": "wearing outdoor apparel", "스포츠 복장": "wearing sportswear"
+  subjectClothesTop: {
+    "선택안함": "", "반팔티": "wearing a short sleeve t-shirt", "긴팔티": "wearing a long sleeve t-shirt", "자켓": "wearing a jacket", "아우터": "wearing outerwear", "원피스": "wearing a dress", "스포츠 복장": "wearing sportswear", "아웃도어": "wearing outdoor apparel"
+  },
+  subjectClothesBottom: {
+    "선택안함": "", "기본 스커트": "with a basic skirt", "미니스커트": "with a miniskirt", "롱스커트": "with a long skirt", "긴바지": "with long pants", "반바지": "with shorts"
   },
   subjectHair: { "선택안함": "", "긴머리": "with long hair", "짧은머리": "with short hair", "단발": "with bob hair", "펌": "with permed hair", "염색": "with dyed hair", "묶은머리": "with tied hair" },
 
@@ -70,10 +72,15 @@ const OPTIONS_DATA = {
   subjectGender: ["선택안함", "여성", "남성", "혼성"],
   subjectAge: ["선택안함", "10대", "20대", "30대", "40대", "중장년"],
   subjectRegion: ["선택안함", "한국", "일본", "북유럽", "북미"],
+  subjectAction: ["선택안함", "기본", "차분함", "활발함", "공간에 어울리게"],
   subjectClothesStyle: ["선택안함", "캐주얼", "비즈니스", "스트릿", "미니멀", "포멀/정장"],
-  subjectClothesType: {
-    female: ["선택안함", "기본 스커트", "미니스커트", "롱스커트", "긴바지", "반바지", "원피스", "아웃도어", "스포츠 복장"],
-    others: ["선택안함", "긴바지", "반바지", "아웃도어", "스포츠 복장"]
+  subjectClothesTop: {
+    female: ["선택안함", "반팔티", "긴팔티", "자켓", "아우터", "원피스", "스포츠 복장", "아웃도어"],
+    male: ["선택안함", "반팔티", "긴팔티", "자켓", "아우터", "스포츠 복장", "아웃도어"]
+  },
+  subjectClothesBottom: {
+    female: ["선택안함", "기본 스커트", "미니스커트", "롱스커트", "긴바지", "반바지"],
+    male: ["선택안함", "긴바지", "반바지"]
   },
   subjectHair: ["선택안함", "긴머리", "짧은머리", "단발", "펌", "염색", "묶은머리"],
   spaceType: ["스튜디오", "오피스", "홈", "리테일", "라운지", "야외"],
@@ -107,8 +114,14 @@ export default function App() {
     subjectGender: "선택안함",
     subjectAge: "선택안함",
     subjectRegion: "선택안함",
+    subjectAction: "기본",
     subjectClothesStyle: "선택안함",
-    subjectClothesType: "선택안함",
+    subjectClothesTop: "선택안함",
+    subjectClothesBottom: "선택안함",
+    femaleClothesTop: "선택안함",
+    femaleClothesBottom: "선택안함",
+    maleClothesTop: "선택안함",
+    maleClothesBottom: "선택안함",
     subjectHair: "선택안함",
     spaceType: "스튜디오",
     spaceDetail: "단색 배경",
@@ -242,8 +255,9 @@ export default function App() {
     setConfig(prev => {
       const next = { ...prev, [key]: value };
       if (key === 'spaceType') next.spaceDetail = OPTIONS_DATA.spaceDetail[value][0];
-      if (key === 'subjectGender' && value !== '여성' && !OPTIONS_DATA.subjectClothesType.others.includes(prev.subjectClothesType)) {
-        next.subjectClothesType = "선택안함";
+      if (key === 'subjectGender') {
+        if (value === '남성' && !OPTIONS_DATA.subjectClothesTop.male.includes(prev.subjectClothesTop)) next.subjectClothesTop = "선택안함";
+        if (value === '남성' && !OPTIONS_DATA.subjectClothesBottom.male.includes(prev.subjectClothesBottom)) next.subjectClothesBottom = "선택안함";
       }
       return next;
     });
@@ -407,10 +421,39 @@ export default function App() {
         const details = [];
         if (config.subjectHair !== "선택안함") details.push(DICTIONARY.subjectHair[config.subjectHair]);
         if (config.subjectClothesStyle !== "선택안함") details.push(DICTIONARY.subjectClothesStyle[config.subjectClothesStyle]);
-        if (config.subjectClothesType !== "선택안함") details.push(DICTIONARY.subjectClothesType[config.subjectClothesType]);
+        
+        if (config.subjectGender === "혼성") {
+          const fTop = DICTIONARY.subjectClothesTop[config.femaleClothesTop];
+          const fBot = DICTIONARY.subjectClothesBottom[config.femaleClothesBottom];
+          const mTop = DICTIONARY.subjectClothesTop[config.maleClothesTop];
+          const mBot = DICTIONARY.subjectClothesBottom[config.maleClothesBottom];
+          
+          let fClothes = [];
+          if (fTop) fClothes.push(fTop);
+          if (fBot) fClothes.push(fBot);
+          
+          let mClothes = [];
+          if (mTop) mClothes.push(mTop);
+          if (mBot) mClothes.push(mBot);
+          
+          if (fClothes.length > 0) details.push(`females ${fClothes.join(" and ")}`);
+          if (mClothes.length > 0) details.push(`males ${mClothes.join(" and ")}`);
+        } else {
+          const top = DICTIONARY.subjectClothesTop[config.subjectClothesTop];
+          const bot = DICTIONARY.subjectClothesBottom[config.subjectClothesBottom];
+          if (top) details.push(top);
+          if (bot) details.push(bot);
+        }
 
         if (details.length > 0) humanStr += ` ${details.join(", ")}`;
-        parts.push(`featuring ${humanStr} posing naturally`);
+        
+        let actionStr = "posing naturally";
+        if (config.subjectAction && config.subjectAction !== "선택안함" && config.subjectAction !== "기본") {
+          actionStr = DICTIONARY.subjectAction[config.subjectAction];
+        } else if (config.subjectAction === "기본") {
+          actionStr = "posing naturally";
+        }
+        parts.push(`featuring ${humanStr} ${actionStr}`);
       } else {
         parts.push(`professional architectural photography of ${subjectStr}`);
       }
@@ -1040,7 +1083,7 @@ export default function App() {
             <AnimatePresence mode="wait">
               {activeCategory === 'subject' && (
                 <motion.section key="subject" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                  <h2 className="ios-section-title">[인물]</h2>
+                  <h2 className="ios-section-title">인물</h2>
                   <div className="ios-bento-card" style={{ padding: '20px' }}>
                     <OptionSelect label="인원" value={config.subjectNum} onChange={(v) => handleConfigChange('subjectNum', v)} options={OPTIONS_DATA.subjectNum} theme="red" />
                     {config.subjectNum !== "없음" && (
@@ -1048,14 +1091,61 @@ export default function App() {
                         <OptionSelect label="성별" value={config.subjectGender} onChange={(v) => handleConfigChange('subjectGender', v)} options={OPTIONS_DATA.subjectGender} theme="red" />
                         <OptionSelect label="연령대" value={config.subjectAge} onChange={(v) => handleConfigChange('subjectAge', v)} options={OPTIONS_DATA.subjectAge} theme="red" />
                         <OptionSelect label="지역/인종" value={config.subjectRegion} onChange={(v) => handleConfigChange('subjectRegion', v)} options={OPTIONS_DATA.subjectRegion} theme="red" />
+                        <OptionSelect label="행동" value={config.subjectAction} onChange={(v) => handleConfigChange('subjectAction', v)} options={OPTIONS_DATA.subjectAction} theme="red" />
                         <OptionSelect label="옷 스타일" value={config.subjectClothesStyle} onChange={(v) => handleConfigChange('subjectClothesStyle', v)} options={OPTIONS_DATA.subjectClothesStyle} theme="red" />
-                        <OptionSelect
-                          label="옷 종류"
-                          value={config.subjectClothesType}
-                          onChange={(v) => handleConfigChange('subjectClothesType', v)}
-                          options={config.subjectGender === '여성' ? OPTIONS_DATA.subjectClothesType.female : OPTIONS_DATA.subjectClothesType.others}
-                          theme="red"
-                        />
+                        
+                        {config.subjectGender === '혼성' ? (
+                          <>
+                            <div className="mt-4 mb-2 text-xs font-bold text-gray-500 border-b pb-1">여성 의상</div>
+                            <OptionSelect
+                              label="상의"
+                              value={config.femaleClothesTop}
+                              onChange={(v) => handleConfigChange('femaleClothesTop', v)}
+                              options={OPTIONS_DATA.subjectClothesTop.female}
+                              theme="red"
+                            />
+                            <OptionSelect
+                              label="하의"
+                              value={config.femaleClothesBottom}
+                              onChange={(v) => handleConfigChange('femaleClothesBottom', v)}
+                              options={OPTIONS_DATA.subjectClothesBottom.female}
+                              theme="red"
+                            />
+                            
+                            <div className="mt-4 mb-2 text-xs font-bold text-gray-500 border-b pb-1">남성 의상</div>
+                            <OptionSelect
+                              label="상의"
+                              value={config.maleClothesTop}
+                              onChange={(v) => handleConfigChange('maleClothesTop', v)}
+                              options={OPTIONS_DATA.subjectClothesTop.male}
+                              theme="red"
+                            />
+                            <OptionSelect
+                              label="하의"
+                              value={config.maleClothesBottom}
+                              onChange={(v) => handleConfigChange('maleClothesBottom', v)}
+                              options={OPTIONS_DATA.subjectClothesBottom.male}
+                              theme="red"
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <OptionSelect
+                              label="상의"
+                              value={config.subjectClothesTop}
+                              onChange={(v) => handleConfigChange('subjectClothesTop', v)}
+                              options={config.subjectGender === '여성' ? OPTIONS_DATA.subjectClothesTop.female : OPTIONS_DATA.subjectClothesTop.male}
+                              theme="red"
+                            />
+                            <OptionSelect
+                              label="하의"
+                              value={config.subjectClothesBottom}
+                              onChange={(v) => handleConfigChange('subjectClothesBottom', v)}
+                              options={config.subjectGender === '여성' ? OPTIONS_DATA.subjectClothesBottom.female : OPTIONS_DATA.subjectClothesBottom.male}
+                              theme="red"
+                            />
+                          </>
+                        )}
                         <OptionSelect label="헤어 스타일" value={config.subjectHair} onChange={(v) => handleConfigChange('subjectHair', v)} options={OPTIONS_DATA.subjectHair} theme="red" />
                       </div>
                     )}
@@ -1065,7 +1155,7 @@ export default function App() {
 
               {activeCategory === 'space' && (
                 <motion.section key="space" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                  <h2 className="ios-section-title">[공간]</h2>
+                  <h2 className="ios-section-title">공간</h2>
                   <div className="ios-bento-card">
                     <OptionSelect label="공간 종류" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} theme="green" />
                     <OptionSelect label="세부 공간" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} theme="green" />
@@ -1096,7 +1186,7 @@ export default function App() {
 
               {activeCategory === 'camera' && (
                 <motion.section key="camera" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                  <h2 className="ios-section-title">[카메라]</h2>
+                  <h2 className="ios-section-title">카메라</h2>
                   <div className="ios-bento-card" style={{ padding: '20px' }}>
                     <div className="mb-4 space-y-4">
                       <IOSToggle
@@ -1202,7 +1292,7 @@ export default function App() {
 
               {activeCategory === 'style' && (
                 <motion.section key="style" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                  <h2 className="ios-section-title">[스타일 & 조명]</h2>
+                  <h2 className="ios-section-title">스타일 & 조명</h2>
                   <div className="ios-bento-card">
                     <OptionSelect
                       label="연출 샷 스타일 (다중 선택)"
@@ -1269,10 +1359,10 @@ export default function App() {
 
                     // Category Color Mapping
                     let color = '#8E8E93'; // Default Gray
-                    if (key.startsWith('subject')) color = '#FF3B30'; // Red for Subject
-                    if (key.startsWith('space') || key === 'interiorStyle' || key === 'country') color = '#34C759'; // Green for Space
-                    if (key.startsWith('camera')) color = '#007AFF'; // Blue for Camera
-                    if (key === 'shotStyle' || key === 'light') color = '#AF52DE'; // Purple for Style (including Light)
+                    if (key.startsWith('subject') || key.startsWith('female') || key.startsWith('male')) color = '#FF3B30'; // Red for Subject
+                    if (key.startsWith('space') || key === 'interiorStyle' || key === 'country' || key.startsWith('detail')) color = '#34C759'; // Green for Space
+                    if (key.startsWith('camera') || key === 'aspectRatio') color = '#007AFF'; // Blue for Camera
+                    if (key === 'shotStyle' || key === 'light' || key === 'brightness' || key === 'useLight') color = '#AF52DE'; // Purple for Style (including Light)
 
                     if (Array.isArray(val)) {
                       return val.map(v => <span key={v} className="ios-summary-tag" style={{ backgroundColor: color }}>{v}</span>);
@@ -1444,7 +1534,7 @@ export default function App() {
       </AnimatePresence>
 
       <footer className="ios-footer">
-        v0.45 Stable | Developed by Gony
+        v0.46 Stable | Developed by Gony
       </footer>
       <div className="h-12"></div>
     </div>
