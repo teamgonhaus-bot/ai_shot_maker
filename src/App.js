@@ -1358,19 +1358,26 @@ export default function App() {
                     if (key === 'brightness' || key === 'useLight') return null; // Skip non-text values
 
                     // Category Color Mapping
-                    let color = '#8E8E93'; // Default Gray
-                    if (key.startsWith('subject') || key.startsWith('female') || key.startsWith('male')) color = '#FF3B30'; // Red for Subject
-                    if (key.startsWith('space') || key === 'interiorStyle' || key === 'country' || key.startsWith('detail')) color = '#34C759'; // Green for Space
-                    if (key.startsWith('camera') || key === 'aspectRatio') color = '#007AFF'; // Blue for Camera
-                    if (key === 'shotStyle' || key === 'light' || key === 'brightness' || key === 'useLight') color = '#AF52DE'; // Purple for Style (including Light)
+                    let bgColor = '#F2F2F7'; // Default Gray Background
+                    let textColor = '#8E8E93'; // Default Gray Text
+                    
+                    if (key.startsWith('subject') || key.startsWith('female') || key.startsWith('male')) {
+                      bgColor = '#FF3B30'; textColor = '#FFFFFF';
+                    } else if (key.startsWith('space') || key === 'interiorStyle' || key === 'country' || key.startsWith('detail')) {
+                      bgColor = '#34C759'; textColor = '#FFFFFF';
+                    } else if (key.startsWith('camera') || key === 'aspectRatio') {
+                      bgColor = '#007AFF'; textColor = '#FFFFFF';
+                    } else if (key === 'shotStyle' || key === 'light' || key === 'brightness' || key === 'useLight') {
+                      bgColor = '#AF52DE'; textColor = '#FFFFFF';
+                    }
 
                     if (Array.isArray(val)) {
-                      return val.map(v => <span key={v} className="ios-summary-tag" style={{ backgroundColor: color }}>{v}</span>);
+                      return val.map(v => <span key={v} className="ios-summary-tag" style={{ backgroundColor: bgColor, color: textColor }}>{v}</span>);
                     }
-                    return <span key={key} className="ios-summary-tag" style={{ backgroundColor: color }}>{val}</span>;
+                    return <span key={key} className="ios-summary-tag" style={{ backgroundColor: bgColor, color: textColor }}>{val}</span>;
                   })}
-                  {config.useLight && <span className="ios-summary-tag" style={{ backgroundColor: '#AF52DE' }}>조명: {config.brightness}</span>}
-                  {removeText && <span className="ios-summary-tag" style={{ backgroundColor: '#AF52DE' }}>텍스트 제거</span>}
+                  {config.useLight && <span className="ios-summary-tag" style={{ backgroundColor: '#AF52DE', color: '#FFFFFF' }}>조명: {config.brightness}</span>}
+                  {removeText && <span className="ios-summary-tag" style={{ backgroundColor: '#AF52DE', color: '#FFFFFF' }}>텍스트 제거</span>}
                 </div>
               </div>
 

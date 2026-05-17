@@ -450,8 +450,8 @@ body {
   display: inline-block !important;
   font-size: 11px !important;
   font-weight: 700 !important;
-  color: #8E8E93 !important;
-  background-color: #F2F2F7 !important;
+  color: #8E8E93;
+  background-color: #F2F2F7;
   padding: 5px 14px !important;
   border-radius: 9999px !important;
   margin-right: 6px !important;
