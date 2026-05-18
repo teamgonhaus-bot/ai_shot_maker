@@ -1560,8 +1560,11 @@ export default function App() {
                   {(() => {
                     const tags = [];
                     Object.entries(config).forEach(([key, val]) => {
-                      if (val === "선택안함" || val === "없음" || (Array.isArray(val) && val.length === 0)) return;
-                      if (key === 'brightness' || key === 'useLight') return;
+                      // Skip empty / unset values
+                      if (val === "선택안함" || val === "없음" || val === false || val === null || val === undefined) return;
+                      if (Array.isArray(val) && val.length === 0) return;
+                      // Skip internal/toggle-only keys that shouldn't appear as pills
+                      if (['brightness', 'useLight', 'useImageRef'].includes(key)) return;
 
                       // 1. 인물없음 일때 인물관련 속성 제거
                       if (config.subjectNum === "없음" && (key.startsWith('subject') || key.startsWith('female') || key.startsWith('male'))) return;
@@ -1576,17 +1579,24 @@ export default function App() {
                       }
 
                       let group = 0;
-                      let bgColor = '#F2F2F7';
-                      let textColor = '#8E8E93';
+                      let bgColor = '#8E8E93';
+                      let textColor = '#FFFFFF';
 
+                      // 🔴 Group 1 — Subject (Red)
                       if (key.startsWith('subject') || key.startsWith('female') || key.startsWith('male')) {
-                        group = 1; bgColor = '#FF3B30'; textColor = '#FFFFFF';
-                      } else if (key.startsWith('space') || key === 'interiorStyle' || key === 'country' || key.startsWith('detail')) {
-                        group = 2; bgColor = '#34C759'; textColor = '#FFFFFF';
-                      } else if (key.startsWith('camera') || key === 'aspectRatio' || key === 'copySpace') {
-                        group = 3; bgColor = '#007AFF'; textColor = '#FFFFFF';
-                      } else if (key === 'shotStyle' || key === 'light' || key === 'brightness' || key === 'useLight') {
-                        group = 4; bgColor = '#AF52DE'; textColor = '#FFFFFF';
+                        group = 1; bgColor = '#FF3B30';
+                      }
+                      // 🟢 Group 2 — Space / Environment (Green)
+                      else if (key.startsWith('space') || key === 'interiorStyle' || key === 'country' || key.startsWith('detail')) {
+                        group = 2; bgColor = '#34C759';
+                      }
+                      // 🔵 Group 3 — Camera / Layout / Product (Blue)
+                      else if (key.startsWith('camera') || key === 'aspectRatio' || key === 'copySpace' || key === 'productAnchor' || key === 'productLayout') {
+                        group = 3; bgColor = '#007AFF';
+                      }
+                      // 🟣 Group 4 — Style / Lighting / Toggles (Purple)
+                      else if (key === 'shotStyle' || key === 'light') {
+                        group = 4; bgColor = '#AF52DE';
                       }
 
                       if (Array.isArray(val)) {
