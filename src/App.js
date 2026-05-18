@@ -302,7 +302,7 @@ export default function App() {
       newConfig.spaceDetail = '그라데이션 배경';
       newConfig.cameraAngle = '풀 샷';
       newConfig.interiorStyle = '모던 미니멀';
-      setActiveMarquee("타이틀씬 활성화: 제품 중심 / 인물 강제 해제 적용 중");
+      setActiveMarquee("Title Scene Active: Focused on product-centric minimalist studio layout...");
     } else if (templateType === '디테일씬') {
       newConfig.subjectNum = '없음';
       newConfig.spaceType = '스튜디오';
@@ -310,7 +310,7 @@ export default function App() {
       newConfig.cameraAngle = '익스트림 클로즈업';
       newConfig.useLight = true;
       newConfig.light = '스포트라이트 조명';
-      setActiveMarquee("디테일씬 활성화: 클로즈업 중심 / 강렬한 조명 연출");
+      setActiveMarquee("Detail Scene Active: Highlighting textures and macro material details...");
     } else if (templateType === '인스타씬') {
       if (newConfig.subjectNum === "없음") newConfig.subjectNum = "혼자";
       newConfig.subjectAge = '20대';
@@ -318,13 +318,13 @@ export default function App() {
       newConfig.spaceType = '야외';
       newConfig.spaceDetail = '힙한곳';
       newConfig.interiorStyle = '플랜테리어';
-      setActiveMarquee("인스타씬 활성화: 트렌디한 공간 / 인물 자동 설정");
+      setActiveMarquee("Insta Scene Active: Trendy lifestyle shots with human interaction...");
     } else if (templateType === '사용씬') {
       if (newConfig.subjectNum === "없음") newConfig.subjectNum = "혼자";
       newConfig.spaceType = '홈';
       newConfig.spaceDetail = '워크룸';
       newConfig.cameraAngle = '미디움 샷';
-      setActiveMarquee("사용씬 활성화: 라이프스타일 중심 / 인물 상호작용 강화");
+      setActiveMarquee("Usage Scene Active: Realistic commercial usage scenarios with model engagement...");
     }
     
     setConfig(newConfig);
@@ -1212,25 +1212,25 @@ export default function App() {
             </div>
 
             {/* Smart Template Marquee */}
-            <AnimatePresence>
-              {activeMarquee && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10, height: 0 }}
-                  animate={{ opacity: 1, y: 0, height: 'auto' }}
-                  exit={{ opacity: 0, y: -10, height: 0 }}
-                  className="overflow-hidden flex items-center justify-center w-full"
-                >
-                  <motion.div
-                    initial={{ x: 30 }}
-                    animate={{ x: 0 }}
-                    className="px-4 py-2 mt-2 bg-black dark:bg-white rounded-full text-[12px] font-bold text-white dark:text-black tracking-tight flex items-center justify-center whitespace-nowrap"
-                    style={{ width: 'fit-content' }}
-                  >
-                    ✨ {activeMarquee}
-                  </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <div className="w-full bg-black dark:bg-white overflow-hidden py-[10px] mt-4 rounded-xl flex items-center relative">
+              <div 
+                className="whitespace-nowrap text-[12px] font-bold text-white dark:text-black tracking-widest uppercase"
+                style={{
+                  animation: 'marquee 12s linear infinite',
+                  display: 'inline-block',
+                  minWidth: '100%',
+                  paddingLeft: '100%'
+                }}
+              >
+                ✨ {activeMarquee || "Start generating your commercial visual concept right now..."}
+              </div>
+              <style>{`
+                @keyframes marquee {
+                  0% { transform: translateX(0%); }
+                  100% { transform: translateX(-100%); }
+                }
+              `}</style>
+            </div>
 
             {/* Category Tabs */}
             <div className="ios-category-tabs">
@@ -1508,6 +1508,14 @@ export default function App() {
                         activeColor="#AF52DE"
                       />
                     </div>
+                    <div className="mt-4 border-t border-gray-100 pt-4">
+                      <IOSToggle
+                        label="상업용 클린 출력 (Commercial Clean)"
+                        isOn={useCommercialNegative}
+                        onToggle={() => setUseCommercialNegative(!useCommercialNegative)}
+                        activeColor="#AF52DE"
+                      />
+                    </div>
                   </div>
                 </motion.section>
               )}
@@ -1526,6 +1534,9 @@ export default function App() {
 
                       // 1. 인물없음 일때 인물관련 속성 제거
                       if (config.subjectNum === "없음" && (key.startsWith('subject') || key.startsWith('female') || key.startsWith('male'))) return;
+                      // 1-2. 메인 토글이 비활성화 상태인 세부 속성 제거
+                      if (!useDetailMaterial && key.startsWith('detail')) return;
+                      if (!config.useLight && key === 'light') return;
 
                       // 혼성/단일 성별에 따른 의상 분기
                       if (config.subjectNum !== "없음") {
@@ -1666,21 +1677,6 @@ export default function App() {
                       </div>
                     </div>
                   ) : null}
-
-                  <div className="ios-bento-card mb-4" style={{ padding: '16px' }}>
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <label className="text-[13px] font-black text-black dark:text-white uppercase tracking-wider block">상업용 클린 출력 (Commercial Clean)</label>
-                        <p className="text-[11px] font-medium text-gray-500 mt-1 mb-0">상업용 합성에 불필요한 요소 제거 프롬프트 자동 추가</p>
-                      </div>
-                      <IOSToggle
-                        label=""
-                        isOn={useCommercialNegative}
-                        onToggle={() => setUseCommercialNegative(!useCommercialNegative)}
-                        activeColor="#007AFF"
-                      />
-                    </div>
-                  </div>
 
                   <PromptOutput prompt={generatedPrompt} />
 
