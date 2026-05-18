@@ -940,13 +940,13 @@ export default function App() {
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="bg-white dark:bg-zinc-900 rounded-[24px] p-6 w-full max-w-sm shadow-2xl relative flex flex-col"
-              style={{ maxHeight: '80vh' }}
+              className="settings-modal"
+              style={{ display: 'flex', flexDirection: 'column', maxHeight: '80vh', padding: '24px', borderRadius: '24px' }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-[20px] font-black text-black dark:text-white mb-4 tracking-tight">Prompt Detail</h3>
-              <div className="flex-1 overflow-y-auto mb-6 p-4 bg-gray-50 dark:bg-zinc-800 rounded-[16px]">
-                <p className="text-[13px] font-medium text-gray-600 dark:text-gray-300 leading-relaxed break-words">
+              <h3 className="text-[20px] font-black text-black dark:text-white mb-4 tracking-tight text-center">Prompt Detail</h3>
+              <div className="flex-1 overflow-y-auto mb-6" style={{ padding: '16px', backgroundColor: '#F2F2F7', borderRadius: '16px' }}>
+                <p className="text-[13px] font-medium text-gray-600 leading-relaxed break-words m-0">
                   {promptModalTarget.prompt}
                 </p>
               </div>
@@ -958,14 +958,15 @@ export default function App() {
                     setPromptCopied(true);
                     setTimeout(() => setPromptCopied(false), 2000);
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full font-bold text-[14px] transition-all"
-                  style={{ backgroundColor: promptCopied ? '#34C759' : '#000', color: '#FFF' }}
+                  className="save-btn flex-1"
+                  style={{ backgroundColor: promptCopied ? '#34C759' : '#000', color: '#FFF', borderRadius: '9999px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
                 >
                   {promptCopied ? <span className="font-black">✓ Copied</span> : <><Copy size={16} /> Copy Prompt</>}
                 </button>
                 <button 
                   onClick={() => setPromptModalTarget(null)}
-                  className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500 hover:bg-gray-200 transition-colors shrink-0"
+                  className="cancel-pill-btn"
+                  style={{ width: '48px', height: '48px', padding: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '9999px', flexShrink: 0 }}
                 >
                   <X size={20} strokeWidth={2.5} />
                 </button>
