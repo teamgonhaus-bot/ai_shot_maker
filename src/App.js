@@ -49,7 +49,7 @@ const DICTIONARY = {
   },
   detailWall: { "화이트 페인트": "clean white painted walls", "노출 콘크리트": "exposed raw concrete walls", "웨인스코팅": "elegant wainscoted walls", "파스텔톤 벽지": "soft pastel wallpaper", "붉은 벽돌": "rustic red brick walls", "세라믹타일": "ceramic tiled walls", "패널": "paneled walls", "템바보드": "tambour board walls", "원목패널": "solid wood paneled walls", "스틸패널": "steel paneled walls", "스톤패널": "stone paneled walls" },
   interiorStyle: { "선택안함": "", "미드센추리 모던": "mid-century modern style", "모던 미니멀": "modern minimal style", "내추럴 우드": "natural wood interior style", "젠 스타일": "Zen-inspired style", "인더스트리얼": "industrial style", "스칸디나비안": "Scandinavian style", "플랜테리어": "planterior style with many indoor plants" },
-  light: { "선택안함": "", "자연광": "natural sunlight", "시네마틱": "cinematic dramatic lighting", "스튜디오 조명": "professional studio softbox lighting", "스포트라이트 조명": "focused spotlight lighting", "무드등": "soft mood lighting", "나르스 확산광": "soft, diffused lighting" },
+  light: { "선택안함": "", "자연광": "natural sunlight", "시네마틱": "cinematic dramatic lighting", "스튜디오 조명": "professional studio softbox lighting", "스포트라이트 조명": "focused spotlight lighting", "무드등": "soft mood lighting", "나르스 확산광": "soft, diffused lighting", "앤비언트 라이트": "warm ambient indoor light" },
 
   detailFloor: { "밝은 우드 마루": "light wood flooring", "어두운 우드 마루": "dark walnut wood flooring", "테라조 타일": "modern terrazzo tile floor", "대리석": "premium marble flooring", "콘크리트": "polished concrete floor", "조약돌 바닥": "pebble stone floor", "자갈 바닥": "gravel floor", "카펫": "with cozy carpet texture", "포세린타일": "with polished porcelain tiles", "에폭시": "with industrial epoxy flooring" },
   detailWood: { "오크(참나무)": "natural oak wood textures", "월넛(호두나무)": "rich walnut wood details", "자작나무": "birch wood accents", "티크": "premium teak wood", "애쉬": "with natural ash wood grain", "마호가니": "with rich mahogany wood finish", "미송": "with clean pine wood textures", "OBS": "with rugged OSB textures", "합판": "with minimalist plywood details" },
@@ -96,7 +96,7 @@ const OPTIONS_DATA = {
     "야외": ["도심", "자연", "테라스", "공원", "강가", "쇼핑가", "힙한곳"]
   },
   interiorStyle: ["선택안함", "미드센추리 모던", "모던 미니멀", "내추럴 우드", "젠 스타일", "인더스트리얼", "스칸디나비안", "플랜테리어"],
-  light: ["선택안함", "자연광", "시네마틱", "스튜디오 조명", "스포트라이트 조명", "무드등", "나르스 확산광"],
+  light: ["선택안함", "자연광", "시네마틱", "스튜디오 조명", "스포트라이트 조명", "무드등", "나르스 확산광", "앤비언트 라이트"],
   detailFloor: ["밝은 우드 마루", "어두운 우드 마루", "테라조 타일", "대리석", "콘크리트", "조약돌 바닥", "자갈 바닥", "카펫", "포세린타일", "에폭시"],
   detailWood: ["오크(참나무)", "월넛(호두나무)", "자작나무", "티크", "애쉬", "마호가니", "미송", "OBS", "합판"],
   detailMetal: ["황동(브라스)", "크롬/실버", "무광 블랙", "유광 블랙", "로즈골드"],
@@ -302,37 +302,77 @@ export default function App() {
     let newConfig = { ...config };
     
     if (templateType === '타이틀씬') {
+      // 🎬 초현실주의 팝 상업 배너 광고
       newConfig.subjectNum = '없음';
       newConfig.spaceType = '스튜디오';
       newConfig.spaceDetail = '단색 모노크롬';
       newConfig.cameraAngle = '풀 샷';
       newConfig.interiorStyle = '모던 미니멀';
       newConfig.productLayout = '대각선 안착';
+      newConfig.productAnchor = '전경 클린';
+      newConfig.copySpace = '선택안함';
+      newConfig.aspectRatio = '1:1 (Square)';
       newConfig.useLight = true;
       newConfig.light = '나르스 확산광';
-      setActiveMarquee("Title Scene Active: Focused on product-centric minimalist studio layout...");
+      newConfig.shotStyle = ['네거티브 스페이스', '톤온톤-모노크로매틱'];
+      newConfig.country = '선택안함';
+      setActiveMarquee("Title Scene Active: Surrealist floating product on monochrome studio backdrop...");
+
     } else if (templateType === '디테일씬') {
+      // 🔍 하이엔드 카탈로그 마감재 테크니컬 샷
       newConfig.subjectNum = '없음';
-      newConfig.spaceType = '스튜디오';
-      newConfig.spaceDetail = '쇼케이스';
+      newConfig.spaceType = '라운지';
+      newConfig.spaceDetail = '쇼케이스 라운지';
       newConfig.cameraAngle = '익스트림 클로즈업';
+      newConfig.copySpace = '우측 여백';
+      newConfig.productLayout = '액체 스플래시';
+      newConfig.productAnchor = '합성 베이스';
+      newConfig.aspectRatio = '4:3 (Standard)';
       newConfig.useLight = true;
       newConfig.light = '스포트라이트 조명';
-      setActiveMarquee("Detail Scene Active: Highlighting textures and macro material details...");
+      newConfig.shotStyle = ['매크로-디테일', '클로즈업 디테일', '하드 섀도우'];
+      newConfig.interiorStyle = '선택안함';
+      newConfig.country = '선택안함';
+      setActiveMarquee("Detail Scene Active: High-end catalog close-up with material texture emphasis...");
+
     } else if (templateType === '인스타씬') {
-      if (newConfig.subjectNum === "없음") newConfig.subjectNum = "혼자";
+      // 📱 MZ 트렌드 SNS 감성 스냅 배너
+      newConfig.subjectNum = '혼자';
+      newConfig.subjectGender = '여성';
       newConfig.subjectAge = '20대';
-      newConfig.aspectRatio = '1:1 (Square)';
+      newConfig.subjectAction = '활발함';
+      newConfig.subjectClothesStyle = '스트릿';
       newConfig.spaceType = '야외';
       newConfig.spaceDetail = '힙한곳';
       newConfig.interiorStyle = '플랜테리어';
-      setActiveMarquee("Insta Scene Active: Trendy lifestyle shots with human interaction...");
+      newConfig.cameraAngle = '하이앵글';
+      newConfig.aspectRatio = '4:5 (SNS)';
+      newConfig.copySpace = '선택안함';
+      newConfig.productLayout = '선택안함';
+      newConfig.productAnchor = '선택안함';
+      newConfig.useLight = true;
+      newConfig.light = '자연광';
+      newConfig.shotStyle = ['라이프스타일 인테리어', '심도 얕은 샷(아웃포커싱)'];
+      newConfig.country = '한국';
+      setActiveMarquee("Insta Scene Active: MZ trendy SNS lifestyle snap with natural sunlight vibes...");
+
     } else if (templateType === '사용씬') {
-      if (newConfig.subjectNum === "없음") newConfig.subjectNum = "혼자";
+      // 🧍 상세페이지용 라이프스타일 실사용 컷
+      newConfig.subjectNum = '혼자';
+      newConfig.subjectAction = '공간에 어울리게';
       newConfig.spaceType = '홈';
       newConfig.spaceDetail = '워크룸';
       newConfig.cameraAngle = '미디움 샷';
-      setActiveMarquee("Usage Scene Active: Realistic commercial usage scenarios with model engagement...");
+      newConfig.copySpace = '선택안함';
+      newConfig.productLayout = '선택안함';
+      newConfig.productAnchor = '선택안함';
+      newConfig.aspectRatio = '4:3 (Standard)';
+      newConfig.useLight = true;
+      newConfig.light = '앤비언트 라이트';
+      newConfig.shotStyle = ['라이프스타일 인테리어', '심도 얕은 샷(아웃포커싱)'];
+      newConfig.interiorStyle = '내추럴 우드';
+      newConfig.country = '선택안함';
+      setActiveMarquee("Usage Scene Active: Lifestyle product-in-use realistic commercial photography...");
     }
     
     setConfig(newConfig);
