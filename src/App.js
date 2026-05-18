@@ -1410,32 +1410,69 @@ export default function App() {
             <div className="pt-4 pb-20">
               <div className="ios-option-label mb-2 px-1">현재 선택된 옵션 (Summary)</div>
               <div className="ios-summary-panel">
-                <div className="flex flex-wrap">
-                  {Object.entries(config).map(([key, val]) => {
-                    if (val === "선택안함" || val === "없음" || (Array.isArray(val) && val.length === 0)) return null;
-                    if (key === 'brightness' || key === 'useLight') return null; // Skip non-text values
+                <div className="flex flex-wrap gap-[6px]">
+                  {(() => {
+                    const tags = [];
+                    Object.entries(config).forEach(([key, val]) => {
+                      if (val === "선택안함" || val === "없음" || (Array.isArray(val) && val.length === 0)) return;
+                      if (key === 'brightness' || key === 'useLight') return;
 
-                    // Category Color Mapping
-                    let bgColor = '#F2F2F7'; // Default Gray Background
-                    let textColor = '#8E8E93'; // Default Gray Text
-                    
-                    if (key.startsWith('subject') || key.startsWith('female') || key.startsWith('male')) {
-                      bgColor = '#FF3B30'; textColor = '#FFFFFF';
-                    } else if (key.startsWith('space') || key === 'interiorStyle' || key === 'country' || key.startsWith('detail')) {
-                      bgColor = '#34C759'; textColor = '#FFFFFF';
-                    } else if (key.startsWith('camera') || key === 'aspectRatio') {
-                      bgColor = '#007AFF'; textColor = '#FFFFFF';
-                    } else if (key === 'shotStyle' || key === 'light' || key === 'brightness' || key === 'useLight') {
-                      bgColor = '#AF52DE'; textColor = '#FFFFFF';
+                      // 1. 인물없음 일때 인물관련 속성 제거
+                      if (config.subjectNum === "없음" && (key.startsWith('subject') || key.startsWith('female') || key.startsWith('male'))) return;
+
+                      // 혼성/단일 성별에 따른 의상 분기
+                      if (config.subjectNum !== "없음") {
+                        if (config.subjectGender === "혼성" && key.startsWith("subjectClothes")) return;
+                        if (config.subjectGender !== "혼성" && (key.startsWith("female") || key.startsWith("male"))) return;
+                      }
+
+                      let group = 0;
+                      let bgColor = '#F2F2F7';
+                      let textColor = '#8E8E93';
+
+                      if (key.startsWith('subject') || key.startsWith('female') || key.startsWith('male')) {
+                        group = 1; bgColor = '#FF3B30'; textColor = '#FFFFFF';
+                      } else if (key.startsWith('space') || key === 'interiorStyle' || key === 'country' || key.startsWith('detail')) {
+                        group = 2; bgColor = '#34C759'; textColor = '#FFFFFF';
+                      } else if (key.startsWith('camera') || key === 'aspectRatio' || key === 'copySpace') {
+                        group = 3; bgColor = '#007AFF'; textColor = '#FFFFFF';
+                      } else if (key === 'shotStyle' || key === 'light' || key === 'brightness' || key === 'useLight') {
+                        group = 4; bgColor = '#AF52DE'; textColor = '#FFFFFF';
+                      }
+
+                      if (Array.isArray(val)) {
+                        val.forEach(v => tags.push({ key: `${key}-${v}`, val: v, group, bgColor, textColor }));
+                      } else {
+                        tags.push({ key, val, group, bgColor, textColor });
+                      }
+                    });
+
+                    if (config.useLight && config.brightness) {
+                      tags.push({ key: 'light-brightness', val: `조명: ${config.brightness}`, group: 4, bgColor: '#AF52DE', textColor: '#FFFFFF' });
+                    }
+                    if (removeText) {
+                      tags.push({ key: 'remove-text', val: '텍스트 제거', group: 4, bgColor: '#AF52DE', textColor: '#FFFFFF' });
                     }
 
-                    if (Array.isArray(val)) {
-                      return val.map(v => <span key={v} className="ios-summary-tag" style={{ backgroundColor: bgColor, color: textColor }}>{v}</span>);
-                    }
-                    return <span key={key} className="ios-summary-tag" style={{ backgroundColor: bgColor, color: textColor }}>{val}</span>;
-                  })}
-                  {config.useLight && <span className="ios-summary-tag" style={{ backgroundColor: '#AF52DE', color: '#FFFFFF' }}>조명: {config.brightness}</span>}
-                  {removeText && <span className="ios-summary-tag" style={{ backgroundColor: '#AF52DE', color: '#FFFFFF' }}>텍스트 제거</span>}
+                    // 2. 같은 탭 속성 정렬 (group 기준)
+                    tags.sort((a, b) => a.group - b.group);
+
+                    // 3. 중복 표기 오류 수정 (val 기준으로 중복 제거)
+                    const uniqueTags = [];
+                    const seen = new Set();
+                    tags.forEach(t => {
+                      if (!seen.has(t.val)) {
+                        seen.add(t.val);
+                        uniqueTags.push(t);
+                      }
+                    });
+
+                    return uniqueTags.map(t => (
+                      <span key={t.key} className="ios-summary-tag" style={{ backgroundColor: t.bgColor, color: t.textColor }}>
+                        {t.val}
+                      </span>
+                    ));
+                  })()}
                 </div>
               </div>
 

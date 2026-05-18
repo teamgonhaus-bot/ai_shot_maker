@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
-import { Trash2, ArrowRight, ChevronDown, ChevronUp, FolderInput, Edit2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Trash2, ArrowRight, ChevronDown, FolderInput, Edit2, Copy, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function TemplateCard({ template, onLoad, onDelete, onRename, onMoveRequest, categories }) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [showPromptModal, setShowPromptModal] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(template.prompt);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <motion.div
@@ -42,17 +50,11 @@ export default function TemplateCard({ template, onLoad, onDelete, onRename, onM
         </div>
         
         <div className="relative">
-          <motion.div 
-            layout
-            initial={false}
-            animate={{ height: isExpanded ? 'auto' : '60px' }}
-            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-            className="overflow-hidden"
-          >
-            <p className={`text-[13px] font-medium text-gray-400 leading-relaxed mt-1 ${!isExpanded ? 'line-clamp-3' : ''}`}>
+          <div className="overflow-hidden" style={{ height: '60px' }}>
+            <p className="text-[13px] font-medium text-gray-400 leading-relaxed mt-1 line-clamp-3">
               {template.prompt}
             </p>
-          </motion.div>
+          </div>
         </div>
       </div>
 
@@ -89,27 +91,57 @@ export default function TemplateCard({ template, onLoad, onDelete, onRename, onM
 
         {template.prompt && template.prompt.length > 80 && (
           <button 
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center justify-center transition-transform active:scale-95"
-            style={{ 
-              padding: '4px 10px', 
-              fontSize: '10px', 
-              fontWeight: '700',
-              borderRadius: '9999px',
-              background: '#000000', 
-              color: '#FFFFFF', 
-              border: 'none', 
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-              whiteSpace: 'nowrap',
-              cursor: 'pointer',
-              marginLeft: 'auto'
-            }}
+            onClick={() => setShowPromptModal(true)}
+            className="ios-card-icon-btn"
+            title="View Prompt"
+            style={{ width: '32px', height: '32px', marginLeft: 'auto', backgroundColor: '#000', color: '#fff' }}
           >
-            <span>{isExpanded ? 'Close' : 'View All'}</span>
-            {isExpanded ? <ChevronUp size={10} className="ml-1" /> : <ChevronDown size={10} className="ml-1" />}
+            <ChevronDown size={16} strokeWidth={2.5} />
           </button>
         )}
       </div>
+
+      <AnimatePresence>
+        {showPromptModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center p-4 z-50"
+            style={{ backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}
+            onClick={(e) => { e.stopPropagation(); setShowPromptModal(false); }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-white dark:bg-zinc-900 rounded-[28px] p-6 w-full max-w-sm shadow-2xl relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-[20px] font-black text-black dark:text-white mb-4 tracking-tight">Prompt Detail</h3>
+              <p className="text-[13px] font-medium text-gray-500 dark:text-gray-300 mb-6 max-h-[40vh] overflow-y-auto leading-relaxed p-4 bg-gray-50 dark:bg-zinc-800 rounded-2xl">
+                {template.prompt}
+              </p>
+              
+              <div className="flex gap-3">
+                <button 
+                  onClick={handleCopy}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full font-bold text-[14px] transition-all"
+                  style={{ backgroundColor: copied ? '#34C759' : '#000', color: '#FFF' }}
+                >
+                  {copied ? <span className="font-black">✓ Copied</span> : <><Copy size={16} /> Copy Prompt</>}
+                </button>
+                <button 
+                  onClick={() => setShowPromptModal(false)}
+                  className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500 hover:bg-gray-200 transition-colors"
+                >
+                  <X size={20} strokeWidth={2.5} />
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
