@@ -48,6 +48,22 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
             </p>
           </div>
         </div>
+
+        {/* Purpose Tag */}
+        {template.config && (
+          <div className="mt-2">
+            <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 text-[10px] font-bold rounded-full border border-gray-200 dark:border-zinc-700">
+              {(() => {
+                const c = template.config;
+                if (c.aspectRatio === '1:1 (Square)' && c.subjectNum === '없음') return 'Title';
+                if (c.cameraAngle === '익스트림 클로즈업' || c.productLayout === '액체 스플래시') return 'Detail';
+                if (c.aspectRatio === '4:5 (SNS)' || c.spaceDetail === '힙한곳') return 'SNS';
+                if (c.spaceType === '홈' || c.spaceType === '오피스' || c.spaceDetail === '워크룸') return 'Usage';
+                return 'General';
+              })()}
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center justify-between pt-3 px-4 pb-4 border-t border-gray-100 mt-2">

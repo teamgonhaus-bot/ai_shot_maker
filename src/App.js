@@ -13,6 +13,7 @@ import OptionSelect from './components/OptionSelect';
 import IOSToggle from './components/IOSToggle';
 import PromptOutput from './components/PromptOutput';
 import TemplateCard from './components/TemplateCard';
+import WireframeVisualizer from './components/WireframeVisualizer';
 
 /**
  * [ROLE: AI/React Senior Engineer]
@@ -299,84 +300,102 @@ export default function App() {
   const handleSmartTemplate = (templateType) => {
     setActiveTemplate(templateType);
     setActiveLibraryTemplateId(null);
-    let newConfig = { ...config };
+    let targetConfig = { ...config };
     
     if (templateType === '타이틀씬') {
       // 🎬 초현실주의 팝 상업 배너 광고
-      newConfig.subjectNum = '없음';
-      newConfig.spaceType = '스튜디오';
-      newConfig.spaceDetail = '단색 모노크롬';
-      newConfig.cameraAngle = '풀 샷';
-      newConfig.interiorStyle = '모던 미니멀';
-      newConfig.productLayout = '대각선 안착';
-      newConfig.productAnchor = '전경 클린';
-      newConfig.copySpace = '선택안함';
-      newConfig.aspectRatio = '1:1 (Square)';
-      newConfig.useLight = true;
-      newConfig.light = '나르스 확산광';
-      newConfig.shotStyle = ['네거티브 스페이스', '톤온톤-모노크로매틱'];
-      newConfig.country = '선택안함';
+      targetConfig.subjectNum = '없음';
+      targetConfig.spaceType = '스튜디오';
+      targetConfig.spaceDetail = '단색 모노크롬';
+      targetConfig.cameraAngle = '풀 샷';
+      targetConfig.interiorStyle = '모던 미니멀';
+      targetConfig.productLayout = '대각선 안착';
+      targetConfig.productAnchor = '전경 클린';
+      targetConfig.copySpace = '선택안함';
+      targetConfig.aspectRatio = '1:1 (Square)';
+      targetConfig.useLight = true;
+      targetConfig.light = '나르스 확산광';
+      targetConfig.shotStyle = ['네거티브 스페이스', '톤온톤-모노크로매틱'];
+      targetConfig.country = '선택안함';
       setActiveMarquee("Title Scene Active: Surrealist floating product on monochrome studio backdrop...");
 
     } else if (templateType === '디테일씬') {
       // 🔍 하이엔드 카탈로그 마감재 테크니컬 샷
-      newConfig.subjectNum = '없음';
-      newConfig.spaceType = '라운지';
-      newConfig.spaceDetail = '쇼케이스 라운지';
-      newConfig.cameraAngle = '익스트림 클로즈업';
-      newConfig.copySpace = '우측 여백';
-      newConfig.productLayout = '액체 스플래시';
-      newConfig.productAnchor = '합성 베이스';
-      newConfig.aspectRatio = '4:3 (Standard)';
-      newConfig.useLight = true;
-      newConfig.light = '스포트라이트 조명';
-      newConfig.shotStyle = ['매크로-디테일', '클로즈업 디테일', '하드 섀도우'];
-      newConfig.interiorStyle = '선택안함';
-      newConfig.country = '선택안함';
+      targetConfig.subjectNum = '없음';
+      targetConfig.spaceType = '라운지';
+      targetConfig.spaceDetail = '쇼케이스 라운지';
+      targetConfig.cameraAngle = '익스트림 클로즈업';
+      targetConfig.copySpace = '우측 여백';
+      targetConfig.productLayout = '액체 스플래시';
+      targetConfig.productAnchor = '합성 베이스';
+      targetConfig.aspectRatio = '4:3 (Standard)';
+      targetConfig.useLight = true;
+      targetConfig.light = '스포트라이트 조명';
+      targetConfig.shotStyle = ['매크로-디테일', '클로즈업 디테일', '하드 섀도우'];
+      targetConfig.interiorStyle = '선택안함';
+      targetConfig.country = '선택안함';
       setActiveMarquee("Detail Scene Active: High-end catalog close-up with material texture emphasis...");
 
     } else if (templateType === '인스타씬') {
       // 📱 MZ 트렌드 SNS 감성 스냅 배너
-      newConfig.subjectNum = '혼자';
-      newConfig.subjectGender = '여성';
-      newConfig.subjectAge = '20대';
-      newConfig.subjectAction = '활발함';
-      newConfig.subjectClothesStyle = '스트릿';
-      newConfig.spaceType = '야외';
-      newConfig.spaceDetail = '힙한곳';
-      newConfig.interiorStyle = '플랜테리어';
-      newConfig.cameraAngle = '하이앵글';
-      newConfig.aspectRatio = '4:5 (SNS)';
-      newConfig.copySpace = '선택안함';
-      newConfig.productLayout = '선택안함';
-      newConfig.productAnchor = '선택안함';
-      newConfig.useLight = true;
-      newConfig.light = '자연광';
-      newConfig.shotStyle = ['라이프스타일 인테리어', '심도 얕은 샷(아웃포커싱)'];
-      newConfig.country = '한국';
+      targetConfig.subjectNum = '혼자';
+      targetConfig.subjectGender = '여성';
+      targetConfig.subjectAge = '20대';
+      targetConfig.subjectAction = '활발함';
+      targetConfig.subjectClothesStyle = '스트릿';
+      targetConfig.spaceType = '야외';
+      targetConfig.spaceDetail = '힙한곳';
+      targetConfig.interiorStyle = '플랜테리어';
+      targetConfig.cameraAngle = '하이앵글';
+      targetConfig.aspectRatio = '4:5 (SNS)';
+      targetConfig.copySpace = '선택안함';
+      targetConfig.productLayout = '선택안함';
+      targetConfig.productAnchor = '선택안함';
+      targetConfig.useLight = true;
+      targetConfig.light = '자연광';
+      targetConfig.shotStyle = ['라이프스타일 인테리어', '심도 얕은 샷(아웃포커싱)'];
+      targetConfig.country = '한국';
       setActiveMarquee("Insta Scene Active: MZ trendy SNS lifestyle snap with natural sunlight vibes...");
 
     } else if (templateType === '사용씬') {
       // 🧍 상세페이지용 라이프스타일 실사용 컷
-      newConfig.subjectNum = '혼자';
-      newConfig.subjectAction = '공간에 어울리게';
-      newConfig.spaceType = '홈';
-      newConfig.spaceDetail = '워크룸';
-      newConfig.cameraAngle = '미디움 샷';
-      newConfig.copySpace = '선택안함';
-      newConfig.productLayout = '선택안함';
-      newConfig.productAnchor = '선택안함';
-      newConfig.aspectRatio = '4:3 (Standard)';
-      newConfig.useLight = true;
-      newConfig.light = '앤비언트 라이트';
-      newConfig.shotStyle = ['라이프스타일 인테리어', '심도 얕은 샷(아웃포커싱)'];
-      newConfig.interiorStyle = '내추럴 우드';
-      newConfig.country = '선택안함';
+      targetConfig.subjectNum = '혼자';
+      targetConfig.subjectAction = '공간에 어울리게';
+      targetConfig.spaceType = '홈';
+      targetConfig.spaceDetail = '워크룸';
+      targetConfig.cameraAngle = '미디움 샷';
+      targetConfig.copySpace = '선택안함';
+      targetConfig.productLayout = '선택안함';
+      targetConfig.productAnchor = '선택안함';
+      targetConfig.aspectRatio = '4:3 (Standard)';
+      targetConfig.useLight = true;
+      targetConfig.light = '앤비언트 라이트';
+      targetConfig.shotStyle = ['라이프스타일 인테리어', '심도 얕은 샷(아웃포커싱)'];
+      targetConfig.interiorStyle = '내추럴 우드';
+      targetConfig.country = '선택안함';
       setActiveMarquee("Usage Scene Active: Lifestyle product-in-use realistic commercial photography...");
     }
     
-    setConfig(newConfig);
-    setIsSaved(false);
+    // Cascading Effect: Apply changed properties sequentially
+    const keysToChange = Object.keys(targetConfig).filter(k => targetConfig[k] !== config[k]);
+    
+    if (keysToChange.length === 0) {
+      setConfig(targetConfig);
+      setIsSaved(false);
+      return;
+    }
+
+    // 0.2s total duration approximate (e.g. 15ms * 15 keys ~ 225ms)
+    const staggerMs = 20; 
+    keysToChange.forEach((key, index) => {
+      setTimeout(() => {
+        setConfig(prev => ({ ...prev, [key]: targetConfig[key] }));
+      }, index * staggerMs);
+    });
+
+    setTimeout(() => {
+      setIsSaved(false);
+    }, keysToChange.length * staggerMs);
   };
 
   const hashPassword = async (password) => {
@@ -625,13 +644,13 @@ export default function App() {
       if (removeText) parts.push("textless, no text, no watermarks, clear image");
       parts.push("8k resolution, highly detailed, masterpiece, photorealistic, interior design magazine cover");
 
-      let finalPrompt = parts.join(", ");
+      let finalParts = [...parts];
       
       if (useCommercialNegative) {
-        finalPrompt += " --no text, watermark, bad label, blurry, ugly shape, deformed packaging";
+        finalParts.push("--no text, watermark, bad label, blurry, ugly shape, deformed packaging");
       }
 
-      setGeneratedPrompt(finalPrompt);
+      setGeneratedPrompt(finalParts); // Keep as array for Word Chips UI
       setGeneratedImage(null);
       setIsGenerating(false);
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -656,17 +675,18 @@ export default function App() {
     const hfToken = sdApiKey?.trim() || process.env.REACT_APP_HF_TOKEN;
 
     if (!hfToken) {
-      triggerToast("Hugging Face API 토큰이 설정되지 않았습니다.");
+      triggerToast("Hugging Face API 키를 설정해 주세요.");
       return;
     }
     const rawPrompt = prompt || generatedPrompt;
-    if (!rawPrompt) {
-      triggerToast("먼저 프롬프트를 생성해주세요.");
+    if (!rawPrompt || (Array.isArray(rawPrompt) && rawPrompt.length === 0)) {
+      triggerToast("먼저 프롬프트를 생성해 주세요.");
       return;
     }
 
-    // [INSTRUCTION 2] 얼굴 일그러짐 방지 프롬프트 주입
-    const promptToUse = enhancePrompt(rawPrompt);
+    // [INSTRUCTION 2] 상업용 화질/질감 부스트 프롬프트 주입
+    const finalPromptStr = Array.isArray(rawPrompt) ? rawPrompt.join(", ") : rawPrompt;
+    const promptToUse = enhancePrompt(finalPromptStr);
 
     setCooldownTime(5);
     setIsImageGenerating(true);
@@ -751,18 +771,22 @@ export default function App() {
 
   const generateImageFromGoogle = async (prompt) => {
     if (!googleApiKey) {
-      triggerToast("API 키가 설정되지 않았습니다.");
+      triggerToast("API 키를 설정해 주세요.");
       return;
     }
     if (cooldownTime > 0) {
-      triggerToast(`${cooldownTime}초 후에 다시 시도해주세요.`);
+      triggerToast(`${cooldownTime}초 후에 다시 시도해 주세요.`);
       return;
     }
-    const promptToUse = prompt || generatedPrompt;
-    if (!promptToUse) {
-      triggerToast("먼저 프롬프트를 생성해주세요.");
+    const promptToUseRaw = prompt || generatedPrompt;
+    if (!promptToUseRaw || (Array.isArray(promptToUseRaw) && promptToUseRaw.length === 0)) {
+      triggerToast("먼저 프롬프트를 생성해 주세요.");
       return;
     }
+
+    // [INSTRUCTION 2] 상업용 부스트 주입
+    const finalPromptStr = Array.isArray(promptToUseRaw) ? promptToUseRaw.join(", ") : promptToUseRaw;
+    const promptToUse = enhancePrompt(finalPromptStr);
 
     // Reduced cooldown to 5 seconds for paid/billing-enabled users
     setCooldownTime(5);
@@ -1515,6 +1539,9 @@ export default function App() {
                         </div>
                       )}
                     </div>
+                    
+                    <WireframeVisualizer aspectRatio={config.aspectRatio} copySpace={config.copySpace} />
+
                     <OptionSelect label="이미지 비율" value={config.aspectRatio} onChange={(v) => handleConfigChange('aspectRatio', v)} options={OPTIONS_DATA.aspectRatio} theme="blue" />
                     <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
                     <OptionSelect label="화면 여백 (Copy Space)" value={config.copySpace || "선택안함"} onChange={(v) => handleConfigChange('copySpace', v)} options={OPTIONS_DATA.copySpace} theme="blue" />
@@ -1759,7 +1786,7 @@ export default function App() {
                     </div>
                   ) : null}
 
-                  <PromptOutput prompt={generatedPrompt} />
+                  <PromptOutput prompt={generatedPrompt} onChange={setGeneratedPrompt} />
 
                   <div className="save-card">
                     <div className="ios-option-label mb-3">Save Preset</div>
