@@ -13,7 +13,6 @@ import OptionSelect from './components/OptionSelect';
 import IOSToggle from './components/IOSToggle';
 import PromptOutput from './components/PromptOutput';
 import TemplateCard from './components/TemplateCard';
-import WireframeVisualizer from './components/WireframeVisualizer';
 
 /**
  * [ROLE: AI/React Senior Engineer]
@@ -644,13 +643,13 @@ export default function App() {
       if (removeText) parts.push("textless, no text, no watermarks, clear image");
       parts.push("8k resolution, highly detailed, masterpiece, photorealistic, interior design magazine cover");
 
-      let finalParts = [...parts];
+      let finalPrompt = parts.join(", ");
       
       if (useCommercialNegative) {
-        finalParts.push("--no text, watermark, bad label, blurry, ugly shape, deformed packaging");
+        finalPrompt += " --no text, watermark, bad label, blurry, ugly shape, deformed packaging";
       }
 
-      setGeneratedPrompt(finalParts); // Keep as array for Word Chips UI
+      setGeneratedPrompt(finalPrompt); // Keep as standard string
       setGeneratedImage(null);
       setIsGenerating(false);
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -679,14 +678,13 @@ export default function App() {
       return;
     }
     const rawPrompt = prompt || generatedPrompt;
-    if (!rawPrompt || (Array.isArray(rawPrompt) && rawPrompt.length === 0)) {
+    if (!rawPrompt) {
       triggerToast("먼저 프롬프트를 생성해 주세요.");
       return;
     }
 
     // [INSTRUCTION 2] 상업용 화질/질감 부스트 프롬프트 주입
-    const finalPromptStr = Array.isArray(rawPrompt) ? rawPrompt.join(", ") : rawPrompt;
-    const promptToUse = enhancePrompt(finalPromptStr);
+    const promptToUse = enhancePrompt(rawPrompt);
 
     setCooldownTime(5);
     setIsImageGenerating(true);
@@ -778,15 +776,14 @@ export default function App() {
       triggerToast(`${cooldownTime}초 후에 다시 시도해 주세요.`);
       return;
     }
-    const promptToUseRaw = prompt || generatedPrompt;
-    if (!promptToUseRaw || (Array.isArray(promptToUseRaw) && promptToUseRaw.length === 0)) {
+    const promptToUse = prompt || generatedPrompt;
+    if (!promptToUse) {
       triggerToast("먼저 프롬프트를 생성해 주세요.");
       return;
     }
 
     // [INSTRUCTION 2] 상업용 부스트 주입
-    const finalPromptStr = Array.isArray(promptToUseRaw) ? promptToUseRaw.join(", ") : promptToUseRaw;
-    const promptToUse = enhancePrompt(finalPromptStr);
+    const finalPrompt = enhancePrompt(promptToUse);
 
     // Reduced cooldown to 5 seconds for paid/billing-enabled users
     setCooldownTime(5);
@@ -806,7 +803,7 @@ export default function App() {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${googleApiKey}`;
 
       // Construct parts for multimodal input
-      const parts = [{ text: promptToUse }];
+      const parts = [{ text: finalPrompt }];
       if (useImageRef && refImage) {
         parts.push({
           inlineData: {
@@ -1540,8 +1537,6 @@ export default function App() {
                       )}
                     </div>
                     
-                    <WireframeVisualizer aspectRatio={config.aspectRatio} copySpace={config.copySpace} />
-
                     <OptionSelect label="이미지 비율" value={config.aspectRatio} onChange={(v) => handleConfigChange('aspectRatio', v)} options={OPTIONS_DATA.aspectRatio} theme="blue" />
                     <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
                     <OptionSelect label="화면 여백 (Copy Space)" value={config.copySpace || "선택안함"} onChange={(v) => handleConfigChange('copySpace', v)} options={OPTIONS_DATA.copySpace} theme="blue" />
@@ -1786,7 +1781,7 @@ export default function App() {
                     </div>
                   ) : null}
 
-                  <PromptOutput prompt={generatedPrompt} onChange={setGeneratedPrompt} />
+                  <PromptOutput prompt={generatedPrompt} />
 
                   <div className="save-card">
                     <div className="ios-option-label mb-3">Save Preset</div>

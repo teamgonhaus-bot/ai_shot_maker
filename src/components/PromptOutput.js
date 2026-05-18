@@ -1,28 +1,17 @@
 import React, { useState } from 'react';
-import { Copy, Check, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Copy, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-export default function PromptOutput({ prompt, onChange }) {
+export default function PromptOutput({ prompt }) {
   const [copied, setCopied] = useState(false);
 
-  const isArray = Array.isArray(prompt);
-  const textPrompt = isArray ? prompt.join(", ") : prompt;
-
   const handleCopy = () => {
-    navigator.clipboard.writeText(textPrompt);
+    navigator.clipboard.writeText(prompt);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleRemoveChip = (index) => {
-    if (isArray && onChange) {
-      const newPrompt = [...prompt];
-      newPrompt.splice(index, 1);
-      onChange(newPrompt);
-    }
-  };
-
-  if (!prompt || (isArray && prompt.length === 0)) return null;
+  if (!prompt) return null;
 
   return (
     <motion.div
@@ -32,6 +21,7 @@ export default function PromptOutput({ prompt, onChange }) {
       className="result-card ios-bento-card relative"
       style={{ padding: '20px' }}
     >
+      {/* Copy Button — absolute top-right inside card */}
       <button
         onClick={handleCopy}
         className={`copy-btn ${copied ? 'copied' : ''}`}
@@ -41,32 +31,11 @@ export default function PromptOutput({ prompt, onChange }) {
         {copied ? 'Copied!' : 'Copy'}
       </button>
 
-      <span className="result-card-label block mb-3 font-bold text-sm">Final Result (Word Chips)</span>
-      
-      {isArray ? (
-        <div className="flex flex-wrap gap-2 pr-[80px]">
-          <AnimatePresence>
-            {prompt.map((chip, idx) => (
-              <motion.div
-                key={`${idx}-${chip}`}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-gray-200 px-3 py-1.5 rounded-full text-xs font-medium border border-gray-200 dark:border-zinc-700 shadow-sm"
-              >
-                <span>{chip}</span>
-                <button onClick={() => handleRemoveChip(idx)} className="hover:text-red-500 transition-colors ml-1 p-0.5">
-                  <X size={12} />
-                </button>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      ) : (
-        <p className="result-card-text pr-[80px] text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-          {textPrompt}
-        </p>
-      )}
+      {/* Content — padded right to not overlap copy btn */}
+      <span className="result-card-label block mb-2 font-bold text-sm">Final Result</span>
+      <p className="result-card-text pr-[90px] text-sm leading-relaxed text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+        {prompt}
+      </p>
     </motion.div>
   );
 }
