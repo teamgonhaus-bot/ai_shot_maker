@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut
+  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { InferenceClient } from "@huggingface/inference";
@@ -181,6 +181,21 @@ export default function App() {
   // Rename Modal State
   const [renameTarget, setRenameTarget] = useState(null); // { id, name }
   const [newPresetName, setNewPresetName] = useState("");
+  
+  // Prompt Modal State
+  const [promptModalTarget, setPromptModalTarget] = useState(null);
+  const [promptCopied, setPromptCopied] = useState(false);
+
+  // ESC Key Listener for Modals
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && promptModalTarget) {
+        setPromptModalTarget(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [promptModalTarget]);
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
@@ -914,6 +929,52 @@ export default function App() {
         )}
       </AnimatePresence>
 
+      {/* 📝 Prompt Detail Global Modal */}
+      <AnimatePresence>
+        {promptModalTarget && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="settings-modal-overlay"
+            style={{ zIndex: 300000, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}
+            onClick={() => setPromptModalTarget(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-white dark:bg-zinc-900 rounded-[24px] p-6 w-full max-w-sm shadow-2xl relative flex flex-col"
+              style={{ maxHeight: '80vh' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-[20px] font-black text-black dark:text-white mb-4 tracking-tight">Prompt Detail</h3>
+              <div className="flex-1 overflow-y-auto mb-6 p-4 bg-gray-50 dark:bg-zinc-800 rounded-[16px]">
+                <p className="text-[13px] font-medium text-gray-600 dark:text-gray-300 leading-relaxed break-words">
+                  {promptModalTarget.prompt}
+                </p>
+              </div>
+              
+              <div className="flex gap-3 mt-auto">
+                <button 
+                  onClick={() => {
+                    navigator.clipboard.writeText(promptModalTarget.prompt);
+                    setPromptCopied(true);
+                    setTimeout(() => setPromptCopied(false), 2000);
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full font-bold text-[14px] transition-all"
+                  style={{ backgroundColor: promptCopied ? '#34C759' : '#000', color: '#FFF' }}
+                >
+                  {promptCopied ? <span className="font-black">✓ Copied</span> : <><Copy size={16} /> Copy Prompt</>}
+                </button>
+                <button 
+                  onClick={() => setPromptModalTarget(null)}
+                  className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500 hover:bg-gray-200 transition-colors shrink-0"
+                >
+                  <X size={20} strokeWidth={2.5} />
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Settings Modal */}
       <AnimatePresence>
         {isSettingsOpen && (
@@ -1621,6 +1682,7 @@ export default function App() {
                     setNewPresetName(name);
                   }}
                   onMoveRequest={(t) => setMoveTarget(t)}
+                  onViewPrompt={(t) => setPromptModalTarget(t)}
                   categories={OPTIONS_DATA.spaceType}
                 />
               ))}
