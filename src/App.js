@@ -56,6 +56,7 @@ const DICTIONARY = {
   detailMetal: { "황동(브라스)": "brushed brass metal points", "크롬/실버": "polished chrome silver accents", "무광 블랙": "matte black metal frames", "유광 블랙": "with polished glossy black metal", "로즈골드": "elegant rose gold details" },
 
   copySpace: { "선택안함": "", "좌측 여백": "with ample empty copy space on the left side", "우측 여백": "with ample empty copy space on the right side" },
+  productAnchor: { "선택안함": "", "라벨 목업": "a blank unbranded minimalist placeholder product container, no text, smooth surface", "전경 클린": "clear unobstructed view of the center item, no foreground occlusion, clean sharp edges", "합성 베이스": "high contrast separation between central item and background, perfect lighting for design composite" },
   cameraAngle: { "선택안함": "", "정면": "frontal shot", "미디움 샷": "medium shot", "하이앵글": "high-angle shot", "로우앵글": "low-angle shot", "아이레벨": "eye-level shot", "클로즈업": "close-up shot", "익스트림 클로즈업": "extreme close-up shot", "버드아이 뷰": "bird's eye view", "웜즈아이 뷰": "worm's eye view", "더치 앵글": "dutch angle shot", "초광각": "ultra-wide angle shot", "망원 샷": "telephoto lens shot", "풀 샷": "full body shot", "드론 샷": "aerial drone shot" },
   shotStyle: {
     "컬러블로킹": "color blocking aesthetic", "네거티브 스페이스": "negative space composition", "하드 섀도우": "hard shadows",
@@ -100,6 +101,7 @@ const OPTIONS_DATA = {
   detailMetal: ["황동(브라스)", "크롬/실버", "무광 블랙", "유광 블랙", "로즈골드"],
   detailWall: ["화이트 페인트", "노출 콘크리트", "웨인스코팅", "파스텔톤 벽지", "붉은 벽돌", "세라믹타일", "패널", "템바보드", "원목패널", "스틸패널", "스톤패널"],
   copySpace: ["선택안함", "좌측 여백", "우측 여백"],
+  productAnchor: ["선택안함", "라벨 목업", "전경 클린", "합성 베이스"],
   cameraAngle: ["선택안함", "정면", "미디움 샷", "풀 샷", "하이앵글", "로우앵글", "아이레벨", "클로즈업", "익스트림 클로즈업", "버드아이 뷰", "웜즈아이 뷰", "더치 앵글", "초광각", "망원 샷", "드론 샷"],
   shotStyle: [
     "컬러블로킹", "네거티브 스페이스", "하드 섀도우", "톤온톤-모노크로매틱", "플랫 레이", "매크로-디테일", "와비사비-어스톤", "모션 캡쳐-동적 연출",
@@ -135,6 +137,7 @@ export default function App() {
     detailWall: "화이트 페인트",
     cameraAngle: "선택안함",
     copySpace: "선택안함",
+    productAnchor: "선택안함",
     shotStyle: [],
     aspectRatio: "1:1 (Square)",
     country: "선택안함",
@@ -144,6 +147,7 @@ export default function App() {
   const [enableImageGeneration, setEnableImageGeneration] = useState(false);
   const [useDetailMaterial, setUseDetailMaterial] = useState(false);
   const [removeText, setRemoveText] = useState(true);
+  const [useCommercialNegative, setUseCommercialNegative] = useState(false);
   const [generatedPrompt, setGeneratedPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [savedTemplates, setSavedTemplates] = useState([]);
@@ -185,6 +189,7 @@ export default function App() {
   // Prompt Modal State
   const [promptModalTarget, setPromptModalTarget] = useState(null);
   const [promptCopied, setPromptCopied] = useState(false);
+  const [activeMarquee, setActiveMarquee] = useState("");
 
   // ESC Key Listener for Modals
   useEffect(() => {
@@ -217,6 +222,8 @@ export default function App() {
     if (savedMat) setUseDetailMaterial(savedMat === 'true');
     const savedText = localStorage.getItem('shotmaker_removeText_v13');
     if (savedText) setRemoveText(savedText === 'true');
+    const savedCommNeg = localStorage.getItem('shotmaker_useCommercialNegative_v13');
+    if (savedCommNeg) setUseCommercialNegative(savedCommNeg === 'true');
 
     const storedApi = localStorage.getItem('shotmaker_selected_api');
     if (storedApi) setSelectedApi(storedApi);
@@ -266,9 +273,10 @@ export default function App() {
       localStorage.setItem('shotmaker_config_v13', JSON.stringify(config));
       localStorage.setItem('shotmaker_useDetailMaterial_v13', useDetailMaterial);
       localStorage.setItem('shotmaker_removeText_v13', removeText);
+      localStorage.setItem('shotmaker_useCommercialNegative_v13', useCommercialNegative);
       localStorage.setItem('shotmaker_enableImageGeneration', enableImageGeneration);
     }
-  }, [config, useDetailMaterial, removeText, enableImageGeneration, isLoading]);
+  }, [config, useDetailMaterial, removeText, useCommercialNegative, enableImageGeneration, isLoading]);
 
   const handleConfigChange = (key, value) => {
     setActiveTemplate(null);
@@ -294,6 +302,7 @@ export default function App() {
       newConfig.spaceDetail = '그라데이션 배경';
       newConfig.cameraAngle = '풀 샷';
       newConfig.interiorStyle = '모던 미니멀';
+      setActiveMarquee("타이틀씬 활성화: 제품 중심 / 인물 강제 해제 적용 중");
     } else if (templateType === '디테일씬') {
       newConfig.subjectNum = '없음';
       newConfig.spaceType = '스튜디오';
@@ -301,6 +310,7 @@ export default function App() {
       newConfig.cameraAngle = '익스트림 클로즈업';
       newConfig.useLight = true;
       newConfig.light = '스포트라이트 조명';
+      setActiveMarquee("디테일씬 활성화: 클로즈업 중심 / 강렬한 조명 연출");
     } else if (templateType === '인스타씬') {
       if (newConfig.subjectNum === "없음") newConfig.subjectNum = "혼자";
       newConfig.subjectAge = '20대';
@@ -308,11 +318,13 @@ export default function App() {
       newConfig.spaceType = '야외';
       newConfig.spaceDetail = '힙한곳';
       newConfig.interiorStyle = '플랜테리어';
+      setActiveMarquee("인스타씬 활성화: 트렌디한 공간 / 인물 자동 설정");
     } else if (templateType === '사용씬') {
       if (newConfig.subjectNum === "없음") newConfig.subjectNum = "혼자";
       newConfig.spaceType = '홈';
       newConfig.spaceDetail = '워크룸';
       newConfig.cameraAngle = '미디움 샷';
+      setActiveMarquee("사용씬 활성화: 라이프스타일 중심 / 인물 상호작용 강화");
     }
     
     setConfig(newConfig);
@@ -520,6 +532,10 @@ export default function App() {
           actionStr = "posing naturally";
         }
         parts.push(`featuring ${humanStr} ${actionStr}`);
+        
+        if (useImageRef && refImage) {
+          parts.push("The person is naturally interacting with/holding the product in the attached image");
+        }
       } else {
         parts.push(`professional architectural photography of ${subjectStr}`);
       }
@@ -544,6 +560,7 @@ export default function App() {
         parts.push(`illuminated by ${DICTIONARY.light[config.light]} with ${config.brightness} brightness`);
       }
       if (config.copySpace && config.copySpace !== "선택안함") parts.push(DICTIONARY.copySpace[config.copySpace]);
+      if (config.productAnchor && config.productAnchor !== "선택안함") parts.push(DICTIONARY.productAnchor[config.productAnchor]);
       if (config.cameraAngle !== "선택안함") parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
       if (config.shotStyle.length > 0) {
         const styles = config.shotStyle.map(s => DICTIONARY.shotStyle[s]);
@@ -552,7 +569,12 @@ export default function App() {
       if (removeText) parts.push("textless, no text, no watermarks, clear image");
       parts.push("8k resolution, highly detailed, masterpiece, photorealistic, interior design magazine cover");
 
-      const finalPrompt = parts.join(", ");
+      let finalPrompt = parts.join(", ");
+      
+      if (useCommercialNegative) {
+        finalPrompt += " --no text, watermark, bad label, blurry, ugly shape, deformed packaging";
+      }
+
       setGeneratedPrompt(finalPrompt);
       setGeneratedImage(null);
       setIsGenerating(false);
@@ -1189,6 +1211,27 @@ export default function App() {
               </button>
             </div>
 
+            {/* Smart Template Marquee */}
+            <AnimatePresence>
+              {activeMarquee && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: 'auto' }}
+                  exit={{ opacity: 0, y: -10, height: 0 }}
+                  className="overflow-hidden flex items-center justify-center w-full"
+                >
+                  <motion.div
+                    initial={{ x: 30 }}
+                    animate={{ x: 0 }}
+                    className="px-4 py-2 mt-2 bg-black dark:bg-white rounded-full text-[12px] font-bold text-white dark:text-black tracking-tight flex items-center justify-center whitespace-nowrap"
+                    style={{ width: 'fit-content' }}
+                  >
+                    ✨ {activeMarquee}
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Category Tabs */}
             <div className="ios-category-tabs">
               <button className={`category-tab ${activeCategory === 'subject' ? 'active' : ''}`} onClick={() => setActiveCategory('subject')}>인물</button>
@@ -1405,6 +1448,9 @@ export default function App() {
                     <OptionSelect label="이미지 비율" value={config.aspectRatio} onChange={(v) => handleConfigChange('aspectRatio', v)} options={OPTIONS_DATA.aspectRatio} theme="blue" />
                     <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
                     <OptionSelect label="화면 여백 (Copy Space)" value={config.copySpace || "선택안함"} onChange={(v) => handleConfigChange('copySpace', v)} options={OPTIONS_DATA.copySpace} theme="blue" />
+                    <div className="mt-4 border-t border-gray-100 dark:border-zinc-800 pt-4">
+                      <OptionSelect label="제품 고정/합성 (Product Anchor)" value={config.productAnchor} onChange={(v) => handleConfigChange('productAnchor', v)} options={OPTIONS_DATA.productAnchor} theme="blue" />
+                    </div>
                   </div>
                 </motion.section>
               )}
@@ -1620,6 +1666,21 @@ export default function App() {
                       </div>
                     </div>
                   ) : null}
+
+                  <div className="ios-bento-card mb-4" style={{ padding: '16px' }}>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <label className="text-[13px] font-black text-black dark:text-white uppercase tracking-wider block">상업용 클린 출력 (Commercial Clean)</label>
+                        <p className="text-[11px] font-medium text-gray-500 mt-1 mb-0">상업용 합성에 불필요한 요소 제거 프롬프트 자동 추가</p>
+                      </div>
+                      <IOSToggle
+                        label=""
+                        isOn={useCommercialNegative}
+                        onToggle={() => setUseCommercialNegative(!useCommercialNegative)}
+                        activeColor="#007AFF"
+                      />
+                    </div>
+                  </div>
 
                   <PromptOutput prompt={generatedPrompt} />
 
