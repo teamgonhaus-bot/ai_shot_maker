@@ -1,23 +1,18 @@
 import React from 'react';
-import { Trash2, ArrowRight, ChevronDown, FolderInput, Edit2 } from 'lucide-react';
+import { Trash2, ChevronDown, FolderInput, Edit2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export default function TemplateCard({ template, onLoad, onDelete, onRename, onMoveRequest, onViewPrompt, categories, isActive }) {
+export default function TemplateCard({ template, onSelect, onApply, onDelete, onRename, onMoveRequest, onViewPrompt, categories, isSelected }) {
   return (
     <motion.div
       layout
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(0,0,0,0.08)' }}
-      className={`ios-bento-card flex flex-col justify-between overflow-hidden relative transition-all duration-300 ${isActive ? 'ring-2 ring-[#007AFF] shadow-md' : ''}`}
+      whileHover={{ y: -4, boxShadow: '0 12px 28px rgba(0,0,0,0.10)' }}
+      className={`ios-bento-card flex flex-col justify-between overflow-hidden relative transition-all duration-300 ${isSelected ? 'ring-2 ring-[#007AFF]' : ''}`}
       style={{ padding: '0', minHeight: '140px', marginBottom: '0', cursor: 'pointer' }}
-      onClick={() => onLoad(template)}
+      onClick={() => onSelect(template)}
     >
-      {isActive && (
-        <div className="absolute top-3 right-3 bg-[#007AFF] text-white rounded-full p-[3px] z-10 shadow-sm flex items-center justify-center">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        </div>
-      )}
       {template.previewImage && (
         <div className="w-full h-32 bg-gray-100">
           <img 
@@ -56,13 +51,24 @@ export default function TemplateCard({ template, onLoad, onDelete, onRename, onM
       </div>
 
       <div className="flex items-center justify-between pt-3 px-4 pb-4 border-t border-gray-100 mt-2">
-        <div className="flex gap-3">
+        <div className="flex gap-2 items-center">
+          {/* Apply Button — only injects data when explicitly pressed */}
           <button
-            onClick={(e) => { e.stopPropagation(); onLoad(template); }}
-            className="ios-card-icon-btn"
-            title="Load"
+            onClick={(e) => { e.stopPropagation(); onApply(template); }}
+            className="ios-pill text-[11px] font-black tracking-wide"
+            title="Apply this preset"
+            style={{
+              backgroundColor: isSelected ? '#007AFF' : '#000',
+              color: '#fff',
+              border: 'none',
+              padding: '6px 14px',
+              borderRadius: '999px',
+              letterSpacing: '0.05em',
+              cursor: 'pointer',
+              transition: 'background 0.2s'
+            }}
           >
-            <ArrowRight size={16} strokeWidth={2} />
+            {isSelected ? '적용' : '선택 후 적용'}
           </button>
           <button
             onClick={(e) => {

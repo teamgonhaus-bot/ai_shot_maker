@@ -445,9 +445,15 @@ export default function App() {
     }
   };
 
-  const handleLoadTemplate = (template) => {
+  // Visual-only select (no data injection)
+  const handleSelectTemplate = (template) => {
+    setActiveLibraryTemplateId(template.id);
+  };
+
+  // Full data injection — only triggered via the Apply button
+  const handleApplyTemplate = (template) => {
     setConfig({
-      ...config, // Keep existing if missing in template
+      ...config,
       ...template.config
     });
     setUseDetailMaterial(template.useDetailMaterial || false);
@@ -1214,34 +1220,39 @@ export default function App() {
               </button>
             </div>
 
-            {/* Smart Template Marquee */}
-            <div className="w-full bg-black dark:bg-white overflow-hidden py-[10px] mt-4 rounded-xl flex relative" style={{ userSelect: 'none' }}>
-              <div 
-                className="whitespace-nowrap text-[12px] font-bold text-white dark:text-black tracking-widest uppercase flex flex-shrink-0 items-center justify-around"
-                style={{
-                  animation: 'marquee-infinite 15s linear infinite',
-                  minWidth: '100%'
-                }}
-              >
-                <span className="px-8">{activeMarquee || "Start generating your commercial visual concept right now..."}</span>
-                <span className="px-8">{activeMarquee || "Start generating your commercial visual concept right now..."}</span>
-              </div>
-              <div 
-                className="whitespace-nowrap text-[12px] font-bold text-white dark:text-black tracking-widest uppercase flex flex-shrink-0 items-center justify-around"
-                style={{
-                  animation: 'marquee-infinite 15s linear infinite',
-                  minWidth: '100%'
-                }}
-              >
-                <span className="px-8">{activeMarquee || "Start generating your commercial visual concept right now..."}</span>
-                <span className="px-8">{activeMarquee || "Start generating your commercial visual concept right now..."}</span>
-              </div>
+            {/* Smart Template Marquee — Seamless single-line loop */}
+            <div
+              className="w-full overflow-hidden mt-4 rounded-xl"
+              style={{ background: '#111', height: '36px', display: 'flex', alignItems: 'center', position: 'relative' }}
+            >
               <style>{`
-                @keyframes marquee-infinite {
-                  0% { transform: translateX(0%); }
-                  100% { transform: translateX(-100%); }
+                @keyframes seamless-marquee {
+                  0%   { transform: translateX(0); }
+                  100% { transform: translateX(-50%); }
+                }
+                .marquee-track {
+                  display: flex;
+                  width: max-content;
+                  animation: seamless-marquee 14s linear infinite;
+                  will-change: transform;
+                }
+                .marquee-track:hover { animation-play-state: paused; }
+                .marquee-segment {
+                  white-space: nowrap;
+                  font-size: 11px;
+                  font-weight: 800;
+                  letter-spacing: 0.12em;
+                  text-transform: uppercase;
+                  color: #fff;
+                  padding: 0 40px;
                 }
               `}</style>
+              <div className="marquee-track" key={activeMarquee}>
+                <span className="marquee-segment">{activeMarquee || 'Start generating your commercial visual concept right now...'}</span>
+                <span className="marquee-segment">{activeMarquee || 'Start generating your commercial visual concept right now...'}</span>
+                <span className="marquee-segment">{activeMarquee || 'Start generating your commercial visual concept right now...'}</span>
+                <span className="marquee-segment">{activeMarquee || 'Start generating your commercial visual concept right now...'}</span>
+              </div>
             </div>
 
             {/* Category Tabs */}
@@ -1741,10 +1752,10 @@ export default function App() {
                 <TemplateCard
                   key={template.id}
                   template={template}
-                  isActive={activeLibraryTemplateId === template.id}
-                  onLoad={(t) => {
-                    handleLoadTemplate(t);
-                    setActiveTab('home');
+                  isSelected={activeLibraryTemplateId === template.id}
+                  onSelect={handleSelectTemplate}
+                  onApply={(t) => {
+                    handleApplyTemplate(t);
                   }}
                   onDelete={handleDeleteTemplate}
                   onRename={(id, name) => {
