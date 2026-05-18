@@ -1214,15 +1214,16 @@ export default function App() {
             {/* Smart Template Marquee */}
             <div className="w-full bg-black dark:bg-white overflow-hidden py-[10px] mt-4 rounded-xl flex items-center relative">
               <div 
-                className="whitespace-nowrap text-[12px] font-bold text-white dark:text-black tracking-widest uppercase"
+                className="text-[12px] font-bold text-white dark:text-black tracking-widest uppercase"
                 style={{
-                  animation: 'marquee 12s linear infinite',
+                  animation: 'marquee 8s linear infinite',
                   display: 'inline-block',
                   minWidth: '100%',
-                  paddingLeft: '100%'
+                  paddingLeft: '100%',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                ✨ {activeMarquee || "Start generating your commercial visual concept right now..."}
+                {activeMarquee || "Start generating your commercial visual concept right now..."}
               </div>
               <style>{`
                 @keyframes marquee {
