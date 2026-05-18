@@ -186,10 +186,10 @@ export default function App() {
   const [renameTarget, setRenameTarget] = useState(null); // { id, name }
   const [newPresetName, setNewPresetName] = useState("");
   
-  // Prompt Modal State
   const [promptModalTarget, setPromptModalTarget] = useState(null);
   const [promptCopied, setPromptCopied] = useState(false);
   const [activeMarquee, setActiveMarquee] = useState("");
+  const [activeLibraryTemplateId, setActiveLibraryTemplateId] = useState(null);
 
   // ESC Key Listener for Modals
   useEffect(() => {
@@ -280,6 +280,7 @@ export default function App() {
 
   const handleConfigChange = (key, value) => {
     setActiveTemplate(null);
+    setActiveLibraryTemplateId(null);
     setConfig(prev => {
       const next = { ...prev, [key]: value };
       if (key === 'spaceType') next.spaceDetail = OPTIONS_DATA.spaceDetail[value][0];
@@ -294,6 +295,7 @@ export default function App() {
 
   const handleSmartTemplate = (templateType) => {
     setActiveTemplate(templateType);
+    setActiveLibraryTemplateId(null);
     let newConfig = { ...config };
     
     if (templateType === '타이틀씬') {
@@ -451,6 +453,7 @@ export default function App() {
     setUseDetailMaterial(template.useDetailMaterial || false);
     setRemoveText(template.removeText !== undefined ? template.removeText : true);
     setGeneratedPrompt(template.prompt);
+    setActiveLibraryTemplateId(template.id);
     setActiveTab('home');
   };
 
@@ -1212,21 +1215,29 @@ export default function App() {
             </div>
 
             {/* Smart Template Marquee */}
-            <div className="w-full bg-black dark:bg-white overflow-hidden py-[10px] mt-4 rounded-xl flex items-center relative">
+            <div className="w-full bg-black dark:bg-white overflow-hidden py-[10px] mt-4 rounded-xl flex relative" style={{ userSelect: 'none' }}>
               <div 
-                className="text-[12px] font-bold text-white dark:text-black tracking-widest uppercase"
+                className="whitespace-nowrap text-[12px] font-bold text-white dark:text-black tracking-widest uppercase flex flex-shrink-0 items-center justify-around"
                 style={{
-                  animation: 'marquee 8s linear infinite',
-                  display: 'inline-block',
-                  minWidth: '100%',
-                  paddingLeft: '100%',
-                  whiteSpace: 'nowrap'
+                  animation: 'marquee-infinite 15s linear infinite',
+                  minWidth: '100%'
                 }}
               >
-                {activeMarquee || "Start generating your commercial visual concept right now..."}
+                <span className="px-8">{activeMarquee || "Start generating your commercial visual concept right now..."}</span>
+                <span className="px-8">{activeMarquee || "Start generating your commercial visual concept right now..."}</span>
+              </div>
+              <div 
+                className="whitespace-nowrap text-[12px] font-bold text-white dark:text-black tracking-widest uppercase flex flex-shrink-0 items-center justify-around"
+                style={{
+                  animation: 'marquee-infinite 15s linear infinite',
+                  minWidth: '100%'
+                }}
+              >
+                <span className="px-8">{activeMarquee || "Start generating your commercial visual concept right now..."}</span>
+                <span className="px-8">{activeMarquee || "Start generating your commercial visual concept right now..."}</span>
               </div>
               <style>{`
-                @keyframes marquee {
+                @keyframes marquee-infinite {
                   0% { transform: translateX(0%); }
                   100% { transform: translateX(-100%); }
                 }
@@ -1730,6 +1741,7 @@ export default function App() {
                 <TemplateCard
                   key={template.id}
                   template={template}
+                  isActive={activeLibraryTemplateId === template.id}
                   onLoad={(t) => {
                     handleLoadTemplate(t);
                     setActiveTab('home');

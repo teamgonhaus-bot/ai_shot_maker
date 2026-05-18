@@ -2,15 +2,22 @@ import React from 'react';
 import { Trash2, ArrowRight, ChevronDown, FolderInput, Edit2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export default function TemplateCard({ template, onLoad, onDelete, onRename, onMoveRequest, onViewPrompt, categories }) {
+export default function TemplateCard({ template, onLoad, onDelete, onRename, onMoveRequest, onViewPrompt, categories, isActive }) {
   return (
     <motion.div
       layout
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="ios-bento-card flex flex-col justify-between overflow-hidden relative"
-      style={{ padding: '0', minHeight: '140px', marginBottom: '0' }}
+      whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(0,0,0,0.08)' }}
+      className={`ios-bento-card flex flex-col justify-between overflow-hidden relative transition-all duration-300 ${isActive ? 'ring-2 ring-[#007AFF] shadow-md' : ''}`}
+      style={{ padding: '0', minHeight: '140px', marginBottom: '0', cursor: 'pointer' }}
+      onClick={() => onLoad(template)}
     >
+      {isActive && (
+        <div className="absolute top-3 right-3 bg-[#007AFF] text-white rounded-full p-[3px] z-10 shadow-sm flex items-center justify-center">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+      )}
       {template.previewImage && (
         <div className="w-full h-32 bg-gray-100">
           <img 
@@ -30,7 +37,7 @@ export default function TemplateCard({ template, onLoad, onDelete, onRename, onM
             </h4>
           </div>
           <button 
-            onClick={() => onMoveRequest(template)}
+            onClick={(e) => { e.stopPropagation(); onMoveRequest(template); }}
             className="ios-card-icon-btn"
             title="Move to category"
             style={{ width: '32px', height: '32px' }}
@@ -51,7 +58,7 @@ export default function TemplateCard({ template, onLoad, onDelete, onRename, onM
       <div className="flex items-center justify-between pt-3 px-4 pb-4 border-t border-gray-100 mt-2">
         <div className="flex gap-3">
           <button
-            onClick={() => onLoad(template)}
+            onClick={(e) => { e.stopPropagation(); onLoad(template); }}
             className="ios-card-icon-btn"
             title="Load"
           >
@@ -81,7 +88,7 @@ export default function TemplateCard({ template, onLoad, onDelete, onRename, onM
 
         {template.prompt && template.prompt.length > 80 && (
           <button 
-            onClick={() => onViewPrompt(template)}
+            onClick={(e) => { e.stopPropagation(); onViewPrompt(template); }}
             className="ios-card-icon-btn"
             title="View Prompt"
             style={{ width: '32px', height: '32px', marginLeft: 'auto', backgroundColor: '#000', color: '#fff' }}
