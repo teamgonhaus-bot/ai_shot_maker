@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trash2, ChevronDown, FolderInput, Edit2 } from 'lucide-react';
+import { Trash2, ChevronDown, FolderInput, Edit2, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function TemplateCard({ template, onSelect, onApply, onDelete, onRename, onMoveRequest, onViewPrompt, categories, isSelected }) {
@@ -52,39 +52,28 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
 
       <div className="flex items-center justify-between pt-3 px-4 pb-4 border-t border-gray-100 mt-2">
         <div className="flex gap-2 items-center">
-          {/* Apply Button — only injects data when explicitly pressed */}
+          {/* Apply arrow — inverts to black when selected */}
           <button
             onClick={(e) => { e.stopPropagation(); onApply(template); }}
-            className="ios-pill text-[11px] font-black tracking-wide"
-            title="Apply this preset"
+            className="ios-card-icon-btn"
+            title="Apply preset"
             style={{
-              backgroundColor: isSelected ? '#007AFF' : '#000',
-              color: '#fff',
-              border: 'none',
-              padding: '6px 14px',
-              borderRadius: '999px',
-              letterSpacing: '0.05em',
-              cursor: 'pointer',
-              transition: 'background 0.2s'
+              backgroundColor: isSelected ? '#000' : undefined,
+              color: isSelected ? '#fff' : undefined,
+              transition: 'background 0.2s, color 0.2s'
             }}
           >
-            {isSelected ? '적용' : '선택 후 적용'}
+            <ArrowRight size={16} strokeWidth={2.5} />
           </button>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(template.id);
-            }}
+            onClick={(e) => { e.stopPropagation(); onDelete(template.id); }}
             className="ios-card-icon-btn"
             title="Delete"
           >
             <Trash2 size={16} strokeWidth={2} />
           </button>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onRename(template.id, template.name);
-            }}
+            onClick={(e) => { e.stopPropagation(); onRename(template.id, template.name); }}
             className="ios-card-icon-btn"
             title="Rename"
           >
