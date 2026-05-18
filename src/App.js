@@ -945,13 +945,13 @@ export default function App() {
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-[20px] font-black text-black dark:text-white mb-4 tracking-tight text-center">Prompt Detail</h3>
-              <div className="flex-1 overflow-y-auto mb-6" style={{ padding: '16px', backgroundColor: '#F2F2F7', borderRadius: '16px' }}>
+              <div className="flex-1 overflow-y-auto" style={{ padding: '16px', backgroundColor: '#F2F2F7', borderRadius: '16px', marginBottom: '20px' }}>
                 <p className="text-[13px] font-medium text-gray-600 leading-relaxed break-words m-0">
                   {promptModalTarget.prompt}
                 </p>
               </div>
               
-              <div className="flex gap-3 mt-auto">
+              <div style={{ display: 'flex', gap: '12px', marginTop: 'auto', alignItems: 'center' }}>
                 <button 
                   onClick={() => {
                     navigator.clipboard.writeText(promptModalTarget.prompt);
@@ -959,14 +959,13 @@ export default function App() {
                     setTimeout(() => setPromptCopied(false), 2000);
                   }}
                   className="save-btn flex-1"
-                  style={{ backgroundColor: promptCopied ? '#34C759' : '#000', color: '#FFF', borderRadius: '9999px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+                  style={{ backgroundColor: promptCopied ? '#34C759' : '#000', color: '#FFF', borderRadius: '9999px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', height: '48px', border: 'none', cursor: 'pointer', outline: 'none' }}
                 >
                   {promptCopied ? <span className="font-black">✓ Copied</span> : <><Copy size={16} /> Copy Prompt</>}
                 </button>
                 <button 
                   onClick={() => setPromptModalTarget(null)}
-                  className="cancel-pill-btn"
-                  style={{ width: '48px', height: '48px', padding: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '9999px', flexShrink: 0 }}
+                  style={{ width: '48px', height: '48px', padding: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%', backgroundColor: '#F2F2F7', border: 'none', cursor: 'pointer', color: '#000', flexShrink: 0, outline: 'none' }}
                 >
                   <X size={20} strokeWidth={2.5} />
                 </button>
