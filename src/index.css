@@ -1116,6 +1116,36 @@ body.dark-mode .ios-loading-screen { background: #1C1C1E !important; color: #8E8
 body.dark-mode .ios-footer { background: rgba(28, 28, 30, 0.85) !important; border-top-color: rgba(255,255,255,0.05) !important; color: #48484A !important; }
 body.dark-mode .ios-library-close { background: #3A3A3C !important; color: #FFF !important; }
 
+/* Dark mode: Smart Template buttons use dark gray instead of white */
+body.dark-mode .ios-smart-template-btn {
+  background-color: #2C2C2E !important;
+  border-color: #3A3A3C !important;
+  color: #FFFFFF !important;
+}
+body.dark-mode .ios-smart-template-btn:hover {
+  border-color: #48484A !important;
+  background-color: #3A3A3C !important;
+}
+body.dark-mode .ios-smart-template-btn.active {
+  background-color: #F2F2F7 !important;
+  border-color: #F2F2F7 !important;
+  color: #000000 !important;
+}
+body.dark-mode .ios-smart-template-btn.active .template-desc {
+  color: rgba(0, 0, 0, 0.7) !important;
+}
+body.dark-mode .template-desc {
+  color: #8E8E93 !important;
+}
+
+/* Dark mode: Camera blue pill selected state — ensure high contrast */
+body.dark-mode .ios-pill.selected-blue {
+  background-color: #0A84FF !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  box-shadow: 0 0 0 1px rgba(10, 132, 255, 0.5) !important;
+}
+
 /* =============================================
    IMAGE RESULT CARD TOOLTIP
    ============================================= */

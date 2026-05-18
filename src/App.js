@@ -49,7 +49,7 @@ const DICTIONARY = {
   },
   detailWall: { "화이트 페인트": "clean white painted walls", "노출 콘크리트": "exposed raw concrete walls", "웨인스코팅": "elegant wainscoted walls", "파스텔톤 벽지": "soft pastel wallpaper", "붉은 벽돌": "rustic red brick walls", "세라믹타일": "ceramic tiled walls", "패널": "paneled walls", "템바보드": "tambour board walls", "원목패널": "solid wood paneled walls", "스틸패널": "steel paneled walls", "스톤패널": "stone paneled walls" },
   interiorStyle: { "선택안함": "", "미드센추리 모던": "mid-century modern style", "모던 미니멀": "modern minimal style", "내추럴 우드": "natural wood interior style", "젠 스타일": "Zen-inspired style", "인더스트리얼": "industrial style", "스칸디나비안": "Scandinavian style", "플랜테리어": "planterior style with many indoor plants" },
-  light: { "선택안함": "", "자연광": "natural sunlight", "시네마틱": "cinematic dramatic lighting", "스튜디오 조명": "professional studio softbox lighting", "스포트라이트 조명": "focused spotlight lighting", "무드등": "soft mood lighting" },
+  light: { "선택안함": "", "자연광": "natural sunlight", "시네마틱": "cinematic dramatic lighting", "스튜디오 조명": "professional studio softbox lighting", "스포트라이트 조명": "focused spotlight lighting", "무드등": "soft mood lighting", "나르스 확산광": "soft, diffused lighting" },
 
   detailFloor: { "밝은 우드 마루": "light wood flooring", "어두운 우드 마루": "dark walnut wood flooring", "테라조 타일": "modern terrazzo tile floor", "대리석": "premium marble flooring", "콘크리트": "polished concrete floor", "조약돌 바닥": "pebble stone floor", "자갈 바닥": "gravel floor", "카펫": "with cozy carpet texture", "포세린타일": "with polished porcelain tiles", "에폭시": "with industrial epoxy flooring" },
   detailWood: { "오크(참나무)": "natural oak wood textures", "월넛(호두나무)": "rich walnut wood details", "자작나무": "birch wood accents", "티크": "premium teak wood", "애쉬": "with natural ash wood grain", "마호가니": "with rich mahogany wood finish", "미송": "with clean pine wood textures", "OBS": "with rugged OSB textures", "합판": "with minimalist plywood details" },
@@ -57,6 +57,7 @@ const DICTIONARY = {
 
   copySpace: { "선택안함": "", "좌측 여백": "with ample empty copy space on the left side", "우측 여백": "with ample empty copy space on the right side" },
   productAnchor: { "선택안함": "", "라벨 목업": "a blank unbranded minimalist placeholder product container, no text, smooth surface", "전경 클린": "clear unobstructed view of the center item, no foreground occlusion, clean sharp edges", "합성 베이스": "high contrast separation between central item and background, perfect lighting for design composite" },
+  productLayout: { "선택안함": "", "공중부양": "product floating in mid-air, levitating with subtle shadow below", "대각선 안착": "product suspended diagonally in mid-air at a dynamic angle", "액체 스플래시": "dramatic liquid splash effect surrounding the product", "파우더 폭발": "powder explosion burst effect around the product" },
   cameraAngle: { "선택안함": "", "정면": "frontal shot", "미디움 샷": "medium shot", "하이앵글": "high-angle shot", "로우앵글": "low-angle shot", "아이레벨": "eye-level shot", "클로즈업": "close-up shot", "익스트림 클로즈업": "extreme close-up shot", "버드아이 뷰": "bird's eye view", "웜즈아이 뷰": "worm's eye view", "더치 앵글": "dutch angle shot", "초광각": "ultra-wide angle shot", "망원 샷": "telephoto lens shot", "풀 샷": "full body shot", "드론 샷": "aerial drone shot" },
   shotStyle: {
     "컬러블로킹": "color blocking aesthetic", "네거티브 스페이스": "negative space composition", "하드 섀도우": "hard shadows",
@@ -87,7 +88,7 @@ const OPTIONS_DATA = {
   subjectHair: ["선택안함", "긴머리", "짧은머리", "단발", "펌", "염색", "묶은머리"],
   spaceType: ["스튜디오", "오피스", "홈", "리테일", "라운지", "야외"],
   spaceDetail: {
-    "스튜디오": ["단색 배경", "인테리어 세트장", "그라데이션 배경", "쇼케이스", "크로마키 그린 배경"],
+    "스튜디오": ["단색 배경", "단색 모노크롬", "인테리어 세트장", "그라데이션 배경", "쇼케이스", "크로마키 그린 배경"],
     "오피스": ["사무실", "회의실", "중역실", "오피스 라운지", "트레이닝룸", "공유오피스"],
     "홈": ["리빙", "다이닝", "룸", "워크룸", "베드룸", "테라스"],
     "리테일": ["카페", "식당", "쇼룸", "로비", "쇼핑몰", "박람회", "갤러리", "도서관", "강의실"],
@@ -95,13 +96,14 @@ const OPTIONS_DATA = {
     "야외": ["도심", "자연", "테라스", "공원", "강가", "쇼핑가", "힙한곳"]
   },
   interiorStyle: ["선택안함", "미드센추리 모던", "모던 미니멀", "내추럴 우드", "젠 스타일", "인더스트리얼", "스칸디나비안", "플랜테리어"],
-  light: ["선택안함", "자연광", "시네마틱", "스튜디오 조명", "스포트라이트 조명", "무드등"],
+  light: ["선택안함", "자연광", "시네마틱", "스튜디오 조명", "스포트라이트 조명", "무드등", "나르스 확산광"],
   detailFloor: ["밝은 우드 마루", "어두운 우드 마루", "테라조 타일", "대리석", "콘크리트", "조약돌 바닥", "자갈 바닥", "카펫", "포세린타일", "에폭시"],
   detailWood: ["오크(참나무)", "월넛(호두나무)", "자작나무", "티크", "애쉬", "마호가니", "미송", "OBS", "합판"],
   detailMetal: ["황동(브라스)", "크롬/실버", "무광 블랙", "유광 블랙", "로즈골드"],
   detailWall: ["화이트 페인트", "노출 콘크리트", "웨인스코팅", "파스텔톤 벽지", "붉은 벽돌", "세라믹타일", "패널", "템바보드", "원목패널", "스틸패널", "스톤패널"],
   copySpace: ["선택안함", "좌측 여백", "우측 여백"],
   productAnchor: ["선택안함", "라벨 목업", "전경 클린", "합성 베이스"],
+  productLayout: ["선택안함", "공중부양", "대각선 안착", "액체 스플래시", "파우더 폭발"],
   cameraAngle: ["선택안함", "정면", "미디움 샷", "풀 샷", "하이앵글", "로우앵글", "아이레벨", "클로즈업", "익스트림 클로즈업", "버드아이 뷰", "웜즈아이 뷰", "더치 앵글", "초광각", "망원 샷", "드론 샷"],
   shotStyle: [
     "컬러블로킹", "네거티브 스페이스", "하드 섀도우", "톤온톤-모노크로매틱", "플랫 레이", "매크로-디테일", "와비사비-어스톤", "모션 캡쳐-동적 연출",
@@ -138,6 +140,7 @@ export default function App() {
     cameraAngle: "선택안함",
     copySpace: "선택안함",
     productAnchor: "선택안함",
+    productLayout: "선택안함",
     shotStyle: [],
     aspectRatio: "1:1 (Square)",
     country: "선택안함",
@@ -301,9 +304,12 @@ export default function App() {
     if (templateType === '타이틀씬') {
       newConfig.subjectNum = '없음';
       newConfig.spaceType = '스튜디오';
-      newConfig.spaceDetail = '그라데이션 배경';
+      newConfig.spaceDetail = '단색 모노크롬';
       newConfig.cameraAngle = '풀 샷';
       newConfig.interiorStyle = '모던 미니멀';
+      newConfig.productLayout = '대각선 안착';
+      newConfig.useLight = true;
+      newConfig.light = '나르스 확산광';
       setActiveMarquee("Title Scene Active: Focused on product-centric minimalist studio layout...");
     } else if (templateType === '디테일씬') {
       newConfig.subjectNum = '없음';
@@ -568,6 +574,7 @@ export default function App() {
       if (config.useLight && config.light !== "선택안함") {
         parts.push(`illuminated by ${DICTIONARY.light[config.light]} with ${config.brightness} brightness`);
       }
+      if (config.productLayout && config.productLayout !== "선택안함") parts.push(DICTIONARY.productLayout[config.productLayout]);
       if (config.copySpace && config.copySpace !== "선택안함") parts.push(DICTIONARY.copySpace[config.copySpace]);
       if (config.productAnchor && config.productAnchor !== "선택안함") parts.push(DICTIONARY.productAnchor[config.productAnchor]);
       if (config.cameraAngle !== "선택안함") parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
@@ -1472,6 +1479,7 @@ export default function App() {
                     <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
                     <OptionSelect label="화면 여백 (Copy Space)" value={config.copySpace || "선택안함"} onChange={(v) => handleConfigChange('copySpace', v)} options={OPTIONS_DATA.copySpace} theme="blue" />
                     <div className="mt-4 border-t border-gray-100 dark:border-zinc-800 pt-4">
+                      <OptionSelect label="제품 레이아웃 (Product Layout)" value={config.productLayout} onChange={(v) => handleConfigChange('productLayout', v)} options={OPTIONS_DATA.productLayout} theme="blue" />
                       <OptionSelect label="제품 고정/합성 (Product Anchor)" value={config.productAnchor} onChange={(v) => handleConfigChange('productAnchor', v)} options={OPTIONS_DATA.productAnchor} theme="blue" />
                     </div>
                   </div>
