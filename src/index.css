@@ -1569,4 +1569,102 @@ body.dark-mode .mode-nav-btn.active {
 
 .mode-nav-btn:active {
   transform: scale(0.96) !important;
+}
+
+/* =============================================
+   ABOUT MODE (WORKFLOW GUIDE)
+   ============================================= */
+.about-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 16px !important;
+  margin-bottom: 24px !important;
+}
+
+@media (max-width: 768px) {
+  .about-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.about-card {
+  padding: 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+  min-height: 180px !important;
+  justify-content: space-between !important;
+  border-radius: 24px !important;
+  cursor: pointer !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.about-card::after {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 100%) !important;
+  pointer-events: none !important;
+}
+
+.about-card:hover {
+  transform: translateY(-4px) scale(1.02) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08) !important;
+}
+
+.about-card:active {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+.about-card-badge {
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  padding: 4px 10px !important;
+  border-radius: 9999px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Light mode specific about-card backgrounds */
+.about-card.mix-mode {
+  border: 1px solid rgba(0, 122, 255, 0.15) !important;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F5F9FF 100%) !important;
+}
+.about-card.workflow {
+  border: 1px solid rgba(52, 199, 89, 0.15) !important;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F5FDF7 100%) !important;
+}
+.about-card.library {
+  border: 1px solid rgba(175, 82, 222, 0.15) !important;
+  background: linear-gradient(135deg, #FFFFFF 0%, #FAF5FF 100%) !important;
+}
+
+/* Dark mode specific about-cards */
+body.dark-mode .about-card.mix-mode {
+  border: 1px solid rgba(0, 122, 255, 0.25) !important;
+  background: linear-gradient(135deg, #1C1C1E 0%, #101F33 100%) !important;
+}
+body.dark-mode .about-card.workflow {
+  border: 1px solid rgba(52, 199, 89, 0.25) !important;
+  background: linear-gradient(135deg, #1C1C1E 0%, #102917 100%) !important;
+}
+body.dark-mode .about-card.library {
+  border: 1px solid rgba(175, 82, 222, 0.25) !important;
+  background: linear-gradient(135deg, #1C1C1E 0%, #20132B 100%) !important;
+}
+
+.icon-wrapper {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body.dark-mode .about-card .text-gray-900 {
+  color: #FFFFFF !important;
 }

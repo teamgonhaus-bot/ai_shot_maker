@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy
+  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { InferenceClient } from "@huggingface/inference";
@@ -193,17 +193,19 @@ export default function App() {
   const [promptCopied, setPromptCopied] = useState(false);
   const [activeMarquee, setActiveMarquee] = useState("");
   const [activeLibraryTemplateId, setActiveLibraryTemplateId] = useState(null);
+  const [aboutModalTarget, setAboutModalTarget] = useState(null);
 
   // ESC Key Listener for Modals
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && promptModalTarget) {
-        setPromptModalTarget(null);
+      if (e.key === 'Escape') {
+        if (promptModalTarget) setPromptModalTarget(null);
+        if (aboutModalTarget) setAboutModalTarget(null);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [promptModalTarget]);
+  }, [promptModalTarget, aboutModalTarget]);
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
@@ -1074,6 +1076,104 @@ export default function App() {
         )}
       </AnimatePresence>
 
+      {/* 📘 About Mode Guide Popup Modal */}
+      <AnimatePresence>
+        {aboutModalTarget && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="settings-modal-overlay"
+            style={{ zIndex: 300000, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}
+            onClick={() => setAboutModalTarget(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }} 
+              animate={{ scale: 1, opacity: 1, y: 0 }} 
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="settings-modal"
+              style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                maxHeight: '85vh', 
+                width: '90%', 
+                maxWidth: '540px', 
+                padding: '28px', 
+                borderRadius: '32px',
+                border: `1px solid rgba(255, 255, 255, 0.2)`
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header inside modal */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                <div 
+                  className="w-12 h-12 rounded-2xl flex items-center justify-center text-white" 
+                  style={{ backgroundColor: aboutModalTarget.color }}
+                >
+                  {aboutModalTarget.icon === 'sliders' && <Sliders className="w-6 h-6" />}
+                  {aboutModalTarget.icon === 'wand' && <Wand2 className="w-6 h-6" />}
+                  {aboutModalTarget.icon === 'library' && <LayoutTemplate className="w-6 h-6" />}
+                </div>
+                <div style={{ textAlign: 'left' }}>
+                  <h3 className="text-[18px] font-black text-black dark:text-white m-0 tracking-tight leading-tight">
+                    {aboutModalTarget.title}
+                  </h3>
+                  <p className="text-[12px] font-bold text-gray-400 m-0 mt-0.5">
+                    {aboutModalTarget.subtitle}
+                  </p>
+                </div>
+              </div>
+
+              {/* Scrollable content box */}
+              <div className="flex-1 overflow-y-auto space-y-4 pr-1" style={{ padding: '16px 0' }}>
+                {aboutModalTarget.content.map((item, idx) => (
+                  <div key={idx} className="ios-bento-card" style={{ padding: '16px', border: '1px solid rgba(0,0,0,0.05)', backgroundColor: 'var(--card-bg)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                      <span className="w-1.5 h-3.5 rounded-full" style={{ backgroundColor: aboutModalTarget.color, display: 'inline-block' }}></span>
+                      <h4 className="text-[13px] font-extrabold text-black dark:text-white m-0">{item.label}</h4>
+                    </div>
+                    <p className="text-[12px] text-gray-500 leading-relaxed m-0 text-left">
+                      {item.text}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Footer text inside modal */}
+              {aboutModalTarget.footer && (
+                <p className="text-[11px] text-gray-400 font-semibold mb-6 mt-2 leading-relaxed text-left">
+                  {aboutModalTarget.footer}
+                </p>
+              )}
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', gap: '12px', marginTop: 'auto', alignItems: 'center' }}>
+                <button 
+                  onClick={() => setAboutModalTarget(null)}
+                  className="save-btn flex-1"
+                  style={{ 
+                    backgroundColor: '#000', 
+                    color: '#FFF', 
+                    borderRadius: '9999px', 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    height: '48px', 
+                    border: 'none', 
+                    cursor: 'pointer', 
+                    outline: 'none', 
+                    fontWeight: 700, 
+                    fontSize: '14px' 
+                  }}
+                >
+                  확인
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Settings Modal */}
       <AnimatePresence>
         {isSettingsOpen && (
@@ -1705,10 +1805,111 @@ export default function App() {
 
         {currentMode === 'about' && (
           <motion.div key="about" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
-            <div className="ios-bento-card" style={{ padding: '40px 20px', textAlign: 'center' }}>
-              <LayoutTemplate className="w-12 h-12 text-gray-300 mb-4 mx-auto" style={{ display: 'block', margin: '0 auto 16px' }} />
-              <p className="text-gray-500 font-bold m-0" style={{ fontSize: '15px' }}>Shot Maker Guide Coming Soon...</p>
+            
+            {/* Bento Grid Header */}
+            <div className="text-center py-2">
+              <h2 className="text-[17px] font-black text-black dark:text-white tracking-tight m-0 uppercase" style={{ letterSpacing: '0.04em' }}>Workflow Guide</h2>
+              <p className="text-[11px] text-gray-400 dark:text-zinc-500 font-bold mt-1">Shot Maker Pro를 활용한 고품질 상업용 이미지 제작 프로세스</p>
             </div>
+
+            {/* 3 Bento Cards with beautiful icons */}
+            <div className="about-grid">
+              
+              {/* Card 1: Mix Mode */}
+              <div 
+                className="about-card mix-mode"
+                onClick={() => setAboutModalTarget({
+                  title: 'Professional Mix Mode',
+                  subtitle: '믹스 모드 핵심 마스터',
+                  color: '#007AFF',
+                  icon: 'sliders',
+                  content: [
+                    { label: '인물 (Person)', text: '모델의 연령, 국적, 스타일, 파지/사용 행동을 정의합니다. 제품 위주 촬영 시 토글을 끄면 인물이 프롬프트에서 완전히 배제됩니다.' },
+                    { label: '공간 (Space)', text: '스튜디오, 오피스, 리테일, 라운지 등 구체적인 배경을 설정합니다. [솔리드] 또는 [그라데이션] 선택 시 색상 외의 소품을 차단하는 격리 로직이 작동하여 순수한 제품 중심 배너 샷을 만듭니다.' },
+                    { label: '카메라 (Camera)', text: '뷰의 각도, 렌즈 심도뿐만 아니라 [카피스페이스(좌/우 여백)]를 통해 타이포그래피 영역을 확보하고, [대각선 공중 부양] 등 트렌디한 글로벌 광고 구도를 주입합니다.' },
+                    { label: '스타일 (Style)', text: '플랜테리어, 미니멀 등 전체 룩앤필을 결정하며, 최하단의 [Clean Output] 토글을 켜면 타 AI 연동 시 불량 아티팩트를 방지하는 배제 지시어가 자동 결합됩니다.' }
+                  ],
+                  footer: 'Mix Mode는 상업용 비주얼의 모든 요소를 사용자가 완벽하게 통제하는 프로페셔널 워크스테이션입니다. 4대 속성 탭을 유기적으로 조합해 보세요.'
+                })}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                  <div className="icon-wrapper" style={{ backgroundColor: 'rgba(0, 122, 255, 0.12)', color: '#007AFF' }}>
+                    <Sliders className="w-5 h-5" />
+                  </div>
+                  <span className="about-card-badge" style={{ backgroundColor: 'rgba(0, 122, 255, 0.08)', color: '#007AFF' }}>Master</span>
+                </div>
+                <div style={{ marginTop: '16px' }}>
+                  <h3 className="text-[15px] font-black text-gray-900 m-0">Mix Mode</h3>
+                  <p className="text-[10px] text-gray-400 font-bold m-0 mt-0.5">속성 마스터 가이드</p>
+                </div>
+              </div>
+
+              {/* Card 2: Workflow */}
+              <div 
+                className="about-card workflow"
+                onClick={() => setAboutModalTarget({
+                  title: 'Generate & Copy Workflow',
+                  subtitle: '생성 및 복사 활용법',
+                  color: '#34C759',
+                  icon: 'wand',
+                  content: [
+                    { label: '프롬프트 완성', text: '원하는 알약 옵션들을 선택한 후, 우측/하단의 GENERATE PROMPT 버튼을 누르면 엔진이 완벽한 상업용 영문 지시어 문장으로 결합해 냅니다.' },
+                    { label: '카피 후 타 AI 연동', text: '결과창의 COPY 버튼을 눌러 클립보드에 복사한 뒤, Midjourney, FLUX.1, Stable Diffusion 등 다른 이미지 생성 AI 사이트의 프롬프트 창에 그대로 붙여넣어(Ctrl+V) 사용하세요. 첨부 이미지 제품과 인물의 자연스러운 상호작용 컷이 완성됩니다.' }
+                  ],
+                  footer: 'Shot Maker의 초고성능 결합 엔진을 통해 완벽한 상업용 지시어 문장을 즉시 생성할 수 있습니다.'
+                })}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                  <div className="icon-wrapper" style={{ backgroundColor: 'rgba(52, 199, 89, 0.12)', color: '#34C759' }}>
+                    <Wand2 className="w-5 h-5" />
+                  </div>
+                  <span className="about-card-badge" style={{ backgroundColor: 'rgba(52, 199, 89, 0.08)', color: '#34C759' }}>Quick</span>
+                </div>
+                <div style={{ marginTop: '16px' }}>
+                  <h3 className="text-[15px] font-black text-gray-900 m-0">Workflow</h3>
+                  <p className="text-[10px] text-gray-400 font-bold m-0 mt-0.5">생성 및 복사 활용법</p>
+                </div>
+              </div>
+
+              {/* Card 3: Library */}
+              <div 
+                className="about-card library"
+                onClick={() => setAboutModalTarget({
+                  title: 'Library Management',
+                  subtitle: '라이브러리 저장 및 이용',
+                  color: '#AF52DE',
+                  icon: 'library',
+                  content: [
+                    { label: '프리셋 저장', text: '현재 내가 조합한 최고의 옵션 세트를 보관하고 싶다면 결과창 근처의 SAVE TO LIBRARY 버튼을 누르세요. 나만의 상업용 프리셋 창고에 고유한 이름으로 저장됩니다.' },
+                    { label: '안전한 데이터 전달', text: 'Library 모드로 이동하여 저장된 카드를 클릭하면 테두리 활성화(Active Border)로 현재 선택 상태를 보여줍니다. 그 상태에서 카드 내의 [적용/전달] 알약 버튼을 최종적으로 눌러야만 상단 옵션 패널에 데이터가 안전하게 바인딩되어 재사용할 수 있습니다.' }
+                  ],
+                  footer: '저장된 최고 효율 프리셋들을 빠르게 스위칭하고 데이터 유실 걱정 없이 안전하게 보관하세요.'
+                })}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                  <div className="icon-wrapper" style={{ backgroundColor: 'rgba(175, 82, 222, 0.12)', color: '#AF52DE' }}>
+                    <LayoutTemplate className="w-5 h-5" />
+                  </div>
+                  <span className="about-card-badge" style={{ backgroundColor: 'rgba(175, 82, 222, 0.08)', color: '#AF52DE' }}>Save</span>
+                </div>
+                <div style={{ marginTop: '16px' }}>
+                  <h3 className="text-[15px] font-black text-gray-900 m-0">Library</h3>
+                  <p className="text-[10px] text-gray-400 font-bold m-0 mt-0.5">프리셋 저장 및 재사용</p>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Quick tips Banner */}
+            <div className="ios-bento-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px', background: 'var(--card-bg)', border: '1px solid rgba(0,0,0,0.02)', margin: '0' }}>
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-yellow-100 dark:bg-yellow-950 text-yellow-500 flex-shrink-0">
+                <span className="text-sm font-black" style={{ transform: 'scale(1.2)' }}>💡</span>
+              </div>
+              <p className="text-[11px] text-gray-500 dark:text-zinc-400 font-semibold m-0 text-left leading-relaxed">
+                <strong className="text-gray-900 dark:text-white" style={{ fontWeight: 800 }}>Pro Tip</strong>: `Mix Mode`에서 제품의 특성에 어울리는 `Space(공간)` 및 `Camera(여백)`를 사전에 확보한 뒤 타 AI 이미지 생성 툴에 결합해 넣으면 압도적인 퀄리티의 고부가가치 상업 브로셔 샷을 손쉽게 얻을 수 있습니다.
+              </p>
+            </div>
+
           </motion.div>
         )}
       </AnimatePresence>
