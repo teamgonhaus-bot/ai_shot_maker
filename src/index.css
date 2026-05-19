@@ -312,11 +312,15 @@ body.dark-mode .ios-smart-template-btn.active {
 }
 
 .template-title {
-  font-size: 13px !important;
-  font-weight: 800 !important;
-  margin-bottom: 4px !important;
-  letter-spacing: -0.01em !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  font-size: 11.5px !important;
+  font-weight: 900 !important;
+  margin-bottom: 5px !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
   text-align: center !important;
+  width: 100% !important;
+  word-wrap: break-word !important;
 }
 
 .template-desc {

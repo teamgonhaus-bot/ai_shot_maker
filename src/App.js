@@ -40,7 +40,7 @@ const DICTIONARY = {
 
   spaceType: { "스튜디오": "a professional studio environment", "오피스": "a modern office space", "홈": "a cozy home interior", "리테일": "a retail commercial space", "라운지": "a luxury lounge area", "야외": "an outdoor setting" },
   spaceDetail: {
-    "단색 배경": "with a solid color background", "단색 모노크롬": "with a monochrome color background", "인테리어 세트장": "within a designed interior set", "그라데이션 배경": "with a gradient background", "쇼케이스": "in a showcase display area", "크로마키 그린 배경": "with a chroma key green screen background",
+    "단색 배경": "with a solid color background", "인테리어 세트장": "within a designed interior set", "그라데이션 배경": "with a gradient background", "쇼케이스": "in a showcase display area", "크로마키 그린 배경": "with a chroma key green screen background",
     "사무실": "in a standard office setup", "회의실": "in a formal meeting room", "중역실": "in an executive office suite", "오피스 라운지": "in a relaxed office lounge", "트레이닝룸": "in a training or lecture room", "공유오피스": "in a modern coworking space",
     "리빙": "in a living room area", "다이닝": "in a dining room setting", "룸": "in a private room", "워크룸": "in a dedicated workroom or study", "베드룸": "in a comfortable bedroom setting", "테라스": "on a scenic terrace",
     "카페": "in a trendy cafe", "식당": "in a modern restaurant", "쇼룸": "in a premium showroom", "로비": "in a grand lobby area", "쇼핑몰": "in a bustling shopping mall", "박람회": "at a professional exhibition or fair", "갤러리": "in a minimalist art gallery", "도서관": "in a quiet library environment", "강의실": "in a modern classroom",
@@ -60,14 +60,15 @@ const DICTIONARY = {
   productLayout: { "선택안함": "", "공중부양": "product floating in mid-air, levitating with subtle shadow below", "대각선 안착": "product suspended diagonally in mid-air at a dynamic angle", "액체 스플래시": "dramatic liquid splash effect surrounding the product", "파우더 폭발": "powder explosion burst effect around the product" },
   cameraAngle: { "선택안함": "", "정면": "frontal shot", "미디움 샷": "medium shot", "하이앵글": "high-angle shot", "로우앵글": "low-angle shot", "아이레벨": "eye-level shot", "클로즈업": "close-up shot", "익스트림 클로즈업": "extreme close-up shot", "버드아이 뷰": "bird's eye view", "웜즈아이 뷰": "worm's eye view", "더치 앵글": "dutch angle shot", "초광각": "ultra-wide angle shot", "망원 샷": "telephoto lens shot", "풀 샷": "full body shot", "드론 샷": "aerial drone shot" },
   shotStyle: {
-    "컬러블로킹": "color blocking aesthetic", "네거티브 스페이스": "negative space composition", "하드 섀도우": "hard shadows",
+    "컬러블로킹": "color blocking aesthetic", "네거티브 스페이스": "negative space composition", "hard shadows": "hard shadows",
     "톤온톤-모노크로매틱": "tone-on-tone monochromatic palette", "플랫 레이": "flat lay perspective", "매크로-디테일": "macro detail shot",
     "와비사비-어스톤": "wabi-sabi earth tone aesthetic", "모션 캡쳐-동적 연출": "motion capture dynamic pose",
     "인테리어 잡지 샷(사실적)": "realistic interior magazine photography", "와이드 건축/공간 샷": "wide architectural space shot",
     "인테리어 비네트(코너)": "interior vignette corner shot", "라이프스타일 인테리어": "lifestyle interior scene",
     "클로즈업 디테일": "close-up detail focus", "심도 얕은 샷(아웃포커싱)": "shallow depth of field with bokeh"
   },
-  country: { "선택안함": "", "한국": "Korea", "일본": "Japan", "동남아 휴양지": "Southeast Asia resort", "미국": "USA", "독일": "Germany", "이탈리아": "Italy" }
+  country: { "선택안함": "", "한국": "Korea", "일본": "Japan", "동남아 휴양지": "Southeast Asia resort", "미국": "USA", "독일": "Germany", "이탈리아": "Italy", "동유럽": "Eastern Europe" },
+  locationContext: { "선택안함": "", "수도": "in the capital city", "도심": "in the downtown area", "번화가": "on a busy main street", "교외": "in the suburbs", "휴양지": "at a holiday resort" }
 };
 
 const OPTIONS_DATA = {
@@ -88,7 +89,7 @@ const OPTIONS_DATA = {
   subjectHair: ["선택안함", "긴머리", "짧은머리", "단발", "펌", "염색", "묶은머리"],
   spaceType: ["스튜디오", "오피스", "홈", "리테일", "라운지", "야외"],
   spaceDetail: {
-    "스튜디오": ["단색 배경", "단색 모노크롬", "인테리어 세트장", "그라데이션 배경", "쇼케이스", "크로마키 그린 배경"],
+    "스튜디오": ["단색 배경", "그라데이션 배경", "인테리어 세트장", "쇼케이스", "크로마키 그린 배경"],
     "오피스": ["사무실", "회의실", "중역실", "오피스 라운지", "트레이닝룸", "공유오피스"],
     "홈": ["리빙", "다이닝", "룸", "워크룸", "베드룸", "테라스"],
     "리테일": ["카페", "식당", "쇼룸", "로비", "쇼핑몰", "박람회", "갤러리", "도서관", "강의실"],
@@ -110,7 +111,8 @@ const OPTIONS_DATA = {
     "인테리어 잡지 샷(사실적)", "와이드 건축/공간 샷", "인테리어 비네트(코너)", "라이프스타일 인테리어", "클로즈업 디테일", "심도 얕은 샷(아웃포커싱)"
   ],
   aspectRatio: ["1:1 (Square)", "16:9 (Widescreen)", "4:3 (Standard)", "3:4 (Portrait)", "4:5 (SNS)", "9:16 (Vertical)"],
-  country: ["선택안함", "한국", "일본", "동남아 휴양지", "미국", "독일", "이탈리아"]
+  country: ["선택안함", "한국", "일본", "동남아 휴양지", "미국", "독일", "이탈리아", "동유럽"],
+  locationContext: ["선택안함", "수도", "도심", "번화가", "교외", "휴양지"]
 };
 
 const getColorHex = (colorName) => {
@@ -163,6 +165,7 @@ export default function App() {
     shotStyle: [],
     aspectRatio: "1:1 (Square)",
     country: "선택안함",
+    locationContext: "선택안함",
     brightness: 1.0,
     useLight: true
   });
@@ -322,10 +325,10 @@ export default function App() {
     setActiveLibraryTemplateId(null);
     let targetConfig = { ...config };
 
-    if (templateType === 'Title Scene') {
+    if (templateType === 'TITLE SCENE') {
       targetConfig.subjectNum = '없음';
       targetConfig.spaceType = '스튜디오';
-      targetConfig.spaceDetail = '단색 모노크롬';
+      targetConfig.spaceDetail = '단색 배경';
       targetConfig.cameraAngle = '풀 샷';
       targetConfig.interiorStyle = '모던 미니멀';
       targetConfig.productLayout = '대각선 안착';
@@ -336,9 +339,9 @@ export default function App() {
       targetConfig.light = '나르스 확산광';
       targetConfig.shotStyle = ['네거티브 스페이스', '톤온톤-모노크로매틱'];
       targetConfig.country = '선택안함';
-      setActiveMarquee("Title Scene Active: Surrealist floating product on monochrome studio backdrop...");
+      setActiveMarquee("TITLE SCENE Active: Surrealist floating product on monochrome studio backdrop...");
 
-    } else if (templateType === 'Detail Scene') {
+    } else if (templateType === 'DETAIL SCENE') {
       targetConfig.subjectNum = '없음';
       targetConfig.spaceType = '라운지';
       targetConfig.spaceDetail = '쇼케이스 라운지';
@@ -352,9 +355,9 @@ export default function App() {
       targetConfig.shotStyle = ['매크로-디테일', '클로즈업 디테일', '하드 섀도우'];
       targetConfig.interiorStyle = '선택안함';
       targetConfig.country = '선택안함';
-      setActiveMarquee("Detail Scene Active: High-end catalog close-up with material texture emphasis...");
+      setActiveMarquee("DETAIL SCENE Active: High-end catalog close-up with material texture emphasis...");
 
-    } else if (templateType === 'Insta Scene') {
+    } else if (templateType === 'INSTA SCENE') {
       targetConfig.subjectNum = '혼자';
       targetConfig.subjectGender = '여성';
       targetConfig.subjectAge = '20대';
@@ -372,9 +375,9 @@ export default function App() {
       targetConfig.light = '자연광';
       targetConfig.shotStyle = ['라이프스타일 인테리어', '심도 얕은 샷(아웃포커싱)'];
       targetConfig.country = '한국';
-      setActiveMarquee("Insta Scene Active: MZ trendy SNS lifestyle snap with natural sunlight vibes...");
+      setActiveMarquee("INSTA SCENE Active: MZ trendy SNS lifestyle snap with natural sunlight vibes...");
 
-    } else if (templateType === 'Usage Scene') {
+    } else if (templateType === 'USAGE SCENE') {
       targetConfig.subjectNum = '혼자';
       targetConfig.subjectAction = '공간에 어울리게';
       targetConfig.spaceType = '홈';
@@ -389,9 +392,9 @@ export default function App() {
       targetConfig.shotStyle = ['라이프스타일 인테리어', '심도 얕은 샷(아웃포커싱)'];
       targetConfig.interiorStyle = '내추럴 우드';
       targetConfig.country = '선택안함';
-      setActiveMarquee("Usage Scene Active: Lifestyle product-in-use realistic commercial photography...");
+      setActiveMarquee("USAGE SCENE Active: Lifestyle product-in-use realistic commercial photography...");
 
-    } else if (templateType === 'Home Living') {
+    } else if (templateType === 'HOME LIVING') {
       targetConfig.subjectNum = '없음';
       targetConfig.spaceType = '홈';
       targetConfig.spaceDetail = '리빙';
@@ -405,9 +408,9 @@ export default function App() {
       targetConfig.shotStyle = ['라이프스타일 인테리어', '인테리어 잡지 샷(사실적)', '심도 얕은 샷(아웃포커싱)'];
       targetConfig.interiorStyle = '내추럴 우드';
       targetConfig.country = '선택안함';
-      setActiveMarquee("Home Living Active: Cozy living room and bedroom backdrop for real-life domestic setup...");
+      setActiveMarquee("HOME LIVING Active: Cozy living room and bedroom backdrop for real-life domestic setup...");
 
-    } else if (templateType === 'Office Tech') {
+    } else if (templateType === 'OFFICE TECH') {
       targetConfig.subjectNum = '없음';
       targetConfig.spaceType = '오피스';
       targetConfig.spaceDetail = '공유오피스';
@@ -421,9 +424,9 @@ export default function App() {
       targetConfig.shotStyle = ['인테리어 잡지 샷(사실적)', '와이드 건축/공간 샷'];
       targetConfig.interiorStyle = '모던 미니멀';
       targetConfig.country = '선택안함';
-      setActiveMarquee("Office Tech Active: Clean desk setup and shared office business photography...");
+      setActiveMarquee("OFFICE TECH Active: Clean desk setup and shared office business photography...");
 
-    } else if (templateType === 'Nature Organic') {
+    } else if (templateType === 'NATURE ORGANIC') {
       targetConfig.subjectNum = '없음';
       targetConfig.spaceType = '야외';
       targetConfig.spaceDetail = '자연';
@@ -437,9 +440,9 @@ export default function App() {
       targetConfig.shotStyle = ['와비사비-어스톤', '심도 얕은 샷(아웃포커싱)'];
       targetConfig.interiorStyle = '플랜테리어';
       targetConfig.country = '선택안함';
-      setActiveMarquee("Nature Organic Active: Eco-friendly organic concept with plant, stone, and water elements...");
+      setActiveMarquee("NATURE ORGANIC Active: Eco-friendly organic concept with plant, stone, and water elements...");
 
-    } else if (templateType === 'Dramatic Studio') {
+    } else if (templateType === 'DRAMATIC STUDIO') {
       targetConfig.subjectNum = '없음';
       targetConfig.spaceType = '스튜디오';
       targetConfig.spaceDetail = '단색 배경';
@@ -453,7 +456,7 @@ export default function App() {
       targetConfig.shotStyle = ['하드 섀도우', '네거티브 스페이스', '컬러블로킹'];
       targetConfig.interiorStyle = '모던 미니멀';
       targetConfig.country = '선택안함';
-      setActiveMarquee("Dramatic Studio Active: High-contrast luxury studio shot with dramatic shadows and lighting...");
+      setActiveMarquee("DRAMATIC STUDIO Active: High-contrast luxury studio shot with dramatic shadows and lighting...");
     }
 
     // Cascading Effect: Apply changed properties sequentially
@@ -628,23 +631,23 @@ export default function App() {
     setIsGenerating(true);
     setTimeout(() => {
       const parts = [];
-      const isSolidBackground = config.spaceDetail === '단색 배경' || config.spaceDetail === '단색 모노크롬';
+      const isSolidBackground = config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경';
 
-      if (activeTemplate === 'Title Scene') {
+      if (activeTemplate === 'TITLE SCENE') {
         parts.push("Clean and organized studio style shot for title banner, product focus");
-      } else if (activeTemplate === 'Detail Scene') {
+      } else if (activeTemplate === 'DETAIL SCENE') {
         parts.push("Close-up detail shot highlighting texture of materials, product focus");
-      } else if (activeTemplate === 'Insta Scene') {
+      } else if (activeTemplate === 'INSTA SCENE') {
         parts.push("Trendy Instagram snapshot style, emotional SNS aesthetic");
-      } else if (activeTemplate === 'Usage Scene') {
+      } else if (activeTemplate === 'USAGE SCENE') {
         parts.push("Commercial lifestyle usage scene emphasizing natural interaction in an everyday space");
-      } else if (activeTemplate === 'Home Living') {
+      } else if (activeTemplate === 'HOME LIVING') {
         parts.push("Cozy home living room or bedroom environment setting, domestic lifestyle theme");
-      } else if (activeTemplate === 'Office Tech') {
+      } else if (activeTemplate === 'OFFICE TECH') {
         parts.push("Modern corporate office setup, professional work space environment");
-      } else if (activeTemplate === 'Nature Organic') {
+      } else if (activeTemplate === 'NATURE ORGANIC') {
         parts.push("Eco-friendly organic environment showcasing natural elements like plants, stones, and water");
-      } else if (activeTemplate === 'Dramatic Studio') {
+      } else if (activeTemplate === 'DRAMATIC STUDIO') {
         parts.push("High-contrast commercial studio lighting, dramatic shadow and luxury styling");
       }
 
@@ -653,7 +656,10 @@ export default function App() {
         const color = config.monochromeColor || 'Cobalt Blue';
 
         parts.push(`A floating ${product}, suspended diagonally in mid-air`);
-        parts.push(`Background is a perfect ${color} monochrome solid color with soft, diffused lighting`);
+        const bgDesc = config.spaceDetail === '그라데이션 배경'
+          ? `Background is a perfect ${color} gradient background with soft, diffused lighting`
+          : `Background is a perfect ${color} monochrome solid color with soft, diffused lighting`;
+        parts.push(bgDesc);
         parts.push(`Highly stylized, product levitation, clean lines, impeccable product finish, flawless production`);
 
         if (config.cameraAngle && config.cameraAngle !== "선택안함") {
@@ -728,6 +734,9 @@ export default function App() {
 
         let envStr = DICTIONARY.spaceType[config.spaceType];
         if (config.spaceDetail) envStr += `, ${DICTIONARY.spaceDetail[config.spaceDetail]}`;
+        if (config.locationContext && config.locationContext !== "선택안함") {
+          envStr += `, ${DICTIONARY.locationContext[config.locationContext]}`;
+        }
         if (config.country !== "선택안함") envStr += ` in ${DICTIONARY.country[config.country]}`;
         parts.push(`set in ${envStr}`);
 
@@ -1200,7 +1209,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="settings-modal-overlay"
-            style={{ zIndex: 300000, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}
+            style={{ zIndex: 300000, backgroundColor: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(16px)' }}
             onClick={() => setAboutModalTarget(null)}
           >
             <motion.div
@@ -1214,14 +1223,41 @@ export default function App() {
                 maxHeight: '85vh',
                 width: '90%',
                 maxWidth: '540px',
-                padding: '28px',
+                padding: '32px',
                 borderRadius: '32px',
-                border: `1px solid rgba(255, 255, 255, 0.2)`
+                border: `1px solid rgba(255, 255, 255, 0.2)`,
+                position: 'relative'
               }}
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Top Right Close Button */}
+              <button
+                onClick={() => setAboutModalTarget(null)}
+                style={{
+                  position: 'absolute',
+                  top: '24px',
+                  right: '24px',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                  border: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: 'inherit',
+                  transition: 'background-color 0.2s',
+                  outline: 'none',
+                  zIndex: 10
+                }}
+                className="hover:bg-black/10 dark:hover:bg-white/10 dark:bg-white/10 dark:text-white"
+              >
+                <X size={16} strokeWidth={2.5} />
+              </button>
+
               {/* Header inside modal */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', paddingRight: '24px' }}>
                 <div
                   className="w-12 h-12 rounded-2xl flex items-center justify-center text-white"
                   style={{ backgroundColor: aboutModalTarget.color }}
@@ -1241,7 +1277,7 @@ export default function App() {
               </div>
 
               {/* Scrollable content box */}
-              <div className="flex-1 overflow-y-auto space-y-4 pr-1" style={{ padding: '16px 0' }}>
+              <div className="flex-1 overflow-y-auto space-y-4 pr-1 mb-4" style={{ padding: '8px 0' }}>
                 {aboutModalTarget.content.map((item, idx) => (
                   <div key={idx} className="ios-bento-card" style={{ padding: '16px', border: '1px solid rgba(0,0,0,0.05)', backgroundColor: 'var(--card-bg)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
@@ -1257,34 +1293,10 @@ export default function App() {
 
               {/* Footer text inside modal */}
               {aboutModalTarget.footer && (
-                <p className="text-[11px] text-gray-400 font-semibold mb-6 mt-2 leading-relaxed text-left">
+                <p className="text-[11px] text-gray-400 font-semibold mt-1 leading-relaxed text-left">
                   {aboutModalTarget.footer}
                 </p>
               )}
-
-              {/* Action Buttons */}
-              <div style={{ display: 'flex', gap: '12px', marginTop: 'auto', alignItems: 'center' }}>
-                <button
-                  onClick={() => setAboutModalTarget(null)}
-                  className="save-btn flex-1"
-                  style={{
-                    backgroundColor: '#000',
-                    color: '#FFF',
-                    borderRadius: '9999px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '48px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    outline: 'none',
-                    fontWeight: 700,
-                    fontSize: '14px'
-                  }}
-                >
-                  확인
-                </button>
-              </div>
             </motion.div>
           </motion.div>
         )}
@@ -1517,36 +1529,36 @@ export default function App() {
 
             {/* Smart Templates */}
             <div className="template-grid">
-              <button className={`ios-smart-template-btn ${activeTemplate === 'Title Scene' ? 'active' : ''}`} onClick={() => handleSmartTemplate('Title Scene')}>
-                <div className="template-title">Title Scene</div>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'TITLE SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('TITLE SCENE')}>
+                <div className="template-title">TITLE SCENE</div>
                 <div className="template-desc">초현실주의 공중 부양</div>
               </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'Detail Scene' ? 'active' : ''}`} onClick={() => handleSmartTemplate('Detail Scene')}>
-                <div className="template-title">Detail Scene</div>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'DETAIL SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('DETAIL SCENE')}>
+                <div className="template-title">DETAIL SCENE</div>
                 <div className="template-desc">질감 강조 초접사</div>
               </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'Insta Scene' ? 'active' : ''}`} onClick={() => handleSmartTemplate('Insta Scene')}>
-                <div className="template-title">Insta Scene</div>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'INSTA SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('INSTA SCENE')}>
+                <div className="template-title">INSTA SCENE</div>
                 <div className="template-desc">MZ SNS 감성 스냅</div>
               </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'Usage Scene' ? 'active' : ''}`} onClick={() => handleSmartTemplate('Usage Scene')}>
-                <div className="template-title">Usage Scene</div>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'USAGE SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('USAGE SCENE')}>
+                <div className="template-title">USAGE SCENE</div>
                 <div className="template-desc">인물 라이프스타일</div>
               </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'Home Living' ? 'active' : ''}`} onClick={() => handleSmartTemplate('Home Living')}>
-                <div className="template-title">Home Living</div>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'HOME LIVING' ? 'active' : ''}`} onClick={() => handleSmartTemplate('HOME LIVING')}>
+                <div className="template-title">HOME LIVING</div>
                 <div className="template-desc">포근한 가정용 연출</div>
               </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'Office Tech' ? 'active' : ''}`} onClick={() => handleSmartTemplate('Office Tech')}>
-                <div className="template-title">Office Tech</div>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'OFFICE TECH' ? 'active' : ''}`} onClick={() => handleSmartTemplate('OFFICE TECH')}>
+                <div className="template-title">OFFICE TECH</div>
                 <div className="template-desc">데스크셋업 비즈니스</div>
               </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'Nature Organic' ? 'active' : ''}`} onClick={() => handleSmartTemplate('Nature Organic')}>
-                <div className="template-title">Nature Organic</div>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'NATURE ORGANIC' ? 'active' : ''}`} onClick={() => handleSmartTemplate('NATURE ORGANIC')}>
+                <div className="template-title">NATURE ORGANIC</div>
                 <div className="template-desc">자연 친환경 컨셉</div>
               </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'Dramatic Studio' ? 'active' : ''}`} onClick={() => handleSmartTemplate('Dramatic Studio')}>
-                <div className="template-title">Dramatic Studio</div>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'DRAMATIC STUDIO' ? 'active' : ''}`} onClick={() => handleSmartTemplate('DRAMATIC STUDIO')}>
+                <div className="template-title">DRAMATIC STUDIO</div>
                 <div className="template-desc">럭셔리 스튜디오</div>
               </button>
             </div>
@@ -1693,11 +1705,11 @@ export default function App() {
                   <div className="ios-bento-card">
                     <OptionSelect label="공간 종류" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} theme="green" />
                     <OptionSelect label="세부 공간" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} theme="green" />
-                    {config.spaceType === '스튜디오' && (config.spaceDetail === '단색 모노크롬' || config.spaceDetail === '단색 배경') && (
+                    {config.spaceType === '스튜디오' && (config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경') && (
                       <div className="mt-2 mb-4 p-4 rounded-2xl bg-gray-50 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700">
                         <div className="ios-option-label mb-2 text-[12px] font-bold">배경 컬러 선택 (Monochrome Color)</div>
 
-                        <div className="flex flex-wrap gap-2 mb-3">
+                        <div className="flex flex-wrap mb-4" style={{ gap: '10px 12px' }}>
                           {['Cobalt Blue', 'Terracotta', 'Sage Green', 'Warm Sand', 'Matte Black', 'Pure White', 'Charcoal'].map(color => (
                             <button
                               key={color}
@@ -1751,6 +1763,7 @@ export default function App() {
                     <OptionSelect label="인테리어 양식" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} theme="green" />
                     <div className="mt-4 border-t border-gray-100">
                       <OptionSelect label="국가/지역 (Country)" value={config.country} onChange={(v) => handleConfigChange('country', v)} options={OPTIONS_DATA.country} theme="green" />
+                      <OptionSelect label="장소 맥락 (Location Context)" value={config.locationContext || "선택안함"} onChange={(v) => handleConfigChange('locationContext', v)} options={OPTIONS_DATA.locationContext} theme="green" />
 
                       <IOSToggle
                         label="세부 소재 및 컬러 (Materials)"
@@ -2009,9 +2022,9 @@ export default function App() {
           <motion.div key="about" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
 
             {/* Bento Grid Header */}
-            <div className="text-center py-2">
-              <h2 className="text-[17px] font-black text-black dark:text-white tracking-tight m-0 uppercase" style={{ letterSpacing: '0.04em' }}>Workflow Guide</h2>
-              <p className="text-[11px] text-gray-400 dark:text-zinc-500 font-bold mt-1">Shot Maker Pro를 활용한 고품질 상업용 이미지 제작 프로세스</p>
+            <div className="text-center pt-2 pb-6 mb-4">
+              <h2 className="text-[17px] font-medium text-black dark:text-white uppercase" style={{ letterSpacing: '0.12em' }}>Workflow Guide</h2>
+              <p className="text-[11px] text-gray-400 dark:text-zinc-500 font-medium mt-1.5">Shot Maker Pro를 활용한 고품질 상업용 이미지 제작 프로세스</p>
             </div>
 
             {/* 3 Bento Cards with beautiful icons */}
@@ -2142,7 +2155,7 @@ export default function App() {
                   textColor: '#FFFFFF'
                 });
               }
-              if (config.spaceType === '스튜디오' && (config.spaceDetail === '단색 모노크롬' || config.spaceDetail === '단색 배경') && config.monochromeColor) {
+              if (config.spaceType === '스튜디오' && (config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경') && config.monochromeColor) {
                 tags.push({
                   key: 'monochromeColorTag',
                   val: `컬러: ${config.monochromeColor}`,
@@ -2180,7 +2193,7 @@ export default function App() {
                   group = 1; bgColor = '#FF3B30';
                 }
                 // 🟢 Group 2 — Space / Environment (Green)
-                else if (key.startsWith('space') || key === 'interiorStyle' || key === 'country' || key.startsWith('detail')) {
+                else if (key.startsWith('space') || key === 'interiorStyle' || key === 'country' || key === 'locationContext' || key.startsWith('detail')) {
                   group = 2; bgColor = '#34C759';
                 }
                 // 🔵 Group 3 — Camera / Layout / Product (Blue)
@@ -2338,7 +2351,7 @@ export default function App() {
       </div>
 
       <footer className="ios-footer">
-        v0.50a | Developed by Gony
+        v0.50b | Developed by Gony
       </footer>
       <div className="h-12"></div>
     </div>
