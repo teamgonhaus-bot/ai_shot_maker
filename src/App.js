@@ -40,7 +40,7 @@ const DICTIONARY = {
 
   spaceType: { "스튜디오": "a professional studio environment", "오피스": "a modern office space", "홈": "a cozy home interior", "리테일": "a retail commercial space", "라운지": "a luxury lounge area", "야외": "an outdoor setting" },
   spaceDetail: {
-    "단색 배경": "with a solid color background", "인테리어 세트장": "within a designed interior set", "그라데이션 배경": "with a gradient background", "쇼케이스": "in a showcase display area", "크로마키 그린 배경": "with a chroma key green screen background",
+    "단색 배경": "with a solid color background", "단색 모노크롬": "with a monochrome color background", "인테리어 세트장": "within a designed interior set", "그라데이션 배경": "with a gradient background", "쇼케이스": "in a showcase display area", "크로마키 그린 배경": "with a chroma key green screen background",
     "사무실": "in a standard office setup", "회의실": "in a formal meeting room", "중역실": "in an executive office suite", "오피스 라운지": "in a relaxed office lounge", "트레이닝룸": "in a training or lecture room", "공유오피스": "in a modern coworking space",
     "리빙": "in a living room area", "다이닝": "in a dining room setting", "룸": "in a private room", "워크룸": "in a dedicated workroom or study", "베드룸": "in a comfortable bedroom setting", "테라스": "on a scenic terrace",
     "카페": "in a trendy cafe", "식당": "in a modern restaurant", "쇼룸": "in a premium showroom", "로비": "in a grand lobby area", "쇼핑몰": "in a bustling shopping mall", "박람회": "at a professional exhibition or fair", "갤러리": "in a minimalist art gallery", "도서관": "in a quiet library environment", "강의실": "in a modern classroom",
@@ -113,9 +113,28 @@ const OPTIONS_DATA = {
   country: ["선택안함", "한국", "일본", "동남아 휴양지", "미국", "독일", "이탈리아"]
 };
 
+const getColorHex = (colorName) => {
+  const mapping = {
+    'Cobalt Blue': '#0047AB',
+    'Terracotta': '#E2725B',
+    'Sage Green': '#87A96B',
+    'Warm Sand': '#E6C280',
+    'Matte Black': '#28282B',
+    'Pure White': '#FFFFFF',
+    'Charcoal': '#36454F'
+  };
+  return mapping[colorName] || colorName;
+};
+
+const isHexColor = (str) => {
+  return /^#[0-9A-F]{6}$/i.test(str);
+};
+
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [config, setConfig] = useState({
+    productName: "product",
+    monochromeColor: "Cobalt Blue",
     subjectNum: "없음",
     subjectGender: "선택안함",
     subjectAge: "선택안함",
@@ -303,8 +322,7 @@ export default function App() {
     setActiveLibraryTemplateId(null);
     let targetConfig = { ...config };
     
-    if (templateType === '타이틀씬') {
-      // 🎬 초현실주의 팝 상업 배너 광고
+    if (templateType === 'Title Scene') {
       targetConfig.subjectNum = '없음';
       targetConfig.spaceType = '스튜디오';
       targetConfig.spaceDetail = '단색 모노크롬';
@@ -320,8 +338,7 @@ export default function App() {
       targetConfig.country = '선택안함';
       setActiveMarquee("Title Scene Active: Surrealist floating product on monochrome studio backdrop...");
 
-    } else if (templateType === '디테일씬') {
-      // 🔍 하이엔드 카탈로그 마감재 테크니컬 샷
+    } else if (templateType === 'Detail Scene') {
       targetConfig.subjectNum = '없음';
       targetConfig.spaceType = '라운지';
       targetConfig.spaceDetail = '쇼케이스 라운지';
@@ -337,8 +354,7 @@ export default function App() {
       targetConfig.country = '선택안함';
       setActiveMarquee("Detail Scene Active: High-end catalog close-up with material texture emphasis...");
 
-    } else if (templateType === '인스타씬') {
-      // 📱 MZ 트렌드 SNS 감성 스냅 배너
+    } else if (templateType === 'Insta Scene') {
       targetConfig.subjectNum = '혼자';
       targetConfig.subjectGender = '여성';
       targetConfig.subjectAge = '20대';
@@ -358,8 +374,7 @@ export default function App() {
       targetConfig.country = '한국';
       setActiveMarquee("Insta Scene Active: MZ trendy SNS lifestyle snap with natural sunlight vibes...");
 
-    } else if (templateType === '사용씬') {
-      // 🧍 상세페이지용 라이프스타일 실사용 컷
+    } else if (templateType === 'Usage Scene') {
       targetConfig.subjectNum = '혼자';
       targetConfig.subjectAction = '공간에 어울리게';
       targetConfig.spaceType = '홈';
@@ -375,6 +390,70 @@ export default function App() {
       targetConfig.interiorStyle = '내추럴 우드';
       targetConfig.country = '선택안함';
       setActiveMarquee("Usage Scene Active: Lifestyle product-in-use realistic commercial photography...");
+      
+    } else if (templateType === 'Home Living') {
+      targetConfig.subjectNum = '없음';
+      targetConfig.spaceType = '홈';
+      targetConfig.spaceDetail = '리빙';
+      targetConfig.cameraAngle = '아이레벨';
+      targetConfig.copySpace = '선택안함';
+      targetConfig.productLayout = '선택안함';
+      targetConfig.productAnchor = '선택안함';
+      targetConfig.aspectRatio = '16:9 (Widescreen)';
+      targetConfig.useLight = true;
+      targetConfig.light = '앤비언트 라이트';
+      targetConfig.shotStyle = ['라이프스타일 인테리어', '인테리어 잡지 샷(사실적)', '심도 얕은 샷(아웃포커싱)'];
+      targetConfig.interiorStyle = '내추럴 우드';
+      targetConfig.country = '선택안함';
+      setActiveMarquee("Home Living Active: Cozy living room and bedroom backdrop for real-life domestic setup...");
+      
+    } else if (templateType === 'Office Tech') {
+      targetConfig.subjectNum = '없음';
+      targetConfig.spaceType = '오피스';
+      targetConfig.spaceDetail = '공유오피스';
+      targetConfig.cameraAngle = '미디움 샷';
+      targetConfig.copySpace = '선택안함';
+      targetConfig.productLayout = '선택안함';
+      targetConfig.productAnchor = '선택안함';
+      targetConfig.aspectRatio = '16:9 (Widescreen)';
+      targetConfig.useLight = true;
+      targetConfig.light = '자연광';
+      targetConfig.shotStyle = ['인테리어 잡지 샷(사실적)', '와이드 건축/공간 샷'];
+      targetConfig.interiorStyle = '모던 미니멀';
+      targetConfig.country = '선택안함';
+      setActiveMarquee("Office Tech Active: Clean desk setup and shared office business photography...");
+      
+    } else if (templateType === 'Nature Organic') {
+      targetConfig.subjectNum = '없음';
+      targetConfig.spaceType = '야외';
+      targetConfig.spaceDetail = '자연';
+      targetConfig.cameraAngle = '클로즈업';
+      targetConfig.copySpace = '선택안함';
+      targetConfig.productLayout = '선택안함';
+      targetConfig.productAnchor = '선택안함';
+      targetConfig.aspectRatio = '1:1 (Square)';
+      targetConfig.useLight = true;
+      targetConfig.light = '자연광';
+      targetConfig.shotStyle = ['와비사비-어스톤', '심도 얕은 샷(아웃포커싱)'];
+      targetConfig.interiorStyle = '플랜테리어';
+      targetConfig.country = '선택안함';
+      setActiveMarquee("Nature Organic Active: Eco-friendly organic concept with plant, stone, and water elements...");
+      
+    } else if (templateType === 'Dramatic Studio') {
+      targetConfig.subjectNum = '없음';
+      targetConfig.spaceType = '스튜디오';
+      targetConfig.spaceDetail = '단색 배경';
+      targetConfig.cameraAngle = '정면';
+      targetConfig.copySpace = '선택안함';
+      targetConfig.productLayout = '대각선 안착';
+      targetConfig.productAnchor = '전경 클린';
+      targetConfig.aspectRatio = '1:1 (Square)';
+      targetConfig.useLight = true;
+      targetConfig.light = '시네마틱';
+      targetConfig.shotStyle = ['하드 섀도우', '네거티브 스페이스', '컬러블로킹'];
+      targetConfig.interiorStyle = '모던 미니멀';
+      targetConfig.country = '선택안함';
+      setActiveMarquee("Dramatic Studio Active: High-contrast luxury studio shot with dramatic shadows and lighting...");
     }
     
     // Cascading Effect: Apply changed properties sequentially
@@ -549,101 +628,138 @@ export default function App() {
     setIsGenerating(true);
     setTimeout(() => {
       const parts = [];
+      const isSolidBackground = config.spaceDetail === '단색 배경' || config.spaceDetail === '단색 모노크롬';
       
-      if (activeTemplate === '타이틀씬') {
+      if (activeTemplate === 'Title Scene') {
         parts.push("Clean and organized studio style shot for title banner, product focus");
-      } else if (activeTemplate === '디테일씬') {
+      } else if (activeTemplate === 'Detail Scene') {
         parts.push("Close-up detail shot highlighting texture of materials, product focus");
-      } else if (activeTemplate === '인스타씬') {
+      } else if (activeTemplate === 'Insta Scene') {
         parts.push("Trendy Instagram snapshot style, emotional SNS aesthetic");
-      } else if (activeTemplate === '사용씬') {
+      } else if (activeTemplate === 'Usage Scene') {
         parts.push("Commercial lifestyle usage scene emphasizing natural interaction in an everyday space");
+      } else if (activeTemplate === 'Home Living') {
+        parts.push("Cozy home living room or bedroom environment setting, domestic lifestyle theme");
+      } else if (activeTemplate === 'Office Tech') {
+        parts.push("Modern corporate office setup, professional work space environment");
+      } else if (activeTemplate === 'Nature Organic') {
+        parts.push("Eco-friendly organic environment showcasing natural elements like plants, stones, and water");
+      } else if (activeTemplate === 'Dramatic Studio') {
+        parts.push("High-contrast commercial studio lighting, dramatic shadow and luxury styling");
       }
 
-      let subjectStr = "a high-end masterpiece";
-
-      if (config.subjectNum !== "없음") {
-        const traits = [];
-        if (config.subjectAge !== "선택안함") traits.push(DICTIONARY.subjectAge[config.subjectAge]);
-        if (config.subjectGender !== "선택안함") traits.push(DICTIONARY.subjectGender[config.subjectGender]);
-        if (config.subjectRegion !== "선택안함") traits.push(DICTIONARY.subjectRegion[config.subjectRegion]);
-
-        let humanStr = DICTIONARY.subjectNum[config.subjectNum];
-        if (traits.length > 0) humanStr += ` (${traits.join(", ")})`;
-
-        const details = [];
-        if (config.subjectHair !== "선택안함") details.push(DICTIONARY.subjectHair[config.subjectHair]);
-        if (config.subjectClothesStyle !== "선택안함") details.push(DICTIONARY.subjectClothesStyle[config.subjectClothesStyle]);
+      if (isSolidBackground) {
+        const product = config.productName || 'product';
+        const color = config.monochromeColor || 'Cobalt Blue';
         
-        if (config.subjectGender === "혼성") {
-          const fTop = DICTIONARY.subjectClothesTop[config.femaleClothesTop];
-          const fBot = DICTIONARY.subjectClothesBottom[config.femaleClothesBottom];
-          const mTop = DICTIONARY.subjectClothesTop[config.maleClothesTop];
-          const mBot = DICTIONARY.subjectClothesBottom[config.maleClothesBottom];
-          
-          let fClothes = [];
-          if (fTop) fClothes.push(fTop);
-          if (fBot) fClothes.push(fBot);
-          
-          let mClothes = [];
-          if (mTop) mClothes.push(mTop);
-          if (mBot) mClothes.push(mBot);
-          
-          if (fClothes.length > 0) details.push(`females ${fClothes.join(" and ")}`);
-          if (mClothes.length > 0) details.push(`males ${mClothes.join(" and ")}`);
-        } else {
-          const top = DICTIONARY.subjectClothesTop[config.subjectClothesTop];
-          const bot = DICTIONARY.subjectClothesBottom[config.subjectClothesBottom];
-          if (top) details.push(top);
-          if (bot) details.push(bot);
-        }
-
-        if (details.length > 0) humanStr += ` ${details.join(", ")}`;
+        parts.push(`A floating ${product}, suspended diagonally in mid-air`);
+        parts.push(`Background is a perfect ${color} monochrome solid color with soft, diffused lighting`);
+        parts.push(`Highly stylized, product levitation, clean lines, impeccable product finish, flawless production`);
         
-        let actionStr = "posing naturally";
-        if (config.subjectAction && config.subjectAction !== "선택안함" && config.subjectAction !== "기본") {
-          actionStr = DICTIONARY.subjectAction[config.subjectAction];
-        } else if (config.subjectAction === "기본") {
-          actionStr = "posing naturally";
+        if (config.cameraAngle && config.cameraAngle !== "선택안함") {
+          parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
         }
-        parts.push(`featuring ${humanStr} ${actionStr}`);
-        
-        if (useImageRef && refImage) {
-          parts.push("The person is naturally interacting with/holding the product in the attached image");
+        if (config.shotStyle && config.shotStyle.length > 0) {
+          const styles = config.shotStyle.map(s => DICTIONARY.shotStyle[s]);
+          parts.push(`rendered with ${styles.join(", ")}`);
         }
+        if (config.useLight && config.light !== "선택안함") {
+          parts.push(`illuminated by ${DICTIONARY.light[config.light]} with ${config.brightness} brightness`);
+        }
+        if (removeText) {
+          parts.push("textless, no text, no watermarks, clear image");
+        }
+        parts.push("8k resolution, highly detailed, masterpiece, photorealistic");
       } else {
-        parts.push(`professional architectural photography of ${subjectStr}`);
-      }
+        let subjectStr = config.productName ? `a high-end ${config.productName}` : "a high-end masterpiece";
 
-      let envStr = DICTIONARY.spaceType[config.spaceType];
-      if (config.spaceDetail) envStr += `, ${DICTIONARY.spaceDetail[config.spaceDetail]}`;
-      if (config.country !== "선택안함") envStr += ` in ${DICTIONARY.country[config.country]}`;
-      parts.push(`set in ${envStr}`);
-      if (config.interiorStyle !== "선택안함") parts.push(`designed with ${DICTIONARY.interiorStyle[config.interiorStyle]}`);
+        if (config.subjectNum !== "없음") {
+          const traits = [];
+          if (config.subjectAge !== "선택안함") traits.push(DICTIONARY.subjectAge[config.subjectAge]);
+          if (config.subjectGender !== "선택안함") traits.push(DICTIONARY.subjectGender[config.subjectGender]);
+          if (config.subjectRegion !== "선택안함") traits.push(DICTIONARY.subjectRegion[config.subjectRegion]);
 
-      if (useDetailMaterial) {
-        const materials = [
-          DICTIONARY.detailFloor[config.detailFloor],
-          DICTIONARY.detailWood[config.detailWood],
-          DICTIONARY.detailMetal[config.detailMetal],
-          DICTIONARY.detailWall[config.detailWall]
-        ];
-        parts.push(`highlighting ${materials.join(", ")}`);
-      }
+          let humanStr = DICTIONARY.subjectNum[config.subjectNum];
+          if (traits.length > 0) humanStr += ` (${traits.join(", ")})`;
 
-      if (config.useLight && config.light !== "선택안함") {
-        parts.push(`illuminated by ${DICTIONARY.light[config.light]} with ${config.brightness} brightness`);
+          const details = [];
+          if (config.subjectHair !== "선택안함") details.push(DICTIONARY.subjectHair[config.subjectHair]);
+          if (config.subjectClothesStyle !== "선택안함") details.push(DICTIONARY.subjectClothesStyle[config.subjectClothesStyle]);
+          
+          if (config.subjectGender === "혼성") {
+            const fTop = DICTIONARY.subjectClothesTop[config.femaleClothesTop];
+            const fBot = DICTIONARY.subjectClothesBottom[config.femaleClothesBottom];
+            const mTop = DICTIONARY.subjectClothesTop[config.maleClothesTop];
+            const mBot = DICTIONARY.subjectClothesBottom[config.maleClothesBottom];
+            
+            let fClothes = [];
+            if (fTop) fClothes.push(fTop);
+            if (fBot) fClothes.push(fBot);
+            
+            let mClothes = [];
+            if (mTop) mClothes.push(mTop);
+            if (mBot) mClothes.push(mBot);
+            
+            if (fClothes.length > 0) details.push(`females ${fClothes.join(" and ")}`);
+            if (mClothes.length > 0) details.push(`males ${mClothes.join(" and ")}`);
+          } else {
+            const top = DICTIONARY.subjectClothesTop[config.subjectClothesTop];
+            const bot = DICTIONARY.subjectClothesBottom[config.subjectClothesBottom];
+            if (top) details.push(top);
+            if (bot) details.push(bot);
+          }
+
+          if (details.length > 0) humanStr += ` ${details.join(", ")}`;
+          
+          let actionStr = "posing naturally";
+          if (config.subjectAction && config.subjectAction !== "선택안함" && config.subjectAction !== "기본") {
+            actionStr = DICTIONARY.subjectAction[config.subjectAction];
+          } else if (config.subjectAction === "기본") {
+            actionStr = "posing naturally";
+          }
+          parts.push(`featuring ${humanStr} ${actionStr} with ${subjectStr}`);
+          
+          if (useImageRef && refImage) {
+            parts.push("The person is naturally interacting with/holding the product in the attached image");
+          }
+        } else {
+          parts.push(`professional architectural photography of ${subjectStr}`);
+        }
+
+        let envStr = DICTIONARY.spaceType[config.spaceType];
+        if (config.spaceDetail) envStr += `, ${DICTIONARY.spaceDetail[config.spaceDetail]}`;
+        if (config.country !== "선택안함") envStr += ` in ${DICTIONARY.country[config.country]}`;
+        parts.push(`set in ${envStr}`);
+        
+        if (config.interiorStyle !== "선택안함") {
+          parts.push(`designed with ${DICTIONARY.interiorStyle[config.interiorStyle]}`);
+        }
+
+        if (useDetailMaterial) {
+          const materials = [];
+          if (config.detailFloor) materials.push(DICTIONARY.detailFloor[config.detailFloor]);
+          if (config.detailWood) materials.push(DICTIONARY.detailWood[config.detailWood]);
+          if (config.detailMetal) materials.push(DICTIONARY.detailMetal[config.detailMetal]);
+          if (config.detailWall) materials.push(DICTIONARY.detailWall[config.detailWall]);
+          if (materials.length > 0) {
+            parts.push(`highlighting ${materials.join(", ")}`);
+          }
+        }
+
+        if (config.useLight && config.light !== "선택안함") {
+          parts.push(`illuminated by ${DICTIONARY.light[config.light]} with ${config.brightness} brightness`);
+        }
+        if (config.productLayout && config.productLayout !== "선택안함") parts.push(DICTIONARY.productLayout[config.productLayout]);
+        if (config.copySpace && config.copySpace !== "선택안함") parts.push(DICTIONARY.copySpace[config.copySpace]);
+        if (config.productAnchor && config.productAnchor !== "선택안함") parts.push(DICTIONARY.productAnchor[config.productAnchor]);
+        if (config.cameraAngle !== "선택안함") parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
+        if (config.shotStyle.length > 0) {
+          const styles = config.shotStyle.map(s => DICTIONARY.shotStyle[s]);
+          parts.push(`rendered with ${styles.join(", ")}`);
+        }
+        if (removeText) parts.push("textless, no text, no watermarks, clear image");
+        parts.push("8k resolution, highly detailed, masterpiece, photorealistic, interior design magazine cover");
       }
-      if (config.productLayout && config.productLayout !== "선택안함") parts.push(DICTIONARY.productLayout[config.productLayout]);
-      if (config.copySpace && config.copySpace !== "선택안함") parts.push(DICTIONARY.copySpace[config.copySpace]);
-      if (config.productAnchor && config.productAnchor !== "선택안함") parts.push(DICTIONARY.productAnchor[config.productAnchor]);
-      if (config.cameraAngle !== "선택안함") parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
-      if (config.shotStyle.length > 0) {
-        const styles = config.shotStyle.map(s => DICTIONARY.shotStyle[s]);
-        parts.push(`rendered with ${styles.join(", ")}`);
-      }
-      if (removeText) parts.push("textless, no text, no watermarks, clear image");
-      parts.push("8k resolution, highly detailed, masterpiece, photorealistic, interior design magazine cover");
 
       let finalPrompt = parts.join(", ");
       
@@ -651,7 +767,7 @@ export default function App() {
         finalPrompt += " --no text, watermark, bad label, blurry, ugly shape, deformed packaging";
       }
 
-      setGeneratedPrompt(finalPrompt); // Keep as standard string
+      setGeneratedPrompt(finalPrompt);
       setGeneratedImage(null);
       setIsGenerating(false);
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -1401,21 +1517,37 @@ export default function App() {
 
             {/* Smart Templates */}
             <div className="template-grid">
-              <button className={`ios-smart-template-btn ${activeTemplate === '타이틀씬' ? 'active' : ''}`} onClick={() => handleSmartTemplate('타이틀씬')}>
-                <div className="template-title">타이틀씬</div>
-                <div className="template-desc">스튜디오 + 그라데이션</div>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'Title Scene' ? 'active' : ''}`} onClick={() => handleSmartTemplate('Title Scene')}>
+                <div className="template-title">Title Scene</div>
+                <div className="template-desc">초현실주의 공중 부양</div>
               </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === '디테일씬' ? 'active' : ''}`} onClick={() => handleSmartTemplate('디테일씬')}>
-                <div className="template-title">디테일씬</div>
-                <div className="template-desc">쇼케이스 + 클로즈업</div>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'Detail Scene' ? 'active' : ''}`} onClick={() => handleSmartTemplate('Detail Scene')}>
+                <div className="template-title">Detail Scene</div>
+                <div className="template-desc">질감 강조 초접사</div>
               </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === '인스타씬' ? 'active' : ''}`} onClick={() => handleSmartTemplate('인스타씬')}>
-                <div className="template-title">인스타씬</div>
-                <div className="template-desc">1:1 SNS + 플랜테리어</div>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'Insta Scene' ? 'active' : ''}`} onClick={() => handleSmartTemplate('Insta Scene')}>
+                <div className="template-title">Insta Scene</div>
+                <div className="template-desc">MZ SNS 감성 스냅</div>
               </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === '사용씬' ? 'active' : ''}`} onClick={() => handleSmartTemplate('사용씬')}>
-                <div className="template-title">사용씬</div>
-                <div className="template-desc">인물 포함 라이프스타일</div>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'Usage Scene' ? 'active' : ''}`} onClick={() => handleSmartTemplate('Usage Scene')}>
+                <div className="template-title">Usage Scene</div>
+                <div className="template-desc">인물 라이프스타일</div>
+              </button>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'Home Living' ? 'active' : ''}`} onClick={() => handleSmartTemplate('Home Living')}>
+                <div className="template-title">Home Living</div>
+                <div className="template-desc">포근한 가정용 연출</div>
+              </button>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'Office Tech' ? 'active' : ''}`} onClick={() => handleSmartTemplate('Office Tech')}>
+                <div className="template-title">Office Tech</div>
+                <div className="template-desc">데스크셋업 비즈니스</div>
+              </button>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'Nature Organic' ? 'active' : ''}`} onClick={() => handleSmartTemplate('Nature Organic')}>
+                <div className="template-title">Nature Organic</div>
+                <div className="template-desc">자연 친환경 컨셉</div>
+              </button>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'Dramatic Studio' ? 'active' : ''}`} onClick={() => handleSmartTemplate('Dramatic Studio')}>
+                <div className="template-title">Dramatic Studio</div>
+                <div className="template-desc">럭셔리 스튜디오</div>
               </button>
             </div>
 
@@ -1458,6 +1590,21 @@ export default function App() {
 
         {currentMode === 'mix' && (
           <motion.div key="mix" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
+
+            {/* Product Name Input */}
+            <div className="ios-bento-card" style={{ padding: '16px 20px', marginBottom: '8px' }}>
+              <label className="ios-option-label" style={{ marginBottom: '8px' }}>대상 제품명 (Product Name)</label>
+              <div className="save-bar" style={{ padding: '4px 4px 4px 16px' }}>
+                <input
+                  type="text"
+                  placeholder="예: perfume bottle, wireless earbuds, luxury watch"
+                  value={config.productName || 'product'}
+                  onChange={(e) => handleConfigChange('productName', e.target.value)}
+                  className="save-input"
+                  style={{ fontSize: '14px', fontWeight: '600' }}
+                />
+              </div>
+            </div>
 
             {/* Category Tabs */}
             <div className="ios-category-tabs">
@@ -1546,6 +1693,61 @@ export default function App() {
                   <div className="ios-bento-card">
                     <OptionSelect label="공간 종류" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} theme="green" />
                     <OptionSelect label="세부 공간" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} theme="green" />
+                    {config.spaceType === '스튜디오' && (config.spaceDetail === '단색 모노크롬' || config.spaceDetail === '단색 배경') && (
+                      <div className="mt-2 mb-4 p-4 rounded-2xl bg-gray-50 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700">
+                        <div className="ios-option-label mb-2 text-[12px] font-bold">배경 컬러 선택 (Monochrome Color)</div>
+                        
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {['Cobalt Blue', 'Terracotta', 'Sage Green', 'Warm Sand', 'Matte Black', 'Pure White', 'Charcoal'].map(color => (
+                            <button
+                              key={color}
+                              onClick={() => handleConfigChange('monochromeColor', color)}
+                              className={`ios-pill ${config.monochromeColor === color ? 'selected-green' : ''}`}
+                              style={{ 
+                                display: 'inline-flex', 
+                                alignItems: 'center', 
+                                gap: '6px', 
+                                padding: '6px 12px', 
+                                fontSize: '12px',
+                                border: config.monochromeColor === color ? '1px solid #34C759' : '1px solid rgba(0,0,0,0.08)',
+                                backgroundColor: config.monochromeColor === color ? 'rgba(52, 199, 89, 0.1)' : undefined,
+                                color: config.monochromeColor === color ? '#34C759' : undefined
+                              }}
+                            >
+                              <span style={{
+                                width: '10px',
+                                height: '10px',
+                                borderRadius: '50%',
+                                backgroundColor: getColorHex(color),
+                                border: '1px solid rgba(0,0,0,0.1)'
+                              }}></span>
+                              {color}
+                            </button>
+                          ))}
+                        </div>
+                        
+                        <div className="flex items-center gap-3">
+                          <div style={{ position: 'relative', width: '36px', height: '36px', borderRadius: '50%', overflow: 'hidden', border: '2px solid #E5E5EA', flexShrink: 0 }}>
+                            <input
+                              type="color"
+                              value={isHexColor(config.monochromeColor) ? config.monochromeColor : '#0047AB'}
+                              onChange={(e) => handleConfigChange('monochromeColor', e.target.value)}
+                              style={{ position: 'absolute', top: '-10px', left: '-10px', width: '60px', height: '60px', cursor: 'pointer', border: 'none', padding: 0 }}
+                            />
+                          </div>
+                          <div className="save-bar flex-1" style={{ padding: '4px 12px' }}>
+                            <input
+                              type="text"
+                              placeholder="직접 입력 (예: Sage Green, Crimson)"
+                              value={config.monochromeColor}
+                              onChange={(e) => handleConfigChange('monochromeColor', e.target.value)}
+                              className="save-input"
+                              style={{ fontSize: '13px', fontWeight: '600', width: '100%', border: 'none', outline: 'none', background: 'transparent' }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     <OptionSelect label="인테리어 양식" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} theme="green" />
                     <div className="mt-4 border-t border-gray-100">
                       <OptionSelect label="국가/지역 (Country)" value={config.country} onChange={(v) => handleConfigChange('country', v)} options={OPTIONS_DATA.country} theme="green" />
@@ -1921,12 +2123,41 @@ export default function App() {
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center', alignContent: 'flex-start' }}>
                   {(() => {
                     const tags = [];
+                    
+                    if (activeTemplate) {
+                      tags.push({
+                        key: 'activeTemplate',
+                        val: `씬: ${activeTemplate}`,
+                        group: 0,
+                        bgColor: '#FF9500',
+                        textColor: '#FFFFFF'
+                      });
+                    }
+                    if (config.productName && config.productName !== 'product') {
+                      tags.push({
+                        key: 'productNameTag',
+                        val: `제품: ${config.productName}`,
+                        group: 0,
+                        bgColor: '#007AFF',
+                        textColor: '#FFFFFF'
+                      });
+                    }
+                    if (config.spaceType === '스튜디오' && (config.spaceDetail === '단색 모노크롬' || config.spaceDetail === '단색 배경') && config.monochromeColor) {
+                      tags.push({
+                        key: 'monochromeColorTag',
+                        val: `컬러: ${config.monochromeColor}`,
+                        group: 2,
+                        bgColor: '#34C759',
+                        textColor: '#FFFFFF'
+                      });
+                    }
+
                     Object.entries(config).forEach(([key, val]) => {
                       // Skip empty / unset values
                       if (val === "선택안함" || val === "없음" || val === false || val === null || val === undefined) return;
                       if (Array.isArray(val) && val.length === 0) return;
                       // Skip internal/toggle-only keys that shouldn't appear as pills
-                      if (['brightness', 'useLight', 'useImageRef'].includes(key)) return;
+                      if (['brightness', 'useLight', 'useImageRef', 'productName', 'monochromeColor'].includes(key)) return;
 
                       // 1. 인물없음 일때 인물관련 속성 제거
                       if (config.subjectNum === "없음" && (key.startsWith('subject') || key.startsWith('female') || key.startsWith('male'))) return;
@@ -2107,7 +2338,7 @@ export default function App() {
             </div>
 
             <footer className="ios-footer">
-              v0.50 Stable | Developed by Gony
+              v0.50a | Developed by Gony
             </footer>
             <div className="h-12"></div>
           </div>
