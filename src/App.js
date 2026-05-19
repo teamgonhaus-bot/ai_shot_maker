@@ -1918,7 +1918,7 @@ export default function App() {
       <div className="pt-4 pb-20">
               <div className="ios-option-label mb-2 px-1">현재 선택된 옵션 (Summary)</div>
               <div className="ios-summary-panel">
-                <div className="flex flex-wrap gap-[6px]">
+                <div className="flex flex-wrap gap-[6px] justify-center" style={{ justifyContent: 'center' }}>
                   {(() => {
                     const tags = [];
                     Object.entries(config).forEach(([key, val]) => {
