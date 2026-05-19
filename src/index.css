@@ -505,21 +505,24 @@ body {
    ============================================= */
 .ios-summary-panel {
   background-color: #FFFFFF !important;
-  border-radius: 16px !important;
-  padding: 14px 16px !important;
+  border-radius: 20px !important;
+  padding: 16px 18px !important;
   margin-bottom: 20px !important;
   border: 1px solid rgba(0, 0, 0, 0.04) !important;
 }
 
 .ios-summary-tag {
-  display: inline-block !important;
+  display: inline-flex !important;
+  align-items: center !important;
   font-size: 11px !important;
   font-weight: 700 !important;
   color: #8E8E93;
   background-color: #F2F2F7;
-  padding: 5px 14px !important;
+  padding: 6px 13px !important;
   border-radius: 9999px !important;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.02) !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05) !important;
+  white-space: nowrap !important;
+  letter-spacing: -0.01em !important;
 }
 
 /* =============================================
