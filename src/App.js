@@ -207,7 +207,7 @@ export default function App() {
   // Rename Modal State
   const [renameTarget, setRenameTarget] = useState(null); // { id, name }
   const [newPresetName, setNewPresetName] = useState("");
-  
+
   const [promptModalTarget, setPromptModalTarget] = useState(null);
   const [promptCopied, setPromptCopied] = useState(false);
   const [activeMarquee, setActiveMarquee] = useState("");
@@ -321,7 +321,7 @@ export default function App() {
     setActiveTemplate(templateType);
     setActiveLibraryTemplateId(null);
     let targetConfig = { ...config };
-    
+
     if (templateType === 'Title Scene') {
       targetConfig.subjectNum = '없음';
       targetConfig.spaceType = '스튜디오';
@@ -390,7 +390,7 @@ export default function App() {
       targetConfig.interiorStyle = '내추럴 우드';
       targetConfig.country = '선택안함';
       setActiveMarquee("Usage Scene Active: Lifestyle product-in-use realistic commercial photography...");
-      
+
     } else if (templateType === 'Home Living') {
       targetConfig.subjectNum = '없음';
       targetConfig.spaceType = '홈';
@@ -406,7 +406,7 @@ export default function App() {
       targetConfig.interiorStyle = '내추럴 우드';
       targetConfig.country = '선택안함';
       setActiveMarquee("Home Living Active: Cozy living room and bedroom backdrop for real-life domestic setup...");
-      
+
     } else if (templateType === 'Office Tech') {
       targetConfig.subjectNum = '없음';
       targetConfig.spaceType = '오피스';
@@ -422,7 +422,7 @@ export default function App() {
       targetConfig.interiorStyle = '모던 미니멀';
       targetConfig.country = '선택안함';
       setActiveMarquee("Office Tech Active: Clean desk setup and shared office business photography...");
-      
+
     } else if (templateType === 'Nature Organic') {
       targetConfig.subjectNum = '없음';
       targetConfig.spaceType = '야외';
@@ -438,7 +438,7 @@ export default function App() {
       targetConfig.interiorStyle = '플랜테리어';
       targetConfig.country = '선택안함';
       setActiveMarquee("Nature Organic Active: Eco-friendly organic concept with plant, stone, and water elements...");
-      
+
     } else if (templateType === 'Dramatic Studio') {
       targetConfig.subjectNum = '없음';
       targetConfig.spaceType = '스튜디오';
@@ -455,10 +455,10 @@ export default function App() {
       targetConfig.country = '선택안함';
       setActiveMarquee("Dramatic Studio Active: High-contrast luxury studio shot with dramatic shadows and lighting...");
     }
-    
+
     // Cascading Effect: Apply changed properties sequentially
     const keysToChange = Object.keys(targetConfig).filter(k => targetConfig[k] !== config[k]);
-    
+
     if (keysToChange.length === 0) {
       setConfig(targetConfig);
       setIsSaved(false);
@@ -466,7 +466,7 @@ export default function App() {
     }
 
     // 0.2s total duration approximate (e.g. 15ms * 15 keys ~ 225ms)
-    const staggerMs = 20; 
+    const staggerMs = 20;
     keysToChange.forEach((key, index) => {
       setTimeout(() => {
         setConfig(prev => ({ ...prev, [key]: targetConfig[key] }));
@@ -629,7 +629,7 @@ export default function App() {
     setTimeout(() => {
       const parts = [];
       const isSolidBackground = config.spaceDetail === '단색 배경' || config.spaceDetail === '단색 모노크롬';
-      
+
       if (activeTemplate === 'Title Scene') {
         parts.push("Clean and organized studio style shot for title banner, product focus");
       } else if (activeTemplate === 'Detail Scene') {
@@ -651,11 +651,11 @@ export default function App() {
       if (isSolidBackground) {
         const product = config.productName || 'product';
         const color = config.monochromeColor || 'Cobalt Blue';
-        
+
         parts.push(`A floating ${product}, suspended diagonally in mid-air`);
         parts.push(`Background is a perfect ${color} monochrome solid color with soft, diffused lighting`);
         parts.push(`Highly stylized, product levitation, clean lines, impeccable product finish, flawless production`);
-        
+
         if (config.cameraAngle && config.cameraAngle !== "선택안함") {
           parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
         }
@@ -685,21 +685,21 @@ export default function App() {
           const details = [];
           if (config.subjectHair !== "선택안함") details.push(DICTIONARY.subjectHair[config.subjectHair]);
           if (config.subjectClothesStyle !== "선택안함") details.push(DICTIONARY.subjectClothesStyle[config.subjectClothesStyle]);
-          
+
           if (config.subjectGender === "혼성") {
             const fTop = DICTIONARY.subjectClothesTop[config.femaleClothesTop];
             const fBot = DICTIONARY.subjectClothesBottom[config.femaleClothesBottom];
             const mTop = DICTIONARY.subjectClothesTop[config.maleClothesTop];
             const mBot = DICTIONARY.subjectClothesBottom[config.maleClothesBottom];
-            
+
             let fClothes = [];
             if (fTop) fClothes.push(fTop);
             if (fBot) fClothes.push(fBot);
-            
+
             let mClothes = [];
             if (mTop) mClothes.push(mTop);
             if (mBot) mClothes.push(mBot);
-            
+
             if (fClothes.length > 0) details.push(`females ${fClothes.join(" and ")}`);
             if (mClothes.length > 0) details.push(`males ${mClothes.join(" and ")}`);
           } else {
@@ -710,7 +710,7 @@ export default function App() {
           }
 
           if (details.length > 0) humanStr += ` ${details.join(", ")}`;
-          
+
           let actionStr = "posing naturally";
           if (config.subjectAction && config.subjectAction !== "선택안함" && config.subjectAction !== "기본") {
             actionStr = DICTIONARY.subjectAction[config.subjectAction];
@@ -718,7 +718,7 @@ export default function App() {
             actionStr = "posing naturally";
           }
           parts.push(`featuring ${humanStr} ${actionStr} with ${subjectStr}`);
-          
+
           if (useImageRef && refImage) {
             parts.push("The person is naturally interacting with/holding the product in the attached image");
           }
@@ -730,7 +730,7 @@ export default function App() {
         if (config.spaceDetail) envStr += `, ${DICTIONARY.spaceDetail[config.spaceDetail]}`;
         if (config.country !== "선택안함") envStr += ` in ${DICTIONARY.country[config.country]}`;
         parts.push(`set in ${envStr}`);
-        
+
         if (config.interiorStyle !== "선택안함") {
           parts.push(`designed with ${DICTIONARY.interiorStyle[config.interiorStyle]}`);
         }
@@ -762,7 +762,7 @@ export default function App() {
       }
 
       let finalPrompt = parts.join(", ");
-      
+
       if (useCommercialNegative) {
         finalPrompt += " --no text, watermark, bad label, blurry, ugly shape, deformed packaging";
       }
@@ -855,7 +855,7 @@ export default function App() {
         triggerToast("Hugging Face (FLUX.1) 생성 성공!");
       } catch (e) {
         const errorMsg = e.message?.toLowerCase() || "";
-        
+
         // [INSTRUCTION 4] Model Loading (503) 발생 시 자동 재시도
         if ((errorMsg.includes('503') || errorMsg.includes('loading')) && retryCount < maxRetries) {
           retryCount++;
@@ -1121,7 +1121,7 @@ export default function App() {
                   className="save-input w-full"
                   autoFocus
                 />
-                
+
                 <div className="flex gap-3 mt-4">
                   <button
                     onClick={() => setRenameTarget(null)}
@@ -1149,7 +1149,7 @@ export default function App() {
       {/* 📝 Prompt Detail Global Modal */}
       <AnimatePresence>
         {promptModalTarget && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="settings-modal-overlay"
             style={{ zIndex: 300000, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}
@@ -1167,9 +1167,9 @@ export default function App() {
                   {promptModalTarget.prompt}
                 </p>
               </div>
-              
+
               <div style={{ display: 'flex', gap: '12px', marginTop: 'auto', alignItems: 'center' }}>
-                <button 
+                <button
                   onClick={() => {
                     navigator.clipboard.writeText(promptModalTarget.prompt);
                     setPromptCopied(true);
@@ -1180,7 +1180,7 @@ export default function App() {
                 >
                   {promptCopied ? <span className="font-black">✓ Copied</span> : <><Copy size={16} /> Copy Prompt</>}
                 </button>
-                <button 
+                <button
                   onClick={() => setPromptModalTarget(null)}
                   style={{ width: '48px', height: '48px', padding: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%', backgroundColor: '#F2F2F7', border: 'none', cursor: 'pointer', color: '#000', flexShrink: 0, outline: 'none' }}
                 >
@@ -1195,26 +1195,26 @@ export default function App() {
       {/* 📘 About Mode Guide Popup Modal */}
       <AnimatePresence>
         {aboutModalTarget && (
-          <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="settings-modal-overlay"
             style={{ zIndex: 300000, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}
             onClick={() => setAboutModalTarget(null)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }} 
-              animate={{ scale: 1, opacity: 1, y: 0 }} 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
               className="settings-modal"
-              style={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                maxHeight: '85vh', 
-                width: '90%', 
-                maxWidth: '540px', 
-                padding: '28px', 
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                maxHeight: '85vh',
+                width: '90%',
+                maxWidth: '540px',
+                padding: '28px',
                 borderRadius: '32px',
                 border: `1px solid rgba(255, 255, 255, 0.2)`
               }}
@@ -1222,8 +1222,8 @@ export default function App() {
             >
               {/* Header inside modal */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-                <div 
-                  className="w-12 h-12 rounded-2xl flex items-center justify-center text-white" 
+                <div
+                  className="w-12 h-12 rounded-2xl flex items-center justify-center text-white"
                   style={{ backgroundColor: aboutModalTarget.color }}
                 >
                   {aboutModalTarget.icon === 'sliders' && <Sliders className="w-6 h-6" />}
@@ -1264,22 +1264,22 @@ export default function App() {
 
               {/* Action Buttons */}
               <div style={{ display: 'flex', gap: '12px', marginTop: 'auto', alignItems: 'center' }}>
-                <button 
+                <button
                   onClick={() => setAboutModalTarget(null)}
                   className="save-btn flex-1"
-                  style={{ 
-                    backgroundColor: '#000', 
-                    color: '#FFF', 
-                    borderRadius: '9999px', 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center', 
-                    height: '48px', 
-                    border: 'none', 
-                    cursor: 'pointer', 
-                    outline: 'none', 
-                    fontWeight: 700, 
-                    fontSize: '14px' 
+                  style={{
+                    backgroundColor: '#000',
+                    color: '#FFF',
+                    borderRadius: '9999px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '48px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    outline: 'none',
+                    fontWeight: 700,
+                    fontSize: '14px'
                   }}
                 >
                   확인
@@ -1468,7 +1468,7 @@ export default function App() {
                     >
                       {isAdmin ? <LogOut size={18} /> : <LogIn size={18} />}
                       <span>{isAdmin ? 'Logout' : 'Login'}</span>
-                                        </button>
+                    </button>
                   </motion.div>
                 </>
               )}
@@ -1485,25 +1485,25 @@ export default function App() {
 
       {/* 🚀 4-Mode Pill Navigation Bar */}
       <div className="mode-nav">
-        <button 
+        <button
           className={`mode-nav-btn ${currentMode === 'smart' ? 'active' : ''}`}
           onClick={() => setCurrentMode('smart')}
         >
           Smart
         </button>
-        <button 
+        <button
           className={`mode-nav-btn ${currentMode === 'mix' ? 'active' : ''}`}
           onClick={() => setCurrentMode('mix')}
         >
           Mix
         </button>
-        <button 
+        <button
           className={`mode-nav-btn ${currentMode === 'library' ? 'active' : ''}`}
           onClick={() => setCurrentMode('library')}
         >
           Library
         </button>
-        <button 
+        <button
           className={`mode-nav-btn ${currentMode === 'about' ? 'active' : ''}`}
           onClick={() => setCurrentMode('about')}
         >
@@ -1627,7 +1627,7 @@ export default function App() {
                         <OptionSelect label="지역/인종" value={config.subjectRegion} onChange={(v) => handleConfigChange('subjectRegion', v)} options={OPTIONS_DATA.subjectRegion} theme="red" />
                         <OptionSelect label="행동" value={config.subjectAction} onChange={(v) => handleConfigChange('subjectAction', v)} options={OPTIONS_DATA.subjectAction} theme="red" />
                         <OptionSelect label="옷 스타일" value={config.subjectClothesStyle} onChange={(v) => handleConfigChange('subjectClothesStyle', v)} options={OPTIONS_DATA.subjectClothesStyle} theme="red" />
-                        
+
                         {config.subjectGender === '혼성' ? (
                           <>
                             <div className="mt-4 mb-2 text-xs font-bold text-gray-500 border-b pb-1">여성 의상</div>
@@ -1645,7 +1645,7 @@ export default function App() {
                               options={OPTIONS_DATA.subjectClothesBottom.female}
                               theme="red"
                             />
-                            
+
                             <div className="mt-4 mb-2 text-xs font-bold text-gray-500 border-b pb-1">남성 의상</div>
                             <OptionSelect
                               label="상의"
@@ -1696,18 +1696,18 @@ export default function App() {
                     {config.spaceType === '스튜디오' && (config.spaceDetail === '단색 모노크롬' || config.spaceDetail === '단색 배경') && (
                       <div className="mt-2 mb-4 p-4 rounded-2xl bg-gray-50 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700">
                         <div className="ios-option-label mb-2 text-[12px] font-bold">배경 컬러 선택 (Monochrome Color)</div>
-                        
+
                         <div className="flex flex-wrap gap-2 mb-3">
                           {['Cobalt Blue', 'Terracotta', 'Sage Green', 'Warm Sand', 'Matte Black', 'Pure White', 'Charcoal'].map(color => (
                             <button
                               key={color}
                               onClick={() => handleConfigChange('monochromeColor', color)}
                               className={`ios-pill ${config.monochromeColor === color ? 'selected-green' : ''}`}
-                              style={{ 
-                                display: 'inline-flex', 
-                                alignItems: 'center', 
-                                gap: '6px', 
-                                padding: '6px 12px', 
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                padding: '6px 12px',
                                 fontSize: '12px',
                                 border: config.monochromeColor === color ? '1px solid #34C759' : '1px solid rgba(0,0,0,0.08)',
                                 backgroundColor: config.monochromeColor === color ? 'rgba(52, 199, 89, 0.1)' : undefined,
@@ -1725,7 +1725,7 @@ export default function App() {
                             </button>
                           ))}
                         </div>
-                        
+
                         <div className="flex items-center gap-3">
                           <div style={{ position: 'relative', width: '36px', height: '36px', borderRadius: '50%', overflow: 'hidden', border: '2px solid #E5E5EA', flexShrink: 0 }}>
                             <input
@@ -1751,7 +1751,7 @@ export default function App() {
                     <OptionSelect label="인테리어 양식" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} theme="green" />
                     <div className="mt-4 border-t border-gray-100">
                       <OptionSelect label="국가/지역 (Country)" value={config.country} onChange={(v) => handleConfigChange('country', v)} options={OPTIONS_DATA.country} theme="green" />
-                      
+
                       <IOSToggle
                         label="세부 소재 및 컬러 (Materials)"
                         isOn={useDetailMaterial}
@@ -1874,7 +1874,7 @@ export default function App() {
                         </div>
                       )}
                     </div>
-                    
+
                     <OptionSelect label="이미지 비율" value={config.aspectRatio} onChange={(v) => handleConfigChange('aspectRatio', v)} options={OPTIONS_DATA.aspectRatio} theme="blue" />
                     <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
                     <OptionSelect label="화면 여백 (Copy Space)" value={config.copySpace || "선택안함"} onChange={(v) => handleConfigChange('copySpace', v)} options={OPTIONS_DATA.copySpace} theme="blue" />
@@ -2007,7 +2007,7 @@ export default function App() {
 
         {currentMode === 'about' && (
           <motion.div key="about" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
-            
+
             {/* Bento Grid Header */}
             <div className="text-center py-2">
               <h2 className="text-[17px] font-black text-black dark:text-white tracking-tight m-0 uppercase" style={{ letterSpacing: '0.04em' }}>Workflow Guide</h2>
@@ -2016,9 +2016,9 @@ export default function App() {
 
             {/* 3 Bento Cards with beautiful icons */}
             <div className="about-grid">
-              
+
               {/* Card 1: Mix Mode */}
-              <div 
+              <div
                 className="about-card mix-mode"
                 onClick={() => setAboutModalTarget({
                   title: 'Professional Mix Mode',
@@ -2047,7 +2047,7 @@ export default function App() {
               </div>
 
               {/* Card 2: Workflow */}
-              <div 
+              <div
                 className="about-card workflow"
                 onClick={() => setAboutModalTarget({
                   title: 'Generate & Copy Workflow',
@@ -2074,7 +2074,7 @@ export default function App() {
               </div>
 
               {/* Card 3: Library */}
-              <div 
+              <div
                 className="about-card library"
                 onClick={() => setAboutModalTarget({
                   title: 'Library Management',
@@ -2118,229 +2118,229 @@ export default function App() {
 
       {/* Action Area with Summary Panel */}
       <div className="pt-4 pb-20">
-              <div className="ios-option-label mb-2 px-1">현재 선택된 옵션 (Summary)</div>
-              <div className="ios-summary-panel">
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center', alignContent: 'flex-start' }}>
-                  {(() => {
-                    const tags = [];
-                    
-                    if (activeTemplate) {
-                      tags.push({
-                        key: 'activeTemplate',
-                        val: `씬: ${activeTemplate}`,
-                        group: 0,
-                        bgColor: '#FF9500',
-                        textColor: '#FFFFFF'
-                      });
-                    }
-                    if (config.productName && config.productName !== 'product') {
-                      tags.push({
-                        key: 'productNameTag',
-                        val: `제품: ${config.productName}`,
-                        group: 0,
-                        bgColor: '#007AFF',
-                        textColor: '#FFFFFF'
-                      });
-                    }
-                    if (config.spaceType === '스튜디오' && (config.spaceDetail === '단색 모노크롬' || config.spaceDetail === '단색 배경') && config.monochromeColor) {
-                      tags.push({
-                        key: 'monochromeColorTag',
-                        val: `컬러: ${config.monochromeColor}`,
-                        group: 2,
-                        bgColor: '#34C759',
-                        textColor: '#FFFFFF'
-                      });
-                    }
+        <div className="ios-option-label mb-2 px-1">현재 선택된 옵션 (Summary)</div>
+        <div className="ios-summary-panel">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center', alignContent: 'flex-start' }}>
+            {(() => {
+              const tags = [];
 
-                    Object.entries(config).forEach(([key, val]) => {
-                      // Skip empty / unset values
-                      if (val === "선택안함" || val === "없음" || val === false || val === null || val === undefined) return;
-                      if (Array.isArray(val) && val.length === 0) return;
-                      // Skip internal/toggle-only keys that shouldn't appear as pills
-                      if (['brightness', 'useLight', 'useImageRef', 'productName', 'monochromeColor'].includes(key)) return;
+              if (activeTemplate) {
+                tags.push({
+                  key: 'activeTemplate',
+                  val: `씬: ${activeTemplate}`,
+                  group: 0,
+                  bgColor: '#FF9500',
+                  textColor: '#FFFFFF'
+                });
+              }
+              if (config.productName && config.productName !== 'product') {
+                tags.push({
+                  key: 'productNameTag',
+                  val: `제품: ${config.productName}`,
+                  group: 0,
+                  bgColor: '#007AFF',
+                  textColor: '#FFFFFF'
+                });
+              }
+              if (config.spaceType === '스튜디오' && (config.spaceDetail === '단색 모노크롬' || config.spaceDetail === '단색 배경') && config.monochromeColor) {
+                tags.push({
+                  key: 'monochromeColorTag',
+                  val: `컬러: ${config.monochromeColor}`,
+                  group: 2,
+                  bgColor: '#34C759',
+                  textColor: '#FFFFFF'
+                });
+              }
 
-                      // 1. 인물없음 일때 인물관련 속성 제거
-                      if (config.subjectNum === "없음" && (key.startsWith('subject') || key.startsWith('female') || key.startsWith('male'))) return;
-                      // 1-2. 메인 토글이 비활성화 상태인 세부 속성 제거
-                      if (!useDetailMaterial && key.startsWith('detail')) return;
-                      if (!config.useLight && key === 'light') return;
+              Object.entries(config).forEach(([key, val]) => {
+                // Skip empty / unset values
+                if (val === "선택안함" || val === "없음" || val === false || val === null || val === undefined) return;
+                if (Array.isArray(val) && val.length === 0) return;
+                // Skip internal/toggle-only keys that shouldn't appear as pills
+                if (['brightness', 'useLight', 'useImageRef', 'productName', 'monochromeColor'].includes(key)) return;
 
-                      // 혼성/단일 성별에 따른 의상 분기
-                      if (config.subjectNum !== "없음") {
-                        if (config.subjectGender === "혼성" && key.startsWith("subjectClothes")) return;
-                        if (config.subjectGender !== "혼성" && (key.startsWith("female") || key.startsWith("male"))) return;
-                      }
+                // 1. 인물없음 일때 인물관련 속성 제거
+                if (config.subjectNum === "없음" && (key.startsWith('subject') || key.startsWith('female') || key.startsWith('male'))) return;
+                // 1-2. 메인 토글이 비활성화 상태인 세부 속성 제거
+                if (!useDetailMaterial && key.startsWith('detail')) return;
+                if (!config.useLight && key === 'light') return;
 
-                      let group = 0;
-                      let bgColor = '#8E8E93';
-                      let textColor = '#FFFFFF';
+                // 혼성/단일 성별에 따른 의상 분기
+                if (config.subjectNum !== "없음") {
+                  if (config.subjectGender === "혼성" && key.startsWith("subjectClothes")) return;
+                  if (config.subjectGender !== "혼성" && (key.startsWith("female") || key.startsWith("male"))) return;
+                }
 
-                      // 🔴 Group 1 — Subject (Red)
-                      if (key.startsWith('subject') || key.startsWith('female') || key.startsWith('male')) {
-                        group = 1; bgColor = '#FF3B30';
-                      }
-                      // 🟢 Group 2 — Space / Environment (Green)
-                      else if (key.startsWith('space') || key === 'interiorStyle' || key === 'country' || key.startsWith('detail')) {
-                        group = 2; bgColor = '#34C759';
-                      }
-                      // 🔵 Group 3 — Camera / Layout / Product (Blue)
-                      else if (key.startsWith('camera') || key === 'aspectRatio' || key === 'copySpace' || key === 'productAnchor' || key === 'productLayout') {
-                        group = 3; bgColor = '#007AFF';
-                      }
-                      // 🟣 Group 4 — Style / Lighting / Toggles (Purple)
-                      else if (key === 'shotStyle' || key === 'light') {
-                        group = 4; bgColor = '#AF52DE';
-                      }
+                let group = 0;
+                let bgColor = '#8E8E93';
+                let textColor = '#FFFFFF';
 
-                      if (Array.isArray(val)) {
-                        val.forEach(v => tags.push({ key: `${key}-${v}`, val: v, group, bgColor, textColor }));
-                      } else {
-                        tags.push({ key, val, group, bgColor, textColor });
-                      }
-                    });
+                // 🔴 Group 1 — Subject (Red)
+                if (key.startsWith('subject') || key.startsWith('female') || key.startsWith('male')) {
+                  group = 1; bgColor = '#FF3B30';
+                }
+                // 🟢 Group 2 — Space / Environment (Green)
+                else if (key.startsWith('space') || key === 'interiorStyle' || key === 'country' || key.startsWith('detail')) {
+                  group = 2; bgColor = '#34C759';
+                }
+                // 🔵 Group 3 — Camera / Layout / Product (Blue)
+                else if (key.startsWith('camera') || key === 'aspectRatio' || key === 'copySpace' || key === 'productAnchor' || key === 'productLayout') {
+                  group = 3; bgColor = '#007AFF';
+                }
+                // 🟣 Group 4 — Style / Lighting / Toggles (Purple)
+                else if (key === 'shotStyle' || key === 'light') {
+                  group = 4; bgColor = '#AF52DE';
+                }
 
-                    if (config.useLight && config.brightness) {
-                      tags.push({ key: 'light-brightness', val: `조명: ${config.brightness}`, group: 4, bgColor: '#AF52DE', textColor: '#FFFFFF' });
-                    }
-                    if (removeText) {
-                      tags.push({ key: 'remove-text', val: '텍스트 제거', group: 4, bgColor: '#AF52DE', textColor: '#FFFFFF' });
-                    }
+                if (Array.isArray(val)) {
+                  val.forEach(v => tags.push({ key: `${key}-${v}`, val: v, group, bgColor, textColor }));
+                } else {
+                  tags.push({ key, val, group, bgColor, textColor });
+                }
+              });
 
-                    // 2. 같은 탭 속성 정렬 (group 기준)
-                    tags.sort((a, b) => a.group - b.group);
+              if (config.useLight && config.brightness) {
+                tags.push({ key: 'light-brightness', val: `조명: ${config.brightness}`, group: 4, bgColor: '#AF52DE', textColor: '#FFFFFF' });
+              }
+              if (removeText) {
+                tags.push({ key: 'remove-text', val: '텍스트 제거', group: 4, bgColor: '#AF52DE', textColor: '#FFFFFF' });
+              }
 
-                    // 3. 중복 표기 오류 수정 (val 기준으로 중복 제거)
-                    const uniqueTags = [];
-                    const seen = new Set();
-                    tags.forEach(t => {
-                      if (!seen.has(t.val)) {
-                        seen.add(t.val);
-                        uniqueTags.push(t);
-                      }
-                    });
+              // 2. 같은 탭 속성 정렬 (group 기준)
+              tags.sort((a, b) => a.group - b.group);
 
-                    return uniqueTags.map(t => (
-                      <span key={t.key} className="ios-summary-tag" style={{ backgroundColor: t.bgColor, color: t.textColor }}>
-                        {t.val}
-                      </span>
-                    ));
-                  })()}
-                </div>
-              </div>
+              // 3. 중복 표기 오류 수정 (val 기준으로 중복 제거)
+              const uniqueTags = [];
+              const seen = new Set();
+              tags.forEach(t => {
+                if (!seen.has(t.val)) {
+                  seen.add(t.val);
+                  uniqueTags.push(t);
+                }
+              });
 
-              {/* Unified Button Container — flex-col with gap */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '8px' }}>
-                <button
-                  onClick={generatePrompt}
-                  disabled={isGenerating}
-                  className="generate-btn"
-                >
-                  <Wand2 className="w-5 h-5 text-white" />
-                  <span>{isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}</span>
-                </button>
+              return uniqueTags.map(t => (
+                <span key={t.key} className="ios-summary-tag" style={{ backgroundColor: t.bgColor, color: t.textColor }}>
+                  {t.val}
+                </span>
+              ));
+            })()}
+          </div>
+        </div>
 
-                {generatedPrompt && (selectedApi === 'google' ? googleApiKey : sdApiKey) && enableImageGeneration && (
-                  <button
-                    onClick={() => {
-                      if (!isAdmin) {
-                        triggerToast("이미지 생성은 관리자 권한이 필요합니다.");
-                        return;
-                      }
-                      generateImage();
-                    }}
-                    disabled={isImageGenerating || cooldownTime > 0}
-                    className={`generate-btn w-full${(!isAdmin || isImageGenerating || cooldownTime > 0) ? '' : ' point-color'}`}
-                    style={{
-                      background: (!isAdmin || isImageGenerating || cooldownTime > 0) ? '#48484A' : undefined,
-                      cursor: (!isAdmin || isImageGenerating || cooldownTime > 0) ? 'not-allowed' : 'pointer',
-                      opacity: !isAdmin ? 0.7 : 1
-                    }}
-                  >
-                    <ImageIcon className="w-5 h-5 text-white" />
-                    <span>
-                      {isImageGenerating ? 'GENERATING...' :
-                        cooldownTime > 0 ? `COOLDOWN (${cooldownTime}s)` : 'GENERATE IMAGE'}
-                    </span>
-                  </button>
-                )}
-              </div>
+        {/* Unified Button Container — flex-col with gap */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '8px' }}>
+          <button
+            onClick={generatePrompt}
+            disabled={isGenerating}
+            className="generate-btn"
+          >
+            <Wand2 className="w-5 h-5 text-white" />
+            <span>{isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}</span>
+          </button>
 
-              {isImageGenerating && (
-                <div className="result-card" style={{ marginTop: '32px', minHeight: '300px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                  <div className="skeleton-pulse"></div>
-                  <p style={{ color: '#8E8E93', fontSize: '12px', fontWeight: 600, zIndex: 1, position: 'relative' }}>
-                    {selectedApi === 'google' ? 'Generating with Gemini...' : 'Generating with FLUX.1...'}
-                  </p>
-                </div>
-              )}
+          {generatedPrompt && (selectedApi === 'google' ? googleApiKey : sdApiKey) && enableImageGeneration && (
+            <button
+              onClick={() => {
+                if (!isAdmin) {
+                  triggerToast("이미지 생성은 관리자 권한이 필요합니다.");
+                  return;
+                }
+                generateImage();
+              }}
+              disabled={isImageGenerating || cooldownTime > 0}
+              className={`generate-btn w-full${(!isAdmin || isImageGenerating || cooldownTime > 0) ? '' : ' point-color'}`}
+              style={{
+                background: (!isAdmin || isImageGenerating || cooldownTime > 0) ? '#48484A' : undefined,
+                cursor: (!isAdmin || isImageGenerating || cooldownTime > 0) ? 'not-allowed' : 'pointer',
+                opacity: !isAdmin ? 0.7 : 1
+              }}
+            >
+              <ImageIcon className="w-5 h-5 text-white" />
+              <span>
+                {isImageGenerating ? 'GENERATING...' :
+                  cooldownTime > 0 ? `COOLDOWN (${cooldownTime}s)` : 'GENERATE IMAGE'}
+              </span>
+            </button>
+          )}
+        </div>
 
-              {!isImageGenerating && generatedPrompt && (
-                <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} className="mt-12 space-y-8">
+        {isImageGenerating && (
+          <div className="result-card" style={{ marginTop: '32px', minHeight: '300px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="skeleton-pulse"></div>
+            <p style={{ color: '#8E8E93', fontSize: '12px', fontWeight: 600, zIndex: 1, position: 'relative' }}>
+              {selectedApi === 'google' ? 'Generating with Gemini...' : 'Generating with FLUX.1...'}
+            </p>
+          </div>
+        )}
 
-                  <div className="flex flex-col items-center mb-[-16px]">
-                    <div className="w-8 h-1 bg-black dark:bg-white rounded-full mt-1 opacity-10"></div>
-                  </div>
+        {!isImageGenerating && generatedPrompt && (
+          <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} className="mt-12 space-y-8">
 
-                  {generatedImage ? (
-                    <div className="image-result-card relative group">
-                      <img
-                        src={generatedImage}
-                        alt="Generated"
-                        className="w-full h-auto cursor-zoom-in"
-                        onClick={() => setLightboxImage(generatedImage)}
-                      />
-
-                      {/* Prompt tooltip on hover */}
-                      <div className="image-prompt-tooltip">
-                        <p>{generatedPrompt.length > 120 ? generatedPrompt.slice(0, 120) + '...' : generatedPrompt}</p>
-                      </div>
-
-                      {isUpscaling && (
-                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', color: 'white', fontWeight: 'bold', letterSpacing: '0.1em', zIndex: 10 }}>
-                          UPSCALING...
-                        </div>
-                      )}
-
-                      <div style={{ position: 'absolute', bottom: '16px', right: '16px', display: 'flex', gap: '8px', zIndex: 20 }}>
-                        <button onClick={simulateUpscale} className="ios-pill" style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', backdropFilter: 'blur(10px)' }}>
-                          2x Upscale
-                        </button>
-                        <button onClick={handleDownload} className="ios-pill" style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', backdropFilter: 'blur(10px)' }}>
-                          Download
-                        </button>
-                      </div>
-                    </div>
-                  ) : null}
-
-                  <PromptOutput prompt={generatedPrompt} />
-
-                  <div className="save-card">
-                    <div className="ios-option-label mb-3">Save Preset</div>
-                    <div className="save-bar">
-                      <input
-                        type="text"
-                        value={templateName}
-                        onChange={(e) => setTemplateName(e.target.value)}
-                        placeholder="Preset name..."
-                        className="save-input"
-                      />
-                      <button
-                        onClick={handleSaveTemplate}
-                        disabled={isSaving}
-                        className={`save-btn ${isSaved ? 'saved' : ''}`}
-                      >
-                        {isSaving ? '저장 중...' : isSaved ? 'Complete ✓' : 'Save'}
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
+            <div className="flex flex-col items-center mb-[-16px]">
+              <div className="w-8 h-1 bg-black dark:bg-white rounded-full mt-1 opacity-10"></div>
             </div>
 
-            <footer className="ios-footer">
-              v0.50a | Developed by Gony
-            </footer>
-            <div className="h-12"></div>
-          </div>
-        );
-      }
+            {generatedImage ? (
+              <div className="image-result-card relative group">
+                <img
+                  src={generatedImage}
+                  alt="Generated"
+                  className="w-full h-auto cursor-zoom-in"
+                  onClick={() => setLightboxImage(generatedImage)}
+                />
+
+                {/* Prompt tooltip on hover */}
+                <div className="image-prompt-tooltip">
+                  <p>{generatedPrompt.length > 120 ? generatedPrompt.slice(0, 120) + '...' : generatedPrompt}</p>
+                </div>
+
+                {isUpscaling && (
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', color: 'white', fontWeight: 'bold', letterSpacing: '0.1em', zIndex: 10 }}>
+                    UPSCALING...
+                  </div>
+                )}
+
+                <div style={{ position: 'absolute', bottom: '16px', right: '16px', display: 'flex', gap: '8px', zIndex: 20 }}>
+                  <button onClick={simulateUpscale} className="ios-pill" style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', backdropFilter: 'blur(10px)' }}>
+                    2x Upscale
+                  </button>
+                  <button onClick={handleDownload} className="ios-pill" style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', backdropFilter: 'blur(10px)' }}>
+                    Download
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
+            <PromptOutput prompt={generatedPrompt} />
+
+            <div className="save-card">
+              <div className="ios-option-label mb-3">Save Preset</div>
+              <div className="save-bar">
+                <input
+                  type="text"
+                  value={templateName}
+                  onChange={(e) => setTemplateName(e.target.value)}
+                  placeholder="Preset name..."
+                  className="save-input"
+                />
+                <button
+                  onClick={handleSaveTemplate}
+                  disabled={isSaving}
+                  className={`save-btn ${isSaved ? 'saved' : ''}`}
+                >
+                  {isSaving ? '저장 중...' : isSaved ? 'Complete ✓' : 'Save'}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </div>
+
+      <footer className="ios-footer">
+        v0.50a | Developed by Gony
+      </footer>
+      <div className="h-12"></div>
+    </div>
+  );
+}
