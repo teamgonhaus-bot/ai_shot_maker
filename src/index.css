@@ -1482,3 +1482,91 @@ body.dark-mode .generate-btn.point-color {
 .generate-btn.point-color:active {
   transform: scale(0.96);
 }
+
+/* =============================================
+   v0.50 4-MODE HERO SECTION & NAVIGATION
+   ============================================= */
+.hero-section {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-radius: 24px !important;
+  padding: 20px 24px !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.5) !important;
+  margin-bottom: 20px !important;
+  text-align: center !important;
+}
+
+body.dark-mode .hero-section {
+  background-color: rgba(28, 28, 30, 0.75) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+}
+
+.hero-title {
+  font-size: 20px !important;
+  font-weight: 900 !important;
+  color: #000000 !important;
+  letter-spacing: -0.02em !important;
+  margin-bottom: 4px !important;
+}
+
+body.dark-mode .hero-title {
+  color: #FFFFFF !important;
+}
+
+.hero-subtitle {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #8E8E93 !important;
+  letter-spacing: 0.02em !important;
+}
+
+body.dark-mode .hero-subtitle {
+  color: #AEAEB2 !important;
+}
+
+.mode-nav {
+  display: flex !important;
+  background: #E5E5EA !important;
+  padding: 3px !important;
+  border-radius: 14px !important;
+  margin-bottom: 24px !important;
+  gap: 3px !important;
+  box-shadow: inset 0 1.5px 3px rgba(0, 0, 0, 0.08) !important;
+}
+
+body.dark-mode .mode-nav {
+  background: #1C1C1E !important;
+  box-shadow: inset 0 1.5px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+.mode-nav-btn {
+  flex: 1 !important;
+  padding: 10px 0 !important;
+  border-radius: 11px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #8E8E93 !important;
+  background: transparent !important;
+  border: none !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer !important;
+  font-family: inherit !important;
+  text-align: center !important;
+}
+
+.mode-nav-btn.active {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 3px 1px rgba(0, 0, 0, 0.04) !important;
+}
+
+body.dark-mode .mode-nav-btn.active {
+  background: #3A3A3C !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.mode-nav-btn:active {
+  transform: scale(0.96) !important;
+}

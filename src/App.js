@@ -157,7 +157,7 @@ export default function App() {
   const [templateName, setTemplateName] = useState("");
   const [isSaved, setIsSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState('home');
+  const [currentMode, setCurrentMode] = useState('smart');
   const [isAdmin, setIsAdmin] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -524,7 +524,7 @@ export default function App() {
     setRemoveText(template.removeText !== undefined ? template.removeText : true);
     setGeneratedPrompt(template.prompt);
     setActiveLibraryTemplateId(template.id);
-    setActiveTab('home');
+    setCurrentMode('mix');
   };
 
   const handleRenameTemplate = async (templateId, newName) => {
@@ -1210,10 +1210,7 @@ export default function App() {
       <header className="app-header">
         <h1 className="text-2xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
         <div className="flex items-center gap-3">
-          <div className="header-nav">
-            <button className={`header-nav-btn ${activeTab === 'home' ? 'active' : 'inactive'}`} onClick={() => setActiveTab('home')}>Create</button>
-            <button className={`header-nav-btn ${activeTab === 'library' ? 'active' : 'inactive'}`} onClick={() => setActiveTab('library')}>Library</button>
-          </div>
+
           <div className="relative">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -1264,9 +1261,43 @@ export default function App() {
         </div>
       </header>
 
+      {/* 🌟 Hero Section (Gony Pill style) */}
+      <div className="hero-section">
+        <div className="hero-title">Shot Maker Pro</div>
+        <div className="hero-subtitle">Craft the perfect commercial product shot prompts instantly</div>
+      </div>
+
+      {/* 🚀 4-Mode Pill Navigation Bar */}
+      <div className="mode-nav">
+        <button 
+          className={`mode-nav-btn ${currentMode === 'smart' ? 'active' : ''}`}
+          onClick={() => setCurrentMode('smart')}
+        >
+          Smart
+        </button>
+        <button 
+          className={`mode-nav-btn ${currentMode === 'mix' ? 'active' : ''}`}
+          onClick={() => setCurrentMode('mix')}
+        >
+          Mix
+        </button>
+        <button 
+          className={`mode-nav-btn ${currentMode === 'library' ? 'active' : ''}`}
+          onClick={() => setCurrentMode('library')}
+        >
+          Library
+        </button>
+        <button 
+          className={`mode-nav-btn ${currentMode === 'about' ? 'active' : ''}`}
+          onClick={() => setCurrentMode('about')}
+        >
+          About
+        </button>
+      </div>
+
       <AnimatePresence mode="wait">
-        {activeTab === 'home' ? (
-          <motion.div key="home" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-12">
+        {currentMode === 'smart' && (
+          <motion.div key="smart" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-4">
 
             {/* Smart Templates */}
             <div className="template-grid">
@@ -1322,6 +1353,11 @@ export default function App() {
                 <span className="marquee-segment">{activeMarquee || 'Start generating your commercial visual concept right now...'}</span>
               </div>
             </div>
+          </motion.div>
+        )}
+
+        {currentMode === 'mix' && (
+          <motion.div key="mix" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
 
             {/* Category Tabs */}
             <div className="ios-category-tabs">
@@ -1613,9 +1649,72 @@ export default function App() {
                 </motion.section>
               )}
             </AnimatePresence>
+          </motion.div>
+        )}
 
-            {/* Action Area with Summary Panel */}
-            <div className="pt-4 pb-20">
+        {currentMode === 'library' && (
+          <motion.div key="library" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6 relative pb-20">
+            <button className="ios-library-close" onClick={() => setCurrentMode('smart')}>
+              <X size={18} strokeWidth={1.5} />
+            </button>
+            <h2 className="ios-section-title">Library</h2>
+
+            <div className="ios-category-tabs" style={{ marginTop: '0', marginBottom: '16px', overflowX: 'auto', whiteSpace: 'nowrap', padding: '4px' }}>
+              <button className={`category-tab ${libraryFilter === '전체' ? 'active' : ''}`} style={{ padding: '8px 12px' }} onClick={() => setLibraryFilter('전체')}>전체</button>
+              {OPTIONS_DATA.spaceType.map(space => (
+                <button
+                  key={space}
+                  className={`category-tab ${libraryFilter === space ? 'active' : ''}`}
+                  style={{ padding: '8px 12px' }}
+                  onClick={() => setLibraryFilter(space)}
+                >
+                  {space}
+                </button>
+              ))}
+            </div>
+
+            <div className="ios-library-grid">
+              {(libraryFilter === '전체' ? savedTemplates : savedTemplates.filter(t => t.config?.spaceType === libraryFilter)).map(template => (
+                <TemplateCard
+                  key={template.id}
+                  template={template}
+                  isSelected={activeLibraryTemplateId === template.id}
+                  onSelect={handleSelectTemplate}
+                  onApply={(t) => {
+                    handleApplyTemplate(t);
+                  }}
+                  onDelete={handleDeleteTemplate}
+                  onRename={(id, name) => {
+                    setRenameTarget({ id, name });
+                    setNewPresetName(name);
+                  }}
+                  onMoveRequest={(t) => setMoveTarget(t)}
+                  onViewPrompt={(t) => setPromptModalTarget(t)}
+                  categories={OPTIONS_DATA.spaceType}
+                />
+              ))}
+              {(libraryFilter === '전체' ? savedTemplates : savedTemplates.filter(t => t.config?.spaceType === libraryFilter)).length === 0 && (
+                <div className="col-span-2 text-center py-20 bg-white rounded-3xl ios-shadow">
+                  <LayoutTemplate className="w-12 h-12 text-gray-200 mb-4 mx-auto" />
+                  <p className="text-gray-400 font-bold m-0">No templates found</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {currentMode === 'about' && (
+          <motion.div key="about" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
+            <div className="ios-bento-card" style={{ padding: '40px 20px', textAlign: 'center' }}>
+              <LayoutTemplate className="w-12 h-12 text-gray-300 mb-4 mx-auto" style={{ display: 'block', margin: '0 auto 16px' }} />
+              <p className="text-gray-500 font-bold m-0" style={{ fontSize: '15px' }}>Shot Maker Guide Coming Soon...</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Action Area with Summary Panel */}
+      <div className="pt-4 pb-20">
               <div className="ios-option-label mb-2 px-1">현재 선택된 옵션 (Summary)</div>
               <div className="ios-summary-panel">
                 <div className="flex flex-wrap gap-[6px]">
@@ -1805,63 +1904,11 @@ export default function App() {
                 </motion.div>
               )}
             </div>
-          </motion.div>
-        ) : (
-          <motion.div key="library" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-6 relative pb-20">
-            <button className="ios-library-close" onClick={() => setActiveTab('home')}>
-              <X size={18} strokeWidth={1.5} />
-            </button>
-            <h2 className="ios-section-title">Library</h2>
 
-            <div className="ios-category-tabs" style={{ marginTop: '0', marginBottom: '16px', overflowX: 'auto', whiteSpace: 'nowrap', padding: '4px' }}>
-              <button className={`category-tab ${libraryFilter === '전체' ? 'active' : ''}`} style={{ padding: '8px 12px' }} onClick={() => setLibraryFilter('전체')}>전체</button>
-              {OPTIONS_DATA.spaceType.map(space => (
-                <button
-                  key={space}
-                  className={`category-tab ${libraryFilter === space ? 'active' : ''}`}
-                  style={{ padding: '8px 12px' }}
-                  onClick={() => setLibraryFilter(space)}
-                >
-                  {space}
-                </button>
-              ))}
-            </div>
-
-            <div className="ios-library-grid">
-              {(libraryFilter === '전체' ? savedTemplates : savedTemplates.filter(t => t.config?.spaceType === libraryFilter)).map(template => (
-                <TemplateCard
-                  key={template.id}
-                  template={template}
-                  isSelected={activeLibraryTemplateId === template.id}
-                  onSelect={handleSelectTemplate}
-                  onApply={(t) => {
-                    handleApplyTemplate(t);
-                  }}
-                  onDelete={handleDeleteTemplate}
-                  onRename={(id, name) => {
-                    setRenameTarget({ id, name });
-                    setNewPresetName(name);
-                  }}
-                  onMoveRequest={(t) => setMoveTarget(t)}
-                  onViewPrompt={(t) => setPromptModalTarget(t)}
-                  categories={OPTIONS_DATA.spaceType}
-                />
-              ))}
-              {(libraryFilter === '전체' ? savedTemplates : savedTemplates.filter(t => t.config?.spaceType === libraryFilter)).length === 0 && (
-                <div className="col-span-2 text-center py-20 bg-white rounded-3xl ios-shadow">
-                  <LayoutTemplate className="w-12 h-12 text-gray-200 mb-4 mx-auto" />
-                  <p className="text-gray-400 font-bold m-0">No templates found</p>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <footer className="ios-footer">
-        v0.48 Stable | Developed by Gony
-      </footer>
-      <div className="h-12"></div>
-    </div>
-  );
-}
+            <footer className="ios-footer">
+              v0.50 Stable | Developed by Gony
+            </footer>
+            <div className="h-12"></div>
+          </div>
+        );
+      }
