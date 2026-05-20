@@ -2014,7 +2014,10 @@ export default function App() {
 
                         {config.subjectGender === '혼성' ? (
                           <>
-                            <div className="mt-4 mb-2 text-xs font-bold text-gray-500 border-b pb-1">여성 의상</div>
+                            <div className="mt-6 mb-3 flex items-center gap-2 border-b border-gray-100 dark:border-zinc-800 pb-1.5">
+                              <span className="w-1.5 h-3.5 bg-red-500 rounded-full" />
+                              <span className="text-[12px] font-black text-gray-700 dark:text-zinc-300 tracking-wider">여성 의상</span>
+                            </div>
                             <OptionSelect
                               label="상의"
                               value={config.femaleClothesTop}
@@ -2030,7 +2033,10 @@ export default function App() {
                               theme="red"
                             />
 
-                            <div className="mt-4 mb-2 text-xs font-bold text-gray-500 border-b pb-1">남성 의상</div>
+                            <div className="mt-6 mb-3 flex items-center gap-2 border-b border-gray-100 dark:border-zinc-800 pb-1.5">
+                              <span className="w-1.5 h-3.5 bg-red-500 rounded-full" />
+                              <span className="text-[12px] font-black text-gray-700 dark:text-zinc-300 tracking-wider">남성 의상</span>
+                            </div>
                             <OptionSelect
                               label="상의"
                               value={config.maleClothesTop}
@@ -2048,6 +2054,14 @@ export default function App() {
                           </>
                         ) : (
                           <>
+                            {config.subjectGender !== "선택안함" && (
+                              <div className="mt-6 mb-3 flex items-center gap-2 border-b border-gray-100 dark:border-zinc-800 pb-1.5">
+                                <span className="w-1.5 h-3.5 bg-red-500 rounded-full" />
+                                <span className="text-[12px] font-black text-gray-700 dark:text-zinc-300 tracking-wider">
+                                  {config.subjectGender === '여성' ? '여성 의상' : '남성 의상'}
+                                </span>
+                              </div>
+                            )}
                             <OptionSelect
                               label="상의"
                               value={config.subjectClothesTop}
@@ -2488,13 +2502,13 @@ export default function App() {
               <div
                 className="about-card workflow"
                 onClick={() => setAboutModalTarget({
-                  title: 'Generate & Copy Workflow',
+                  title: 'Workflow',
                   subtitle: '생성 및 복사 활용법',
                   color: '#34C759',
                   icon: 'wand',
                   content: [
-                    { label: '프롬프트 완성', text: '원하는 알약 옵션들을 선택한 후, 우측/하단의 GENERATE PROMPT 버튼을 누르면 엔진이 완벽한 상업용 영문 지시어 문장으로 결합해 냅니다.' },
-                    { label: '카피 후 타 AI 연동', text: '결과창의 COPY 버튼을 눌러 클립보드에 복사한 뒤, Midjourney, FLUX.1, Stable Diffusion 등 다른 이미지 생성 AI 사이트의 프롬프트 창에 그대로 붙여넣어(Ctrl+V) 사용하세요. 첨부 이미지 제품과 인물의 자연스러운 상호작용 컷이 완성됩니다.' }
+                    { label: '프롬프트 완성', text: '스마트 모드나 믹스 모드의 다양한 옵션들을 자유롭게 조합하여 원하는 연출 방향을 설정할 수 있습니다. 설정 완료 후 Generate Prompt 버튼을 누르면 이미지 생성용 고화질 프롬프트가 즉시 생성됩니다.' },
+                    { label: '복사 및 AI 활용', text: 'Copy 버튼으로 완성된 프롬프트를 간편하게 복사한 뒤, Gemini, ChatGPT, Midjourney 등 다양한 생성형 AI 서비스에 붙여넣어 이미지를 완성할 수 있습니다. 실제 제품 이미지를 함께 첨부하여 사용하시면 해당 장면에 브랜드 제품을 자연스럽게 함께 녹여내어 고품질의 연출 샷을 확보할 수 있습니다.' }
                   ],
                   footer: 'Shot Maker의 초고성능 결합 엔진을 통해 완벽한 상업용 지시어 문장을 즉시 생성할 수 있습니다.'
                 })}
