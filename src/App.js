@@ -249,6 +249,7 @@ export default function App() {
         setActiveMarquee("SMART MODE Active: Select a template for instant commercial setup...");
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMode]);
 
   // Initial Data Load & Persistence Sync
