@@ -177,6 +177,7 @@ export default function App() {
   });
   const [enableImageGeneration, setEnableImageGeneration] = useState(false);
   const [useDetailMaterial, setUseDetailMaterial] = useState(false);
+  const [smartUseSubject, setSmartUseSubject] = useState(false);
   const [removeText, setRemoveText] = useState(true);
   const [useCommercialNegative, setUseCommercialNegative] = useState(false);
   const [generatedPrompt, setGeneratedPrompt] = useState("");
@@ -253,6 +254,8 @@ export default function App() {
     if (savedConfig) setConfig(JSON.parse(savedConfig));
     const savedMat = localStorage.getItem('shotmaker_useDetailMaterial_v13');
     if (savedMat) setUseDetailMaterial(savedMat === 'true');
+    const savedSmartSubj = localStorage.getItem('shotmaker_smartUseSubject_v13');
+    if (savedSmartSubj) setSmartUseSubject(savedSmartSubj === 'true');
     const savedText = localStorage.getItem('shotmaker_removeText_v13');
     if (savedText) setRemoveText(savedText === 'true');
     const savedCommNeg = localStorage.getItem('shotmaker_useCommercialNegative_v13');
@@ -305,11 +308,12 @@ export default function App() {
     if (!isLoading) {
       localStorage.setItem('shotmaker_config_v13', JSON.stringify(config));
       localStorage.setItem('shotmaker_useDetailMaterial_v13', useDetailMaterial);
+      localStorage.setItem('shotmaker_smartUseSubject_v13', smartUseSubject);
       localStorage.setItem('shotmaker_removeText_v13', removeText);
       localStorage.setItem('shotmaker_useCommercialNegative_v13', useCommercialNegative);
       localStorage.setItem('shotmaker_enableImageGeneration', enableImageGeneration);
     }
-  }, [config, useDetailMaterial, removeText, useCommercialNegative, enableImageGeneration, isLoading]);
+  }, [config, useDetailMaterial, smartUseSubject, removeText, useCommercialNegative, enableImageGeneration, isLoading]);
 
   const handleConfigChange = (key, value) => {
     setActiveTemplate(null);
@@ -475,6 +479,21 @@ export default function App() {
       setActiveMarquee("RETAIL SCENE Active: Premium commercial showroom and luxury retail display photography...");
     }
 
+    // Title 씬과 Detail 씬을 제외한 스마트 씬에 대해 인물 유무 스위치(smartUseSubject) 최종 반영
+    if (templateType !== 'TITLE SCENE' && templateType !== 'DETAIL SCENE') {
+      if (smartUseSubject) {
+        targetConfig.subjectNum = '혼자';
+        if (targetConfig.subjectGender === '선택안함') targetConfig.subjectGender = '여성';
+        if (targetConfig.subjectAge === '선택안함') targetConfig.subjectAge = '20대';
+        if (targetConfig.subjectAction === '선택안함') targetConfig.subjectAction = '공간에 어울리게';
+      } else {
+        targetConfig.subjectNum = '없음';
+      }
+    } else {
+      // 타이틀과 디테일은 인물을 항상 '없음'으로 강제 격리
+      targetConfig.subjectNum = '없음';
+    }
+
     // Cascading Effect: Apply changed properties sequentially
     const keysToChange = Object.keys(targetConfig).filter(k => targetConfig[k] !== config[k]);
 
@@ -495,6 +514,146 @@ export default function App() {
     setTimeout(() => {
       setIsSaved(false);
     }, keysToChange.length * staggerMs);
+  };
+
+  const handleSmartSubjectToggle = (isOn) => {
+    setSmartUseSubject(isOn);
+    
+    // 만약 스마트 씬 모드이고 TITLE이나 DETAIL이 아니면 subjectNum을 동적으로 믹스 탭에도 즉시 갱신
+    if (activeTemplate && activeTemplate !== 'TITLE SCENE' && activeTemplate !== 'DETAIL SCENE') {
+      setConfig(prev => ({
+        ...prev,
+        subjectNum: isOn ? '혼자' : '없음',
+        subjectGender: isOn && prev.subjectGender === '선택안함' ? '여성' : prev.subjectGender,
+        subjectAge: isOn && prev.subjectAge === '선택안함' ? '20대' : prev.subjectAge,
+        subjectAction: isOn && prev.subjectAction === '선택안함' ? '공간에 어울리게' : prev.subjectAction
+      }));
+    } else {
+      setConfig(prev => ({
+        ...prev,
+        subjectNum: isOn ? '혼자' : '없음'
+      }));
+    }
+    
+    setIsSaved(false);
+    triggerToast(isOn ? "스마트 씬 인물이 활성화되었습니다." : "스마트 씬 인물이 비활성화되었습니다.");
+  };
+
+  const handleSmartRandomShuffle = () => {
+    if (!activeTemplate) {
+      triggerToast("먼저 스마트 씬을 선택해주세요!");
+      return;
+    }
+
+    let targetConfig = { ...config };
+    let marqueeMsg = "";
+
+    if (activeTemplate === 'TITLE SCENE') {
+      const colors = ['Cobalt Blue', 'Terracotta', 'Sage Green', 'Warm Sand', 'Matte Black', 'Pure White', 'Charcoal', 'Royal Purple', 'Ruby Red', 'Mustard Yellow'];
+      const current = config.monochromeColor || 'Cobalt Blue';
+      const filtered = colors.filter(c => c !== current);
+      targetConfig.monochromeColor = filtered[Math.floor(Math.random() * filtered.length)];
+      marqueeMsg = `Title Scene Shuffle: ${targetConfig.monochromeColor} Background Set!`;
+
+    } else if (activeTemplate === 'DETAIL SCENE') {
+      const lights = ['스포트라이트 조명', '시네마틱', '나르스 확산광'];
+      const angles = ['익스트림 클로즈업', '클로즈업'];
+      const styleOptions = [
+        ['매크로-디테일', '클로즈업 디테일'],
+        ['매크로-디테일', '하드 섀도우'],
+        ['클로즈업 디테일', '톤온톤-모노크로매틱'],
+        ['매크로-디테일', '심도 얕은 샷(아웃포커싱)']
+      ];
+      targetConfig.light = lights[Math.floor(Math.random() * lights.length)];
+      targetConfig.cameraAngle = angles[Math.floor(Math.random() * angles.length)];
+      targetConfig.shotStyle = styleOptions[Math.floor(Math.random() * styleOptions.length)];
+      marqueeMsg = `Detail Scene Shuffle: High-contrast Close-up Re-arranged!`;
+
+    } else if (activeTemplate === 'INSTA SCENE') {
+      const genders = ['여성', '남성'];
+      const clothes = ['스트릿', '캐주얼', '미니멀'];
+      const spaces = ['힙한곳', '도심', '공원', '카페'];
+      const styles = [
+        ['라이프스타일 인테리어', '심도 얕은 샷(아웃포커싱)'],
+        ['컬러블로킹', '심도 얕은 샷(아웃포커싱)'],
+        ['네거티브 스페이스', '심도 얕은 샷(아웃포커싱)']
+      ];
+      targetConfig.subjectGender = genders[Math.floor(Math.random() * genders.length)];
+      targetConfig.subjectClothesStyle = clothes[Math.floor(Math.random() * clothes.length)];
+      targetConfig.spaceDetail = spaces[Math.floor(Math.random() * spaces.length)];
+      targetConfig.shotStyle = styles[Math.floor(Math.random() * styles.length)];
+      marqueeMsg = `Insta Scene Shuffle: New SNS Snap composition loaded!`;
+
+    } else if (activeTemplate === 'USAGE SCENE') {
+      const genders = ['여성', '남성'];
+      const actions = ['공간에 어울리게', '차분함', '활발함'];
+      const spaces = ['워크룸', '룸', '테라스', '카페'];
+      const interiors = ['내추럴 우드', '모던 미니멀', '스칸디나비안'];
+      targetConfig.subjectGender = genders[Math.floor(Math.random() * genders.length)];
+      targetConfig.subjectAction = actions[Math.floor(Math.random() * actions.length)];
+      targetConfig.spaceDetail = spaces[Math.floor(Math.random() * spaces.length)];
+      targetConfig.interiorStyle = interiors[Math.floor(Math.random() * interiors.length)];
+      marqueeMsg = `User Scene Shuffle: Lifestyle product interaction changed!`;
+
+    } else if (activeTemplate === 'HOME LIVING') {
+      const spaces = ['리빙', '다이닝', '룸', '워크룸', '베드룸', '테라스'];
+      const lights = ['자연광', '앤비언트 라이트', '무드등'];
+      const interiors = ['내추럴 우드', '모던 미니멀', '스칸디나비안', '플랜테리어'];
+      targetConfig.spaceDetail = spaces[Math.floor(Math.random() * spaces.length)];
+      targetConfig.light = lights[Math.floor(Math.random() * lights.length)];
+      targetConfig.interiorStyle = interiors[Math.floor(Math.random() * interiors.length)];
+      marqueeMsg = `Home Scene Shuffle: ${targetConfig.spaceDetail} & ${targetConfig.interiorStyle} Cozy Setting Active!`;
+
+    } else if (activeTemplate === 'OFFICE TECH') {
+      const spaces = ['공유오피스', '사무실', '회의실', '중역실'];
+      const lights = ['자연광', '앤비언트 라이트', '나르스 확산광'];
+      const interiors = ['모던 미니멀', '인더스트리얼', '미드센추리 모던'];
+      targetConfig.spaceDetail = spaces[Math.floor(Math.random() * spaces.length)];
+      targetConfig.light = lights[Math.floor(Math.random() * lights.length)];
+      targetConfig.interiorStyle = interiors[Math.floor(Math.random() * interiors.length)];
+      marqueeMsg = `Office Scene Shuffle: ${targetConfig.spaceDetail} workspace reorganized!`;
+
+    } else if (activeTemplate === 'RETAIL SCENE') {
+      const spaces = ['쇼룸', '카페', '식당', '갤러리', '로비'];
+      const lights = ['시네마틱', '앤비언트 라이트', '스포트라이트 조명'];
+      const interiors = ['모던 미니멀', '인더스트리얼', '젠 스타일'];
+      targetConfig.spaceDetail = spaces[Math.floor(Math.random() * spaces.length)];
+      targetConfig.light = lights[Math.floor(Math.random() * lights.length)];
+      targetConfig.interiorStyle = interiors[Math.floor(Math.random() * interiors.length)];
+      marqueeMsg = `Retail Scene Shuffle: Premium ${targetConfig.spaceDetail} space display updated!`;
+
+    } else if (activeTemplate === 'NATURE ORGANIC') {
+      const spaces = ['자연', '공원', '강가', '도심'];
+      const lights = ['자연광', '시네마틱'];
+      const styles = [
+         ['와비사비-어스톤', '심도 얕은 샷(아웃포커싱)'],
+         ['네거티브 스페이스', '심도 얕은 샷(아웃포커싱)'],
+         ['와이드 건축/공간 샷', '심도 얕은 샷(아웃포커싱)']
+      ];
+      targetConfig.spaceDetail = spaces[Math.floor(Math.random() * spaces.length)];
+      targetConfig.light = lights[Math.floor(Math.random() * lights.length)];
+      targetConfig.shotStyle = styles[Math.floor(Math.random() * styles.length)];
+      marqueeMsg = `Outdoor Scene Shuffle: Natural elements and background landscape rearranged!`;
+    }
+
+    // 인물 유무 스위치 상태 반영
+    if (activeTemplate !== 'TITLE SCENE' && activeTemplate !== 'DETAIL SCENE') {
+      if (smartUseSubject) {
+        targetConfig.subjectNum = '혼자';
+        if (targetConfig.subjectGender === '선택안함') targetConfig.subjectGender = '여성';
+        if (targetConfig.subjectAge === '선택안함') targetConfig.subjectAge = '20대';
+        if (targetConfig.subjectAction === '선택안함') targetConfig.subjectAction = '공간에 어울리게';
+      } else {
+        targetConfig.subjectNum = '없음';
+      }
+    } else {
+      targetConfig.subjectNum = '없음';
+    }
+
+    setConfig(targetConfig);
+    setIsSaved(false);
+    if (marqueeMsg) setActiveMarquee(marqueeMsg);
+    triggerToast("스마트 테마 옵션이 조화롭게 무작위 셔플되었습니다!");
   };
 
   const hashPassword = async (password) => {
@@ -1305,18 +1464,23 @@ export default function App() {
               </div>
 
               {/* Scrollable content box */}
-              <div className="flex-1 overflow-y-auto space-y-4 pr-1 mb-4" style={{ padding: '8px 0' }}>
-                {aboutModalTarget.content.map((item, idx) => (
-                  <div key={idx} className="p-5 rounded-2xl border border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.03] transition-all hover:bg-black/[0.04] dark:hover:bg-white/[0.05]">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                      <span className="w-1.5 h-3.5 rounded-full" style={{ backgroundColor: aboutModalTarget.color, display: 'inline-block' }}></span>
-                      <h4 className="text-[13px] font-extrabold text-black dark:text-white m-0">{item.label}</h4>
+              <div className="flex-1 overflow-y-auto pr-1 mb-4" style={{ padding: '8px 0' }}>
+                <div className="p-3.5 rounded-[24px] bg-black/[0.03] dark:bg-white/[0.03] border border-black/5 dark:border-white/5 space-y-3">
+                  {aboutModalTarget.content.map((item, idx) => (
+                    <div 
+                      key={idx} 
+                      className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-black/5 dark:border-white/5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all hover:scale-[1.005]"
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                        <span className="w-1.5 h-3.5 rounded-full" style={{ backgroundColor: aboutModalTarget.color, display: 'inline-block' }}></span>
+                        <h4 className="text-[13px] font-black text-black dark:text-white m-0">{item.label}</h4>
+                      </div>
+                      <p className="text-[11.5px] text-gray-600 dark:text-zinc-300 font-semibold leading-relaxed m-0 text-left">
+                        {item.text}
+                      </p>
                     </div>
-                    <p className="text-[11.5px] text-gray-600 dark:text-zinc-300 font-medium leading-relaxed m-0 text-left">
-                      {item.text}
-                    </p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
 
               {/* Footer text inside modal */}
@@ -1549,7 +1713,79 @@ export default function App() {
         {currentMode === 'smart' && (
           <motion.div key="smart" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-4">
 
-            <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>Smart</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', marginBottom: '16px' }}>
+              <h2 className="ios-section-title" style={{ margin: 0 }}>Smart</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                {/* 1. Subject Toggle Switch */}
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '8px', 
+                  backgroundColor: 'var(--card-bg)', 
+                  padding: '4px 10px', 
+                  borderRadius: '14px', 
+                  border: '1px solid rgba(0,0,0,0.04)',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.01)'
+                }}>
+                  <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-secondary)' }}>인물</span>
+                  <div 
+                    onClick={() => handleSmartSubjectToggle(!smartUseSubject)}
+                    className="ios-switch"
+                    style={{ 
+                      width: '38px',
+                      height: '22px',
+                      backgroundColor: smartUseSubject ? '#34C759' : '#D1D1D6',
+                      cursor: 'pointer',
+                      borderRadius: '9999px',
+                      position: 'relative',
+                      transition: 'background-color 0.2s'
+                    }}
+                  >
+                    <div 
+                      className="ios-switch-handle"
+                      style={{ 
+                        width: '16px',
+                        height: '16px',
+                        backgroundColor: '#fff',
+                        borderRadius: '50%',
+                        position: 'absolute',
+                        top: '3px',
+                        left: '3px',
+                        transform: smartUseSubject ? 'translateX(16px)' : 'translateX(0)',
+                        transition: 'transform 0.2s',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* 2. Circular R Random Button */}
+                <button
+                  onClick={handleSmartRandomShuffle}
+                  title="랜덤 셔플"
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: '#007AFF',
+                    color: '#fff',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    fontWeight: '900',
+                    fontSize: '14px',
+                    boxShadow: '0 2px 8px rgba(0, 122, 255, 0.25)',
+                    transition: 'all 0.2s ease',
+                    outline: 'none'
+                  }}
+                  className="hover:scale-105 active:scale-95 hover:bg-[#0066d6]"
+                >
+                  R
+                </button>
+              </div>
+            </div>
 
             {/* Smart Templates */}
             <div className="template-grid">
