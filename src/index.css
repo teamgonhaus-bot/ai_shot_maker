@@ -120,8 +120,8 @@ body {
   font-size: 18px !important;
   font-weight: 800 !important;
   color: #000000 !important;
-  margin-top: 32px !important;
-  margin-bottom: 16px !important;
+  margin-top: 32px;
+  margin-bottom: 16px;
   line-height: 1.2 !important;
   display: block !important;
   letter-spacing: -0.02em !important;

@@ -132,6 +132,12 @@ const isHexColor = (str) => {
   return /^#[0-9A-F]{6}$/i.test(str);
 };
 
+const getValidHexColor = (color) => {
+  if (!color) return '#0047AB';
+  const resolved = getColorHex(color);
+  return isHexColor(resolved) ? resolved : '#0047AB';
+};
+
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [config, setConfig] = useState({
@@ -1285,7 +1291,7 @@ export default function App() {
                       <span className="w-1.5 h-3.5 rounded-full" style={{ backgroundColor: aboutModalTarget.color, display: 'inline-block' }}></span>
                       <h4 className="text-[13px] font-extrabold text-black dark:text-white m-0">{item.label}</h4>
                     </div>
-                    <p className="text-[12px] text-gray-500 leading-relaxed m-0 text-left">
+                    <p className="text-[11.5px] text-gray-600 dark:text-zinc-300 font-medium leading-relaxed m-0 text-left">
                       {item.text}
                     </p>
                   </div>
@@ -1294,7 +1300,7 @@ export default function App() {
 
               {/* Footer text inside modal */}
               {aboutModalTarget.footer && (
-                <p className="text-[11px] text-gray-400 font-semibold mt-1 leading-relaxed text-left">
+                <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-semibold mt-1 leading-relaxed text-left">
                   {aboutModalTarget.footer}
                 </p>
               )}
@@ -1490,12 +1496,6 @@ export default function App() {
         </div>
       </header>
 
-      {/* 🌟 Hero Section (Gony Pill style) */}
-      <div className="hero-section">
-        <div className="hero-title">Shot Maker Pro</div>
-        <div className="hero-subtitle">Craft the perfect commercial product shot prompts instantly</div>
-      </div>
-
       {/* 🚀 4-Mode Pill Navigation Bar */}
       <div className="mode-nav">
         <button
@@ -1528,38 +1528,40 @@ export default function App() {
         {currentMode === 'smart' && (
           <motion.div key="smart" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-4">
 
+            <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>Smart</h2>
+
             {/* Smart Templates */}
             <div className="template-grid">
               <button className={`ios-smart-template-btn ${activeTemplate === 'TITLE SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('TITLE SCENE')}>
-                <div className="template-title">TITLE SCENE</div>
+                <div className="template-title">Title</div>
                 <div className="template-desc">초현실주의 공중 부양</div>
               </button>
               <button className={`ios-smart-template-btn ${activeTemplate === 'DETAIL SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('DETAIL SCENE')}>
-                <div className="template-title">DETAIL SCENE</div>
+                <div className="template-title">Detail</div>
                 <div className="template-desc">질감 강조 초접사</div>
               </button>
               <button className={`ios-smart-template-btn ${activeTemplate === 'INSTA SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('INSTA SCENE')}>
-                <div className="template-title">INSTA SCENE</div>
+                <div className="template-title">Insta</div>
                 <div className="template-desc">MZ SNS 감성 스냅</div>
               </button>
               <button className={`ios-smart-template-btn ${activeTemplate === 'USAGE SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('USAGE SCENE')}>
-                <div className="template-title">USAGE SCENE</div>
+                <div className="template-title">User</div>
                 <div className="template-desc">인물 라이프스타일</div>
               </button>
               <button className={`ios-smart-template-btn ${activeTemplate === 'HOME LIVING' ? 'active' : ''}`} onClick={() => handleSmartTemplate('HOME LIVING')}>
-                <div className="template-title">HOME LIVING</div>
+                <div className="template-title">Home</div>
                 <div className="template-desc">포근한 가정용 연출</div>
               </button>
               <button className={`ios-smart-template-btn ${activeTemplate === 'OFFICE TECH' ? 'active' : ''}`} onClick={() => handleSmartTemplate('OFFICE TECH')}>
-                <div className="template-title">OFFICE TECH</div>
+                <div className="template-title">Office</div>
                 <div className="template-desc">데스크셋업 비즈니스</div>
               </button>
               <button className={`ios-smart-template-btn ${activeTemplate === 'NATURE ORGANIC' ? 'active' : ''}`} onClick={() => handleSmartTemplate('NATURE ORGANIC')}>
-                <div className="template-title">NATURE ORGANIC</div>
+                <div className="template-title">Natural</div>
                 <div className="template-desc">자연 친환경 컨셉</div>
               </button>
               <button className={`ios-smart-template-btn ${activeTemplate === 'DRAMATIC STUDIO' ? 'active' : ''}`} onClick={() => handleSmartTemplate('DRAMATIC STUDIO')}>
-                <div className="template-title">DRAMATIC STUDIO</div>
+                <div className="template-title">Dramatic</div>
                 <div className="template-desc">럭셔리 스튜디오</div>
               </button>
             </div>
@@ -1603,6 +1605,8 @@ export default function App() {
 
         {currentMode === 'mix' && (
           <motion.div key="mix" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
+
+            <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>Mix</h2>
 
             {/* Product Name Input */}
             <div className="ios-bento-card" style={{ padding: '16px 20px', marginBottom: '8px' }}>
@@ -1710,7 +1714,7 @@ export default function App() {
                       <div className="mt-2 mb-4 p-4 rounded-2xl bg-gray-50 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700">
                         <div className="ios-option-label mb-2 text-[12px] font-bold">배경 컬러 선택 (Monochrome Color)</div>
 
-                        <div className="flex flex-wrap mb-4" style={{ gap: '10px 12px' }}>
+                        <div className="flex flex-wrap" style={{ gap: '10px 12px', marginBottom: '24px' }}>
                           {['Cobalt Blue', 'Terracotta', 'Sage Green', 'Warm Sand', 'Matte Black', 'Pure White', 'Charcoal'].map(color => (
                             <button
                               key={color}
@@ -1743,7 +1747,7 @@ export default function App() {
                           <div style={{ position: 'relative', width: '36px', height: '36px', borderRadius: '50%', overflow: 'hidden', border: '2px solid #E5E5EA', flexShrink: 0 }}>
                             <input
                               type="color"
-                              value={isHexColor(config.monochromeColor) ? config.monochromeColor : '#0047AB'}
+                              value={getValidHexColor(config.monochromeColor)}
                               onChange={(e) => handleConfigChange('monochromeColor', e.target.value)}
                               style={{ position: 'absolute', top: '-10px', left: '-10px', width: '60px', height: '60px', cursor: 'pointer', border: 'none', padding: 0 }}
                             />
@@ -1973,7 +1977,7 @@ export default function App() {
             <button className="ios-library-close" onClick={() => setCurrentMode('smart')}>
               <X size={18} strokeWidth={1.5} />
             </button>
-            <h2 className="ios-section-title">Library</h2>
+            <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>Library</h2>
 
             <div className="ios-category-tabs" style={{ marginTop: '0', marginBottom: '16px', overflowX: 'auto', whiteSpace: 'nowrap', padding: '4px' }}>
               <button className={`category-tab ${libraryFilter === '전체' ? 'active' : ''}`} style={{ padding: '8px 12px' }} onClick={() => setLibraryFilter('전체')}>전체</button>
@@ -2024,8 +2028,7 @@ export default function App() {
 
             {/* Bento Grid Header */}
             <div>
-              <h2 className="ios-section-title">About</h2>
-              <p className="text-[11px] text-gray-400 dark:text-zinc-500 font-semibold -mt-4 mb-6">Shot Maker Pro를 활용한 고품질 상업용 이미지 제작 프로세스</p>
+              <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>About</h2>
             </div>
 
             {/* 3 Bento Cards with beautiful icons */}
@@ -2055,8 +2058,8 @@ export default function App() {
                   <span className="about-card-badge" style={{ backgroundColor: 'rgba(0, 122, 255, 0.08)', color: '#007AFF' }}>Master</span>
                 </div>
                 <div style={{ marginTop: '16px' }}>
-                  <h3 className="text-[15px] font-black text-gray-900 m-0">Mix Mode</h3>
-                  <p className="text-[10px] text-gray-400 font-bold m-0 mt-0.5">속성 마스터 가이드</p>
+                  <h3 className="text-[15px] font-black text-gray-900 dark:text-white m-0">Mix Mode</h3>
+                  <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">속성 마스터 가이드</p>
                 </div>
               </div>
 
@@ -2082,8 +2085,8 @@ export default function App() {
                   <span className="about-card-badge" style={{ backgroundColor: 'rgba(52, 199, 89, 0.08)', color: '#34C759' }}>Quick</span>
                 </div>
                 <div style={{ marginTop: '16px' }}>
-                  <h3 className="text-[15px] font-black text-gray-900 m-0">Workflow</h3>
-                  <p className="text-[10px] text-gray-400 font-bold m-0 mt-0.5">생성 및 복사 활용법</p>
+                  <h3 className="text-[15px] font-black text-gray-900 dark:text-white m-0">Workflow</h3>
+                  <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">생성 및 복사 활용법</p>
                 </div>
               </div>
 
@@ -2109,8 +2112,8 @@ export default function App() {
                   <span className="about-card-badge" style={{ backgroundColor: 'rgba(175, 82, 222, 0.08)', color: '#AF52DE' }}>Save</span>
                 </div>
                 <div style={{ marginTop: '16px' }}>
-                  <h3 className="text-[15px] font-black text-gray-900 m-0">Library</h3>
-                  <p className="text-[10px] text-gray-400 font-bold m-0 mt-0.5">프리셋 저장 및 재사용</p>
+                  <h3 className="text-[15px] font-black text-gray-900 dark:text-white m-0">Library</h3>
+                  <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">프리셋 저장 및 재사용</p>
                 </div>
               </div>
 
