@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function IOSToggle({ label, isOn, onToggle, activeColor = '#34C759' }) {
+export default function IOSToggle({ label, isOn, onToggle }) {
   return (
     <div className="ios-toggle-row">
       <span className="ios-toggle-label">
@@ -8,17 +8,9 @@ export default function IOSToggle({ label, isOn, onToggle, activeColor = '#34C75
       </span>
       <div 
         onClick={onToggle}
-        className="ios-switch"
-        style={{ 
-          backgroundColor: isOn ? activeColor : '#D1D1D6'
-        }}
+        className={`ios-switch ${isOn ? 'active' : 'inactive'}`}
       >
-        <div 
-          className="ios-switch-handle"
-          style={{ 
-            transform: isOn ? 'translateX(18px)' : 'translateX(0)' 
-          }}
-        />
+        <div className="ios-switch-handle" />
       </div>
     </div>
   );

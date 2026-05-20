@@ -9,7 +9,7 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4, boxShadow: '0 12px 28px rgba(0,0,0,0.10)' }}
-      className={`ios-bento-card flex flex-col justify-between overflow-hidden relative transition-all duration-300 ${isSelected ? 'ring-2 ring-[#007AFF]' : ''}`}
+      className={`ios-bento-card flex flex-col justify-between overflow-hidden relative transition-all duration-300 ${isSelected ? 'ring-2 ring-[#0022FF]' : ''}`}
       style={{ padding: '0', minHeight: '140px', marginBottom: '0', cursor: 'pointer' }}
       onClick={() => onSelect(template)}
     >
@@ -74,8 +74,8 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
             className="ios-card-icon-btn"
             title="Apply preset"
             style={{
-              backgroundColor: isSelected ? '#000' : undefined,
-              color: isSelected ? '#fff' : undefined,
+              backgroundColor: isSelected ? '#0022FF' : undefined,
+              color: isSelected ? '#FFFFFF' : undefined,
               transition: 'background 0.2s, color 0.2s'
             }}
           >
@@ -102,7 +102,7 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
             onClick={(e) => { e.stopPropagation(); onViewPrompt(template); }}
             className="ios-card-icon-btn"
             title="View Prompt"
-            style={{ width: '32px', height: '32px', marginLeft: 'auto', backgroundColor: '#000', color: '#fff' }}
+            style={{ width: '32px', height: '32px', marginLeft: 'auto', backgroundColor: '#0022FF', color: '#FFFFFF' }}
           >
             <ChevronDown size={16} strokeWidth={2.5} />
           </button>

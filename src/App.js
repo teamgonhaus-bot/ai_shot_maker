@@ -1277,7 +1277,7 @@ export default function App() {
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: '#0055FF',
+            backgroundColor: '#0022FF',
             zIndex: 99999,
             display: 'flex',
             alignItems: 'center',
@@ -1797,7 +1797,7 @@ export default function App() {
       </div>
 
       <header className="app-header">
-        <h1 className="text-2xl font-black text-black tracking-tight leading-none m-0">Shot Maker</h1>
+        <h1 className="text-2xl font-black text-[#0022FF] tracking-tight leading-none m-0">Shot Maker</h1>
         <div className="flex items-center gap-3">
 
           <div className="relative">
@@ -1852,15 +1852,17 @@ export default function App() {
 
       {/* Global Marquee — Seamless single-line loop */}
       <div
-        className="w-full overflow-hidden rounded-xl border border-transparent dark:border-zinc-800"
+        className="w-full overflow-hidden"
         style={{
-          background: isDarkMode ? '#1E1E22' : '#111111',
+          background: 'transparent',
           height: '36px',
           display: 'flex',
           alignItems: 'center',
           position: 'relative',
           marginBottom: '36px',
-          boxShadow: isDarkMode ? '0 4px 20px rgba(0,0,0,0.25)' : 'none'
+          boxShadow: 'none',
+          borderTop: '1px solid #0022FF',
+          borderBottom: '1px solid #0022FF'
         }}
       >
         <style>{`
@@ -1881,7 +1883,7 @@ export default function App() {
             font-weight: 900 !important;
             letter-spacing: 0.15em !important;
             text-transform: uppercase;
-            color: #fff;
+            color: #0022FF;
             padding: 0 40px;
           }
         `}</style>
@@ -1933,41 +1935,17 @@ export default function App() {
                   display: 'flex', 
                   alignItems: 'center', 
                   gap: '8px', 
-                  backgroundColor: 'var(--card-bg)', 
+                  backgroundColor: '#FFFFFF', 
                   padding: '4px 10px', 
                   borderRadius: '14px', 
-                  border: '1px solid rgba(0,0,0,0.04)',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.01)'
+                  border: '1px solid #0022FF'
                 }}>
-                  <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-secondary)' }}>인물</span>
+                  <span style={{ fontSize: '12px', fontWeight: '800', color: '#0022FF' }}>인물</span>
                   <div 
                     onClick={() => handleSmartSubjectToggle(!smartUseSubject)}
-                    className="ios-switch"
-                    style={{ 
-                      width: '38px',
-                      height: '22px',
-                      backgroundColor: smartUseSubject ? '#34C759' : '#D1D1D6',
-                      cursor: 'pointer',
-                      borderRadius: '9999px',
-                      position: 'relative',
-                      transition: 'background-color 0.2s'
-                    }}
+                    className={`ios-switch ${smartUseSubject ? 'active' : 'inactive'}`}
                   >
-                    <div 
-                      className="ios-switch-handle"
-                      style={{ 
-                        width: '16px',
-                        height: '16px',
-                        backgroundColor: '#fff',
-                        borderRadius: '50%',
-                        position: 'absolute',
-                        top: '3px',
-                        left: '3px',
-                        transform: smartUseSubject ? 'translateX(16px)' : 'translateX(0)',
-                        transition: 'transform 0.2s',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
-                      }}
-                    />
+                    <div className="ios-switch-handle" />
                   </div>
                 </div>
 
@@ -1979,8 +1957,8 @@ export default function App() {
                     width: '32px',
                     height: '32px',
                     borderRadius: '50%',
-                    backgroundColor: '#007AFF',
-                    color: '#fff',
+                    backgroundColor: '#0022FF',
+                    color: '#FFFFFF',
                     border: 'none',
                     display: 'flex',
                     alignItems: 'center',
@@ -1988,11 +1966,11 @@ export default function App() {
                     cursor: 'pointer',
                     fontWeight: '900',
                     fontSize: '14px',
-                    boxShadow: '0 2px 8px rgba(0, 122, 255, 0.25)',
+                    boxShadow: 'none',
                     transition: 'all 0.2s ease',
                     outline: 'none'
                   }}
-                  className="hover:scale-105 active:scale-95 hover:bg-[#0066d6]"
+                  className="hover:scale-105 active:scale-95 hover:opacity-90"
                 >
                   R
                 </button>
@@ -2611,7 +2589,7 @@ export default function App() {
 
       {/* Action Area with Summary Panel */}
       <div className="pt-4 pb-20">
-        <div className="ios-option-label mb-2 px-1">현재 선택된 옵션 (Summary)</div>
+        <div className="ios-option-label mb-2 px-1">Current Option Summary</div>
         <div className="ios-summary-panel">
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center', alignContent: 'flex-start' }}>
             {(() => {
@@ -2716,7 +2694,7 @@ export default function App() {
               });
 
               return uniqueTags.map(t => (
-                <span key={t.key} className="ios-summary-tag" style={{ backgroundColor: t.bgColor, color: t.textColor }}>
+                <span key={t.key} className="ios-summary-tag" style={{ backgroundColor: '#0022FF', color: '#FFFFFF' }}>
                   {t.val}
                 </span>
               ));
