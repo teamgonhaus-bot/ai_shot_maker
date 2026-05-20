@@ -539,21 +539,28 @@ body.dark-mode .ios-smart-template-btn.active {
   border-radius: 20px !important;
   padding: 16px 18px !important;
   margin-bottom: 20px !important;
-  border: 1px solid rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid #0022FF !important; /* 선명한 파란색 테두리 */
 }
 
 .ios-summary-tag {
   display: inline-flex !important;
   align-items: center !important;
   font-size: 11px !important;
-  font-weight: 700 !important;
-  color: #8E8E93;
-  background-color: #F2F2F7;
-  padding: 6px 13px !important;
+  font-weight: 800 !important;
+  color: #0022FF !important; /* 라이트모드: 파란 글자 */
+  background-color: #FFFFFF !important; /* 라이트모드: 배경 흰색 */
+  border: 1px solid #0022FF !important; /* 라이트모드: 파란 테두리 */
+  padding: 5px 12px !important;
   border-radius: 9999px !important;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.05) !important;
+  box-shadow: none !important;
   white-space: nowrap !important;
   letter-spacing: -0.01em !important;
+}
+
+body.dark-mode .ios-summary-tag {
+  color: #FFFFFF !important; /* 블루모드: 흰 글자 */
+  background-color: #0022FF !important; /* 블루모드: 파란 배경 */
+  border: 1px solid #FFFFFF !important; /* 블루모드: 흰 테두리 */
 }
 
 /* =============================================
@@ -1383,8 +1390,8 @@ body.dark-mode .category-tab.active {
    iOS UPLOAD ZONE (Image-to-Image)
    ============================================= */
 .ios-upload-zone {
-  background: #F2F2F7 !important;
-  border: 2px dashed #C7C7CC !important;
+  background: #FFFFFF !important;
+  border: 1px dashed #0022FF !important; /* 1px 파란색 점선 */
   border-radius: 16px !important;
   padding: 16px !important;
   display: flex !important;
@@ -1397,30 +1404,24 @@ body.dark-mode .category-tab.active {
 }
 
 .ios-upload-zone:hover {
-  border-color: #007AFF !important;
-  background: #E5E5EA !important;
+  border-color: #0022FF !important;
+  background: rgba(0, 34, 255, 0.03) !important;
 }
 
 .ios-upload-zone.dragging {
-  border-color: #007AFF !important;
-  background: #E5E5EA !important;
-  transform: scale(1.02) !important;
-}
-
-.ios-upload-zone.dragging {
-  border-color: #007AFF !important;
-  background: #E5E5EA !important;
+  border-color: #0022FF !important;
+  background: rgba(0, 34, 255, 0.03) !important;
   transform: scale(1.02) !important;
 }
 
 body.dark-mode .ios-upload-zone {
-  background: #1C1C1E !important;
-  border-color: #3A3A3C !important;
+  background: #0022FF !important; /* 블루모드 시 파란 배경 */
+  border-color: #FFFFFF !important; /* 흰색 보더 */
 }
 
 body.dark-mode .ios-upload-zone.dragging {
-  background: #2C2C2E !important;
-  border-color: #0A84FF !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: #FFFFFF !important;
 }
 
 .ios-upload-placeholder {
@@ -1434,46 +1435,42 @@ body.dark-mode .ios-upload-zone.dragging {
   text-align: center !important;
 }
 
-.upload-main-text {
-  font-size: 16px !important;
-  font-weight: 800 !important;
-  color: #000000 !important;
-  margin-bottom: 2px !important;
-}
-
-body.dark-mode .upload-main-text {
-  color: #FFFFFF !important;
-}
-
 .upload-sub-text {
   font-size: 11px !important;
-  font-weight: 600 !important;
-  color: #8E8E93 !important;
-  margin-bottom: 16px !important;
+  font-weight: 900 !important;
+  color: #0022FF !important; /* 파란 글자 */
+  margin-bottom: 12px !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+}
+
+body.dark-mode .upload-sub-text {
+  color: #FFFFFF !important; /* 블루모드 시 흰 글자 */
 }
 
 .ios-upload-capsule {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background: #000000 !important;
-  color: #FFFFFF !important;
+  background: #0022FF !important; /* 파란색 배경 */
+  color: #FFFFFF !important; /* 흰 글자 */
+  border: 1px solid #0022FF !important;
   border-radius: 9999px !important;
-  padding: 10px 24px !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+  padding: 8px 20px !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  box-shadow: none !important;
   transition: all 0.2s ease !important;
 }
 
 body.dark-mode .ios-upload-capsule {
-  background: #FFFFFF !important;
-  color: #000000 !important;
+  background: #FFFFFF !important; /* 블루모드 시 흰색 배경 */
+  color: #0022FF !important; /* 파란 글자 */
+  border: 1px solid #FFFFFF !important;
 }
 
 .ios-upload-zone:hover .ios-upload-capsule {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.2) !important;
+  transform: translateY(-1px) !important;
 }
 
 .ios-upload-preview {
@@ -1846,10 +1843,10 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
 }
 
 @keyframes preset-scroll-loop {
-  0%, 15% {
+  0%, 7.5% {
     transform: translateY(0);
   }
-  85%, 100% {
+  92.5%, 100% {
     /* 텍스트 높이가 60px보다 길 때만 위로 스크롤되도록 수학적으로 처리 */
     transform: translateY(min(0px, calc(52px - 100%)));
   }

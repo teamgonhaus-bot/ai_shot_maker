@@ -1843,8 +1843,8 @@ export default function App() {
           position: 'relative',
           marginBottom: '36px',
           boxShadow: 'none',
-          borderTop: '1px solid #0022FF',
-          borderBottom: '1px solid #0022FF'
+          borderTop: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+          borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF'
         }}
       >
         <style>{`
@@ -1865,7 +1865,7 @@ export default function App() {
             font-weight: 900 !important;
             letter-spacing: 0.15em !important;
             text-transform: uppercase;
-            color: #0022FF;
+            color: ${isDarkMode ? '#FFFFFF' : '#0022FF'};
             padding: 0 40px;
           }
         `}</style>
@@ -1935,8 +1935,8 @@ export default function App() {
                     width: '32px',
                     height: '32px',
                     borderRadius: '50%',
-                    backgroundColor: '#0022FF',
-                    color: '#FFFFFF',
+                    backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+                    color: isDarkMode ? '#0022FF' : '#FFFFFF',
                     border: 'none',
                     display: 'flex',
                     alignItems: 'center',
@@ -2251,10 +2251,9 @@ export default function App() {
                             />
                             {!refImage ? (
                               <label htmlFor="ref-image-upload" className="ios-upload-placeholder">
-                                <div className="upload-main-text">Image Upload</div>
-                                <div className="upload-sub-text">Drag & Drop</div>
+                                <div className="upload-sub-text">DRAG & DROP</div>
                                 <div className="ios-upload-capsule">
-                                  <span>파일 선택</span>
+                                  <span>SELECT</span>
                                 </div>
                               </label>
                             ) : (
@@ -2274,10 +2273,16 @@ export default function App() {
                             )}
                           </div>
 
-                          <div className="p-4 bg-gray-50 dark:bg-zinc-800 rounded-2xl border border-gray-100 dark:border-zinc-700">
+                          <div 
+                            style={{
+                              borderTop: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                              paddingTop: '16px',
+                              marginTop: '16px',
+                            }}
+                          >
                             <div className="flex justify-between items-center mb-2">
-                              <label className="text-[11px] font-black text-gray-400 uppercase tracking-wider">Strength (변형 강도)</label>
-                              <span className="text-[11px] font-black text-[var(--current-theme)]">{img2imgStrength}</span>
+                              <label style={{ fontSize: '11px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', letterSpacing: '0.1em' }}>STRENGTH</label>
+                              <span style={{ fontSize: '11px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>{img2imgStrength}</span>
                             </div>
                             <input
                               type="range"
@@ -2286,12 +2291,17 @@ export default function App() {
                               step="0.05"
                               value={img2imgStrength}
                               onChange={(e) => setImg2imgStrength(parseFloat(e.target.value))}
-                              className="w-full h-1 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer"
-                              style={{ accentColor: '#007AFF' }}
+                              className="w-full cursor-pointer appearance-none"
+                              style={{ 
+                                accentColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+                                height: '2px',
+                                background: isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,34,255,0.3)',
+                                outline: 'none'
+                              }}
                             />
-                            <div className="flex justify-between mt-1">
-                              <span className="text-[9px] font-bold text-gray-300">ORIGIN</span>
-                              <span className="text-[9px] font-bold text-gray-300">CREATIVE</span>
+                            <div className="flex justify-between mt-1.5">
+                              <span style={{ fontSize: '9px', fontWeight: '800', color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,34,255,0.6)' }}>ORIGIN</span>
+                              <span style={{ fontSize: '9px', fontWeight: '800', color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,34,255,0.6)' }}>CREATIVE</span>
                             </div>
                           </div>
                         </div>
@@ -2670,7 +2680,7 @@ export default function App() {
               });
 
               return uniqueTags.map(t => (
-                <span key={t.key} className="ios-summary-tag" style={{ backgroundColor: '#0022FF', color: '#FFFFFF' }}>
+                <span key={t.key} className="ios-summary-tag">
                   {t.val}
                 </span>
               ));
