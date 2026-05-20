@@ -1289,48 +1289,17 @@ export default function App() {
         <div 
           className={`ios-splash-screen ${splashFade ? 'fade-out' : ''}`}
           style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: '#0022FF',
-            zIndex: 99999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
             opacity: splashFade ? 0 : 1,
-            transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             pointerEvents: splashFade ? 'none' : 'auto',
           }}
         >
-          <div 
-            style={{
-              color: '#FFFFFF',
-              fontWeight: 900,
-              fontSize: 'clamp(3.5rem, 12vh, 6.5rem)',
-              letterSpacing: '-0.03em',
-              lineHeight: 1,
-              textTransform: 'uppercase',
-              transform: 'rotate(-90deg)',
-              transformOrigin: 'center',
-              whiteSpace: 'nowrap',
-              fontFamily: '"Inter", "Outfit", -apple-system, BlinkMacSystemFont, sans-serif',
-              textAlign: 'center',
-            }}
-          >
-            SHOT MAKER
-          </div>
-          <div
-            style={{
-              position: 'absolute',
-              bottom: '40px',
-              color: 'rgba(255, 255, 255, 0.6)',
-              fontSize: '0.75rem',
-              fontWeight: 500,
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              fontFamily: '"Inter", -apple-system, sans-serif',
-            }}
-          >
-            v0.51 | Swiss Minimalist
+          <div className="ios-splash-container">
+            <div className="ios-splash-title">
+              SHOT MAKER
+            </div>
+            <div className="ios-splash-version">
+              v0.51b | Swiss Minimalist
+            </div>
           </div>
         </div>
       )}
@@ -1534,7 +1503,6 @@ export default function App() {
                 flexDirection: 'column',
                 maxHeight: '85vh',
                 width: '90%',
-                border: `1px solid rgba(255, 255, 255, 0.2)`,
                 position: 'relative'
               }}
               onClick={(e) => e.stopPropagation()}
@@ -1569,84 +1537,73 @@ export default function App() {
               <div style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                gap: '12px', 
-                paddingBottom: '16px', 
-                borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)', 
-                marginBottom: '16px', 
+                gap: '14px', 
+                paddingBottom: '20px', 
+                borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)', 
+                marginBottom: '20px', 
                 paddingRight: '24px' 
               }}>
                 <div
-                  className="w-12 h-12 rounded-2xl flex items-center justify-center text-white"
-                  style={{ backgroundColor: aboutModalTarget.color }}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{ 
+                    backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+                    color: isDarkMode ? '#0022FF' : '#FFFFFF'
+                  }}
                 >
-                  {aboutModalTarget.icon === 'sliders' && <Sliders className="w-6 h-6" />}
-                  {aboutModalTarget.icon === 'wand' && <Wand2 className="w-6 h-6" />}
-                  {aboutModalTarget.icon === 'library' && <LayoutTemplate className="w-6 h-6" />}
+                  {aboutModalTarget.icon === 'sliders' && <Sliders className="w-5 h-5" />}
+                  {aboutModalTarget.icon === 'wand' && <Wand2 className="w-5 h-5" />}
+                  {aboutModalTarget.icon === 'library' && <LayoutTemplate className="w-5 h-5" />}
+                  {aboutModalTarget.icon === 'smart' && <Zap className="w-5 h-5" />}
                 </div>
                 <div style={{ textAlign: 'left' }}>
-                  <h3 style={{ fontSize: '18px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#000000', margin: 0, trackingTight: 'tight', leadingTight: 'tight' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', margin: 0, letterSpacing: '-0.03em' }}>
                     {aboutModalTarget.title}
                   </h3>
-                  <p style={{ fontSize: '12px', fontWeight: '700', color: isDarkMode ? '#8E8E93' : '#8E8E93', margin: 0, marginTop: '2px' }}>
+                  <p style={{ fontSize: '11px', fontWeight: '700', color: isDarkMode ? '#FFFFFFB3' : '#0022FF80', margin: 0, marginTop: '2px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                     {aboutModalTarget.subtitle}
                   </p>
                 </div>
               </div>
 
-              {/* Scrollable content box wrapped in solid contrasting container and elevated cards */}
-              <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px', marginBottom: '16px' }}>
+              {/* Scrollable content box wrapped in Swiss Simple Blue style */}
+              <div style={{ flex: 1, overflowY: 'auto', paddingRight: '8px', marginBottom: '16px' }} className="about-modal-scroll">
                 <div 
                   style={{
-                    padding: '16px',
-                    borderRadius: '24px',
-                    backgroundColor: isDarkMode ? '#2C2C2E' : '#F2F2F7',
-                    border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid rgba(0, 0, 0, 0.04)',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '12px'
+                    gap: '24px',
+                    padding: '8px 0'
                   }}
                 >
                   {aboutModalTarget.content.map((item, idx) => (
                     <div 
                       key={idx} 
                       style={{
-                        padding: '16px',
-                        borderRadius: '16px',
-                        backgroundColor: isDarkMode ? '#1C1C1E' : '#FFFFFF',
-                        border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid rgba(0, 0, 0, 0.04)',
-                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)',
+                        paddingBottom: '20px',
+                        borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)',
                         textAlign: 'left'
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                        <span 
-                          style={{ 
-                            width: '4px', 
-                            height: '14px', 
-                            borderRadius: '999px', 
-                            backgroundColor: aboutModalTarget.color, 
-                            display: 'inline-block' 
-                          }}
-                        />
-                        <h4 
-                          style={{ 
-                            fontSize: '13.5px', 
-                            fontWeight: '800', 
-                            color: isDarkMode ? '#FFFFFF' : '#000000', 
-                            margin: 0
-                          }}
-                        >
-                          {item.label}
-                        </h4>
-                      </div>
+                      <h4 
+                        style={{ 
+                          fontSize: '15px', 
+                          fontWeight: '800', 
+                          color: isDarkMode ? '#FFFFFF' : '#0022FF', 
+                          margin: '0 0 8px 0',
+                          letterSpacing: '-0.02em'
+                        }}
+                      >
+                        {item.label}
+                      </h4>
                       <p 
                         style={{ 
-                          fontSize: '12px', 
-                          color: isDarkMode ? '#D1D1D6' : '#3A3A3C', 
-                          fontWeight: '600', 
-                          lineHeight: '1.6', 
+                          fontSize: '12.5px', 
+                          color: isDarkMode ? '#FFFFFFB3' : '#4E5B85', 
+                          fontWeight: '500', 
+                          lineHeight: '1.65', 
                           margin: 0,
-                          textAlign: 'left'
+                          textAlign: 'left',
+                          wordBreak: 'keep-all'
                         }}
                       >
                         {item.text}
@@ -1658,19 +1615,25 @@ export default function App() {
 
               {/* Footer text inside modal */}
               {aboutModalTarget.footer && (
-                <p 
-                  style={{ 
-                    fontSize: '11px', 
-                    color: isDarkMode ? '#8E8E93' : '#636366', 
-                    fontWeight: '600', 
-                    marginTop: '4px', 
-                    lineHeight: '1.5', 
-                    textAlign: 'left',
-                    margin: 0
-                  }}
-                >
-                  {aboutModalTarget.footer}
-                </p>
+                <div style={{
+                  paddingTop: '16px',
+                  borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)',
+                  marginTop: '4px'
+                }}>
+                  <p 
+                    style={{ 
+                      fontSize: '11px', 
+                      color: isDarkMode ? '#FFFFFFB3' : '#0022FFCC', 
+                      fontWeight: '600', 
+                      lineHeight: '1.5', 
+                      textAlign: 'left',
+                      margin: 0,
+                      wordBreak: 'keep-all'
+                    }}
+                  >
+                    💡 {aboutModalTarget.footer}
+                  </p>
+                </div>
               )}
             </motion.div>
           </motion.div>
@@ -1953,13 +1916,9 @@ export default function App() {
                 <div style={{ 
                   display: 'flex', 
                   alignItems: 'center', 
-                  gap: '8px', 
-                  backgroundColor: '#FFFFFF', 
-                  padding: '4px 10px', 
-                  borderRadius: '14px', 
-                  border: '1px solid #0022FF'
+                  gap: '8px'
                 }}>
-                  <span style={{ fontSize: '12px', fontWeight: '800', color: '#0022FF' }}>인물</span>
+                  <span style={{ fontSize: '12px', fontWeight: '800', color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>인물</span>
                   <div 
                     onClick={() => handleSmartSubjectToggle(!smartUseSubject)}
                     className={`ios-switch ${smartUseSubject ? 'active' : 'inactive'}`}
@@ -2208,6 +2167,7 @@ export default function App() {
                         </div>
                       </div>
                     )}
+                    <div style={{ borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)', margin: '24px 0' }} />
                     <OptionSelect label="인테리어 양식" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} theme="green" />
                     <div className="mt-4 border-t border-gray-100">
                       <OptionSelect label="국가/지역 (Country)" value={config.country} onChange={(v) => handleConfigChange('country', v)} options={OPTIONS_DATA.country} theme="green" />

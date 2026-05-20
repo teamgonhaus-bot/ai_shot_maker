@@ -44,10 +44,9 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
         <div className="relative">
           <div className="overflow-hidden" style={{ height: '60px', display: 'flex', alignItems: 'center' }}>
             {isSelected ? (
-              <div className="preset-marquee-container w-full">
-                <div className="preset-marquee-track text-[13px] font-medium text-gray-400 dark:text-white/70">
-                  <span className="marquee-content">{template.prompt}</span>
-                  <span className="marquee-content-gap" style={{ paddingLeft: '50px' }}>{template.prompt}</span>
+              <div className="preset-scroll-container w-full">
+                <div className="preset-scroll-track text-[13px] font-medium text-gray-400 dark:text-white/70">
+                  {template.prompt}
                 </div>
               </div>
             ) : (
