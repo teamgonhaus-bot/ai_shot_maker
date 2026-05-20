@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders
+  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders, Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { InferenceClient } from "@huggingface/inference";
@@ -235,6 +235,21 @@ export default function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [promptModalTarget, aboutModalTarget]);
+
+  // Sync Marquee text with active tab
+  useEffect(() => {
+    if (currentMode === 'mix') {
+      setActiveMarquee("MIX MODE Active: Build your custom commercial prompt with granular control...");
+    } else if (currentMode === 'library') {
+      setActiveMarquee("LIBRARY Active: Manage and apply your saved premium presets...");
+    } else if (currentMode === 'about') {
+      setActiveMarquee("ABOUT: Learn the core concepts and workflows of Professional Shot Maker...");
+    } else if (currentMode === 'smart') {
+      if (!activeMarquee.includes("SCENE") && !activeMarquee.includes("Shuffle")) {
+        setActiveMarquee("SMART MODE Active: Select a template for instant commercial setup...");
+      }
+    }
+  }, [currentMode]);
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
@@ -1742,6 +1757,41 @@ export default function App() {
         </div>
       </header>
 
+      {/* Global Marquee — Seamless single-line loop */}
+      <div
+        className="w-full overflow-hidden mb-4 rounded-xl"
+        style={{ background: '#111', height: '36px', display: 'flex', alignItems: 'center', position: 'relative' }}
+      >
+        <style>{`
+          @keyframes seamless-marquee {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+          .marquee-track {
+            display: flex;
+            width: max-content;
+            animation: seamless-marquee 14s linear infinite;
+            will-change: transform;
+          }
+          .marquee-track:hover { animation-play-state: paused; }
+          .marquee-segment {
+            white-space: nowrap;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #fff;
+            padding: 0 40px;
+          }
+        `}</style>
+        <div className="marquee-track" key={activeMarquee}>
+          <span className="marquee-segment">{activeMarquee || 'Start generating your commercial visual concept right now...'}</span>
+          <span className="marquee-segment">{activeMarquee || 'Start generating your commercial visual concept right now...'}</span>
+          <span className="marquee-segment">{activeMarquee || 'Start generating your commercial visual concept right now...'}</span>
+          <span className="marquee-segment">{activeMarquee || 'Start generating your commercial visual concept right now...'}</span>
+        </div>
+      </div>
+
       {/* 🚀 4-Mode Pill Navigation Bar */}
       <div className="mode-nav">
         <button
@@ -1884,40 +1934,6 @@ export default function App() {
               </button>
             </div>
 
-            {/* Smart Template Marquee — Seamless single-line loop */}
-            <div
-              className="w-full overflow-hidden mt-4 rounded-xl"
-              style={{ background: '#111', height: '36px', display: 'flex', alignItems: 'center', position: 'relative' }}
-            >
-              <style>{`
-                @keyframes seamless-marquee {
-                  0%   { transform: translateX(0); }
-                  100% { transform: translateX(-50%); }
-                }
-                .marquee-track {
-                  display: flex;
-                  width: max-content;
-                  animation: seamless-marquee 14s linear infinite;
-                  will-change: transform;
-                }
-                .marquee-track:hover { animation-play-state: paused; }
-                .marquee-segment {
-                  white-space: nowrap;
-                  font-size: 11px;
-                  font-weight: 800;
-                  letter-spacing: 0.12em;
-                  text-transform: uppercase;
-                  color: #fff;
-                  padding: 0 40px;
-                }
-              `}</style>
-              <div className="marquee-track" key={activeMarquee}>
-                <span className="marquee-segment">{activeMarquee || 'Start generating your commercial visual concept right now...'}</span>
-                <span className="marquee-segment">{activeMarquee || 'Start generating your commercial visual concept right now...'}</span>
-                <span className="marquee-segment">{activeMarquee || 'Start generating your commercial visual concept right now...'}</span>
-                <span className="marquee-segment">{activeMarquee || 'Start generating your commercial visual concept right now...'}</span>
-              </div>
-            </div>
           </motion.div>
         )}
 
@@ -2437,6 +2453,33 @@ export default function App() {
                 <div style={{ marginTop: '16px' }}>
                   <h3 className="text-[15px] font-black text-gray-900 dark:text-white m-0">Library</h3>
                   <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">커스텀 프리셋 사용</p>
+                </div>
+              </div>
+
+              {/* Card 4: Smart Mode */}
+              <div
+                className="about-card smart-mode"
+                onClick={() => setAboutModalTarget({
+                  title: 'Smart Mode',
+                  subtitle: '스마트 모드 자동화',
+                  color: '#FF9500',
+                  icon: 'smart',
+                  content: [
+                    { label: '빠른 프리셋 적용', text: '복잡한 설정 없이 원하는 씬(Scene) 템플릿을 선택하면 최적의 조명, 샷 스타일, 공간이 자동으로 세팅됩니다.' },
+                    { label: '다이내믹 셔플 (R)', text: '스마트 탭 우측의 원형 R 버튼을 누르면 해당 씬 테마에 어울리는 조화로운 범위 내에서 각 요소들이 지능적으로 셔플(무작위 변경)되어 무한한 영감을 제공합니다.' }
+                  ],
+                  footer: 'Tip : 스마트 모드 선택 후 믹스모드 수정 후 저장 및 커스터마이징 활용'
+                })}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                  <div className="icon-wrapper" style={{ backgroundColor: 'rgba(255, 149, 0, 0.12)', color: '#FF9500' }}>
+                    <Zap className="w-5 h-5" />
+                  </div>
+                  <span className="about-card-badge" style={{ backgroundColor: 'rgba(255, 149, 0, 0.08)', color: '#FF9500' }}>Auto</span>
+                </div>
+                <div style={{ marginTop: '16px' }}>
+                  <h3 className="text-[15px] font-black text-gray-900 dark:text-white m-0">Smart Mode</h3>
+                  <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">스마트 모드 자동화</p>
                 </div>
               </div>
 

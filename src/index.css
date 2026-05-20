@@ -1638,14 +1638,14 @@ body.dark-mode .mode-nav-btn.active {
    ============================================= */
 .about-grid {
   display: grid !important;
-  grid-template-columns: repeat(3, 1fr) !important;
+  grid-template-columns: repeat(2, 1fr) !important;
   gap: 16px !important;
   margin-bottom: 24px !important;
 }
 
 @media (max-width: 768px) {
   .about-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 }
 
