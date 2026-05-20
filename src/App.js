@@ -666,7 +666,7 @@ export default function App() {
           ? `Background is a perfect ${color} gradient background with soft, diffused lighting`
           : `Background is a perfect ${color} monochrome solid color with soft, diffused lighting`;
         parts.push(bgDesc);
-        parts.push(`Highly stylized, product levitation, clean lines, impeccable product finish, flawless production`);
+        parts.push(`product levitation, clean lines, impeccable product finish, flawless production`);
 
         if (config.cameraAngle && config.cameraAngle !== "선택안함") {
           parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
@@ -780,7 +780,29 @@ export default function App() {
         parts.push("8k resolution, highly detailed, masterpiece, photorealistic, interior design magazine cover");
       }
 
-      let finalPrompt = parts.join(", ");
+      // 1. 핵심 개체명 추출 및 정제
+      const productVar = config.productName ? config.productName.trim() : "";
+
+      // 2. 성공 프롬프트 삼총사 정의
+      const successTriad = "professional architectural photography, clear unobstructed view, clean sharp edges";
+
+      // 3. 기존 parts 배열 내 삼총사와 겹치는 표현 중복 방지를 위한 필터링
+      let filteredParts = parts.filter(p => {
+        if (!p) return false;
+        const lower = p.toLowerCase();
+        if (lower.includes("professional architectural photography")) return false;
+        return true;
+      });
+
+      // 4. 요구사항에 맞춘 완벽한 순서 고정 재조합
+      // [1순위: 핵심 개체명] -> [2순위: 성공 삼총사 세트] -> [3순위: 나머지 세부 옵션들]
+      let prefixParts = [];
+      if (productVar) {
+        prefixParts.push(productVar);
+      }
+      prefixParts.push(successTriad);
+
+      let finalPrompt = [...prefixParts, ...filteredParts].join(", ");
 
       if (useCommercialNegative) {
         finalPrompt += " --no text, watermark, bad label, blurry, ugly shape, deformed packaging";
@@ -1974,9 +1996,6 @@ export default function App() {
 
         {currentMode === 'library' && (
           <motion.div key="library" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6 relative pb-20">
-            <button className="ios-library-close" onClick={() => setCurrentMode('smart')}>
-              <X size={18} strokeWidth={1.5} />
-            </button>
             <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>Library</h2>
 
             <div className="ios-category-tabs" style={{ marginTop: '0', marginBottom: '16px', overflowX: 'auto', whiteSpace: 'nowrap', padding: '4px' }}>
@@ -2113,7 +2132,7 @@ export default function App() {
                 </div>
                 <div style={{ marginTop: '16px' }}>
                   <h3 className="text-[15px] font-black text-gray-900 dark:text-white m-0">Library</h3>
-                  <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">프리셋 저장 및 재사용</p>
+                  <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">커스텀 프리셋 사용</p>
                 </div>
               </div>
 
