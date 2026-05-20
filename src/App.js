@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders, Zap
 } from 'lucide-react';
@@ -143,6 +143,20 @@ export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [splashFade, setSplashFade] = useState(false);
   const [minTimePassed, setMinTimePassed] = useState(false);
+
+  const splashTimerRef = useRef(null);
+
+  const triggerSplashShow = () => {
+    if (splashTimerRef.current) clearTimeout(splashTimerRef.current);
+    setShowSplash(true);
+    setSplashFade(false);
+    setMinTimePassed(false);
+    
+    splashTimerRef.current = setTimeout(() => {
+      setMinTimePassed(true);
+    }, 1200);
+  };
+
   const [config, setConfig] = useState({
     productName: "",
     monochromeColor: "Cobalt Blue",
@@ -1797,7 +1811,12 @@ export default function App() {
       </div>
 
       <header className="app-header">
-        <h1 className="text-2xl font-black text-[#0022FF] tracking-tight leading-none m-0">Shot Maker</h1>
+        <h1 
+          className="text-2xl font-black text-[#0022FF] tracking-tight leading-none m-0 cursor-pointer select-none"
+          onClick={triggerSplashShow}
+        >
+          Shot Maker
+        </h1>
         <div className="flex items-center gap-3">
 
           <div className="relative">
@@ -2060,9 +2079,8 @@ export default function App() {
 
                         {config.subjectGender === '혼성' ? (
                           <>
-                            <div className="mt-6 mb-3 flex items-center gap-2 border-b border-gray-100 dark:border-zinc-800 pb-1.5">
-                              <span className="w-1.5 h-3.5 bg-red-500 rounded-full" />
-                              <span className="text-[12px] font-black text-gray-700 dark:text-zinc-300 tracking-wider">여성 의상</span>
+                            <div className="mt-6 mb-3 pt-4 border-t border-[#0022FF]/30 dark:border-white/30 flex items-center">
+                              <span className="text-[13px] font-extrabold text-[#0022FF] dark:text-white tracking-widest">여성 의상</span>
                             </div>
                             <OptionSelect
                               label="상의"
@@ -2079,9 +2097,8 @@ export default function App() {
                               theme="red"
                             />
 
-                            <div className="mt-6 mb-3 flex items-center gap-2 border-b border-gray-100 dark:border-zinc-800 pb-1.5">
-                              <span className="w-1.5 h-3.5 bg-red-500 rounded-full" />
-                              <span className="text-[12px] font-black text-gray-700 dark:text-zinc-300 tracking-wider">남성 의상</span>
+                            <div className="mt-6 mb-3 pt-4 border-t border-[#0022FF]/30 dark:border-white/30 flex items-center">
+                              <span className="text-[13px] font-extrabold text-[#0022FF] dark:text-white tracking-widest">남성 의상</span>
                             </div>
                             <OptionSelect
                               label="상의"
@@ -2101,9 +2118,8 @@ export default function App() {
                         ) : (
                           <>
                             {config.subjectGender !== "선택안함" && (
-                              <div className="mt-6 mb-3 flex items-center gap-2 border-b border-gray-100 dark:border-zinc-800 pb-1.5">
-                                <span className="w-1.5 h-3.5 bg-red-500 rounded-full" />
-                                <span className="text-[12px] font-black text-gray-700 dark:text-zinc-300 tracking-wider">
+                              <div className="mt-6 mb-3 pt-4 border-t border-[#0022FF]/30 dark:border-white/30 flex items-center">
+                                <span className="text-[13px] font-extrabold text-[#0022FF] dark:text-white tracking-widest">
                                   {config.subjectGender === '여성' ? '여성 의상' : '남성 의상'}
                                 </span>
                               </div>

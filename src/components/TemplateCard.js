@@ -42,10 +42,19 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
         </div>
         
         <div className="relative">
-          <div className="overflow-hidden" style={{ height: '60px' }}>
-            <p className="text-[13px] font-medium text-gray-400 leading-relaxed mt-1 line-clamp-3">
-              {template.prompt}
-            </p>
+          <div className="overflow-hidden" style={{ height: '60px', display: 'flex', alignItems: 'center' }}>
+            {isSelected ? (
+              <div className="preset-marquee-container w-full">
+                <div className="preset-marquee-track text-[13px] font-medium text-gray-400 dark:text-white/70">
+                  <span className="marquee-content">{template.prompt}</span>
+                  <span className="marquee-content-gap" style={{ paddingLeft: '50px' }}>{template.prompt}</span>
+                </div>
+              </div>
+            ) : (
+              <p className="text-[13px] font-medium text-gray-400 dark:text-zinc-400 leading-relaxed mt-1 line-clamp-3 w-full">
+                {template.prompt}
+              </p>
+            )}
           </div>
         </div>
 
