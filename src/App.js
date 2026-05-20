@@ -1659,10 +1659,10 @@ export default function App() {
               </div>
               <div className="settings-body space-y-4">
                 {/* Dark Mode Section */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', paddingBottom: '28px', borderBottom: '1px solid #E5E5EA' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', paddingBottom: '16px', borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)' }}>
                   <div>
-                    <label className="settings-prop-label">다크 모드</label>
-                    <p className="settings-desc-text">앱 테마를 어둡게 변경합니다.</p>
+                    <label className="settings-prop-label">블루 모드</label>
+                    <p className="settings-desc-text">앱 테마를 블루로 변경합니다.</p>
                   </div>
                   <IOSToggle
                     label=""
@@ -1672,7 +1672,7 @@ export default function App() {
                   />
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '28px', borderBottom: '1px solid #E5E5EA' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', paddingBottom: '16px', borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)' }}>
                   <div>
                     <label className="settings-prop-label">이미지 생성 기능</label>
                     <p className="settings-desc-text">메인 화면에서 이미지 생성 버튼을 표시합니다.</p>
@@ -1686,7 +1686,7 @@ export default function App() {
                 </div>
 
                 {/* Generate API Section */}
-                <div style={{ paddingTop: '32px', marginTop: '4px' }}>
+                <div style={{ paddingTop: '16px', marginTop: '0px' }}>
                   <label className="settings-prop-label">Generate API</label>
                   <p className="settings-desc-text" style={{ marginBottom: '24px' }}>사용할 이미지 생성 AI 엔진을 선택하세요.</p>
 
@@ -1775,7 +1775,7 @@ export default function App() {
 
       <header className="app-header">
         <h1 
-          className="text-2xl font-black text-[#0022FF] tracking-tight leading-none m-0 cursor-pointer select-none"
+          className={`text-2xl font-black tracking-tight leading-none m-0 cursor-pointer select-none ${isDarkMode ? 'text-white' : 'text-[#0022FF]'}`}
           onClick={triggerSplashShow}
         >
           Shot Maker
@@ -2038,8 +2038,8 @@ export default function App() {
 
                         {config.subjectGender === '혼성' ? (
                           <>
-                            <div className="mt-6 mb-3 pt-4 border-t border-[#0022FF]/30 dark:border-white/30 flex items-center">
-                              <span className="text-[13px] font-extrabold text-[#0022FF] dark:text-white tracking-widest">여성 의상</span>
+                            <div className={`mt-6 mb-3 pt-4 border-t ${isDarkMode ? 'border-white/30' : 'border-[#0022FF]/30'} flex items-center`}>
+                              <span className={`text-[13px] font-extrabold tracking-widest ${isDarkMode ? 'text-white' : 'text-[#0022FF]'}`}>여성 의상</span>
                             </div>
                             <OptionSelect
                               label="상의"
@@ -2056,8 +2056,8 @@ export default function App() {
                               theme="red"
                             />
 
-                            <div className="mt-6 mb-3 pt-4 border-t border-[#0022FF]/30 dark:border-white/30 flex items-center">
-                              <span className="text-[13px] font-extrabold text-[#0022FF] dark:text-white tracking-widest">남성 의상</span>
+                            <div className={`mt-6 mb-3 pt-4 border-t ${isDarkMode ? 'border-white/30' : 'border-[#0022FF]/30'} flex items-center`}>
+                              <span className={`text-[13px] font-extrabold tracking-widest ${isDarkMode ? 'text-white' : 'text-[#0022FF]'}`}>남성 의상</span>
                             </div>
                             <OptionSelect
                               label="상의"
@@ -2077,8 +2077,8 @@ export default function App() {
                         ) : (
                           <>
                             {config.subjectGender !== "선택안함" && (
-                              <div className="mt-6 mb-3 pt-4 border-t border-[#0022FF]/30 dark:border-white/30 flex items-center">
-                                <span className="text-[13px] font-extrabold text-[#0022FF] dark:text-white tracking-widest">
+                              <div className={`mt-6 mb-3 pt-4 border-t ${isDarkMode ? 'border-white/30' : 'border-[#0022FF]/30'} flex items-center`}>
+                                <span className={`text-[13px] font-extrabold tracking-widest ${isDarkMode ? 'text-white' : 'text-[#0022FF]'}`}>
                                   {config.subjectGender === '여성' ? '여성 의상' : '남성 의상'}
                                 </span>
                               </div>
@@ -2695,7 +2695,7 @@ export default function App() {
             disabled={isGenerating}
             className="generate-btn"
           >
-            <Wand2 className="w-5 h-5 text-white" />
+            <Wand2 className={`w-5 h-5 ${isDarkMode ? 'text-[#0022FF]' : 'text-white'}`} />
             <span>{isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}</span>
           </button>
 
