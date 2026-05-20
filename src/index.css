@@ -1176,7 +1176,9 @@ body.dark-mode .header-brand h1,
 body.dark-mode .result-card-text,
 body.dark-mode .settings-header h3,
 body.dark-mode .settings-body label,
-body.dark-mode .ios-toggle-label {
+body.dark-mode .ios-toggle-label,
+body.dark-mode .ios-option-label,
+body.dark-mode .save-card-label {
   color: #FFFFFF !important;
 }
 
@@ -1232,11 +1234,20 @@ body.dark-mode .ios-footer { background: #0022FF !important; border-top-color: #
 body.dark-mode .ios-library-close { background: #0022FF !important; color: #FFFFFF !important; border: 1px solid #FFFFFF !important; }
 
 /* Input fields inverted */
-body.dark-mode .settings-input,
-body.dark-mode .save-input {
+body.dark-mode .settings-input {
   background-color: transparent !important;
   color: #FFFFFF !important;
   border: 1px solid #FFFFFF !important;
+}
+
+body.dark-mode .save-input {
+  background-color: transparent !important;
+  color: #FFFFFF !important;
+  border: none !important;
+}
+
+body.dark-mode .save-input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
 }
 
 body.dark-mode .settings-input:focus,
@@ -1355,13 +1366,17 @@ body.dark-mode .ios-toast {
 }
 
 body.dark-mode .ios-category-tabs {
-  background: #FFFFFF !important;
-  border-color: #0022FF !important;
+  background: #0022FF !important;
+  border-color: #FFFFFF !important;
+}
+
+body.dark-mode .category-tab {
+  color: #FFFFFF !important;
 }
 
 body.dark-mode .category-tab.active {
-  background: #0022FF !important;
-  color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  color: #0022FF !important;
 }
 
 /* =============================================
@@ -1806,7 +1821,7 @@ body.dark-mode .about-card .text-gray-900 {
 }
 
 body.dark-mode .ios-bento-card div[class*="border-t"] {
-  border-top: 1px solid #2C2C2E !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
 /* =============================================
@@ -1827,7 +1842,7 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   line-height: 1.4 !important;
   word-break: break-word !important;
   white-space: normal !important; /* 한줄 변환 절대 금지! */
-  animation: preset-scroll-loop 12s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate !important;
+  animation: preset-scroll-loop 24s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate !important;
 }
 
 @keyframes preset-scroll-loop {

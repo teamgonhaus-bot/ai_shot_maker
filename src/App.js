@@ -2788,7 +2788,7 @@ export default function App() {
       </div>
 
       <footer className="ios-footer">
-        v0.51 | Developed by Gony
+        v0.51b | Developed by Gony
       </footer>
       <div className="h-12"></div>
     </div>
