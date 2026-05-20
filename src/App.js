@@ -605,13 +605,27 @@ export default function App() {
     } else if (activeTemplate === 'USAGE SCENE') {
       const genders = ['여성', '남성'];
       const actions = ['공간에 어울리게', '차분함', '활발함'];
-      const spaces = ['워크룸', '룸', '테라스', '카페'];
-      const interiors = ['내추럴 우드', '모던 미니멀', '스칸디나비안'];
+      const ages = ['20대', '30대', '40대'];
+      const hairs = ['긴머리', '짧은머리', '단발', '묶은머리'];
+      const clothesStyles = ['캐주얼', '비즈니스', '미니멀'];
+
       targetConfig.subjectGender = genders[Math.floor(Math.random() * genders.length)];
       targetConfig.subjectAction = actions[Math.floor(Math.random() * actions.length)];
-      targetConfig.spaceDetail = spaces[Math.floor(Math.random() * spaces.length)];
-      targetConfig.interiorStyle = interiors[Math.floor(Math.random() * interiors.length)];
-      marqueeMsg = `User Scene Shuffle: Lifestyle product interaction changed!`;
+      targetConfig.subjectAge = ages[Math.floor(Math.random() * ages.length)];
+      targetConfig.subjectHair = hairs[Math.floor(Math.random() * hairs.length)];
+      targetConfig.subjectClothesStyle = clothesStyles[Math.floor(Math.random() * clothesStyles.length)];
+
+      // 인물 외 공간(스튜디오, 화이트벽 빈공간) 및 주요 세팅은 바뀌지 않도록 명시적 고정
+      targetConfig.spaceType = '스튜디오';
+      targetConfig.spaceDetail = '화이트벽 빈공간';
+      targetConfig.cameraAngle = '풀 샷';
+      targetConfig.light = '균일하게 비치는 조명';
+      targetConfig.useLight = true;
+      targetConfig.shotStyle = [];
+      targetConfig.interiorStyle = '선택안함';
+      targetConfig.country = '선택안함';
+
+      marqueeMsg = `User Scene Shuffle: Lifestyle subject traits updated, backdrop locked!`;
 
     } else if (activeTemplate === 'HOME LIVING') {
       const spaces = ['리빙', '다이닝', '룸', '워크룸', '베드룸', '테라스'];
@@ -1770,8 +1784,16 @@ export default function App() {
 
       {/* Global Marquee — Seamless single-line loop */}
       <div
-        className="w-full overflow-hidden rounded-xl"
-        style={{ background: '#111', height: '36px', display: 'flex', alignItems: 'center', position: 'relative', marginBottom: '36px' }}
+        className="w-full overflow-hidden rounded-xl border border-transparent dark:border-zinc-800"
+        style={{
+          background: isDarkMode ? '#1E1E22' : '#111111',
+          height: '36px',
+          display: 'flex',
+          alignItems: 'center',
+          position: 'relative',
+          marginBottom: '36px',
+          boxShadow: isDarkMode ? '0 4px 20px rgba(0,0,0,0.25)' : 'none'
+        }}
       >
         <style>{`
           @keyframes seamless-marquee {
@@ -1925,7 +1947,7 @@ export default function App() {
               </button>
               <button className={`ios-smart-template-btn ${activeTemplate === 'USAGE SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('USAGE SCENE')}>
                 <div className="template-title">User</div>
-                <div className="template-desc">인물 라이프스타일</div>
+                <div className="template-desc">유저 사용 장면</div>
               </button>
               <button className={`ios-smart-template-btn ${activeTemplate === 'HOME LIVING' ? 'active' : ''}`} onClick={() => handleSmartTemplate('HOME LIVING')}>
                 <div className="template-title">Home</div>
@@ -2302,7 +2324,8 @@ export default function App() {
                       </AnimatePresence>
                     </div>
 
-                    <div className="mt-4 border-t border-gray-100 pt-4">
+                    <div className="mt-4 border-t border-gray-100 dark:border-zinc-800 pt-4">
+                      <div className="text-[11px] font-black text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-3">기타 스타일 설정</div>
                       <IOSToggle
                         label="텍스트/로고 제거"
                         isOn={removeText}
@@ -2598,6 +2621,9 @@ export default function App() {
               }
               if (removeText) {
                 tags.push({ key: 'remove-text', val: '텍스트 제거', group: 4, bgColor: '#AF52DE', textColor: '#FFFFFF' });
+              }
+              if (useCommercialNegative) {
+                tags.push({ key: 'commercial-clean', val: '상업용 클린 출력', group: 4, bgColor: '#AF52DE', textColor: '#FFFFFF' });
               }
 
               // 2. 같은 탭 속성 정렬 (group 기준)
