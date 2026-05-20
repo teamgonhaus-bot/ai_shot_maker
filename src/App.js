@@ -1443,8 +1443,16 @@ export default function App() {
                 <X size={16} strokeWidth={2.5} />
               </button>
 
-              {/* Header inside modal */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', paddingRight: '24px' }}>
+              {/* Header inside modal with a beautiful divider line and generous spacing */}
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '12px', 
+                paddingBottom: '16px', 
+                borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)', 
+                marginBottom: '16px', 
+                paddingRight: '24px' 
+              }}>
                 <div
                   className="w-12 h-12 rounded-2xl flex items-center justify-center text-white"
                   style={{ backgroundColor: aboutModalTarget.color }}
@@ -1454,28 +1462,71 @@ export default function App() {
                   {aboutModalTarget.icon === 'library' && <LayoutTemplate className="w-6 h-6" />}
                 </div>
                 <div style={{ textAlign: 'left' }}>
-                  <h3 className="text-[18px] font-black text-black dark:text-white m-0 tracking-tight leading-tight">
+                  <h3 style={{ fontSize: '18px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#000000', margin: 0, trackingTight: 'tight', leadingTight: 'tight' }}>
                     {aboutModalTarget.title}
                   </h3>
-                  <p className="text-[12px] font-bold text-gray-400 m-0 mt-0.5">
+                  <p style={{ fontSize: '12px', fontWeight: '700', color: isDarkMode ? '#8E8E93' : '#8E8E93', margin: 0, marginTop: '2px' }}>
                     {aboutModalTarget.subtitle}
                   </p>
                 </div>
               </div>
 
-              {/* Scrollable content box */}
-              <div className="flex-1 overflow-y-auto pr-1 mb-4" style={{ padding: '8px 0' }}>
-                <div className="p-3.5 rounded-[24px] bg-black/[0.03] dark:bg-white/[0.03] border border-black/5 dark:border-white/5 space-y-3">
+              {/* Scrollable content box wrapped in solid contrasting container and elevated cards */}
+              <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px', marginBottom: '16px' }}>
+                <div 
+                  style={{
+                    padding: '16px',
+                    borderRadius: '24px',
+                    backgroundColor: isDarkMode ? '#2C2C2E' : '#F2F2F7',
+                    border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid rgba(0, 0, 0, 0.04)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px'
+                  }}
+                >
                   {aboutModalTarget.content.map((item, idx) => (
                     <div 
                       key={idx} 
-                      className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-black/5 dark:border-white/5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all hover:scale-[1.005]"
+                      style={{
+                        padding: '16px',
+                        borderRadius: '16px',
+                        backgroundColor: isDarkMode ? '#1C1C1E' : '#FFFFFF',
+                        border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid rgba(0, 0, 0, 0.04)',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)',
+                        textAlign: 'left'
+                      }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                        <span className="w-1.5 h-3.5 rounded-full" style={{ backgroundColor: aboutModalTarget.color, display: 'inline-block' }}></span>
-                        <h4 className="text-[13px] font-black text-black dark:text-white m-0">{item.label}</h4>
+                        <span 
+                          style={{ 
+                            width: '4px', 
+                            height: '14px', 
+                            borderRadius: '999px', 
+                            backgroundColor: aboutModalTarget.color, 
+                            display: 'inline-block' 
+                          }}
+                        />
+                        <h4 
+                          style={{ 
+                            fontSize: '13.5px', 
+                            fontWeight: '800', 
+                            color: isDarkMode ? '#FFFFFF' : '#000000', 
+                            margin: 0
+                          }}
+                        >
+                          {item.label}
+                        </h4>
                       </div>
-                      <p className="text-[11.5px] text-gray-600 dark:text-zinc-300 font-semibold leading-relaxed m-0 text-left">
+                      <p 
+                        style={{ 
+                          fontSize: '12px', 
+                          color: isDarkMode ? '#D1D1D6' : '#3A3A3C', 
+                          fontWeight: '600', 
+                          lineHeight: '1.6', 
+                          margin: 0,
+                          textAlign: 'left'
+                        }}
+                      >
                         {item.text}
                       </p>
                     </div>
@@ -1485,7 +1536,17 @@ export default function App() {
 
               {/* Footer text inside modal */}
               {aboutModalTarget.footer && (
-                <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-semibold mt-1 leading-relaxed text-left">
+                <p 
+                  style={{ 
+                    fontSize: '11px', 
+                    color: isDarkMode ? '#8E8E93' : '#636366', 
+                    fontWeight: '600', 
+                    marginTop: '4px', 
+                    lineHeight: '1.5', 
+                    textAlign: 'left',
+                    margin: 0
+                  }}
+                >
                   {aboutModalTarget.footer}
                 </p>
               )}
