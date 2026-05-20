@@ -123,7 +123,10 @@ const getColorHex = (colorName) => {
     'Warm Sand': '#E6C280',
     'Matte Black': '#28282B',
     'Pure White': '#FFFFFF',
-    'Charcoal': '#36454F'
+    'Ash Gray': '#B2BEB5',
+    'Ruby Red': '#C41E3A',
+    'Royal Purple': '#7851A9',
+    'Mustard Yellow': '#E1AD01'
   };
   return mapping[colorName] || colorName;
 };
@@ -402,7 +405,7 @@ export default function App() {
       targetConfig.country = '선택안함';
 
       // 기본색은 Cobalt Blue로 적용 (혹은 누를때마다 랜덤 적용)
-      const colors = ['Cobalt Blue', 'Terracotta', 'Sage Green', 'Warm Sand', 'Matte Black', 'Pure White', 'Charcoal'];
+      const colors = ['Cobalt Blue', 'Terracotta', 'Sage Green', 'Warm Sand', 'Matte Black', 'Pure White', 'Ash Gray', 'Ruby Red'];
       if (config.monochromeColor === 'Cobalt Blue') {
         const otherColors = colors.filter(c => c !== 'Cobalt Blue');
         targetConfig.monochromeColor = otherColors[Math.floor(Math.random() * otherColors.length)];
@@ -602,7 +605,7 @@ export default function App() {
     let marqueeMsg = "";
 
     if (activeTemplate === 'TITLE SCENE') {
-      const colors = ['Cobalt Blue', 'Terracotta', 'Sage Green', 'Warm Sand', 'Matte Black', 'Pure White', 'Charcoal', 'Royal Purple', 'Ruby Red', 'Mustard Yellow'];
+      const colors = ['Cobalt Blue', 'Terracotta', 'Sage Green', 'Warm Sand', 'Matte Black', 'Pure White', 'Ash Gray', 'Royal Purple', 'Ruby Red', 'Mustard Yellow'];
       const current = config.monochromeColor || 'Cobalt Blue';
       const filtered = colors.filter(c => c !== current);
       targetConfig.monochromeColor = filtered[Math.floor(Math.random() * filtered.length)];
@@ -850,7 +853,7 @@ export default function App() {
     setRemoveText(template.removeText !== undefined ? template.removeText : true);
     setGeneratedPrompt(template.prompt);
     setActiveLibraryTemplateId(template.id);
-    setCurrentMode('mix');
+    triggerToast("프롬프트가 적용되었습니다.");
   };
 
   const handleRenameTemplate = async (templateId, newName) => {
@@ -2117,7 +2120,7 @@ export default function App() {
                         <div className="ios-option-label mb-2 text-[12px] font-bold">배경 컬러 선택 (Monochrome Color)</div>
 
                         <div className="flex flex-wrap" style={{ gap: '10px 12px', marginBottom: '24px' }}>
-                          {['Cobalt Blue', 'Terracotta', 'Sage Green', 'Warm Sand', 'Matte Black', 'Pure White', 'Charcoal'].map(color => (
+                          {['Cobalt Blue', 'Terracotta', 'Sage Green', 'Warm Sand', 'Matte Black', 'Pure White', 'Ash Gray', 'Ruby Red'].map(color => (
                             <button
                               key={color}
                               onClick={() => handleConfigChange('monochromeColor', color)}
