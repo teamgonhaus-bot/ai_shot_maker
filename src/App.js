@@ -363,15 +363,15 @@ export default function App() {
       targetConfig.spaceDetail = '쇼케이스 라운지';
       targetConfig.cameraAngle = '익스트림 클로즈업';
       targetConfig.copySpace = '우측 여백';
-      targetConfig.productLayout = '액체 스플래시';
-      targetConfig.productAnchor = '합성 베이스';
+      targetConfig.productLayout = '선택안함';
+      targetConfig.productAnchor = '전경 클린';
       targetConfig.aspectRatio = '4:3 (Standard)';
       targetConfig.useLight = true;
       targetConfig.light = '스포트라이트 조명';
       targetConfig.shotStyle = ['매크로-디테일', '클로즈업 디테일', '하드 섀도우'];
       targetConfig.interiorStyle = '선택안함';
       targetConfig.country = '선택안함';
-      setActiveMarquee("DETAIL SCENE Active: High-end catalog close-up with material texture emphasis...");
+      setActiveMarquee("DETAIL SCENE Active: High-end catalog close-up focusing strictly on product details and texture...");
 
     } else if (templateType === 'INSTA SCENE') {
       targetConfig.subjectNum = '혼자';
@@ -456,23 +456,23 @@ export default function App() {
       targetConfig.shotStyle = ['와비사비-어스톤', '심도 얕은 샷(아웃포커싱)'];
       targetConfig.interiorStyle = '플랜테리어';
       targetConfig.country = '선택안함';
-      setActiveMarquee("NATURE ORGANIC Active: Eco-friendly organic concept with plant, stone, and water elements...");
+      setActiveMarquee("OUTDOOR SCENE Active: Eco-friendly outdoor natural environment snap with natural elements...");
 
-    } else if (templateType === 'DRAMATIC STUDIO') {
+    } else if (templateType === 'RETAIL SCENE') {
       targetConfig.subjectNum = '없음';
-      targetConfig.spaceType = '스튜디오';
-      targetConfig.spaceDetail = '단색 배경';
+      targetConfig.spaceType = '리테일';
+      targetConfig.spaceDetail = '쇼룸';
       targetConfig.cameraAngle = '정면';
       targetConfig.copySpace = '선택안함';
-      targetConfig.productLayout = '대각선 안착';
-      targetConfig.productAnchor = '전경 클린';
-      targetConfig.aspectRatio = '1:1 (Square)';
+      targetConfig.productLayout = '선택안함';
+      targetConfig.productAnchor = '선택안함';
+      targetConfig.aspectRatio = '4:3 (Standard)';
       targetConfig.useLight = true;
       targetConfig.light = '시네마틱';
-      targetConfig.shotStyle = ['하드 섀도우', '네거티브 스페이스', '컬러블로킹'];
+      targetConfig.shotStyle = ['인테리어 잡지 샷(사실적)', '와이드 건축/공간 샷'];
       targetConfig.interiorStyle = '모던 미니멀';
       targetConfig.country = '선택안함';
-      setActiveMarquee("DRAMATIC STUDIO Active: High-contrast luxury studio shot with dramatic shadows and lighting...");
+      setActiveMarquee("RETAIL SCENE Active: Premium commercial showroom and luxury retail display photography...");
     }
 
     // Cascading Effect: Apply changed properties sequentially
@@ -649,23 +649,6 @@ export default function App() {
       const parts = [];
       const isSolidBackground = config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경';
 
-      if (activeTemplate === 'TITLE SCENE') {
-        // 타이틀 씬은 단순함을 극대화하기 위해 별도의 기본 구문을 추가하지 않습니다.
-      } else if (activeTemplate === 'DETAIL SCENE') {
-        parts.push("Close-up detail shot highlighting texture of materials, product focus");
-      } else if (activeTemplate === 'INSTA SCENE') {
-        parts.push("Trendy Instagram snapshot style, emotional SNS aesthetic");
-      } else if (activeTemplate === 'USAGE SCENE') {
-        parts.push("Commercial lifestyle usage scene emphasizing natural interaction in an everyday space");
-      } else if (activeTemplate === 'HOME LIVING') {
-        parts.push("Cozy home living room or bedroom environment setting, domestic lifestyle theme");
-      } else if (activeTemplate === 'OFFICE TECH') {
-        parts.push("Modern corporate office setup, professional work space environment");
-      } else if (activeTemplate === 'NATURE ORGANIC') {
-        parts.push("Eco-friendly organic environment showcasing natural elements like plants, stones, and water");
-      } else if (activeTemplate === 'DRAMATIC STUDIO') {
-        parts.push("High-contrast commercial studio lighting, dramatic shadow and luxury styling");
-      }
 
       if (isSolidBackground) {
         const product = config.productName || 'product';
@@ -1324,7 +1307,7 @@ export default function App() {
               {/* Scrollable content box */}
               <div className="flex-1 overflow-y-auto space-y-4 pr-1 mb-4" style={{ padding: '8px 0' }}>
                 {aboutModalTarget.content.map((item, idx) => (
-                  <div key={idx} className="ios-bento-card" style={{ padding: '16px', border: '1px solid rgba(0,0,0,0.05)', backgroundColor: 'var(--card-bg)' }}>
+                  <div key={idx} className="p-5 rounded-2xl border border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.03] transition-all hover:bg-black/[0.04] dark:hover:bg-white/[0.05]">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                       <span className="w-1.5 h-3.5 rounded-full" style={{ backgroundColor: aboutModalTarget.color, display: 'inline-block' }}></span>
                       <h4 className="text-[13px] font-extrabold text-black dark:text-white m-0">{item.label}</h4>
@@ -1594,13 +1577,13 @@ export default function App() {
                 <div className="template-title">Office</div>
                 <div className="template-desc">데스크셋업 비즈니스</div>
               </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'NATURE ORGANIC' ? 'active' : ''}`} onClick={() => handleSmartTemplate('NATURE ORGANIC')}>
-                <div className="template-title">Natural</div>
-                <div className="template-desc">자연 친환경 컨셉</div>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'RETAIL SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('RETAIL SCENE')}>
+                <div className="template-title">Retail</div>
+                <div className="template-desc">상업용 쇼룸 연출</div>
               </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'DRAMATIC STUDIO' ? 'active' : ''}`} onClick={() => handleSmartTemplate('DRAMATIC STUDIO')}>
-                <div className="template-title">Dramatic</div>
-                <div className="template-desc">럭셔리 스튜디오</div>
+              <button className={`ios-smart-template-btn ${activeTemplate === 'NATURE ORGANIC' ? 'active' : ''}`} onClick={() => handleSmartTemplate('NATURE ORGANIC')}>
+                <div className="template-title">Outdoor</div>
+                <div className="template-desc">야외 자연 연출</div>
               </button>
             </div>
 
