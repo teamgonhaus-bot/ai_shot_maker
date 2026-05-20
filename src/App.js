@@ -140,6 +140,9 @@ const getValidHexColor = (color) => {
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
+  const [showSplash, setShowSplash] = useState(true);
+  const [splashFade, setSplashFade] = useState(false);
+  const [minTimePassed, setMinTimePassed] = useState(false);
   const [config, setConfig] = useState({
     productName: "",
     monochromeColor: "Cobalt Blue",
@@ -302,6 +305,24 @@ export default function App() {
 
     fetchTemplates();
   }, []);
+
+  // ⏳ Splash Intro Timer (at least 1.2s exposure + 0.3s smooth fade out)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMinTimePassed(true);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading && minTimePassed) {
+      setSplashFade(true);
+      const fadeTimer = setTimeout(() => {
+        setShowSplash(false);
+      }, 300);
+      return () => clearTimeout(fadeTimer);
+    }
+  }, [isLoading, minTimePassed]);
 
   // ⏱️ Cooldown Timer Logic
   useEffect(() => {
@@ -1248,10 +1269,57 @@ export default function App() {
     a.click();
   };
 
-  if (isLoading) return <div className="ios-loading-screen">Loading Studio...</div>;
-
   return (
     <div className="app-container">
+      {showSplash && (
+        <div 
+          className={`ios-splash-screen ${splashFade ? 'fade-out' : ''}`}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: '#0055FF',
+            zIndex: 99999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: splashFade ? 0 : 1,
+            transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            pointerEvents: splashFade ? 'none' : 'auto',
+          }}
+        >
+          <div 
+            style={{
+              color: '#FFFFFF',
+              fontWeight: 900,
+              fontSize: 'clamp(3.5rem, 12vh, 6.5rem)',
+              letterSpacing: '-0.03em',
+              lineHeight: 1,
+              textTransform: 'uppercase',
+              transform: 'rotate(-90deg)',
+              transformOrigin: 'center',
+              whiteSpace: 'nowrap',
+              fontFamily: '"Inter", "Outfit", -apple-system, BlinkMacSystemFont, sans-serif',
+              textAlign: 'center',
+            }}
+          >
+            SHOT MAKER
+          </div>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '40px',
+              color: 'rgba(255, 255, 255, 0.6)',
+              fontSize: '0.75rem',
+              fontWeight: 500,
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              fontFamily: '"Inter", -apple-system, sans-serif',
+            }}
+          >
+            v0.51 | Swiss Minimalist
+          </div>
+        </div>
+      )}
       {/* 🖼️ Lightbox Modal */}
       <AnimatePresence>
         {lightboxImage && (
@@ -1636,7 +1704,7 @@ export default function App() {
                     label=""
                     isOn={enableImageGeneration}
                     onToggle={() => setEnableImageGeneration(!enableImageGeneration)}
-                    activeColor="#34C759"
+                    activeColor="#0055FF"
                   />
                 </div>
 
@@ -1810,8 +1878,8 @@ export default function App() {
           .marquee-segment {
             white-space: nowrap;
             font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 0.12em;
+            font-weight: 900 !important;
+            letter-spacing: 0.15em !important;
             text-transform: uppercase;
             color: #fff;
             padding: 0 40px;
@@ -2156,7 +2224,7 @@ export default function App() {
                           label="세부 소재 및 컬러 (Materials)"
                           isOn={useDetailMaterial}
                           onToggle={() => setUseDetailMaterial(!useDetailMaterial)}
-                          activeColor="#34C759"
+                          activeColor="#0055FF"
                         />
                         <AnimatePresence>
                           {useDetailMaterial && (
@@ -2183,7 +2251,7 @@ export default function App() {
                         label="이미지 참조 모드 (Image-to-Image)"
                         isOn={useImageRef}
                         onToggle={() => setUseImageRef(!useImageRef)}
-                        activeColor="#007AFF"
+                        activeColor="#0055FF"
                       />
 
                       {useImageRef && (
@@ -2305,7 +2373,7 @@ export default function App() {
                         label="조명 밝기(Lighting Brightness)"
                         isOn={config.useLight}
                         onToggle={() => handleConfigChange('useLight', !config.useLight)}
-                        activeColor="#FFD60A"
+                        activeColor="#0055FF"
                       />
                       <AnimatePresence>
                         {config.useLight && (
@@ -2314,7 +2382,7 @@ export default function App() {
                             <div className="p-4 bg-gray-50 dark:bg-zinc-800 rounded-2xl mt-2 mb-4">
                               <div className="flex justify-between items-center mb-2">
                                 <label className="text-[11px] font-black text-gray-400 uppercase tracking-wider">Brightness (밝기)</label>
-                                <span className="text-[11px] font-black text-[#FFD60A]">{config.brightness}</span>
+                                <span className="text-[11px] font-black text-[#0055FF]">{config.brightness}</span>
                               </div>
                               <input
                                 type="range"
@@ -2324,7 +2392,7 @@ export default function App() {
                                 value={config.brightness}
                                 onChange={(e) => handleConfigChange('brightness', parseFloat(e.target.value))}
                                 className="w-full h-1 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer"
-                                style={{ accentColor: '#FFD60A' }}
+                                style={{ accentColor: '#0055FF' }}
                               />
                             </div>
                           </motion.div>
@@ -2338,7 +2406,7 @@ export default function App() {
                         label="텍스트/로고 제거"
                         isOn={removeText}
                         onToggle={() => setRemoveText(!removeText)}
-                        activeColor="#AF52DE"
+                        activeColor="#0055FF"
                       />
                     </div>
                     <div className="mt-4 border-t border-gray-100 pt-4">
@@ -2346,7 +2414,7 @@ export default function App() {
                         label="상업용 클린 출력 (Commercial Clean)"
                         isOn={useCommercialNegative}
                         onToggle={() => setUseCommercialNegative(!useCommercialNegative)}
-                        activeColor="#AF52DE"
+                        activeColor="#0055FF"
                       />
                     </div>
                   </div>
@@ -2766,7 +2834,7 @@ export default function App() {
       </div>
 
       <footer className="ios-footer">
-        v0.50b | Developed by Gony
+        v0.51 | Developed by Gony
       </footer>
       <div className="h-12"></div>
     </div>

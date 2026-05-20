@@ -182,40 +182,16 @@ body {
   transform: scale(0.93) !important;
 }
 
-/* Selected state themes */
-.ios-pill.selected-red {
-  background-color: #FF3B30 !important;
-  color: #FFFFFF !important;
-  border-color: transparent !important;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
-}
-
-.ios-pill.selected-green {
-  background-color: #34C759 !important;
-  color: #FFFFFF !important;
-  border-color: transparent !important;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
-}
-
-.ios-pill.selected-purple {
-  background-color: #AF52DE !important;
-  color: #FFFFFF !important;
-  border-color: transparent !important;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
-}
-
-.ios-pill.selected-blue {
-  background-color: #007AFF !important;
-  color: #FFFFFF !important;
-  border-color: transparent !important;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
-}
-
+/* Selected state themes - Unified Monochromatic Santorini Blue */
+.ios-pill.selected-red,
+.ios-pill.selected-green,
+.ios-pill.selected-purple,
+.ios-pill.selected-blue,
 .ios-pill.selected-yellow {
-  background-color: #FFD60A !important;
+  background-color: #0055FF !important;
   color: #FFFFFF !important;
-  border-color: transparent !important;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+  border-color: #0055FF !important;
+  box-shadow: none !important;
 }
 
 /* =============================================
@@ -1171,9 +1147,14 @@ body.dark-mode .settings-input {
   border-color: #48484A !important;
 }
 
-body.dark-mode .ios-pill.selected-red { background-color: #FF453A !important; color: #FFF !important; }
-body.dark-mode .ios-pill.selected-green { background-color: #32D74B !important; color: #FFF !important; }
-body.dark-mode .ios-pill.selected-purple { background-color: #BF5AF2 !important; color: #FFF !important; }
+body.dark-mode .ios-pill.selected-red,
+body.dark-mode .ios-pill.selected-green,
+body.dark-mode .ios-pill.selected-purple {
+  background-color: #0055FF !important;
+  color: #FFFFFF !important;
+  border-color: #0055FF !important;
+  box-shadow: none !important;
+}
 
 body.dark-mode .header-nav-btn { color: #8E8E93 !important; background: transparent !important; }
 body.dark-mode .header-nav-btn.active { background-color: #3A3A3C !important; color: #FFFFFF !important; }
@@ -1210,12 +1191,13 @@ body.dark-mode .template-desc {
   color: #8E8E93 !important;
 }
 
-/* Dark mode: Camera blue pill selected state — ensure high contrast */
-body.dark-mode .ios-pill.selected-blue {
-  background-color: #0A84FF !important;
+/* Dark mode: Santorini Blue selected state */
+body.dark-mode .ios-pill.selected-blue,
+body.dark-mode .ios-pill.selected-yellow {
+  background-color: #0055FF !important;
   color: #FFFFFF !important;
-  border-color: transparent !important;
-  box-shadow: 0 0 0 1px rgba(10, 132, 255, 0.5) !important;
+  border-color: #0055FF !important;
+  box-shadow: none !important;
 }
 
 /* =============================================
@@ -1741,4 +1723,15 @@ body.dark-mode .about-card.library {
 
 body.dark-mode .about-card .text-gray-900 {
   color: #FFFFFF !important;
+}
+
+/* Mix Mode Fine Line Grid Style - Swiss Minimalist 1px Ultra Slim Borders */
+.ios-bento-card div[class*="border-t"] {
+  border-top: 1px solid #E5E5EA !important;
+  margin-top: 16px !important;
+  padding-top: 16px !important;
+}
+
+body.dark-mode .ios-bento-card div[class*="border-t"] {
+  border-top: 1px solid #2C2C2E !important;
 }
