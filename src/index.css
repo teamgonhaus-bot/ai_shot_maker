@@ -592,8 +592,8 @@ body.dark-mode .ios-smart-template-btn.active {
 
 .ios-toggle-label {
   font-size: 14px !important;
-  font-weight: 600 !important;
-  color: #000000 !important;
+  font-weight: 700 !important;
+  color: #8E8E93 !important;
 }
 
 .ios-switch {
@@ -1150,12 +1150,15 @@ body.dark-mode .header-nav {
 
 body.dark-mode .ios-section-title,
 body.dark-mode .header-brand h1,
-body.dark-mode .ios-toggle-label,
 body.dark-mode .result-card-text,
 body.dark-mode .save-input,
 body.dark-mode .settings-header h3,
 body.dark-mode .settings-body label {
   color: #FFFFFF !important;
+}
+
+body.dark-mode .ios-toggle-label {
+  color: #8E8E93 !important;
 }
 
 body.dark-mode .ios-pill,

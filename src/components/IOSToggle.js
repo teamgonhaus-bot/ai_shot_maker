@@ -3,11 +3,7 @@ import React from 'react';
 export default function IOSToggle({ label, isOn, onToggle, activeColor = '#34C759' }) {
   return (
     <div className="ios-toggle-row">
-      <span style={{ 
-        fontSize: '15px', 
-        fontWeight: '700', 
-        color: '#1C1C1E' 
-      }}>
+      <span className="ios-toggle-label">
         {label}
       </span>
       <div 

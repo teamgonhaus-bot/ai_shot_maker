@@ -950,7 +950,7 @@ export default function App() {
           parts.push(`designed with ${DICTIONARY.interiorStyle[config.interiorStyle]}`);
         }
 
-        if (useDetailMaterial && !activeTemplate) {
+        if (useDetailMaterial) {
           const materials = [];
           if (config.detailFloor) materials.push(DICTIONARY.detailFloor[config.detailFloor]);
           if (config.detailWood) materials.push(DICTIONARY.detailWood[config.detailWood]);
@@ -2137,30 +2137,24 @@ export default function App() {
                       <OptionSelect label="국가/지역 (Country)" value={config.country} onChange={(v) => handleConfigChange('country', v)} options={OPTIONS_DATA.country} theme="green" />
                       <OptionSelect label="장소 맥락 (Location Context)" value={config.locationContext || "선택안함"} onChange={(v) => handleConfigChange('locationContext', v)} options={OPTIONS_DATA.locationContext} theme="green" />
 
-                      {activeTemplate ? (
-                        <div className="text-[11px] text-gray-400 dark:text-zinc-500 font-semibold p-3 bg-gray-50 dark:bg-zinc-800/50 rounded-xl border border-dashed border-gray-200 dark:border-zinc-700/50 mt-4 text-center">
-                          🔒 스마트 템플릿 모드에서는 세부 소재 및 컬러가 자동으로 비활성화됩니다.
-                        </div>
-                      ) : (
-                        <>
-                          <IOSToggle
-                            label="세부 소재 및 컬러 (Materials)"
-                            isOn={useDetailMaterial}
-                            onToggle={() => setUseDetailMaterial(!useDetailMaterial)}
-                            activeColor="#34C759"
-                          />
-                          <AnimatePresence>
-                            {useDetailMaterial && (
-                              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="flex flex-col overflow-hidden">
-                                <OptionSelect label="바닥 소재" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} theme="green" />
-                                <OptionSelect label="우드 소재" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} theme="green" />
-                                <OptionSelect label="메탈 소재" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} theme="green" />
-                                <OptionSelect label="벽 소재/마감" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} theme="green" />
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </>
-                      )}
+                      <>
+                        <IOSToggle
+                          label="세부 소재 및 컬러 (Materials)"
+                          isOn={useDetailMaterial}
+                          onToggle={() => setUseDetailMaterial(!useDetailMaterial)}
+                          activeColor="#34C759"
+                        />
+                        <AnimatePresence>
+                          {useDetailMaterial && (
+                            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="flex flex-col overflow-hidden">
+                              <OptionSelect label="바닥 소재" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} theme="green" />
+                              <OptionSelect label="우드 소재" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} theme="green" />
+                              <OptionSelect label="메탈 소재" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} theme="green" />
+                              <OptionSelect label="벽 소재/마감" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} theme="green" />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </>
                     </div>
                   </div>
                 </motion.section>
@@ -2303,7 +2297,7 @@ export default function App() {
                         {config.useLight && (
                           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                             <OptionSelect label="조명 스타일" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="purple" />
-                            <div className="p-4 bg-gray-50 dark:bg-zinc-800 rounded-2xl mt-2">
+                            <div className="p-4 bg-gray-50 dark:bg-zinc-800 rounded-2xl mt-2 mb-4">
                               <div className="flex justify-between items-center mb-2">
                                 <label className="text-[11px] font-black text-gray-400 uppercase tracking-wider">Brightness (밝기)</label>
                                 <span className="text-[11px] font-black text-[#FFD60A]">{config.brightness}</span>
@@ -2324,8 +2318,8 @@ export default function App() {
                       </AnimatePresence>
                     </div>
 
-                    <div className="mt-4 border-t border-gray-100 dark:border-zinc-800 pt-4">
-                      <div className="text-[11px] font-black text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-3">기타 스타일 설정</div>
+                    <div className="mt-6 border-t border-gray-100 dark:border-zinc-800 pt-6">
+                      <div className="ios-option-label" style={{ marginBottom: '12px' }}>추가 옵션</div>
                       <IOSToggle
                         label="텍스트/로고 제거"
                         isOn={removeText}
