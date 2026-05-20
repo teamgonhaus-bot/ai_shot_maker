@@ -335,16 +335,26 @@ export default function App() {
       targetConfig.subjectNum = '없음';
       targetConfig.spaceType = '스튜디오';
       targetConfig.spaceDetail = '단색 배경';
-      targetConfig.cameraAngle = '풀 샷';
-      targetConfig.interiorStyle = '모던 미니멀';
+      targetConfig.cameraAngle = '선택안함';
+      targetConfig.interiorStyle = '선택안함';
       targetConfig.productLayout = '대각선 안착';
-      targetConfig.productAnchor = '전경 클린';
+      targetConfig.productAnchor = '선택안함';
       targetConfig.copySpace = '선택안함';
       targetConfig.aspectRatio = '1:1 (Square)';
       targetConfig.useLight = true;
       targetConfig.light = '나르스 확산광';
-      targetConfig.shotStyle = ['네거티브 스페이스', '톤온톤-모노크로매틱'];
+      targetConfig.shotStyle = [];
       targetConfig.country = '선택안함';
+
+      // 기본색은 Cobalt Blue로 적용 (혹은 누를때마다 랜덤 적용)
+      const colors = ['Cobalt Blue', 'Terracotta', 'Sage Green', 'Warm Sand', 'Matte Black', 'Pure White', 'Charcoal'];
+      if (config.monochromeColor === 'Cobalt Blue') {
+        const otherColors = colors.filter(c => c !== 'Cobalt Blue');
+        targetConfig.monochromeColor = otherColors[Math.floor(Math.random() * otherColors.length)];
+      } else {
+        targetConfig.monochromeColor = 'Cobalt Blue';
+      }
+
       setActiveMarquee("TITLE SCENE Active: Surrealist floating product on monochrome studio backdrop...");
 
     } else if (templateType === 'DETAIL SCENE') {
@@ -640,7 +650,7 @@ export default function App() {
       const isSolidBackground = config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경';
 
       if (activeTemplate === 'TITLE SCENE') {
-        parts.push("Clean and organized studio style shot for title banner, product focus");
+        // 타이틀 씬은 단순함을 극대화하기 위해 별도의 기본 구문을 추가하지 않습니다.
       } else if (activeTemplate === 'DETAIL SCENE') {
         parts.push("Close-up detail shot highlighting texture of materials, product focus");
       } else if (activeTemplate === 'INSTA SCENE') {
@@ -668,20 +678,24 @@ export default function App() {
         parts.push(bgDesc);
         parts.push(`product levitation, clean lines, impeccable product finish, flawless production`);
 
-        if (config.cameraAngle && config.cameraAngle !== "선택안함") {
-          parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
-        }
-        if (config.shotStyle && config.shotStyle.length > 0) {
-          const styles = config.shotStyle.map(s => DICTIONARY.shotStyle[s]);
-          parts.push(`rendered with ${styles.join(", ")}`);
-        }
-        if (config.useLight && config.light !== "선택안함") {
-          parts.push(`illuminated by ${DICTIONARY.light[config.light]} with ${config.brightness} brightness`);
+        if (activeTemplate !== 'TITLE SCENE') {
+          if (config.cameraAngle && config.cameraAngle !== "선택안함") {
+            parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
+          }
+          if (config.shotStyle && config.shotStyle.length > 0) {
+            const styles = config.shotStyle.map(s => DICTIONARY.shotStyle[s]);
+            parts.push(`rendered with ${styles.join(", ")}`);
+          }
+          if (config.useLight && config.light !== "선택안함") {
+            parts.push(`illuminated by ${DICTIONARY.light[config.light]} with ${config.brightness} brightness`);
+          }
         }
         if (removeText) {
           parts.push("textless, no text, no watermarks, clear image");
         }
-        parts.push("8k resolution, highly detailed, masterpiece, photorealistic");
+        if (activeTemplate !== 'TITLE SCENE') {
+          parts.push("8k resolution, highly detailed, masterpiece, photorealistic");
+        }
       } else {
         let subjectStr = config.productName ? `a high-end ${config.productName}` : "a high-end masterpiece";
 
@@ -754,7 +768,7 @@ export default function App() {
           parts.push(`designed with ${DICTIONARY.interiorStyle[config.interiorStyle]}`);
         }
 
-        if (useDetailMaterial) {
+        if (useDetailMaterial && !activeTemplate) {
           const materials = [];
           if (config.detailFloor) materials.push(DICTIONARY.detailFloor[config.detailFloor]);
           if (config.detailWood) materials.push(DICTIONARY.detailWood[config.detailWood]);
@@ -795,12 +809,14 @@ export default function App() {
       });
 
       // 4. 요구사항에 맞춘 완벽한 순서 고정 재조합
-      // [1순위: 핵심 개체명] -> [2순위: 성공 삼총사 세트] -> [3순위: 나머지 세부 옵션들]
+      // [1순위: 핵심 개체명] -> [2순위: 성공 삼총사 세트(단색/그라데이션 배경 아닐 때만)] -> [3순위: 나머지 세부 옵션들]
       let prefixParts = [];
       if (productVar) {
         prefixParts.push(productVar);
       }
-      prefixParts.push(successTriad);
+      if (!isSolidBackground) {
+        prefixParts.push(successTriad);
+      }
 
       let finalPrompt = [...prefixParts, ...filteredParts].join(", ");
 
@@ -1792,22 +1808,30 @@ export default function App() {
                       <OptionSelect label="국가/지역 (Country)" value={config.country} onChange={(v) => handleConfigChange('country', v)} options={OPTIONS_DATA.country} theme="green" />
                       <OptionSelect label="장소 맥락 (Location Context)" value={config.locationContext || "선택안함"} onChange={(v) => handleConfigChange('locationContext', v)} options={OPTIONS_DATA.locationContext} theme="green" />
 
-                      <IOSToggle
-                        label="세부 소재 및 컬러 (Materials)"
-                        isOn={useDetailMaterial}
-                        onToggle={() => setUseDetailMaterial(!useDetailMaterial)}
-                        activeColor="#34C759"
-                      />
-                      <AnimatePresence>
-                        {useDetailMaterial && (
-                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="flex flex-col overflow-hidden">
-                            <OptionSelect label="바닥 소재" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} theme="green" />
-                            <OptionSelect label="우드 소재" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} theme="green" />
-                            <OptionSelect label="메탈 소재" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} theme="green" />
-                            <OptionSelect label="벽 소재/마감" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} theme="green" />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      {activeTemplate ? (
+                        <div className="text-[11px] text-gray-400 dark:text-zinc-500 font-semibold p-3 bg-gray-50 dark:bg-zinc-800/50 rounded-xl border border-dashed border-gray-200 dark:border-zinc-700/50 mt-4 text-center">
+                          🔒 스마트 템플릿 모드에서는 세부 소재 및 컬러가 자동으로 비활성화됩니다.
+                        </div>
+                      ) : (
+                        <>
+                          <IOSToggle
+                            label="세부 소재 및 컬러 (Materials)"
+                            isOn={useDetailMaterial}
+                            onToggle={() => setUseDetailMaterial(!useDetailMaterial)}
+                            activeColor="#34C759"
+                          />
+                          <AnimatePresence>
+                            {useDetailMaterial && (
+                              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="flex flex-col overflow-hidden">
+                                <OptionSelect label="바닥 소재" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} theme="green" />
+                                <OptionSelect label="우드 소재" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} theme="green" />
+                                <OptionSelect label="메탈 소재" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} theme="green" />
+                                <OptionSelect label="벽 소재/마감" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} theme="green" />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </>
+                      )}
                     </div>
                   </div>
                 </motion.section>
