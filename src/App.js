@@ -40,16 +40,16 @@ const DICTIONARY = {
 
   spaceType: { "스튜디오": "a professional studio environment", "오피스": "a modern office space", "홈": "a cozy home interior", "리테일": "a retail commercial space", "라운지": "a luxury lounge area", "야외": "an outdoor setting" },
   spaceDetail: {
-    "단색 배경": "with a solid color background", "인테리어 세트장": "within a designed interior set", "그라데이션 배경": "with a gradient background", "쇼케이스": "in a showcase display area", "크로마키 그린 배경": "with a chroma key green screen background",
+    "단색 배경": "with a solid color background", "인테리어 세트장": "within a designed interior set", "그라데이션 배경": "with a gradient background", "화이트벽 빈공간": "in a clean studio with an empty white wall backdrop", "쇼케이스": "in a showcase display area", "크로마키 그린 배경": "with a chroma key green screen background",
     "사무실": "in a standard office setup", "회의실": "in a formal meeting room", "중역실": "in an executive office suite", "오피스 라운지": "in a relaxed office lounge", "트레이닝룸": "in a training or lecture room", "공유오피스": "in a modern coworking space",
     "리빙": "in a living room area", "다이닝": "in a dining room setting", "룸": "in a private room", "워크룸": "in a dedicated workroom or study", "베드룸": "in a comfortable bedroom setting", "테라스": "on a scenic terrace",
     "카페": "in a trendy cafe", "식당": "in a modern restaurant", "쇼룸": "in a premium showroom", "로비": "in a grand lobby area", "쇼핑몰": "in a bustling shopping mall", "박람회": "at a professional exhibition or fair", "갤러리": "in a minimalist art gallery", "도서관": "in a quiet library environment", "강의실": "in a modern classroom",
     "호텔 라운지": "in a luxury hotel lounge", "공항 라운지": "in a premium airport lounge", "쇼핑몰라운지": "in a shopping mall lounge area", "쇼케이스 라운지": "in a showcase lounge area",
     "도심": "in a bustling city urban environment", "자연": "surrounded by natural scenery", "공원": "in a public park", "강가": "by a scenic riverside", "쇼핑가": "on a busy shopping street", "힙한곳": "in a trendy, hip neighborhood"
   },
-  detailWall: { "화이트 페인트": "clean white painted walls", "노출 콘크리트": "exposed raw concrete walls", "웨인스코팅": "elegant wainscoted walls", "파스텔톤 벽지": "soft pastel wallpaper", "붉은 벽돌": "rustic red brick walls", "세라믹타일": "ceramic tiled walls", "패널": "paneled walls", "템바보드": "tambour board walls", "원목패널": "solid wood paneled walls", "스틸패널": "steel paneled walls", "스톤패널": "stone paneled walls" },
+  detailWall: { "화이트 페인트": "clean white painted walls", "노출 콘크리트": "exposed raw concrete walls", "웨인스코팅": "elegant wainscoted walls", "파스텔톤 벽지": "soft pastel wallpaper", "붉은 벽돌": "rustic red brick walls", "세라믹타일": "ceramic tiled walls", "paneled walls": "paneled walls", "템바보드": "tambour board walls", "원목패널": "solid wood paneled walls", "스틸패널": "steel paneled walls", "스톤패널": "stone paneled walls" },
   interiorStyle: { "선택안함": "", "미드센추리 모던": "mid-century modern style", "모던 미니멀": "modern minimal style", "내추럴 우드": "natural wood interior style", "젠 스타일": "Zen-inspired style", "인더스트리얼": "industrial style", "스칸디나비안": "Scandinavian style", "플랜테리어": "planterior style with many indoor plants" },
-  light: { "선택안함": "", "자연광": "natural sunlight", "시네마틱": "cinematic dramatic lighting", "스튜디오 조명": "professional studio softbox lighting", "스포트라이트 조명": "focused spotlight lighting", "무드등": "soft mood lighting", "나르스 확산광": "soft, diffused lighting", "앤비언트 라이트": "warm ambient indoor light" },
+  light: { "선택안함": "", "자연광": "natural sunlight", "시네마틱": "cinematic dramatic lighting", "스튜디오 조명": "professional studio softbox lighting", "스포트라이트 조명": "focused spotlight lighting", "무드등": "soft mood lighting", "나르스 확산광": "soft, diffused lighting", "앤비언트 라이트": "warm ambient indoor light", "균일하게 비치는 조명": "evenly distributed bright studio light" },
 
   detailFloor: { "밝은 우드 마루": "light wood flooring", "어두운 우드 마루": "dark walnut wood flooring", "테라조 타일": "modern terrazzo tile floor", "대리석": "premium marble flooring", "콘크리트": "polished concrete floor", "조약돌 바닥": "pebble stone floor", "자갈 바닥": "gravel floor", "카펫": "with cozy carpet texture", "포세린타일": "with polished porcelain tiles", "에폭시": "with industrial epoxy flooring" },
   detailWood: { "오크(참나무)": "natural oak wood textures", "월넛(호두나무)": "rich walnut wood details", "자작나무": "birch wood accents", "티크": "premium teak wood", "애쉬": "with natural ash wood grain", "마호가니": "with rich mahogany wood finish", "미송": "with clean pine wood textures", "OBS": "with rugged OSB textures", "합판": "with minimalist plywood details" },
@@ -89,7 +89,7 @@ const OPTIONS_DATA = {
   subjectHair: ["선택안함", "긴머리", "짧은머리", "단발", "펌", "염색", "묶은머리"],
   spaceType: ["스튜디오", "오피스", "홈", "리테일", "라운지", "야외"],
   spaceDetail: {
-    "스튜디오": ["단색 배경", "그라데이션 배경", "인테리어 세트장", "쇼케이스", "크로마키 그린 배경"],
+    "스튜디오": ["단색 배경", "그라데이션 배경", "화이트벽 빈공간", "인테리어 세트장", "쇼케이스", "크로마키 그린 배경"],
     "오피스": ["사무실", "회의실", "중역실", "오피스 라운지", "트레이닝룸", "공유오피스"],
     "홈": ["리빙", "다이닝", "룸", "워크룸", "베드룸", "테라스"],
     "리테일": ["카페", "식당", "쇼룸", "로비", "쇼핑몰", "박람회", "갤러리", "도서관", "강의실"],
@@ -97,7 +97,7 @@ const OPTIONS_DATA = {
     "야외": ["도심", "자연", "테라스", "공원", "강가", "쇼핑가", "힙한곳"]
   },
   interiorStyle: ["선택안함", "미드센추리 모던", "모던 미니멀", "내추럴 우드", "젠 스타일", "인더스트리얼", "스칸디나비안", "플랜테리어"],
-  light: ["선택안함", "자연광", "시네마틱", "스튜디오 조명", "스포트라이트 조명", "무드등", "나르스 확산광", "앤비언트 라이트"],
+  light: ["선택안함", "자연광", "시네마틱", "스튜디오 조명", "스포트라이트 조명", "무드등", "나르스 확산광", "앤비언트 라이트", "균일하게 비치는 조명"],
   detailFloor: ["밝은 우드 마루", "어두운 우드 마루", "테라조 타일", "대리석", "콘크리트", "조약돌 바닥", "자갈 바닥", "카펫", "포세린타일", "에폭시"],
   detailWood: ["오크(참나무)", "월넛(호두나무)", "자작나무", "티크", "애쉬", "마호가니", "미송", "OBS", "합판"],
   detailMetal: ["황동(브라스)", "크롬/실버", "무광 블랙", "유광 블랙", "로즈골드"],
@@ -415,20 +415,22 @@ export default function App() {
 
     } else if (templateType === 'USAGE SCENE') {
       targetConfig.subjectNum = '혼자';
+      targetConfig.subjectGender = '여성';
+      targetConfig.subjectAge = '20대';
       targetConfig.subjectAction = '공간에 어울리게';
-      targetConfig.spaceType = '홈';
-      targetConfig.spaceDetail = '워크룸';
-      targetConfig.cameraAngle = '미디움 샷';
+      targetConfig.spaceType = '스튜디오';
+      targetConfig.spaceDetail = '화이트벽 빈공간';
+      targetConfig.cameraAngle = '풀 샷';
       targetConfig.copySpace = '선택안함';
       targetConfig.productLayout = '선택안함';
       targetConfig.productAnchor = '선택안함';
       targetConfig.aspectRatio = '4:3 (Standard)';
       targetConfig.useLight = true;
-      targetConfig.light = '앤비언트 라이트';
-      targetConfig.shotStyle = ['라이프스타일 인테리어', '심도 얕은 샷(아웃포커싱)'];
-      targetConfig.interiorStyle = '내추럴 우드';
+      targetConfig.light = '균일하게 비치는 조명';
+      targetConfig.shotStyle = [];
+      targetConfig.interiorStyle = '선택안함';
       targetConfig.country = '선택안함';
-      setActiveMarquee("USAGE SCENE Active: Lifestyle product-in-use realistic commercial photography...");
+      setActiveMarquee("USAGE SCENE Active: Lifestyle product-in-use inside clean white studio backdrop...");
 
     } else if (templateType === 'HOME LIVING') {
       targetConfig.subjectNum = '없음';
@@ -822,7 +824,7 @@ export default function App() {
     setIsGenerating(true);
     setTimeout(() => {
       const parts = [];
-      const isSolidBackground = config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경';
+      const isSolidBackground = (config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경') && config.subjectNum === '없음';
 
 
       if (isSolidBackground) {
@@ -915,7 +917,15 @@ export default function App() {
         }
 
         let envStr = DICTIONARY.spaceType[config.spaceType];
-        if (config.spaceDetail) envStr += `, ${DICTIONARY.spaceDetail[config.spaceDetail]}`;
+        if (config.spaceDetail) {
+          if (config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경') {
+            const color = config.monochromeColor || 'Cobalt Blue';
+            const bgType = config.spaceDetail === '그라데이션 배경' ? 'gradient' : 'monochrome solid color';
+            envStr += `, with a perfect ${color} ${bgType} background`;
+          } else {
+            envStr += `, ${DICTIONARY.spaceDetail[config.spaceDetail]}`;
+          }
+        }
         if (config.locationContext && config.locationContext !== "선택안함") {
           envStr += `, ${DICTIONARY.locationContext[config.locationContext]}`;
         }
@@ -1760,8 +1770,8 @@ export default function App() {
 
       {/* Global Marquee — Seamless single-line loop */}
       <div
-        className="w-full overflow-hidden mb-4 rounded-xl"
-        style={{ background: '#111', height: '36px', display: 'flex', alignItems: 'center', position: 'relative' }}
+        className="w-full overflow-hidden rounded-xl"
+        style={{ background: '#111', height: '36px', display: 'flex', alignItems: 'center', position: 'relative', marginBottom: '36px' }}
       >
         <style>{`
           @keyframes seamless-marquee {
@@ -1771,7 +1781,7 @@ export default function App() {
           .marquee-track {
             display: flex;
             width: max-content;
-            animation: seamless-marquee 14s linear infinite;
+            animation: seamless-marquee 17.5s linear infinite;
             will-change: transform;
           }
           .marquee-track:hover { animation-play-state: paused; }
@@ -2371,10 +2381,37 @@ export default function App() {
               <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>About</h2>
             </div>
 
-            {/* 3 Bento Cards with beautiful icons */}
+             {/* 3 Bento Cards with beautiful icons */}
             <div className="about-grid">
 
-              {/* Card 1: Mix Mode */}
+              {/* Card 1: Smart Mode */}
+              <div
+                className="about-card smart-mode"
+                onClick={() => setAboutModalTarget({
+                  title: 'Smart Mode',
+                  subtitle: '스마트 모드 자동화',
+                  color: '#FF9500',
+                  icon: 'smart',
+                  content: [
+                    { label: '빠른 프리셋 적용', text: '복잡한 설정 없이 원하는 씬(Scene) 템플릿을 선택하면 최적의 조명, 샷 스타일, 공간이 자동으로 세팅됩니다.' },
+                    { label: '다이내믹 셔플 (R)', text: '스마트 탭 우측의 원형 R 버튼을 누르면 해당 씬 테마에 어울리는 조화로운 범위 내에서 각 요소들이 지능적으로 셔플(무작위 변경)되어 무한한 영감을 제공합니다.' }
+                  ],
+                  footer: 'Tip : 스마트 모드 선택 후 믹스모드 수정 후 저장 및 커스터마이징 활용'
+                })}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                  <div className="icon-wrapper" style={{ backgroundColor: 'rgba(255, 149, 0, 0.12)', color: '#FF9500' }}>
+                    <Zap className="w-5 h-5" />
+                  </div>
+                  <span className="about-card-badge" style={{ backgroundColor: 'rgba(255, 149, 0, 0.08)', color: '#FF9500' }}>Auto</span>
+                </div>
+                <div style={{ marginTop: '16px' }}>
+                  <h3 className="text-[15px] font-black text-gray-900 dark:text-white m-0">Smart Mode</h3>
+                  <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">스마트 모드 자동화</p>
+                </div>
+              </div>
+
+              {/* Card 2: Mix Mode */}
               <div
                 className="about-card mix-mode"
                 onClick={() => setAboutModalTarget({
@@ -2400,33 +2437,6 @@ export default function App() {
                 <div style={{ marginTop: '16px' }}>
                   <h3 className="text-[15px] font-black text-gray-900 dark:text-white m-0">Mix Mode</h3>
                   <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">속성 마스터 가이드</p>
-                </div>
-              </div>
-
-              {/* Card 2: Workflow */}
-              <div
-                className="about-card workflow"
-                onClick={() => setAboutModalTarget({
-                  title: 'Generate & Copy Workflow',
-                  subtitle: '생성 및 복사 활용법',
-                  color: '#34C759',
-                  icon: 'wand',
-                  content: [
-                    { label: '프롬프트 완성', text: '원하는 알약 옵션들을 선택한 후, 우측/하단의 GENERATE PROMPT 버튼을 누르면 엔진이 완벽한 상업용 영문 지시어 문장으로 결합해 냅니다.' },
-                    { label: '카피 후 타 AI 연동', text: '결과창의 COPY 버튼을 눌러 클립보드에 복사한 뒤, Midjourney, FLUX.1, Stable Diffusion 등 다른 이미지 생성 AI 사이트의 프롬프트 창에 그대로 붙여넣어(Ctrl+V) 사용하세요. 첨부 이미지 제품과 인물의 자연스러운 상호작용 컷이 완성됩니다.' }
-                  ],
-                  footer: 'Shot Maker의 초고성능 결합 엔진을 통해 완벽한 상업용 지시어 문장을 즉시 생성할 수 있습니다.'
-                })}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                  <div className="icon-wrapper" style={{ backgroundColor: 'rgba(52, 199, 89, 0.12)', color: '#34C759' }}>
-                    <Wand2 className="w-5 h-5" />
-                  </div>
-                  <span className="about-card-badge" style={{ backgroundColor: 'rgba(52, 199, 89, 0.08)', color: '#34C759' }}>Quick</span>
-                </div>
-                <div style={{ marginTop: '16px' }}>
-                  <h3 className="text-[15px] font-black text-gray-900 dark:text-white m-0">Workflow</h3>
-                  <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">생성 및 복사 활용법</p>
                 </div>
               </div>
 
@@ -2457,30 +2467,30 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Card 4: Smart Mode */}
+              {/* Card 4: Workflow */}
               <div
-                className="about-card smart-mode"
+                className="about-card workflow"
                 onClick={() => setAboutModalTarget({
-                  title: 'Smart Mode',
-                  subtitle: '스마트 모드 자동화',
-                  color: '#FF9500',
-                  icon: 'smart',
+                  title: 'Generate & Copy Workflow',
+                  subtitle: '생성 및 복사 활용법',
+                  color: '#34C759',
+                  icon: 'wand',
                   content: [
-                    { label: '빠른 프리셋 적용', text: '복잡한 설정 없이 원하는 씬(Scene) 템플릿을 선택하면 최적의 조명, 샷 스타일, 공간이 자동으로 세팅됩니다.' },
-                    { label: '다이내믹 셔플 (R)', text: '스마트 탭 우측의 원형 R 버튼을 누르면 해당 씬 테마에 어울리는 조화로운 범위 내에서 각 요소들이 지능적으로 셔플(무작위 변경)되어 무한한 영감을 제공합니다.' }
+                    { label: '프롬프트 완성', text: '원하는 알약 옵션들을 선택한 후, 우측/하단의 GENERATE PROMPT 버튼을 누르면 엔진이 완벽한 상업용 영문 지시어 문장으로 결합해 냅니다.' },
+                    { label: '카피 후 타 AI 연동', text: '결과창의 COPY 버튼을 눌러 클립보드에 복사한 뒤, Midjourney, FLUX.1, Stable Diffusion 등 다른 이미지 생성 AI 사이트의 프롬프트 창에 그대로 붙여넣어(Ctrl+V) 사용하세요. 첨부 이미지 제품과 인물의 자연스러운 상호작용 컷이 완성됩니다.' }
                   ],
-                  footer: 'Tip : 스마트 모드 선택 후 믹스모드 수정 후 저장 및 커스터마이징 활용'
+                  footer: 'Shot Maker의 초고성능 결합 엔진을 통해 완벽한 상업용 지시어 문장을 즉시 생성할 수 있습니다.'
                 })}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                  <div className="icon-wrapper" style={{ backgroundColor: 'rgba(255, 149, 0, 0.12)', color: '#FF9500' }}>
-                    <Zap className="w-5 h-5" />
+                  <div className="icon-wrapper" style={{ backgroundColor: 'rgba(52, 199, 89, 0.12)', color: '#34C759' }}>
+                    <Wand2 className="w-5 h-5" />
                   </div>
-                  <span className="about-card-badge" style={{ backgroundColor: 'rgba(255, 149, 0, 0.08)', color: '#FF9500' }}>Auto</span>
+                  <span className="about-card-badge" style={{ backgroundColor: 'rgba(52, 199, 89, 0.08)', color: '#34C759' }}>Quick</span>
                 </div>
                 <div style={{ marginTop: '16px' }}>
-                  <h3 className="text-[15px] font-black text-gray-900 dark:text-white m-0">Smart Mode</h3>
-                  <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">스마트 모드 자동화</p>
+                  <h3 className="text-[15px] font-black text-gray-900 dark:text-white m-0">Workflow</h3>
+                  <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">생성 및 복사 활용법</p>
                 </div>
               </div>
 

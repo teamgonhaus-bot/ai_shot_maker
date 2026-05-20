@@ -1691,6 +1691,10 @@ body.dark-mode .mode-nav-btn.active {
 }
 
 /* Light mode specific about-card backgrounds */
+.about-card.smart-mode {
+  border: 1px solid rgba(255, 149, 0, 0.15) !important;
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFF9F0 100%) !important;
+}
 .about-card.mix-mode {
   border: 1px solid rgba(0, 122, 255, 0.15) !important;
   background: linear-gradient(135deg, #FFFFFF 0%, #F5F9FF 100%) !important;
@@ -1705,6 +1709,10 @@ body.dark-mode .mode-nav-btn.active {
 }
 
 /* Dark mode specific about-cards */
+body.dark-mode .about-card.smart-mode {
+  border: 1px solid rgba(255, 149, 0, 0.25) !important;
+  background: linear-gradient(135deg, #1C1C1E 0%, #2B1C10 100%) !important;
+}
 body.dark-mode .about-card.mix-mode {
   border: 1px solid rgba(0, 122, 255, 0.25) !important;
   background: linear-gradient(135deg, #1C1C1E 0%, #101F33 100%) !important;
@@ -1717,6 +1725,7 @@ body.dark-mode .about-card.library {
   border: 1px solid rgba(175, 82, 222, 0.25) !important;
   background: linear-gradient(135deg, #1C1C1E 0%, #20132B 100%) !important;
 }
+
 
 .icon-wrapper {
   width: 44px !important;
