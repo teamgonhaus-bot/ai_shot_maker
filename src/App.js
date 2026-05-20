@@ -135,7 +135,7 @@ const isHexColor = (str) => {
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [config, setConfig] = useState({
-    productName: "product",
+    productName: "",
     monochromeColor: "Cobalt Blue",
     subjectNum: "없음",
     subjectGender: "선택안함",
@@ -729,7 +729,11 @@ export default function App() {
             parts.push("The person is naturally interacting with/holding the product in the attached image");
           }
         } else {
-          parts.push(`professional architectural photography of ${subjectStr}`);
+          if (config.productName) {
+            parts.push(`a scene using ${config.productName}`);
+          } else {
+            parts.push(`professional architectural photography of ${subjectStr}`);
+          }
         }
 
         let envStr = DICTIONARY.spaceType[config.spaceType];
@@ -1216,15 +1220,12 @@ export default function App() {
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="settings-modal"
+              className="settings-modal about-modal"
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 maxHeight: '85vh',
                 width: '90%',
-                maxWidth: '540px',
-                padding: '32px',
-                borderRadius: '32px',
                 border: `1px solid rgba(255, 255, 255, 0.2)`,
                 position: 'relative'
               }}
@@ -1610,7 +1611,7 @@ export default function App() {
                 <input
                   type="text"
                   placeholder="예: perfume bottle, wireless earbuds, luxury watch"
-                  value={config.productName || 'product'}
+                  value={config.productName}
                   onChange={(e) => handleConfigChange('productName', e.target.value)}
                   className="save-input"
                   style={{ fontSize: '14px', fontWeight: '600' }}
@@ -2022,9 +2023,9 @@ export default function App() {
           <motion.div key="about" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
 
             {/* Bento Grid Header */}
-            <div className="text-center pt-2 pb-6 mb-4">
-              <h2 className="text-[17px] font-medium text-black dark:text-white uppercase" style={{ letterSpacing: '0.12em' }}>Workflow Guide</h2>
-              <p className="text-[11px] text-gray-400 dark:text-zinc-500 font-medium mt-1.5">Shot Maker Pro를 활용한 고품질 상업용 이미지 제작 프로세스</p>
+            <div>
+              <h2 className="ios-section-title">About</h2>
+              <p className="text-[11px] text-gray-400 dark:text-zinc-500 font-semibold -mt-4 mb-6">Shot Maker Pro를 활용한 고품질 상업용 이미지 제작 프로세스</p>
             </div>
 
             {/* 3 Bento Cards with beautiful icons */}
@@ -2146,7 +2147,7 @@ export default function App() {
                   textColor: '#FFFFFF'
                 });
               }
-              if (config.productName && config.productName !== 'product') {
+              if (config.productName) {
                 tags.push({
                   key: 'productNameTag',
                   val: `제품: ${config.productName}`,
