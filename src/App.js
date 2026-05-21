@@ -229,6 +229,7 @@ export default function App() {
   const [lightboxImage, setLightboxImage] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [libraryFilter, setLibraryFilter] = useState('전체');
+  const [libraryPage, setLibraryPage] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedApi, setSelectedApi] = useState("google");
   const [sdApiKey, setSdApiKey] = useState("");
@@ -2080,7 +2081,7 @@ export default function App() {
             <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>Mix</h2>
 
             {/* Product Name Input */}
-            <div className="ios-bento-card" style={{ padding: '12px 20px', marginBottom: '8px' }}>
+            <div className="ios-bento-card" style={{ padding: useProduct ? '8px 14px' : '6px 14px', marginBottom: '8px', borderRadius: useProduct ? '20px' : '9999px', transition: 'all 0.22s ease' }}>
               <div className="flex items-center justify-between" style={{ marginBottom: useProduct ? '8px' : '0px' }}>
                 <label className="ios-option-label" style={{ margin: 0 }}>대상 제품명 (Product Name)</label>
                 <div 
@@ -2483,13 +2484,13 @@ export default function App() {
             {/* Library Tabs & Envelope Wrapper (eliminates space-y-6 top margin gap) */}
             <div>
               <div className="folder-tabs-container no-scrollbar" style={{ marginTop: '0', marginBottom: '0', overflowX: 'auto', whiteSpace: 'nowrap', padding: '0', gap: '0' }}>
-                <button className={`folder-tab ${libraryFilter === '전체' ? 'active' : ''}`} style={{ padding: '8px 12px', flexShrink: 0, flex: 'none' }} onClick={() => setLibraryFilter('전체')}>전체</button>
+                <button className={`folder-tab ${libraryFilter === '전체' ? 'active' : ''}`} style={{ padding: '8px 12px', flexShrink: 0, flex: 'none' }} onClick={() => { setLibraryFilter('전체'); setLibraryPage(0); }}>전체</button>
               {OPTIONS_DATA.spaceType.map(space => (
                 <button
                   key={space}
                   className={`folder-tab ${libraryFilter === space ? 'active' : ''}`}
                   style={{ padding: '8px 12px', flexShrink: 0, flex: 'none' }}
-                  onClick={() => setLibraryFilter(space)}
+                  onClick={() => { setLibraryFilter(space); setLibraryPage(0); }}
                 >
                   {space}
                 </button>
@@ -2498,35 +2499,80 @@ export default function App() {
 
             <div className="folder-content-envelope">
               <div className="ios-library-grid">
-                {(libraryFilter === '전체' ? savedTemplates : savedTemplates.filter(t => t.config?.spaceType === libraryFilter)).map(template => (
-                  <TemplateCard
-                    key={template.id}
-                    template={template}
-                    isSelected={activeLibraryTemplateId === template.id}
-                    isDarkMode={isDarkMode}
-                    onSelect={handleSelectTemplate}
-                    onApply={(t) => {
-                      handleApplyTemplate(t);
-                    }}
-                    onDelete={(id) => {
-                      const target = savedTemplates.find(t => t.id === id);
-                      setDeleteTarget(target);
-                    }}
-                    onRename={(id, name) => {
-                      setRenameTarget({ id, name });
-                      setNewPresetName(name);
-                    }}
-                    onMoveRequest={(t) => setMoveTarget(t)}
-                    onViewPrompt={(t) => setPromptModalTarget(t)}
-                    categories={OPTIONS_DATA.spaceType}
-                  />
-                ))}
-                {(libraryFilter === '전체' ? savedTemplates : savedTemplates.filter(t => t.config?.spaceType === libraryFilter)).length === 0 && (
-                  <div className="col-span-2 text-center py-20 bg-white rounded-3xl ios-shadow">
-                    <LayoutTemplate className="w-12 h-12 text-gray-200 mb-4 mx-auto" />
-                    <p className="text-gray-400 font-bold m-0">No templates found</p>
-                  </div>
-                )}
+                {(() => {
+                  const filtered = libraryFilter === '전체' ? savedTemplates : savedTemplates.filter(t => t.config?.spaceType === libraryFilter);
+                  const PAGE_SIZE = 12;
+                  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+                  const paged = filtered.slice(libraryPage * PAGE_SIZE, (libraryPage + 1) * PAGE_SIZE);
+                  return (
+                    <>
+                      {paged.map(template => (
+                        <TemplateCard
+                          key={template.id}
+                          template={template}
+                          isSelected={activeLibraryTemplateId === template.id}
+                          isDarkMode={isDarkMode}
+                          onSelect={handleSelectTemplate}
+                          onApply={(t) => {
+                            handleApplyTemplate(t);
+                          }}
+                          onDelete={(id) => {
+                            const target = savedTemplates.find(t => t.id === id);
+                            setDeleteTarget(target);
+                          }}
+                          onRename={(id, name) => {
+                            setRenameTarget({ id, name });
+                            setNewPresetName(name);
+                          }}
+                          onMoveRequest={(t) => setMoveTarget(t)}
+                          onViewPrompt={(t) => setPromptModalTarget(t)}
+                          categories={OPTIONS_DATA.spaceType}
+                        />
+                      ))}
+                      {paged.length === 0 && (
+                        <div className="col-span-2 text-center py-20 bg-white rounded-3xl ios-shadow">
+                          <LayoutTemplate className="w-12 h-12 text-gray-200 mb-4 mx-auto" />
+                          <p className="text-gray-400 font-bold m-0">No templates found</p>
+                        </div>
+                      )}
+                      {totalPages > 1 && (
+                        <div className="col-span-2 flex items-center justify-center gap-3 pt-2 pb-1">
+                          <button
+                            onClick={() => setLibraryPage(p => Math.max(0, p - 1))}
+                            disabled={libraryPage === 0}
+                            style={{
+                              width: '32px', height: '32px', borderRadius: '50%',
+                              border: '1.5px solid #0022FF', background: libraryPage === 0 ? '#F2F2F7' : '#0022FF',
+                              color: libraryPage === 0 ? '#999' : '#FFF',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              cursor: libraryPage === 0 ? 'default' : 'pointer',
+                              fontSize: '14px', fontWeight: '700', transition: 'all 0.2s'
+                            }}
+                          >
+                            ‹
+                          </button>
+                          <span style={{ fontSize: '12px', fontWeight: '700', color: '#0022FF', minWidth: '40px', textAlign: 'center' }}>
+                            {libraryPage + 1} / {totalPages}
+                          </span>
+                          <button
+                            onClick={() => setLibraryPage(p => Math.min(totalPages - 1, p + 1))}
+                            disabled={libraryPage === totalPages - 1}
+                            style={{
+                              width: '32px', height: '32px', borderRadius: '50%',
+                              border: '1.5px solid #0022FF', background: libraryPage === totalPages - 1 ? '#F2F2F7' : '#0022FF',
+                              color: libraryPage === totalPages - 1 ? '#999' : '#FFF',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              cursor: libraryPage === totalPages - 1 ? 'default' : 'pointer',
+                              fontSize: '14px', fontWeight: '700', transition: 'all 0.2s'
+                            }}
+                          >
+                            ›
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
             </div>

@@ -216,7 +216,7 @@ body {
   justify-content: center !important;
   aspect-ratio: auto !important;
   min-height: 96px !important;
-  padding: 16px 10px !important;
+  padding: 16px 6px !important;
   border-radius: 16px !important;
   background-color: #FFFFFF !important;
   border: 1px solid #0022FF !important;
@@ -289,14 +289,16 @@ body.dark-mode .ios-smart-template-btn.active {
 
 .template-title {
   font-family: "Outfit", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-  font-size: 21px !important;
+  font-size: 19px !important;
   font-weight: 900 !important;
   margin-bottom: 4px !important;
   letter-spacing: -0.05em !important;
   text-transform: uppercase !important;
   text-align: center !important;
   width: 100% !important;
-  word-wrap: break-word !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
   color: #0022FF !important;
   line-height: 1.0 !important;
 }
@@ -675,8 +677,8 @@ body.dark-mode .ios-summary-tag {
 .ios-library-grid {
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
-  gap: 14px !important;
-  padding: 4px 0 !important;
+  gap: 8px !important;
+  padding: 2px 0 !important;
 }
 
 .ios-library-close {
