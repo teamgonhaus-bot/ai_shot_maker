@@ -1999,6 +1999,12 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   position: relative !important;
   z-index: 5 !important; /* Higher than envelope body (z-index: 2) */
   overflow-y: visible !important; /* Prevent bottom border clipping and vertical scrollbars */
+  
+  /* Prevent text dragging layout scrolling issues */
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
 }
 
 /* Hides scrollbars but keeps horizontal swipe functionality */
@@ -2030,6 +2036,12 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   z-index: 3 !important; /* Above envelope (z-index: 2) to cleanly draw the bottom border line */
   margin-bottom: -1px !important; /* Overlap seamlessly with envelope */
   margin-right: -1px !important; /* Overlap right-borders to prevent double-border thickness */
+  
+  /* Prevent drag/highlight selection scrolling bugs */
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
 }
 
 .folder-tab:last-child {
