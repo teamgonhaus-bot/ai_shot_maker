@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trash2, ChevronDown, FolderInput, Edit2, ArrowRight } from 'lucide-react';
+import { Trash2, FolderInput, Edit2, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function TemplateCard({ template, onSelect, onApply, onDelete, onRename, onMoveRequest, onViewPrompt, categories, isSelected }) {
@@ -11,7 +11,10 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
       whileHover={{ y: -4, boxShadow: '0 12px 28px rgba(0,0,0,0.10)' }}
       className={`ios-bento-card flex flex-col justify-between overflow-hidden relative transition-all duration-300 ${isSelected ? 'ring-2 ring-[#0022FF]' : ''}`}
       style={{ padding: '0', minHeight: '140px', marginBottom: '0', cursor: 'pointer' }}
-      onClick={() => onSelect(template)}
+      onClick={() => {
+        onSelect(template);
+        onViewPrompt(template);
+      }}
     >
       {template.previewImage && (
         <div className="w-full h-32 bg-gray-100">
@@ -43,17 +46,9 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
         
         <div className="relative">
           <div className="overflow-hidden" style={{ height: '60px', display: 'flex', alignItems: 'center' }}>
-            {isSelected ? (
-              <div className="preset-scroll-container w-full">
-                <div className="preset-scroll-track text-[13px] font-medium text-gray-400 dark:text-white/70">
-                  {template.prompt}
-                </div>
-              </div>
-            ) : (
-              <p className="text-[13px] font-medium text-gray-400 dark:text-zinc-400 leading-relaxed mt-1 line-clamp-3 w-full">
-                {template.prompt}
-              </p>
-            )}
+            <p className="text-[13px] font-medium text-gray-400 dark:text-zinc-400 leading-relaxed mt-1 line-clamp-3 w-full">
+              {template.prompt}
+            </p>
           </div>
         </div>
 
@@ -104,17 +99,6 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
             <Edit2 size={16} strokeWidth={2} />
           </button>
         </div>
-
-        {template.prompt && template.prompt.length > 80 && (
-          <button 
-            onClick={(e) => { e.stopPropagation(); onViewPrompt(template); }}
-            className="ios-card-icon-btn"
-            title="View Prompt"
-            style={{ width: '32px', height: '32px', marginLeft: 'auto', backgroundColor: '#0022FF', color: '#FFFFFF' }}
-          >
-            <ChevronDown size={16} strokeWidth={2.5} />
-          </button>
-        )}
       </div>
     </motion.div>
   );
