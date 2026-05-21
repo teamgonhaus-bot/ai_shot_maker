@@ -238,6 +238,9 @@ export default function App() {
   const [renameTarget, setRenameTarget] = useState(null); // { id, name }
   const [newPresetName, setNewPresetName] = useState("");
 
+  // Delete Confirmation Modal State
+  const [deleteTarget, setDeleteTarget] = useState(null); // template object
+
   const [promptModalTarget, setPromptModalTarget] = useState(null);
   const [promptCopied, setPromptCopied] = useState(false);
   const [activeMarquee, setActiveMarquee] = useState("");
@@ -807,6 +810,7 @@ export default function App() {
     }
     try {
       await deleteDoc(doc(db, "templates", id));
+      setSavedTemplates(prev => prev.filter(t => t.id !== id));
       triggerToast("템플릿이 삭제되었습니다.");
     } catch (e) {
       console.error("Error deleting template:", e);
@@ -1433,6 +1437,48 @@ export default function App() {
                     Update
                   </button>
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 🗑️ Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deleteTarget && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="settings-modal-overlay"
+            style={{ zIndex: 200000 }}
+            onClick={() => setDeleteTarget(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="settings-modal"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-[22px] font-black text-black dark:text-white mb-2 text-center tracking-tight">Delete Preset</h3>
+              <p className="text-[13px] font-bold text-gray-400 mb-8 text-center leading-relaxed">
+                정말로 이 프리셋을 삭제하시겠습니까?<br/>이 작업은 되돌릴 수 없습니다.
+              </p>
+
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => setDeleteTarget(null)}
+                  className="cancel-pill-btn flex-1"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    handleDeleteTemplate(deleteTarget.id);
+                    setDeleteTarget(null);
+                  }}
+                  className="save-btn flex-1"
+                  style={{ background: '#FF3B30', color: 'white' }}
+                >
+                  Delete
+                </button>
               </div>
             </motion.div>
           </motion.div>
@@ -2419,7 +2465,10 @@ export default function App() {
                   onApply={(t) => {
                     handleApplyTemplate(t);
                   }}
-                  onDelete={handleDeleteTemplate}
+                  onDelete={(id) => {
+                    const target = savedTemplates.find(t => t.id === id);
+                    setDeleteTarget(target);
+                  }}
                   onRename={(id, name) => {
                     setRenameTarget({ id, name });
                     setNewPresetName(name);

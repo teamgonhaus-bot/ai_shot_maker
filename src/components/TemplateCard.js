@@ -26,8 +26,8 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
         </div>
       )}
       
-      <div className="flex-1 p-4">
-        <div className="flex items-center justify-between mb-3">
+      <div className="flex-1 p-3 pb-1">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: template.thumbnailColor || '#000' }} />
             <h4 className="font-bold text-[14px] text-black line-clamp-1">
@@ -45,8 +45,8 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
         </div>
         
         <div className="relative">
-          <div className="overflow-hidden" style={{ height: '60px', display: 'flex', alignItems: 'center' }}>
-            <p className="text-[13px] font-medium text-gray-400 dark:text-zinc-400 leading-relaxed mt-1 line-clamp-3 w-full">
+          <div className="overflow-hidden" style={{ height: '68px', display: 'flex', alignItems: 'flex-start' }}>
+            <p className="text-[11.5px] font-medium text-gray-400 dark:text-zinc-400 leading-[1.5] mt-0 line-clamp-4 w-full text-left">
               {template.prompt}
             </p>
           </div>
@@ -54,8 +54,8 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
 
         {/* Purpose Tag */}
         {template.config && (
-          <div className="mt-2">
-            <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 text-[10px] font-bold rounded-full border border-gray-200 dark:border-zinc-700">
+          <div className="mt-1">
+            <span className="inline-block px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 text-[9px] font-black tracking-wider rounded-full border border-gray-200 dark:border-zinc-700">
               {(() => {
                 const c = template.config;
                 if (c.aspectRatio === '1:1 (Square)' && c.subjectNum === '없음') return 'Title';
@@ -69,7 +69,7 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
         )}
       </div>
 
-      <div className="flex items-center justify-between pt-3 px-4 pb-4 border-t border-gray-100 mt-2">
+      <div className="flex items-center justify-between pt-2 px-3 pb-2.5 border-t border-gray-100 mt-1">
         <div className="flex gap-2 items-center">
           {/* Apply arrow — inverts to black when selected */}
           <button
