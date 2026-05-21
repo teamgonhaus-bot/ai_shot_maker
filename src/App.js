@@ -2064,18 +2064,17 @@ export default function App() {
             </div>
 
             {/* Category Tabs */}
-            <div className="ios-category-tabs">
-              <button className={`category-tab ${activeCategory === 'subject' ? 'active' : ''}`} onClick={() => setActiveCategory('subject')}>인물</button>
-              <button className={`category-tab ${activeCategory === 'space' ? 'active' : ''}`} onClick={() => setActiveCategory('space')}>공간</button>
-              <button className={`category-tab ${activeCategory === 'camera' ? 'active' : ''}`} onClick={() => setActiveCategory('camera')}>카메라</button>
-              <button className={`category-tab ${activeCategory === 'style' ? 'active' : ''}`} onClick={() => setActiveCategory('style')}>스타일</button>
+            <div className="folder-tabs-container">
+              <button className={`folder-tab ${activeCategory === 'subject' ? 'active' : ''}`} onClick={() => setActiveCategory('subject')}>인물</button>
+              <button className={`folder-tab ${activeCategory === 'space' ? 'active' : ''}`} onClick={() => setActiveCategory('space')}>공간</button>
+              <button className={`folder-tab ${activeCategory === 'camera' ? 'active' : ''}`} onClick={() => setActiveCategory('camera')}>카메라</button>
+              <button className={`folder-tab ${activeCategory === 'style' ? 'active' : ''}`} onClick={() => setActiveCategory('style')}>스타일</button>
             </div>
 
             <AnimatePresence mode="wait">
               {activeCategory === 'subject' && (
                 <motion.section key="subject" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                  <h2 className="ios-section-title">인물</h2>
-                  <div className="ios-bento-card" style={{ padding: '20px' }}>
+                  <div className="folder-content-envelope">
                     <OptionSelect label="인원" value={config.subjectNum} onChange={(v) => handleConfigChange('subjectNum', v)} options={OPTIONS_DATA.subjectNum} theme="red" />
                     {config.subjectNum !== "없음" && (
                       <div className="mt-2 space-y-1">
@@ -2157,8 +2156,7 @@ export default function App() {
 
               {activeCategory === 'space' && (
                 <motion.section key="space" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                  <h2 className="ios-section-title">공간</h2>
-                  <div className="ios-bento-card">
+                  <div className="folder-content-envelope">
                     <OptionSelect label="공간 종류" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} theme="green" />
                     <OptionSelect label="세부 공간" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} theme="green" />
                     {config.spaceType === '스튜디오' && (config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경') && (
@@ -2247,8 +2245,7 @@ export default function App() {
 
               {activeCategory === 'camera' && (
                 <motion.section key="camera" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                  <h2 className="ios-section-title">카메라</h2>
-                  <div className="ios-bento-card" style={{ padding: '20px' }}>
+                  <div className="folder-content-envelope">
                     <div className="mb-4 space-y-4">
                       <IOSToggle
                         label="이미지 참조 모드 (Image-to-Image)"
@@ -2370,8 +2367,7 @@ export default function App() {
 
               {activeCategory === 'style' && (
                 <motion.section key="style" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                  <h2 className="ios-section-title">스타일 & 조명</h2>
-                  <div className="ios-bento-card">
+                  <div className="folder-content-envelope">
                     <OptionSelect
                       label="연출 샷 스타일 (다중 선택)"
                       value={config.shotStyle}
@@ -2441,13 +2437,13 @@ export default function App() {
           <motion.div key="library" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6 relative pb-20">
             <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>Library</h2>
 
-            <div className="ios-category-tabs" style={{ marginTop: '0', marginBottom: '16px', overflowX: 'auto', whiteSpace: 'nowrap', padding: '4px' }}>
-              <button className={`category-tab ${libraryFilter === '전체' ? 'active' : ''}`} style={{ padding: '8px 12px' }} onClick={() => setLibraryFilter('전체')}>전체</button>
+            <div className="folder-tabs-container no-scrollbar" style={{ marginTop: '0', marginBottom: '16px', overflowX: 'auto', whiteSpace: 'nowrap', padding: '4px', gap: '4px' }}>
+              <button className={`folder-tab ${libraryFilter === '전체' ? 'active' : ''}`} style={{ padding: '8px 12px', flexShrink: 0, flex: 'none' }} onClick={() => setLibraryFilter('전체')}>전체</button>
               {OPTIONS_DATA.spaceType.map(space => (
                 <button
                   key={space}
-                  className={`category-tab ${libraryFilter === space ? 'active' : ''}`}
-                  style={{ padding: '8px 12px' }}
+                  className={`folder-tab ${libraryFilter === space ? 'active' : ''}`}
+                  style={{ padding: '8px 12px', flexShrink: 0, flex: 'none' }}
                   onClick={() => setLibraryFilter(space)}
                 >
                   {space}
@@ -2461,6 +2457,7 @@ export default function App() {
                   key={template.id}
                   template={template}
                   isSelected={activeLibraryTemplateId === template.id}
+                  isDarkMode={isDarkMode}
                   onSelect={handleSelectTemplate}
                   onApply={(t) => {
                     handleApplyTemplate(t);

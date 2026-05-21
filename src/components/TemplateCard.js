@@ -2,7 +2,9 @@ import React from 'react';
 import { Trash2, FolderInput, Edit2, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export default function TemplateCard({ template, onSelect, onApply, onDelete, onRename, onMoveRequest, onViewPrompt, categories, isSelected }) {
+export default function TemplateCard({ template, onSelect, onApply, onDelete, onRename, onMoveRequest, onViewPrompt, categories, isSelected, isDarkMode }) {
+  const bodyIsDark = isDarkMode !== undefined ? isDarkMode : (typeof document !== 'undefined' && document.body.classList.contains('dark-mode'));
+
   return (
     <motion.div
       layout
@@ -45,8 +47,8 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
         </div>
         
         <div className="relative">
-          <div className="overflow-hidden" style={{ height: '68px', display: 'flex', alignItems: 'flex-start' }}>
-            <p className="text-[11.5px] font-medium text-gray-400 dark:text-zinc-400 leading-[1.5] mt-0 line-clamp-4 w-full text-left">
+          <div className="overflow-hidden" style={{ height: '60px', display: 'flex', alignItems: 'flex-start' }}>
+            <p className="text-[10px] font-medium text-gray-400 dark:text-zinc-400 leading-[1.5] mt-0 line-clamp-4 w-full text-left">
               {template.prompt}
             </p>
           </div>
@@ -70,34 +72,37 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
       </div>
 
       <div className="flex items-center justify-between pt-2 px-3 pb-2.5 border-t border-gray-100 mt-1">
-        <div className="flex gap-2 items-center">
-          {/* Apply arrow — inverts to black when selected */}
+        <div className="flex gap-2 items-center w-full">
+          {/* 원형 Apply Preset 서클 버튼 - 일반: 블루원형/화이트아이콘, 블루모드: 화이트원형/블루아이콘 */}
           <button
             onClick={(e) => { e.stopPropagation(); onApply(template); }}
-            className="ios-card-icon-btn"
+            className={`w-8 h-8 rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition-all duration-200 shrink-0 shadow-sm ${
+              bodyIsDark 
+                ? 'bg-white text-[#0022FF] hover:bg-white/90' 
+                : 'bg-[#0022FF] text-white hover:bg-[#0022FF]/90'
+            }`}
             title="Apply preset"
-            style={{
-              backgroundColor: isSelected ? '#0022FF' : undefined,
-              color: isSelected ? '#FFFFFF' : undefined,
-              transition: 'background 0.2s, color 0.2s'
-            }}
           >
             <ArrowRight size={16} strokeWidth={2.5} />
           </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); onDelete(template.id); }}
-            className="ios-card-icon-btn"
-            title="Delete"
-          >
-            <Trash2 size={16} strokeWidth={2} />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); onRename(template.id, template.name); }}
-            className="ios-card-icon-btn"
-            title="Rename"
-          >
-            <Edit2 size={16} strokeWidth={2} />
-          </button>
+
+          {/* 보조 관리 버튼 그룹을 우측 끝으로 완벽 격리 */}
+          <div className="flex gap-2 items-center ml-auto">
+            <button
+              onClick={(e) => { e.stopPropagation(); onDelete(template.id); }}
+              className="ios-card-icon-btn"
+              title="Delete"
+            >
+              <Trash2 size={16} strokeWidth={2} />
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); onRename(template.id, template.name); }}
+              className="ios-card-icon-btn"
+              title="Rename"
+            >
+              <Edit2 size={16} strokeWidth={2} />
+            </button>
+          </div>
         </div>
       </div>
     </motion.div>
