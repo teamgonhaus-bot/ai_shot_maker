@@ -340,6 +340,49 @@ body.dark-mode .ios-smart-template-btn.active {
 }
 
 /* =============================================
+   APPLY PRESET STANDOUT BUTTON
+   ============================================= */
+.ios-apply-preset-btn {
+  width: 34px !important;
+  height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  
+  /* Light mode: Blue background, white icon */
+  background-color: #0022FF !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+}
+
+.ios-apply-preset-btn:hover {
+  background-color: #001ad4 !important; /* Slightly darker blue */
+}
+
+.ios-apply-preset-btn:active {
+  transform: scale(0.9) !important;
+}
+
+/* Dark mode (Blue mode): White background, blue icon */
+body.dark-mode .ios-apply-preset-btn {
+  background-color: #FFFFFF !important;
+  color: #0022FF !important;
+  border: none !important;
+}
+
+body.dark-mode .ios-apply-preset-btn:hover {
+  background-color: #e5e7eb !important; /* Slightly darker white/light gray */
+}
+
+body.dark-mode .ios-apply-preset-btn:active {
+  transform: scale(0.9) !important;
+}
+
+/* =============================================
    GENERATE BUTTON
    ============================================= */
 .generate-btn {
@@ -1952,7 +1995,7 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   margin: 16px 0 0 0 !important;
   padding: 0 !important;
   background: transparent !important;
-  gap: 4px !important;
+  gap: 0 !important; /* Touch adjacent borders seamlessly */
   position: relative !important;
   z-index: 2 !important;
 }
@@ -1976,6 +2019,11 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   border-bottom: none !important;
   z-index: 1 !important;
   margin-bottom: -1px !important; /* 아래 봉투와 밀착 결합 */
+  margin-right: -1px !important; /* Overlap right-borders to prevent double-border thickness */
+}
+
+.folder-tab:last-child {
+  margin-right: 0 !important; /* Last tab matches right boundary */
 }
 
 /* Active 탭: 솔리드 코발트 블루 배경 + 화이트 텍스트 + 돌출(z-index) */
@@ -1991,7 +2039,7 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
 .folder-content-envelope {
   background: #FFFFFF !important;
   border: 1px solid #0022FF !important;
-  border-radius: 0 16px 16px 16px !important;
+  border-radius: 0 0 16px 16px !important; /* Perfectly flat top corners to align with leftmost and rightmost tabs */
   padding: 20px !important;
   position: relative !important;
   z-index: 1 !important;

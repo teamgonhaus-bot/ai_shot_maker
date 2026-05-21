@@ -2063,8 +2063,9 @@ export default function App() {
               </div>
             </div>
 
-            {/* Category Tabs */}
-            <div className="folder-tabs-container">
+            {/* Category Tabs & Content Wrapper (eliminates space-y-6 top margin gap) */}
+            <div>
+              <div className="folder-tabs-container">
               <button className={`folder-tab ${activeCategory === 'subject' ? 'active' : ''}`} onClick={() => setActiveCategory('subject')}>인물</button>
               <button className={`folder-tab ${activeCategory === 'space' ? 'active' : ''}`} onClick={() => setActiveCategory('space')}>공간</button>
               <button className={`folder-tab ${activeCategory === 'camera' ? 'active' : ''}`} onClick={() => setActiveCategory('camera')}>카메라</button>
@@ -2430,6 +2431,7 @@ export default function App() {
                 </motion.section>
               )}
             </AnimatePresence>
+            </div>
           </motion.div>
         )}
 
@@ -2437,8 +2439,10 @@ export default function App() {
           <motion.div key="library" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6 relative pb-20">
             <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>Library</h2>
 
-            <div className="folder-tabs-container no-scrollbar" style={{ marginTop: '0', marginBottom: '16px', overflowX: 'auto', whiteSpace: 'nowrap', padding: '4px', gap: '4px' }}>
-              <button className={`folder-tab ${libraryFilter === '전체' ? 'active' : ''}`} style={{ padding: '8px 12px', flexShrink: 0, flex: 'none' }} onClick={() => setLibraryFilter('전체')}>전체</button>
+            {/* Library Tabs & Envelope Wrapper (eliminates space-y-6 top margin gap) */}
+            <div>
+              <div className="folder-tabs-container no-scrollbar" style={{ marginTop: '0', marginBottom: '0', overflowX: 'auto', whiteSpace: 'nowrap', padding: '0', gap: '0' }}>
+                <button className={`folder-tab ${libraryFilter === '전체' ? 'active' : ''}`} style={{ padding: '8px 12px', flexShrink: 0, flex: 'none' }} onClick={() => setLibraryFilter('전체')}>전체</button>
               {OPTIONS_DATA.spaceType.map(space => (
                 <button
                   key={space}
@@ -2451,36 +2455,39 @@ export default function App() {
               ))}
             </div>
 
-            <div className="ios-library-grid">
-              {(libraryFilter === '전체' ? savedTemplates : savedTemplates.filter(t => t.config?.spaceType === libraryFilter)).map(template => (
-                <TemplateCard
-                  key={template.id}
-                  template={template}
-                  isSelected={activeLibraryTemplateId === template.id}
-                  isDarkMode={isDarkMode}
-                  onSelect={handleSelectTemplate}
-                  onApply={(t) => {
-                    handleApplyTemplate(t);
-                  }}
-                  onDelete={(id) => {
-                    const target = savedTemplates.find(t => t.id === id);
-                    setDeleteTarget(target);
-                  }}
-                  onRename={(id, name) => {
-                    setRenameTarget({ id, name });
-                    setNewPresetName(name);
-                  }}
-                  onMoveRequest={(t) => setMoveTarget(t)}
-                  onViewPrompt={(t) => setPromptModalTarget(t)}
-                  categories={OPTIONS_DATA.spaceType}
-                />
-              ))}
-              {(libraryFilter === '전체' ? savedTemplates : savedTemplates.filter(t => t.config?.spaceType === libraryFilter)).length === 0 && (
-                <div className="col-span-2 text-center py-20 bg-white rounded-3xl ios-shadow">
-                  <LayoutTemplate className="w-12 h-12 text-gray-200 mb-4 mx-auto" />
-                  <p className="text-gray-400 font-bold m-0">No templates found</p>
-                </div>
-              )}
+            <div className="folder-content-envelope">
+              <div className="ios-library-grid">
+                {(libraryFilter === '전체' ? savedTemplates : savedTemplates.filter(t => t.config?.spaceType === libraryFilter)).map(template => (
+                  <TemplateCard
+                    key={template.id}
+                    template={template}
+                    isSelected={activeLibraryTemplateId === template.id}
+                    isDarkMode={isDarkMode}
+                    onSelect={handleSelectTemplate}
+                    onApply={(t) => {
+                      handleApplyTemplate(t);
+                    }}
+                    onDelete={(id) => {
+                      const target = savedTemplates.find(t => t.id === id);
+                      setDeleteTarget(target);
+                    }}
+                    onRename={(id, name) => {
+                      setRenameTarget({ id, name });
+                      setNewPresetName(name);
+                    }}
+                    onMoveRequest={(t) => setMoveTarget(t)}
+                    onViewPrompt={(t) => setPromptModalTarget(t)}
+                    categories={OPTIONS_DATA.spaceType}
+                  />
+                ))}
+                {(libraryFilter === '전체' ? savedTemplates : savedTemplates.filter(t => t.config?.spaceType === libraryFilter)).length === 0 && (
+                  <div className="col-span-2 text-center py-20 bg-white rounded-3xl ios-shadow">
+                    <LayoutTemplate className="w-12 h-12 text-gray-200 mb-4 mx-auto" />
+                    <p className="text-gray-400 font-bold m-0">No templates found</p>
+                  </div>
+                )}
+              </div>
+            </div>
             </div>
           </motion.div>
         )}
@@ -2622,8 +2629,8 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Action Area with Summary Panel */}
-      <div className="pt-4 pb-20">
+      {/* Action Area with Summary Panel - padded to separate from folder bottom border */}
+      <div className="pb-20" style={{ paddingTop: '48px' }}>
         <div className="ios-option-label mb-2 px-1">Current Option Summary</div>
         <div className="ios-summary-panel">
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center', alignContent: 'flex-start' }}>

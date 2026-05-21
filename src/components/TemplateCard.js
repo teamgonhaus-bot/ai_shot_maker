@@ -3,8 +3,6 @@ import { Trash2, FolderInput, Edit2, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function TemplateCard({ template, onSelect, onApply, onDelete, onRename, onMoveRequest, onViewPrompt, categories, isSelected, isDarkMode }) {
-  const bodyIsDark = isDarkMode !== undefined ? isDarkMode : (typeof document !== 'undefined' && document.body.classList.contains('dark-mode'));
-
   return (
     <motion.div
       layout
@@ -73,14 +71,10 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
 
       <div className="flex items-center justify-between pt-2 px-3 pb-2.5 border-t border-gray-100 mt-1">
         <div className="flex gap-2 items-center w-full">
-          {/* 원형 Apply Preset 서클 버튼 - 일반: 블루원형/화이트아이콘, 블루모드: 화이트원형/블루아이콘 */}
+          {/* 원형 Apply Preset 서클 버튼 - 옆의 다른 버튼과 동일 규격(34px), 일반: 블루원형/화이트아이콘, 블루모드: 화이트원형/블루아이콘 */}
           <button
             onClick={(e) => { e.stopPropagation(); onApply(template); }}
-            className={`w-8 h-8 rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition-all duration-200 shrink-0 shadow-sm ${
-              bodyIsDark 
-                ? 'bg-white text-[#0022FF] hover:bg-white/90' 
-                : 'bg-[#0022FF] text-white hover:bg-[#0022FF]/90'
-            }`}
+            className="ios-apply-preset-btn"
             title="Apply preset"
           >
             <ArrowRight size={16} strokeWidth={2.5} />
