@@ -200,6 +200,7 @@ export default function App() {
   const [smartUseSubject, setSmartUseSubject] = useState(false);
   const [removeText, setRemoveText] = useState(true);
   const [useCommercialNegative, setUseCommercialNegative] = useState(false);
+  const [useProduct, setUseProduct] = useState(true);
   const [generatedPrompt, setGeneratedPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [savedTemplates, setSavedTemplates] = useState([]);
@@ -855,6 +856,7 @@ export default function App() {
     });
     setUseDetailMaterial(template.useDetailMaterial || false);
     setRemoveText(template.removeText !== undefined ? template.removeText : true);
+    setUseProduct(!!(template.config && template.config.productName));
     setGeneratedPrompt(template.prompt);
     setActiveLibraryTemplateId(template.id);
     triggerToast("프롬프트가 적용되었습니다.");
@@ -879,12 +881,13 @@ export default function App() {
   const generatePrompt = () => {
     setIsGenerating(true);
     setTimeout(() => {
+      const activeProductName = useProduct ? config.productName : "";
       const parts = [];
       const isSolidBackground = (config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경') && config.subjectNum === '없음';
 
 
       if (isSolidBackground) {
-        const product = config.productName || 'product';
+        const product = activeProductName || 'product';
         const color = config.monochromeColor || 'Cobalt Blue';
 
         parts.push(`A floating ${product}, suspended diagonally in mid-air`);
@@ -913,7 +916,7 @@ export default function App() {
           parts.push("8k resolution, highly detailed, masterpiece, photorealistic");
         }
       } else {
-        let subjectStr = config.productName ? `a high-end ${config.productName}` : "a high-end masterpiece";
+        let subjectStr = activeProductName ? `a high-end ${activeProductName}` : "a high-end masterpiece";
 
         if (config.subjectNum !== "없음") {
           const traits = [];
@@ -965,8 +968,8 @@ export default function App() {
             parts.push("The person is naturally interacting with/holding the product in the attached image");
           }
         } else {
-          if (config.productName) {
-            parts.push(`a scene using ${config.productName}`);
+          if (activeProductName) {
+            parts.push(`a scene using ${activeProductName}`);
           } else {
             parts.push(`professional architectural photography of ${subjectStr}`);
           }
@@ -1019,7 +1022,7 @@ export default function App() {
       }
 
       // 1. 핵심 개체명 추출 및 정제
-      const productVar = config.productName ? config.productName.trim() : "";
+      const productVar = activeProductName ? activeProductName.trim() : "";
 
       // 2. 성공 프롬프트 삼총사 정의
       const successTriad = "professional architectural photography, clear unobstructed view, clean sharp edges";
@@ -2077,18 +2080,28 @@ export default function App() {
             <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>Mix</h2>
 
             {/* Product Name Input */}
-            <div className="ios-bento-card" style={{ padding: '16px 20px', marginBottom: '8px' }}>
-              <label className="ios-option-label" style={{ marginBottom: '8px' }}>대상 제품명 (Product Name)</label>
-              <div className="save-bar" style={{ padding: '4px 4px 4px 16px' }}>
-                <input
-                  type="text"
-                  placeholder="예: perfume bottle, wireless earbuds, luxury watch"
-                  value={config.productName}
-                  onChange={(e) => handleConfigChange('productName', e.target.value)}
-                  className="save-input"
-                  style={{ fontSize: '14px', fontWeight: '600' }}
-                />
+            <div className="ios-bento-card" style={{ padding: '12px 20px', marginBottom: '8px' }}>
+              <div className="flex items-center justify-between" style={{ marginBottom: useProduct ? '8px' : '0px' }}>
+                <label className="ios-option-label" style={{ margin: 0 }}>대상 제품명 (Product Name)</label>
+                <div 
+                  onClick={() => setUseProduct(!useProduct)}
+                  className={`ios-switch ${useProduct ? 'active' : 'inactive'}`}
+                >
+                  <div className="ios-switch-handle" />
+                </div>
               </div>
+              {useProduct && (
+                <div className="save-bar" style={{ padding: '4px 4px 4px 16px' }}>
+                  <input
+                    type="text"
+                    placeholder="예: perfume bottle, wireless earbuds, luxury watch"
+                    value={config.productName}
+                    onChange={(e) => handleConfigChange('productName', e.target.value)}
+                    className="save-input"
+                    style={{ fontSize: '14px', fontWeight: '600' }}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Category Tabs & Content Wrapper (eliminates space-y-6 top margin gap) */}
@@ -2644,12 +2657,9 @@ export default function App() {
             </div>
 
             {/* Quick tips Banner */}
-            <div className="ios-bento-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px', background: 'var(--card-bg)', border: '1px solid rgba(0,0,0,0.02)', margin: '0' }}>
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-yellow-100 dark:bg-yellow-950 text-yellow-500 flex-shrink-0">
-                <span className="text-sm font-black" style={{ transform: 'scale(1.2)' }}>💡</span>
-              </div>
+            <div className="ios-bento-card" style={{ padding: '12px 16px', background: 'var(--card-bg)', border: '1px solid rgba(0,0,0,0.02)', margin: '0' }}>
               <p className="text-[11px] text-gray-500 dark:text-zinc-400 font-semibold m-0 text-left leading-relaxed">
-                <strong className="text-gray-900 dark:text-white" style={{ fontWeight: 800 }}>Pro Tip</strong>: `Mix Mode`에서 제품의 특성에 어울리는 `Space(공간)` 및 `Camera(여백)`를 사전에 확보한 뒤 타 AI 이미지 생성 툴에 결합해 넣으면 압도적인 퀄리티의 고부가가치 상업 브로셔 샷을 손쉽게 얻을 수 있습니다.
+                <strong className="text-gray-900 dark:text-white" style={{ fontWeight: 800 }}>Tip</strong>: `Mix Mode`에서 적합한 공간과 여백을 확보한 뒤 타 AI 툴과 조합해 고품질 상업용 연출 샷을 쉽게 완성해 보세요.
               </p>
             </div>
 
@@ -2674,7 +2684,7 @@ export default function App() {
                   textColor: '#FFFFFF'
                 });
               }
-              if (config.productName) {
+              if (useProduct && config.productName) {
                 tags.push({
                   key: 'productNameTag',
                   val: `제품: ${config.productName}`,

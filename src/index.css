@@ -442,7 +442,8 @@ body.dark-mode .ios-apply-preset-btn:active {
   font-size: 14px !important;
   font-weight: 500 !important;
   color: #0022FF !important;
-  line-height: 1.65 !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.01em !important;
   margin: 0 !important;
   padding-right: 8px !important;
 }
@@ -1785,12 +1786,12 @@ body.dark-mode .mode-nav-btn.active {
 }
 
 .about-card {
-  padding: 24px !important;
+  padding: 16px !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
   text-align: left !important;
-  min-height: 180px !important;
+  min-height: 125px !important;
   justify-content: space-between !important;
   border-radius: 20px !important;
   cursor: pointer !important;
@@ -1853,6 +1854,14 @@ body.dark-mode .about-card-badge {
 
 body.dark-mode .about-card h3 {
   color: #FFFFFF !important;
+}
+
+.about-card p {
+  font-size: 9.5px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  width: 100% !important;
 }
 
 body.dark-mode .about-card p {
@@ -2091,4 +2100,54 @@ body.dark-mode .folder-content-envelope {
 /* Library grid tighter spacing inside envelope */
 body.dark-mode .folder-content-envelope .ios-library-grid {
   gap: 10px !important;
+}
+
+/* =============================================
+   LIBRARY CARD FOOTER & SIZING ADJUSTMENTS
+   ============================================= */
+.ios-template-card-footer {
+  border-top: 1px solid #F2F2F7 !important;
+  margin-top: 2px !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+
+body.dark-mode .ios-template-card-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.ios-library-grid .ios-card-icon-btn,
+.ios-library-grid .ios-apply-preset-btn {
+  width: 28px !important;
+  height: 28px !important;
+}
+
+/* =============================================
+   ABOUT CARD MOBILE RESPONSIVE
+   ============================================= */
+@media (max-width: 480px) {
+  .about-card {
+    padding: 12px !important;
+    min-height: 105px !important;
+  }
+  .about-card h3 {
+    font-size: 13px !important;
+  }
+  .about-card p {
+    font-size: 8.5px !important;
+  }
+  .icon-wrapper {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  .icon-wrapper svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  .about-card-badge {
+    font-size: 8px !important;
+    padding: 2px 6px !important;
+  }
 }
