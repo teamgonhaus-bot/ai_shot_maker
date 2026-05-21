@@ -26,7 +26,7 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
         </div>
       )}
       
-      <div className="flex-1 p-3 pb-1">
+      <div className="flex-1 p-3 pb-0">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: template.thumbnailColor || '#000' }} />
@@ -54,8 +54,8 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
 
         {/* Purpose Tag */}
         {template.config && (
-          <div className="mt-1">
-            <span className="inline-block px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 text-[9px] font-black tracking-wider rounded-full border border-gray-200 dark:border-zinc-700">
+          <div style={{ marginTop: '12px', marginBottom: '2px' }}>
+            <span className="inline-block px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 text-[10px] font-bold tracking-wider rounded-full border border-gray-200 dark:border-zinc-700">
               {(() => {
                 const c = template.config;
                 if (c.aspectRatio === '1:1 (Square)' && c.subjectNum === '없음') return 'Title';
@@ -69,7 +69,7 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
         )}
       </div>
 
-      <div className="flex items-center justify-between pt-2 px-3 pb-2.5 border-t border-gray-100 mt-1">
+      <div className="flex items-center justify-between pt-2 px-3 pb-2.5 border-t border-gray-100 mt-0">
         <div className="flex gap-2 items-center w-full">
           {/* 원형 Apply Preset 서클 버튼 - 옆의 다른 버튼과 동일 규격(34px), 일반: 블루원형/화이트아이콘, 블루모드: 화이트원형/블루아이콘 */}
           <button

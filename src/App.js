@@ -2074,7 +2074,7 @@ export default function App() {
 
             <AnimatePresence mode="wait">
               {activeCategory === 'subject' && (
-                <motion.section key="subject" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                <motion.section key="subject" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} style={{ position: 'relative', zIndex: 1 }}>
                   <div className="folder-content-envelope">
                     <OptionSelect label="인원" value={config.subjectNum} onChange={(v) => handleConfigChange('subjectNum', v)} options={OPTIONS_DATA.subjectNum} theme="red" />
                     {config.subjectNum !== "없음" && (
@@ -2156,7 +2156,7 @@ export default function App() {
               )}
 
               {activeCategory === 'space' && (
-                <motion.section key="space" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                <motion.section key="space" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} style={{ position: 'relative', zIndex: 1 }}>
                   <div className="folder-content-envelope">
                     <OptionSelect label="공간 종류" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} theme="green" />
                     <OptionSelect label="세부 공간" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} theme="green" />
@@ -2245,7 +2245,7 @@ export default function App() {
               )}
 
               {activeCategory === 'camera' && (
-                <motion.section key="camera" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                <motion.section key="camera" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} style={{ position: 'relative', zIndex: 1 }}>
                   <div className="folder-content-envelope">
                     <div className="mb-4 space-y-4">
                       <IOSToggle
@@ -2367,7 +2367,7 @@ export default function App() {
               )}
 
               {activeCategory === 'style' && (
-                <motion.section key="style" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                <motion.section key="style" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} style={{ position: 'relative', zIndex: 1 }}>
                   <div className="folder-content-envelope">
                     <OptionSelect
                       label="연출 샷 스타일 (다중 선택)"
@@ -2630,7 +2630,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* Action Area with Summary Panel - padded to separate from folder bottom border */}
-      <div className="pb-20" style={{ paddingTop: '48px' }}>
+      <div className="pb-20" style={{ paddingTop: '16px' }}>
         <div className="ios-option-label mb-2 px-1">Current Option Summary</div>
         <div className="ios-summary-panel">
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center', alignContent: 'flex-start' }}>

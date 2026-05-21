@@ -1997,7 +1997,17 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   background: transparent !important;
   gap: 0 !important; /* Touch adjacent borders seamlessly */
   position: relative !important;
-  z-index: 2 !important;
+  z-index: 5 !important; /* Higher than envelope body (z-index: 2) */
+  overflow-y: visible !important; /* Prevent bottom border clipping and vertical scrollbars */
+}
+
+/* Hides scrollbars but keeps horizontal swipe functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
 
 /* Individual File Folder Tab */
@@ -2016,9 +2026,9 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   background: #FFFFFF !important;
   color: #0022FF !important;
   border: 1px solid #0022FF !important;
-  border-bottom: none !important;
-  z-index: 1 !important;
-  margin-bottom: -1px !important; /* 아래 봉투와 밀착 결합 */
+  border-bottom: 1px solid #0022FF !important; /* Closed at bottom so inactive tabs are separate from envelope */
+  z-index: 3 !important; /* Above envelope (z-index: 2) to cleanly draw the bottom border line */
+  margin-bottom: -1px !important; /* Overlap seamlessly with envelope */
   margin-right: -1px !important; /* Overlap right-borders to prevent double-border thickness */
 }
 
@@ -2030,9 +2040,9 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
 .folder-tab.active {
   background: #0022FF !important;
   color: #FFFFFF !important;
-  z-index: 10 !important;
+  z-index: 10 !important; /* Highest priority to cover adjacent tabs and envelope border */
   border: 1px solid #0022FF !important;
-  border-bottom: 1px solid #0022FF !important;
+  border-bottom: none !important; /* Open at bottom so active tab merges into envelope */
 }
 
 /* 아래 서류 봉투 내부 컨테이너 */
@@ -2042,7 +2052,7 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   border-radius: 0 0 16px 16px !important; /* Perfectly flat top corners to align with leftmost and rightmost tabs */
   padding: 20px !important;
   position: relative !important;
-  z-index: 1 !important;
+  z-index: 2 !important; /* Lower than tabs so their bottom border sits on top */
   margin-top: 0 !important;
 }
 
@@ -2051,14 +2061,14 @@ body.dark-mode .folder-tab {
   background: #0022FF !important;
   color: #FFFFFF !important;
   border: 1px solid #FFFFFF !important;
-  border-bottom: none !important;
+  border-bottom: 1px solid #FFFFFF !important; /* Closed at bottom in dark mode */
 }
 
 body.dark-mode .folder-tab.active {
   background: #FFFFFF !important;
   color: #0022FF !important;
   border: 1px solid #FFFFFF !important;
-  border-bottom: 1px solid #FFFFFF !important;
+  border-bottom: none !important; /* Open at bottom in dark mode to merge */
 }
 
 body.dark-mode .folder-content-envelope {
