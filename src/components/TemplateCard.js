@@ -44,9 +44,9 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
           </button>
         </div>
         
-        {/* Prompt: true 4-line clamp with 8px font, no fixed height override */}
+        {/* Prompt: true 4-line clamp with 10px font */}
         <p style={{
-          fontSize: '8px',
+          fontSize: '10px',
           fontWeight: 500,
           color: '#9CA3AF',
           lineHeight: 1.5,
@@ -62,8 +62,8 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
 
         {/* Purpose Tag */}
         {template.config && (
-          <div style={{ marginTop: '6px', marginBottom: '0px' }}>
-            <span className="inline-block px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 text-[9px] font-bold tracking-wider rounded-full border border-gray-200 dark:border-zinc-700">
+          <div style={{ marginTop: '4px', marginBottom: '0px' }}>
+            <span className="inline-block px-1 py-0 bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 text-[9px] font-bold tracking-wider rounded-full border border-gray-200 dark:border-zinc-700">
               {(() => {
                 const c = template.config;
                 if (c.aspectRatio === '1:1 (Square)' && c.subjectNum === '없음') return 'Title';
@@ -77,7 +77,7 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
         )}
       </div>
 
-      <div className="flex items-center justify-between pt-1 px-2 pb-1.5 border-t border-gray-100 mt-1">
+      <div className="flex items-center justify-between pt-1 px-2 pb-1.5 border-t border-gray-100 mt-0.5">
         <div className="flex gap-2 items-center w-full">
           {/* 원형 Apply Preset 서클 버튼 - 옆의 다른 버튼과 동일 규격(34px), 일반: 블루원형/화이트아이콘, 블루모드: 화이트원형/블루아이콘 */}
           <button
