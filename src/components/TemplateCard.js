@@ -28,17 +28,17 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
       
       <div className="flex-1 p-1.5 pb-0">
         <div className="flex items-center justify-between mb-0.5">
-          <div className="flex items-center gap-1.5 min-w-0">
+          <div className="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
             <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: template.thumbnailColor || '#000' }} />
-            <h4 className="font-bold text-[13px] text-black truncate">
+            <h4 className="font-bold text-[13px] text-black truncate min-w-0">
               {template.name}
             </h4>
           </div>
           <button 
             onClick={(e) => { e.stopPropagation(); onMoveRequest(template); }}
-            className="ios-card-icon-btn"
+            className="ios-card-icon-btn flex-shrink-0 ml-1"
             title="Move to category"
-            style={{ width: '28px', height: '28px', flexShrink: 0 }}
+            style={{ width: '28px', height: '28px' }}
           >
             <FolderInput size={13} />
           </button>

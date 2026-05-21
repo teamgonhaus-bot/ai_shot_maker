@@ -1308,8 +1308,8 @@ export default function App() {
             <div className="ios-splash-title">
               SHOT MAKER
             </div>
-            <div className="ios-splash-version">
-              v0.51b | Swiss Minimalist
+            <div class="ios-splash-version">
+              v0.52c | Swiss Minimalist
             </div>
           </div>
         </div>
@@ -1769,7 +1769,7 @@ export default function App() {
                 {/* Generate API Section */}
                 <div style={{ paddingTop: '16px', marginTop: '0px' }}>
                   <label className="settings-prop-label">Generate API</label>
-                  <p className="settings-desc-text" style={{ marginBottom: '24px' }}>사용할 이미지 생성 AI 엔진을 선택하세요.</p>
+                  <p className="settings-desc-text" style={{ marginBottom: '36px' }}>사용할 이미지 생성 AI 엔진을 선택하세요.</p>
 
                   {/* Google Gemini Row */}
                   <div
@@ -2081,18 +2081,19 @@ export default function App() {
             <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>Mix</h2>
 
             {/* Product Name Input */}
-            <div className="ios-bento-card" style={{ padding: useProduct ? '8px 14px' : '6px 14px', marginBottom: '8px', borderRadius: useProduct ? '20px' : '9999px', transition: 'all 0.22s ease' }}>
-              <div className="flex items-center justify-between" style={{ marginBottom: useProduct ? '8px' : '0px' }}>
-                <label className="ios-option-label" style={{ margin: 0 }}>대상 제품명 (Product Name)</label>
+            <div className="ios-bento-card" style={{ padding: useProduct ? '10px 14px 10px' : '5px 14px', marginBottom: '8px', borderRadius: useProduct ? '20px' : '9999px', transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)' }}>
+              <div className="flex items-center justify-between" style={{ minHeight: '26px' }}>
+                <label className="ios-option-label" style={{ margin: 0, fontSize: useProduct ? undefined : '11px' }}>대상 제품명 (Product Name)</label>
                 <div 
                   onClick={() => setUseProduct(!useProduct)}
                   className={`ios-switch ${useProduct ? 'active' : 'inactive'}`}
+                  style={{ flexShrink: 0 }}
                 >
                   <div className="ios-switch-handle" />
                 </div>
               </div>
               {useProduct && (
-                <div className="save-bar" style={{ padding: '4px 4px 4px 16px' }}>
+                <div className="save-bar" style={{ padding: '4px 4px 4px 16px', marginTop: '8px' }}>
                   <input
                     type="text"
                     placeholder="예: perfume bottle, wireless earbuds, luxury watch"
@@ -2612,7 +2613,7 @@ export default function App() {
                   <span className="about-card-badge" style={{ backgroundColor: 'rgba(255, 149, 0, 0.08)', color: '#FF9500' }}>Auto</span>
                 </div>
                 <div style={{ marginTop: '16px' }}>
-                  <h3 className="text-[15px] font-black text-gray-900 dark:text-white m-0">Smart Mode</h3>
+                  <h3 className="font-black text-gray-900 dark:text-white m-0" style={{ fontSize: 'clamp(16px, 4vw, 20px)' }}>Smart Mode</h3>
                   <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">스마트 모드 자동화</p>
                 </div>
               </div>
@@ -2641,7 +2642,7 @@ export default function App() {
                   <span className="about-card-badge" style={{ backgroundColor: 'rgba(0, 122, 255, 0.08)', color: '#007AFF' }}>Master</span>
                 </div>
                 <div style={{ marginTop: '16px' }}>
-                  <h3 className="text-[15px] font-black text-gray-900 dark:text-white m-0">Mix Mode</h3>
+                  <h3 className="font-black text-gray-900 dark:text-white m-0" style={{ fontSize: 'clamp(16px, 4vw, 20px)' }}>Mix Mode</h3>
                   <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">속성 마스터 가이드</p>
                 </div>
               </div>
@@ -2668,7 +2669,7 @@ export default function App() {
                   <span className="about-card-badge" style={{ backgroundColor: 'rgba(175, 82, 222, 0.08)', color: '#AF52DE' }}>Save</span>
                 </div>
                 <div style={{ marginTop: '16px' }}>
-                  <h3 className="text-[15px] font-black text-gray-900 dark:text-white m-0">Library</h3>
+                  <h3 className="font-black text-gray-900 dark:text-white m-0" style={{ fontSize: 'clamp(16px, 4vw, 20px)' }}>Library</h3>
                   <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">커스텀 프리셋 사용</p>
                 </div>
               </div>
@@ -2695,7 +2696,7 @@ export default function App() {
                   <span className="about-card-badge" style={{ backgroundColor: 'rgba(52, 199, 89, 0.08)', color: '#34C759' }}>Quick</span>
                 </div>
                 <div style={{ marginTop: '16px' }}>
-                  <h3 className="text-[15px] font-black text-gray-900 dark:text-white m-0">Workflow</h3>
+                  <h3 className="font-black text-gray-900 dark:text-white m-0" style={{ fontSize: 'clamp(16px, 4vw, 20px)' }}>Workflow</h3>
                   <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">생성 및 복사 활용법</p>
                 </div>
               </div>
