@@ -1497,12 +1497,26 @@ export default function App() {
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }}
               className="settings-modal"
-              style={{ display: 'flex', flexDirection: 'column', maxHeight: '80vh', padding: '24px', borderRadius: '24px' }}
+              style={{
+                display: 'flex', flexDirection: 'column', maxHeight: '80vh', padding: '24px', borderRadius: '24px',
+                backgroundColor: isDarkMode ? '#0022FF' : '#FFFFFF',
+                border: isDarkMode ? '2px solid #FFFFFF' : '1px solid #E5E7EB',
+              }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-[20px] font-black text-black dark:text-white mb-4 tracking-tight text-center">Prompt Detail</h3>
-              <div className="flex-1 overflow-y-auto" style={{ padding: '16px', backgroundColor: '#F2F2F7', borderRadius: '16px', marginBottom: '20px' }}>
-                <p className="text-[13px] font-medium text-gray-600 leading-relaxed break-words m-0">
+              <h3 style={{ color: isDarkMode ? '#FFFFFF' : '#000000' }} className="text-[20px] font-black mb-4 tracking-tight text-center">Prompt Detail</h3>
+              <div className="flex-1 overflow-y-auto" style={{
+                padding: '16px',
+                backgroundColor: isDarkMode ? 'rgba(255,255,255,0.12)' : '#F2F2F7',
+                borderRadius: '16px',
+                marginBottom: '20px',
+                border: isDarkMode ? '1px solid rgba(255,255,255,0.3)' : 'none',
+              }}>
+                <p style={{
+                  fontSize: '13px', fontWeight: 500,
+                  color: isDarkMode ? '#FFFFFF' : '#4B5563',
+                  lineHeight: 1.7, margin: 0, wordBreak: 'break-word',
+                }}>
                   {promptModalTarget.prompt}
                 </p>
               </div>
@@ -1515,13 +1529,27 @@ export default function App() {
                     setTimeout(() => setPromptCopied(false), 2000);
                   }}
                   className="save-btn flex-1"
-                  style={{ backgroundColor: promptCopied ? '#34C759' : '#000', color: '#FFF', borderRadius: '9999px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', height: '48px', border: 'none', cursor: 'pointer', outline: 'none' }}
+                  style={{
+                    backgroundColor: promptCopied ? '#34C759' : (isDarkMode ? '#FFFFFF' : '#000000'),
+                    color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                    borderRadius: '9999px', display: 'flex', justifyContent: 'center', alignItems: 'center',
+                    gap: '8px', height: '48px', border: 'none', cursor: 'pointer', outline: 'none',
+                    fontWeight: 800,
+                  }}
                 >
                   {promptCopied ? <span className="font-black">✓ Copied</span> : <><Copy size={16} /> Copy Prompt</>}
                 </button>
                 <button
                   onClick={() => setPromptModalTarget(null)}
-                  style={{ width: '48px', height: '48px', padding: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%', backgroundColor: '#F2F2F7', border: 'none', cursor: 'pointer', color: '#000', flexShrink: 0, outline: 'none' }}
+                  style={{
+                    width: '48px', height: '48px', padding: 0, display: 'flex', justifyContent: 'center',
+                    alignItems: 'center', borderRadius: '50%',
+                    backgroundColor: isDarkMode ? 'rgba(255,255,255,0.2)' : '#F2F2F7',
+                    border: isDarkMode ? '1px solid rgba(255,255,255,0.4)' : 'none',
+                    cursor: 'pointer',
+                    color: isDarkMode ? '#FFFFFF' : '#000000',
+                    flexShrink: 0, outline: 'none',
+                  }}
                 >
                   <X size={20} strokeWidth={2.5} />
                 </button>

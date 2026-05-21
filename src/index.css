@@ -2062,7 +2062,7 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   background: #FFFFFF !important;
   border: 1px solid #0022FF !important;
   border-radius: 0 0 16px 16px !important; /* Perfectly flat top corners to align with leftmost and rightmost tabs */
-  padding: 20px !important;
+  padding: 12px !important;
   position: relative !important;
   z-index: 2 !important; /* Lower than tabs so their bottom border sits on top */
   margin-top: 0 !important;
@@ -2086,4 +2086,9 @@ body.dark-mode .folder-tab.active {
 body.dark-mode .folder-content-envelope {
   background: #0022FF !important;
   border: 1px solid #FFFFFF !important;
+}
+
+/* Library grid tighter spacing inside envelope */
+body.dark-mode .folder-content-envelope .ios-library-grid {
+  gap: 10px !important;
 }
