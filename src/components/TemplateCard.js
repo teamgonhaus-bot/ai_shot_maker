@@ -76,20 +76,24 @@ export default function TemplateCard({
           {template.prompt}
         </p>
 
-        {/* Action Buttons: Minimal Text-Only Underlined */}
-        <div className="flex items-center gap-3 mt-2 md:mt-0 flex-shrink-0 self-end">
+        {/* Action Buttons: Solid Swiss Block Style (Copied from spec sheet Copy tab specs) */}
+        <div className="flex flex-wrap items-center gap-4 mt-3 md:mt-0 flex-shrink-0 self-end w-full md:w-auto justify-end">
           <button
             onClick={(e) => {
               e.stopPropagation();
               onApply(template);
             }}
-            className="text-[10px] font-black tracking-wider hover:opacity-70 transition-opacity"
+            className="hover:opacity-90 active:scale-95 transition-all duration-200"
             style={{
-              color: isDarkMode ? '#FFFFFF' : '#0022FF',
-              borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
-              paddingBottom: '1px',
-              background: 'transparent',
+              backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+              color: isDarkMode ? '#0022FF' : '#FFFFFF',
               border: 'none',
+              borderRadius: '0px',
+              padding: '6px 14px',
+              fontSize: '10px',
+              fontWeight: '900',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
               cursor: 'pointer'
             }}
           >
@@ -101,13 +105,17 @@ export default function TemplateCard({
               e.stopPropagation();
               onMoveRequest(template);
             }}
-            className="text-[10px] font-black tracking-wider hover:opacity-70 transition-opacity"
+            className="hover:opacity-90 active:scale-95 transition-all duration-200"
             style={{
-              color: isDarkMode ? '#FFFFFF' : '#0022FF',
-              borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
-              paddingBottom: '1px',
-              background: 'transparent',
+              backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+              color: isDarkMode ? '#0022FF' : '#FFFFFF',
               border: 'none',
+              borderRadius: '0px',
+              padding: '6px 14px',
+              fontSize: '10px',
+              fontWeight: '900',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
               cursor: 'pointer'
             }}
           >
@@ -119,13 +127,17 @@ export default function TemplateCard({
               e.stopPropagation();
               onRename(template.id, template.name);
             }}
-            className="text-[10px] font-black tracking-wider hover:opacity-70 transition-opacity"
+            className="hover:opacity-90 active:scale-95 transition-all duration-200"
             style={{
-              color: isDarkMode ? '#FFFFFF' : '#0022FF',
-              borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
-              paddingBottom: '1px',
-              background: 'transparent',
+              backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+              color: isDarkMode ? '#0022FF' : '#FFFFFF',
               border: 'none',
+              borderRadius: '0px',
+              padding: '6px 14px',
+              fontSize: '10px',
+              fontWeight: '900',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
               cursor: 'pointer'
             }}
           >
@@ -137,13 +149,17 @@ export default function TemplateCard({
               e.stopPropagation();
               onDelete(template.id);
             }}
-            className="text-[10px] font-black tracking-wider hover:opacity-70 transition-opacity"
+            className="hover:opacity-90 active:scale-95 transition-all duration-200"
             style={{
-              color: '#FF3B30',
-              borderBottom: '1px solid #FF3B30',
-              paddingBottom: '1px',
-              background: 'transparent',
+              backgroundColor: '#FF3B30',
+              color: '#FFFFFF',
               border: 'none',
+              borderRadius: '0px',
+              padding: '6px 14px',
+              fontSize: '10px',
+              fontWeight: '900',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
               cursor: 'pointer'
             }}
           >

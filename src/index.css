@@ -593,34 +593,7 @@ body.dark-mode .ios-apply-preset-btn:active {
 /* =============================================
    SUMMARY PANEL
    ============================================= */
-.ios-summary-panel {
-  background-color: #FFFFFF !important;
-  border-radius: 20px !important;
-  padding: 16px 18px !important;
-  margin-bottom: 20px !important;
-  border: 1px solid #0022FF !important; /* 선명한 파란색 테두리 */
-}
 
-.ios-summary-tag {
-  display: inline-flex !important;
-  align-items: center !important;
-  font-size: 11px !important;
-  font-weight: 800 !important;
-  color: #0022FF !important; /* 라이트모드: 파란 글자 */
-  background-color: #FFFFFF !important; /* 라이트모드: 배경 흰색 */
-  border: 1px solid #0022FF !important; /* 라이트모드: 파란 테두리 */
-  padding: 5px 12px !important;
-  border-radius: 9999px !important;
-  box-shadow: none !important;
-  white-space: nowrap !important;
-  letter-spacing: -0.01em !important;
-}
-
-body.dark-mode .ios-summary-tag {
-  color: #FFFFFF !important; /* 블루모드: 흰 글자 */
-  background-color: #0022FF !important; /* 블루모드: 파란 배경 */
-  border: 1px solid #FFFFFF !important; /* 블루모드: 흰 테두리 */
-}
 
 /* =============================================
    TOGGLE SWITCH
@@ -1284,8 +1257,7 @@ body.dark-mode .text-zinc-300 {
 
 body.dark-mode .ios-pill,
 body.dark-mode .ios-card-icon-btn,
-body.dark-mode .save-bar,
-body.dark-mode .ios-summary-tag {
+body.dark-mode .save-bar {
   background-color: #0022FF !important;
   color: #FFFFFF !important;
   border-color: #FFFFFF !important;
@@ -2031,6 +2003,7 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   position: relative !important;
   z-index: 5 !important; /* Higher than envelope body (z-index: 2) */
   overflow-y: visible !important; /* Prevent bottom border clipping and vertical scrollbars */
+  border-bottom: 1px solid #0022FF !important;
   
   /* Prevent text dragging layout scrolling issues */
   user-select: none !important;
@@ -2064,7 +2037,7 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   background: #FFFFFF !important;
   color: #0022FF !important;
   border: 1px solid #0022FF !important;
-  border-bottom: none !important; /* 아래 봉투와 완벽히 겹치도록 기본적으로 bottom border를 지움 */
+  border-bottom: 1px solid #0022FF !important; /* 아래 봉투와 나뉘도록 기본적으로 bottom border를 보여줌 */
   z-index: 3 !important; /* Above envelope (z-index: 2) */
   margin-bottom: -1px !important; /* Overlap seamlessly with envelope */
   margin-right: -1px !important; /* Overlap right-borders to prevent double-border thickness */
@@ -2102,11 +2075,15 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
 }
 
 /* 🔵 블루모드 (body.dark-mode) 대응 반전 */
+body.dark-mode .folder-tabs-container {
+  border-bottom: 1px solid #FFFFFF !important;
+}
+
 body.dark-mode .folder-tab {
   background: #0022FF !important;
   color: #FFFFFF !important;
   border: 1px solid #FFFFFF !important;
-  border-bottom: none !important; /* Closed at bottom in dark mode */
+  border-bottom: 1px solid #FFFFFF !important; /* Closed at bottom in dark mode */
 }
 
 body.dark-mode .folder-tab.active {
@@ -2166,26 +2143,15 @@ body.dark-mode .ios-template-card-footer {
    ============================================= */
 @media (max-width: 480px) {
   .about-card {
-    padding: 12px !important;
-    min-height: 105px !important;
+    padding: 16px 0 !important;
+    min-height: 0 !important;
   }
   .about-card h3 {
-    font-size: 13px !important;
+    font-size: clamp(28px, 4.5vw, 42px) !important;
   }
   .about-card p {
-    font-size: 8.5px !important;
-  }
-  .icon-wrapper {
-    width: 28px !important;
-    height: 28px !important;
-  }
-  .icon-wrapper svg {
-    width: 16px !important;
-    height: 16px !important;
-  }
-  .about-card-badge {
-    font-size: 8px !important;
-    padding: 2px 6px !important;
+    font-size: 10.5px !important;
+    margin-top: 8px !important;
   }
 }
 
@@ -2314,7 +2280,6 @@ body.dark-mode .workspace-left {
 .ios-bento-card, 
 .ios-bento-card-compact, 
 .ios-bento-card-expanded,
-.folder-content-envelope,
 .about-card,
 .save-card {
   background-color: transparent !important;
@@ -2329,7 +2294,6 @@ body.dark-mode .workspace-left {
 body.dark-mode .ios-bento-card, 
 body.dark-mode .ios-bento-card-compact, 
 body.dark-mode .ios-bento-card-expanded,
-body.dark-mode .folder-content-envelope,
 body.dark-mode .about-card,
 body.dark-mode .save-card {
   border: none !important;
