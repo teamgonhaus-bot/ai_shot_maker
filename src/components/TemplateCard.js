@@ -78,7 +78,7 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
       </div>
 
       <div className="ios-template-card-footer flex items-center justify-between mt-0" style={{ paddingLeft: '6px', paddingRight: '6px' }}>
-        <div className="flex items-center w-full" style={{ gap: '12px' }}>
+        <div className="flex items-center w-full justify-start" style={{ gap: '8px' }}>
           {/* 원형 Apply Preset 서클 버튼 - 일반: 블루원형/화이트아이콘, 블루모드: 화이트원형/블루아이콘 */}
           <button
             onClick={(e) => { e.stopPropagation(); onApply(template); }}
@@ -88,23 +88,23 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
             <ArrowRight size={14} strokeWidth={2.5} />
           </button>
 
-          {/* 보조 관리 버튼 그룹을 우측 끝으로 완벽 격리 */}
-          <div className="flex items-center ml-auto" style={{ gap: '10px' }}>
-            <button
-              onClick={(e) => { e.stopPropagation(); onDelete(template.id); }}
-              className="ios-card-icon-btn"
-              title="Delete"
-            >
-              <Trash2 size={14} strokeWidth={2} />
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); onRename(template.id, template.name); }}
-              className="ios-card-icon-btn"
-              title="Rename"
-            >
-              <Edit2 size={14} strokeWidth={2} />
-            </button>
-          </div>
+          {/* Delete 버튼 */}
+          <button
+            onClick={(e) => { e.stopPropagation(); onDelete(template.id); }}
+            className="ios-card-icon-btn"
+            title="Delete"
+          >
+            <Trash2 size={14} strokeWidth={2} />
+          </button>
+
+          {/* Rename/Edit 버튼 */}
+          <button
+            onClick={(e) => { e.stopPropagation(); onRename(template.id, template.name); }}
+            className="ios-card-icon-btn"
+            title="Rename"
+          >
+            <Edit2 size={14} strokeWidth={2} />
+          </button>
         </div>
       </div>
     </motion.div>

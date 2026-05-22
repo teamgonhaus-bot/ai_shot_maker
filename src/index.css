@@ -2117,13 +2117,9 @@ body.dark-mode .folder-content-envelope .ios-library-grid {
 }
 
 /* Ensure bulletproof margins for library bento card footer buttons */
-.ios-template-card-footer .ml-auto {
+.ios-template-card-footer > div {
   display: flex !important;
-  gap: 10px !important;
-}
-
-.ios-template-card-footer .ios-card-icon-btn + .ios-card-icon-btn {
-  margin-left: 10px !important;
+  gap: 8px !important;
 }
 
 body.dark-mode .ios-template-card-footer {
