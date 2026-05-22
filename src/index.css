@@ -2122,8 +2122,8 @@ body.dark-mode .ios-template-card-footer {
 
 .ios-library-grid .ios-card-icon-btn,
 .ios-library-grid .ios-apply-preset-btn {
-  width: 28px !important;
-  height: 28px !important;
+  width: 32px !important;
+  height: 32px !important;
 }
 
 /* =============================================
@@ -2170,7 +2170,7 @@ body.dark-mode .ios-template-card-footer {
 /* Custom compact product name bento card */
 .ios-bento-card-compact {
   background-color: #FFFFFF !important;
-  border-radius: 9999px !important;
+  border-radius: 20px !important;
   padding: 4px 16px !important;
   box-shadow: none !important;
   border: 1px solid #0022FF !important;

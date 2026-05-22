@@ -78,7 +78,7 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
       </div>
 
       <div className="ios-template-card-footer flex items-center justify-between mt-0">
-        <div className="flex gap-2 items-center w-full">
+        <div className="flex gap-3.5 items-center w-full">
           {/* 원형 Apply Preset 서클 버튼 - 일반: 블루원형/화이트아이콘, 블루모드: 화이트원형/블루아이콘 */}
           <button
             onClick={(e) => { e.stopPropagation(); onApply(template); }}
@@ -89,7 +89,7 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
           </button>
 
           {/* 보조 관리 버튼 그룹을 우측 끝으로 완벽 격리 */}
-          <div className="flex gap-2 items-center ml-auto">
+          <div className="flex gap-3.5 items-center ml-auto">
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(template.id); }}
               className="ios-card-icon-btn"
