@@ -43,7 +43,15 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+@media (min-width: 1024px) {
+  .app-container {
+    max-width: 1200px;
+  }
+}
+
 
 /* =============================================
    HEADER
@@ -2226,4 +2234,61 @@ body.dark-mode .ios-bento-card-expanded {
 body.dark-mode .ios-product-label {
   color: #FFFFFF !important;
 }
+
+/* =============================================
+   v0.60 SWISS ADAPTIVE WORKSPACE GRID LAYOUT
+   ============================================= */
+.workspace-layout {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 32px !important;
+  width: 100% !important;
+  margin-top: 16px !important;
+}
+
+.workspace-left {
+  width: 100% !important;
+  border-bottom: 1.5px solid #0022FF !important;
+  padding-bottom: 32px !important;
+  box-sizing: border-box !important;
+}
+
+body.dark-mode .workspace-left {
+  border-bottom: 1.5px solid #FFFFFF !important;
+}
+
+.workspace-right {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Desktop Split-Pane Grid Configuration */
+@media (min-width: 1024px) {
+  .workspace-layout {
+    display: grid !important;
+    grid-template-columns: 6.2fr 3.8fr !important;
+    gap: 48px !important;
+    align-items: start !important;
+    flex-direction: row !important;
+  }
+
+  .workspace-left {
+    border-bottom: none !important;
+    border-right: 1.5px solid #0022FF !important;
+    padding-bottom: 0 !important;
+    padding-right: 48px !important;
+  }
+
+  body.dark-mode .workspace-left {
+    border-right: 1.5px solid #FFFFFF !important;
+    border-bottom: none !important;
+  }
+
+  .workspace-right {
+    position: sticky !important;
+    top: 24px !important;
+    align-self: start !important;
+  }
+}
+
 

@@ -11,7 +11,7 @@ import { signInAnonymously, signOut } from 'firebase/auth';
 // Modular Components
 import OptionSelect from './components/OptionSelect';
 import IOSToggle from './components/IOSToggle';
-import PromptOutput from './components/PromptOutput';
+import SwissSpecificationSheet from './components/SwissSpecificationSheet';
 import TemplateCard from './components/TemplateCard';
 
 /**
@@ -1317,8 +1317,8 @@ export default function App() {
             <div className="ios-splash-title">
               SHOT MAKER
             </div>
-            <div class="ios-splash-version">
-              v0.52d | Swiss Minimalist
+            <div className="ios-splash-version">
+              v0.60 | Swiss Adaptive Workspace
             </div>
           </div>
         </div>
@@ -1994,7 +1994,11 @@ export default function App() {
         </button>
       </div>
 
-      <AnimatePresence mode="wait">
+      {/* 🚀 Swiss Utilitarian Workspace Layout */}
+      <div className="workspace-layout">
+        {/* 💻 Left Column: Control Center */}
+        <div className="workspace-left">
+          <AnimatePresence mode="wait">
         {currentMode === 'smart' && (
           <motion.div key="smart" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-4">
 
@@ -2726,8 +2730,8 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Action Area with Summary Panel - padded to separate from folder bottom border */}
-      <div className="pb-20" style={{ paddingTop: '16px' }}>
+      {/* Action Area with Summary Panel - Left column bottom */}
+      <div style={{ paddingTop: '24px', paddingBottom: '32px' }}>
         <div className="ios-option-label mb-2 px-1">Current Option Summary</div>
         <div className="ios-summary-panel">
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center', alignContent: 'flex-start' }}>
@@ -2845,7 +2849,7 @@ export default function App() {
         </div>
 
         {/* Unified Button Container — flex-col with gap */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px' }}>
           <button
             onClick={generatePrompt}
             disabled={isGenerating}
@@ -2881,82 +2885,55 @@ export default function App() {
           )}
         </div>
 
-        {isImageGenerating && (
-          <div className="result-card" style={{ marginTop: '32px', minHeight: '300px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <div className="skeleton-pulse"></div>
-            <p style={{ color: '#8E8E93', fontSize: '12px', fontWeight: 600, zIndex: 1, position: 'relative' }}>
-              {selectedApi === 'google' ? 'Generating with Gemini...' : 'Generating with FLUX.1...'}
-            </p>
+        {/* Save Preset Card - integrated into Left Column */}
+        {generatedPrompt && (
+          <div className="save-card" style={{ marginTop: '24px' }}>
+            <div className="ios-option-label mb-3">Save Preset</div>
+            <div className="save-bar">
+              <input
+                type="text"
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                placeholder="Preset name..."
+                className="save-input"
+              />
+              <button
+                onClick={handleSaveTemplate}
+                disabled={isSaving}
+                className={`save-btn ${isSaved ? 'saved' : ''}`}
+              >
+                {isSaving ? '저장 중...' : isSaved ? 'Complete ✓' : 'Save'}
+              </button>
+            </div>
           </div>
-        )}
-
-        {!isImageGenerating && generatedPrompt && (
-          <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} className="mt-12 space-y-8">
-
-            <div className="flex flex-col items-center mb-[-16px]">
-              <div className="w-8 h-1 bg-black dark:bg-white rounded-full mt-1 opacity-10"></div>
-            </div>
-
-            {generatedImage ? (
-              <div className="image-result-card relative group">
-                <img
-                  src={generatedImage}
-                  alt="Generated"
-                  className="w-full h-auto cursor-zoom-in"
-                  onClick={() => setLightboxImage(generatedImage)}
-                />
-
-                {/* Prompt tooltip on hover */}
-                <div className="image-prompt-tooltip">
-                  <p>{generatedPrompt.length > 120 ? generatedPrompt.slice(0, 120) + '...' : generatedPrompt}</p>
-                </div>
-
-                {isUpscaling && (
-                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', color: 'white', fontWeight: 'bold', letterSpacing: '0.1em', zIndex: 10 }}>
-                    UPSCALING...
-                  </div>
-                )}
-
-                <div style={{ position: 'absolute', bottom: '16px', right: '16px', display: 'flex', gap: '8px', zIndex: 20 }}>
-                  <button onClick={simulateUpscale} className="ios-pill" style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', backdropFilter: 'blur(10px)' }}>
-                    2x Upscale
-                  </button>
-                  <button onClick={handleDownload} className="ios-pill" style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', backdropFilter: 'blur(10px)' }}>
-                    Download
-                  </button>
-                </div>
-              </div>
-            ) : null}
-
-            <PromptOutput prompt={generatedPrompt} />
-
-            <div className="save-card">
-              <div className="ios-option-label mb-3">Save Preset</div>
-              <div className="save-bar">
-                <input
-                  type="text"
-                  value={templateName}
-                  onChange={(e) => setTemplateName(e.target.value)}
-                  placeholder="Preset name..."
-                  className="save-input"
-                />
-                <button
-                  onClick={handleSaveTemplate}
-                  disabled={isSaving}
-                  className={`save-btn ${isSaved ? 'saved' : ''}`}
-                >
-                  {isSaving ? '저장 중...' : isSaved ? 'Complete ✓' : 'Save'}
-                </button>
-              </div>
-            </div>
-          </motion.div>
         )}
       </div>
 
-      <footer className="ios-footer">
-        v0.52d | Developed by Gony
-      </footer>
-      <div className="h-12"></div>
+      </div>
+
+      {/* 📊 Right Column: Sticky Swiss Specification Sheet */}
+      <div className="workspace-right">
+        <SwissSpecificationSheet 
+          prompt={generatedPrompt}
+          image={generatedImage}
+          isImageGenerating={isImageGenerating}
+          config={config}
+          activeTemplate={activeTemplate}
+          useProduct={useProduct}
+          isDarkMode={isDarkMode}
+          selectedApi={selectedApi}
+          simulateUpscale={simulateUpscale}
+          handleDownload={handleDownload}
+          isUpscaling={isUpscaling}
+          setLightboxImage={setLightboxImage}
+        />
+      </div>
+    </div>
+
+    <footer className="ios-footer">
+      v0.60 | Swiss Adaptive Workspace
+    </footer>
+    <div className="h-12"></div>
     </div>
   );
 }
