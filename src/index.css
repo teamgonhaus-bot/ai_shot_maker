@@ -1203,14 +1203,20 @@ body.dark-mode {
   color: #FFFFFF !important;
 }
 
-/* 블루모드에서 테두리를 유지해야 하는 요소 (라이트모드에서 테두리가 있던 요소들) */
+/* 블루모드에서 불필요한 사각형 보더라인 제거 및 가로선 마감 */
 body.dark-mode .ios-bento-card,
-body.dark-mode .result-card,
 body.dark-mode .save-card,
 body.dark-mode .ios-summary-panel {
-  background-color: #0022FF !important;
+  background-color: transparent !important;
   box-shadow: none !important;
-  border: 1px solid #FFFFFF !important;
+  border: none !important;
+  border-bottom: 1.5px solid #FFFFFF !important;
+}
+
+body.dark-mode .result-card {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: 1px solid #FFFFFF !important; /* 결과물 스펙 시트 카드는 예외적으로 전체 테두리 유지 */
 }
 
 /* 블루모드에서 테두리가 없어야 하는 요소 (라이트모드에서 테두리가 없었던 요소들, 강제 테두리 씌우기 금지!) */
@@ -1791,33 +1797,35 @@ body.dark-mode .mode-nav-btn.active {
    ABOUT MODE (WORKFLOW GUIDE)
    ============================================= */
 .about-grid {
-  display: grid !important;
-  grid-template-columns: repeat(2, 1fr) !important;
-  gap: 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0px !important;
   margin-bottom: 24px !important;
 }
 
 @media (max-width: 768px) {
   .about-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    flex-direction: column !important;
+    gap: 0px !important;
   }
 }
 
 .about-card {
-  padding: 16px !important;
+  padding: 20px 4px !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
   text-align: left !important;
-  min-height: 125px !important;
-  justify-content: space-between !important;
-  border-radius: 20px !important;
+  min-height: 0 !important;
+  justify-content: flex-start !important;
+  border-radius: 0px !important;
   cursor: pointer !important;
   transition: all 0.2s ease !important;
   position: relative !important;
-  overflow: hidden !important;
-  background: #FFFFFF !important;
-  border: 1px solid #0022FF !important;
+  overflow: visible !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid #0022FF !important;
   box-shadow: none !important;
 }
 
@@ -1826,24 +1834,22 @@ body.dark-mode .mode-nav-btn.active {
 }
 
 .about-card:hover {
-  transform: translateY(-3px) !important;
-  border-width: 2px !important;
+  background-color: rgba(0, 34, 255, 0.04) !important;
 }
 
 .about-card:active {
-  transform: translateY(0) scale(0.98) !important;
+  transform: scale(0.99) !important;
 }
 
 .about-card-badge {
   font-size: 10px !important;
-  font-weight: 800 !important;
-  padding: 3px 8px !important;
-  border-radius: 9999px !important;
+  font-weight: 900 !important;
+  padding: 0 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
+  letter-spacing: 0.08em !important;
   background: transparent !important;
-  border: 1px solid #0022FF !important;
-  color: #0022FF !important;
+  border: none !important;
+  color: #FF9500 !important; /* Specific color tag */
 }
 
 /* Light mode specific about-card backgrounds */
@@ -1851,8 +1857,9 @@ body.dark-mode .mode-nav-btn.active {
 .about-card.mix-mode,
 .about-card.workflow,
 .about-card.library {
-  background: #FFFFFF !important;
-  border: 1px solid #0022FF !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid #0022FF !important;
 }
 
 /* Dark mode (Blue Mode) specific about-cards */
@@ -1861,13 +1868,14 @@ body.dark-mode .about-card.smart-mode,
 body.dark-mode .about-card.mix-mode,
 body.dark-mode .about-card.workflow,
 body.dark-mode .about-card.library {
-  background: #0022FF !important;
-  border: 1px solid #FFFFFF !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid #FFFFFF !important;
 }
 
 body.dark-mode .about-card-badge {
-  border: 1px solid #FFFFFF !important;
-  color: #FFFFFF !important;
+  border: none !important;
+  color: #FF9500 !important;
 }
 
 body.dark-mode .about-card h3 {
@@ -1875,30 +1883,27 @@ body.dark-mode .about-card h3 {
 }
 
 .about-card p {
-  font-size: 9.5px !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  font-size: 11px !important;
+  line-height: 1.6 !important;
+  font-weight: 500 !important;
+  color: #48484A !important;
+  margin: 10px 0 0 0 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
   width: 100% !important;
 }
 
 body.dark-mode .about-card p {
-  color: #FFFFFFB3 !important;
+  color: #E5E5EA !important;
 }
 
 .icon-wrapper {
-  width: 36px !important;
-  height: 36px !important;
-  border-radius: 12px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background: transparent !important;
-  color: #0022FF !important;
+  display: none !important;
 }
 
 body.dark-mode .icon-wrapper {
-  color: #FFFFFF !important;
+  display: none !important;
 }
 
 body.dark-mode .about-card .text-gray-900 {
@@ -2046,7 +2051,7 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
 /* Individual File Folder Tab */
 .folder-tab {
   flex: 1 !important;
-  padding: 10px 4px !important;
+  padding: 10px 4px 11px 4px !important;
   border-radius: 8px 8px 0 0 !important;
   font-size: 13px !important;
   font-weight: 900 !important;
@@ -2059,8 +2064,8 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   background: #FFFFFF !important;
   color: #0022FF !important;
   border: 1px solid #0022FF !important;
-  border-bottom: 1px solid #0022FF !important; /* Closed at bottom so inactive tabs are separate from envelope */
-  z-index: 3 !important; /* Above envelope (z-index: 2) to cleanly draw the bottom border line */
+  border-bottom: none !important; /* 아래 봉투와 완벽히 겹치도록 기본적으로 bottom border를 지움 */
+  z-index: 3 !important; /* Above envelope (z-index: 2) */
   margin-bottom: -1px !important; /* Overlap seamlessly with envelope */
   margin-right: -1px !important; /* Overlap right-borders to prevent double-border thickness */
   
@@ -2081,7 +2086,8 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   color: #FFFFFF !important;
   z-index: 10 !important; /* Highest priority to cover adjacent tabs and envelope border */
   border: 1px solid #0022FF !important;
-  border-bottom: none !important; /* Open at bottom so active tab merges into envelope */
+  border-bottom: 1px solid transparent !important; /* 아래 가로선과 완벽하게 겹쳐서 만나게 조정 */
+  margin-bottom: -1px !important;
 }
 
 /* 아래 서류 봉투 내부 컨테이너 */
@@ -2100,14 +2106,15 @@ body.dark-mode .folder-tab {
   background: #0022FF !important;
   color: #FFFFFF !important;
   border: 1px solid #FFFFFF !important;
-  border-bottom: 1px solid #FFFFFF !important; /* Closed at bottom in dark mode */
+  border-bottom: none !important; /* Closed at bottom in dark mode */
 }
 
 body.dark-mode .folder-tab.active {
   background: #FFFFFF !important;
   color: #0022FF !important;
   border: 1px solid #FFFFFF !important;
-  border-bottom: none !important; /* Open at bottom in dark mode to merge */
+  border-bottom: 1px solid transparent !important; /* Meets and merges in dark mode */
+  margin-bottom: -1px !important;
 }
 
 body.dark-mode .folder-content-envelope {
@@ -2325,6 +2332,7 @@ body.dark-mode .ios-bento-card-expanded,
 body.dark-mode .folder-content-envelope,
 body.dark-mode .about-card,
 body.dark-mode .save-card {
+  border: none !important;
   border-bottom: 1.5px solid #FFFFFF !important;
 }
 
@@ -2533,40 +2541,7 @@ body.dark-mode .ios-switch.active {
   background: #FFFFFF !important;
 }
 
-/* Clean folder tabs line */
-.folder-tabs-container {
-  display: flex !important;
-  gap: 16px !important;
-  border-bottom: 1px solid #0022FF !important;
-  padding-bottom: 4px !important;
-  margin-bottom: 16px !important;
-}
 
-body.dark-mode .folder-tabs-container {
-  border-bottom: 1px solid #FFFFFF !important;
-}
-
-.folder-tab {
-  background: transparent !important;
-  border: none !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  color: #8E8E93 !important;
-  cursor: pointer !important;
-  padding: 8px 0 !important;
-  border-bottom: 2px solid transparent !important;
-}
-
-.folder-tab.active {
-  color: #0022FF !important;
-  font-weight: 900 !important;
-  border-bottom: 2px solid #0022FF !important;
-}
-
-body.dark-mode .folder-tab.active {
-  color: #FFFFFF !important;
-  border-bottom: 2px solid #FFFFFF !important;
-}
 
 
 

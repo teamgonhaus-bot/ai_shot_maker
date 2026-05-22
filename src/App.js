@@ -2642,16 +2642,22 @@ export default function App() {
               <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>About</h2>
             </div>
 
-             {/* 3 Bento Cards with beautiful icons */}
-            <div className="about-grid">
+            {/* 4 Swiss Spec list rows with huge bold titles */}
+            <div className="about-grid" style={{ display: 'flex', flexDirection: 'column', gap: '0px' }}>
 
               {/* Card 1: Smart Mode */}
               <div
                 className="about-card smart-mode"
+                style={{
+                  padding: '24px 0',
+                  borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
+                  cursor: 'pointer',
+                  backgroundColor: 'transparent'
+                }}
                 onClick={() => setAboutModalTarget({
                   title: 'Smart Mode',
                   subtitle: '스마트 모드 자동화',
-                  color: '#FF9500',
+                  color: '#0022FF',
                   icon: 'smart',
                   content: [
                     { label: '빠른 프리셋 적용', text: '복잡한 설정 없이 원하는 씬(Scene) 템플릿을 선택하면 최적의 조명, 샷 스타일, 공간이 자동으로 세팅됩니다.' },
@@ -2660,25 +2666,44 @@ export default function App() {
                   footer: 'Tip : 스마트 모드 선택 후 믹스모드 수정 후 저장 및 커스터마이징 활용'
                 })}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                  <div className="icon-wrapper" style={{ backgroundColor: 'rgba(255, 149, 0, 0.12)', color: '#FF9500' }}>
-                    <Zap className="w-5 h-5" />
-                  </div>
-                  <span className="about-card-badge" style={{ backgroundColor: 'rgba(255, 149, 0, 0.08)', color: '#FF9500' }}>Auto</span>
-                </div>
-                <div style={{ marginTop: '16px' }}>
-                  <h3 className="font-black text-gray-900 dark:text-white m-0" style={{ fontSize: 'clamp(20px, 5vw, 24px)' }}>Smart Mode</h3>
-                  <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">스마트 모드 자동화</p>
-                </div>
+                <h3 
+                  className="font-[900] tracking-tighter uppercase m-0"
+                  style={{ 
+                    color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                    fontSize: 'clamp(28px, 4.5vw, 42px)',
+                    lineHeight: '1.0'
+                  }}
+                >
+                  01 / Smart Mode
+                </h3>
+                <p 
+                  className="font-sans m-0 text-justify"
+                  style={{ 
+                    color: isDarkMode ? '#E5E5EA' : '#48484A',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    lineHeight: '1.6',
+                    marginTop: '12px',
+                    maxWidth: '800px'
+                  }}
+                >
+                  복잡한 설정 없이 원하는 씬(Scene) 템플릿을 선택하여 최적의 조명, 샷 스타일, 배경을 즉각 완성하는 자동화 환경입니다.
+                </p>
               </div>
 
               {/* Card 2: Mix Mode */}
               <div
                 className="about-card mix-mode"
+                style={{
+                  padding: '24px 0',
+                  borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
+                  cursor: 'pointer',
+                  backgroundColor: 'transparent'
+                }}
                 onClick={() => setAboutModalTarget({
                   title: 'Professional Mix Mode',
                   subtitle: '믹스 모드 핵심 마스터',
-                  color: '#007AFF',
+                  color: '#0022FF',
                   icon: 'sliders',
                   content: [
                     { label: '인물 (Person)', text: '모델의 연령, 국적, 스타일, 파지/사용 행동을 정의합니다. 제품 위주 촬영 시 토글을 끄면 인물이 프롬프트에서 완전히 배제됩니다.' },
@@ -2689,25 +2714,44 @@ export default function App() {
                   footer: 'Mix Mode는 상업용 비주얼의 모든 요소를 사용자가 완벽하게 통제하는 프로페셔널 워크스테이션입니다. 4대 속성 탭을 유기적으로 조합해 보세요.'
                 })}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                  <div className="icon-wrapper" style={{ backgroundColor: 'rgba(0, 122, 255, 0.12)', color: '#007AFF' }}>
-                    <Sliders className="w-5 h-5" />
-                  </div>
-                  <span className="about-card-badge" style={{ backgroundColor: 'rgba(0, 122, 255, 0.08)', color: '#007AFF' }}>Master</span>
-                </div>
-                <div style={{ marginTop: '16px' }}>
-                  <h3 className="font-black text-gray-900 dark:text-white m-0" style={{ fontSize: 'clamp(20px, 5vw, 24px)' }}>Mix Mode</h3>
-                  <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">속성 마스터 가이드</p>
-                </div>
+                <h3 
+                  className="font-[900] tracking-tighter uppercase m-0"
+                  style={{ 
+                    color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                    fontSize: 'clamp(28px, 4.5vw, 42px)',
+                    lineHeight: '1.0'
+                  }}
+                >
+                  02 / Mix Mode
+                </h3>
+                <p 
+                  className="font-sans m-0 text-justify"
+                  style={{ 
+                    color: isDarkMode ? '#E5E5EA' : '#48484A',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    lineHeight: '1.6',
+                    marginTop: '12px',
+                    maxWidth: '800px'
+                  }}
+                >
+                  인물, 공간배경, 카메라 앵글, 조명 및 상업용 룩앤필 등 모든 변수를 사용자가 완전하게 컨트롤하는 프로페셔널 모드입니다.
+                </p>
               </div>
 
               {/* Card 3: Library */}
               <div
                 className="about-card library"
+                style={{
+                  padding: '24px 0',
+                  borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
+                  cursor: 'pointer',
+                  backgroundColor: 'transparent'
+                }}
                 onClick={() => setAboutModalTarget({
                   title: 'Library Management',
                   subtitle: '라이브러리 저장 및 이용',
-                  color: '#AF52DE',
+                  color: '#0022FF',
                   icon: 'library',
                   content: [
                     { label: '프리셋 저장', text: '현재 내가 조합한 최고의 옵션 세트를 보관하고 싶다면 결과창 근처의 SAVE TO LIBRARY 버튼을 누르세요. 나만의 상업용 프리셋 창고에 고유한 이름으로 저장됩니다.' },
@@ -2716,25 +2760,44 @@ export default function App() {
                   footer: '저장된 최고 효율 프리셋들을 빠르게 스위칭하고 데이터 유실 걱정 없이 안전하게 보관하세요.'
                 })}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                  <div className="icon-wrapper" style={{ backgroundColor: 'rgba(175, 82, 222, 0.12)', color: '#AF52DE' }}>
-                    <LayoutTemplate className="w-5 h-5" />
-                  </div>
-                  <span className="about-card-badge" style={{ backgroundColor: 'rgba(175, 82, 222, 0.08)', color: '#AF52DE' }}>Save</span>
-                </div>
-                <div style={{ marginTop: '16px' }}>
-                  <h3 className="font-black text-gray-900 dark:text-white m-0" style={{ fontSize: 'clamp(20px, 5vw, 24px)' }}>Library</h3>
-                  <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">커스텀 프리셋 사용</p>
-                </div>
+                <h3 
+                  className="font-[900] tracking-tighter uppercase m-0"
+                  style={{ 
+                    color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                    fontSize: 'clamp(28px, 4.5vw, 42px)',
+                    lineHeight: '1.0'
+                  }}
+                >
+                  03 / Library
+                </h3>
+                <p 
+                  className="font-sans m-0 text-justify"
+                  style={{ 
+                    color: isDarkMode ? '#E5E5EA' : '#48484A',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    lineHeight: '1.6',
+                    marginTop: '12px',
+                    maxWidth: '800px'
+                  }}
+                >
+                  생성 완료한 프롬프트 옵션 조합을 전용 창고에 안전하게 보관하고, 필요할 때 즉시 스위칭하여 재사용할 수 있는 보관소입니다.
+                </p>
               </div>
 
               {/* Card 4: Workflow */}
               <div
                 className="about-card workflow"
+                style={{
+                  padding: '24px 0',
+                  borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
+                  cursor: 'pointer',
+                  backgroundColor: 'transparent'
+                }}
                 onClick={() => setAboutModalTarget({
                   title: 'Workflow',
                   subtitle: '생성 및 복사 활용법',
-                  color: '#34C759',
+                  color: '#0022FF',
                   icon: 'wand',
                   content: [
                     { label: '프롬프트 완성', text: '스마트 모드나 믹스 모드의 다양한 옵션들을 자유롭게 조합하여 원하는 연출 방향을 설정할 수 있습니다. 설정 완료 후 Generate Prompt 버튼을 누르면 이미지 생성용 고화질 프롬프트가 즉시 생성됩니다.' },
@@ -2743,24 +2806,37 @@ export default function App() {
                   footer: 'Shot Maker의 초고성능 결합 엔진을 통해 완벽한 상업용 지시어 문장을 즉시 생성할 수 있습니다.'
                 })}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                  <div className="icon-wrapper" style={{ backgroundColor: 'rgba(52, 199, 89, 0.12)', color: '#34C759' }}>
-                    <Wand2 className="w-5 h-5" />
-                  </div>
-                  <span className="about-card-badge" style={{ backgroundColor: 'rgba(52, 199, 89, 0.08)', color: '#34C759' }}>Quick</span>
-                </div>
-                <div style={{ marginTop: '16px' }}>
-                  <h3 className="font-black text-gray-900 dark:text-white m-0" style={{ fontSize: 'clamp(20px, 5vw, 24px)' }}>Workflow</h3>
-                  <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">생성 및 복사 활용법</p>
-                </div>
+                <h3 
+                  className="font-[900] tracking-tighter uppercase m-0"
+                  style={{ 
+                    color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                    fontSize: 'clamp(28px, 4.5vw, 42px)',
+                    lineHeight: '1.0'
+                  }}
+                >
+                  04 / Workflow
+                </h3>
+                <p 
+                  className="font-sans m-0 text-justify"
+                  style={{ 
+                    color: isDarkMode ? '#E5E5EA' : '#48484A',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    lineHeight: '1.6',
+                    marginTop: '12px',
+                    maxWidth: '800px'
+                  }}
+                >
+                  정교하게 추출된 최종 고성능 상업용 프롬프트를 복사하여 Gemini, ChatGPT, Midjourney 등 다양한 외부 AI로 제품 컷을 최종 빌드하는 작업 순서입니다.
+                </p>
               </div>
 
             </div>
 
             {/* Quick tips Banner */}
-            <div className="ios-bento-card" style={{ padding: '12px 16px', background: 'var(--card-bg)', border: '1px solid rgba(0,0,0,0.02)', margin: '0' }}>
+            <div className="ios-bento-card" style={{ padding: '12px 16px', background: 'transparent', border: 'none', borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF', margin: '0', borderRadius: '0' }}>
               <p className="text-[11px] text-gray-500 dark:text-zinc-400 font-semibold m-0 text-left leading-relaxed">
-                <strong className="text-gray-900 dark:text-white" style={{ fontWeight: 800 }}>Tip</strong>: `Mix Mode`에서 적합한 공간과 여백을 확보한 뒤 타 AI 툴과 조합해 고품질 상업용 연출 샷을 쉽게 완성해 보세요.
+                <strong style={{ fontWeight: 900, color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>Tip</strong>: `Mix Mode`에서 적합한 공간과 여백을 확보한 뒤 타 AI 툴과 조합해 고품질 상업용 연출 샷을 쉽게 완성해 보세요.
               </p>
             </div>
 
