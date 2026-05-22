@@ -1243,7 +1243,7 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.63 | Ultimate Swiss Workspace
+              v0.63a | Lower Layout Optimized
             </div>
           </div>
         </div>
@@ -2894,20 +2894,21 @@ export default function App() {
         {/* ⚡ Swiss Status Bar at the bottom of Left Column */}
         <div 
           style={{
-            marginTop: '48px',
-            borderTop: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
-            paddingTop: '20px',
+            marginTop: 'auto',
+            paddingTop: '16px',
+            paddingBottom: '16px',
+            borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
             textAlign: 'left'
           }}
         >
           <div 
             style={{
-              fontSize: 'clamp(28px, 4.5vw, 42px)',
+              fontSize: 'clamp(24px, 3.5vw, 28px)',
               fontWeight: 900,
               color: isDarkMode ? '#FFFFFF' : '#0022FF',
               fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
               letterSpacing: '-0.07em',
-              lineHeight: 0.9,
+              lineHeight: 1.0,
               textTransform: 'uppercase'
             }}
           >
@@ -2937,7 +2938,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.63 | Ultimate Swiss Workspace
+      v0.63a | Lower Layout Optimized
     </footer>
     <div className="h-12"></div>
     </div>

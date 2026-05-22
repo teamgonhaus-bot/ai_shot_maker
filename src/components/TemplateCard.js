@@ -28,36 +28,30 @@ export default function TemplateCard({
         isSelected ? 'bg-blue-50/40 dark:bg-zinc-800/40' : 'hover:bg-gray-50/50 dark:hover:bg-zinc-800/20'
       }`}
       style={{
-        borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #0022FF',
-        padding: '16px 8px',
+        borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+        padding: '12px 8px',
       }}
     >
       {/* Line 1: Split Justification (Preset name is massive bold blue like right spec sheet) */}
-      <div className="flex justify-between items-end" style={{ marginBottom: '14px' }}>
-        <div className="flex flex-col items-start gap-1">
-          <span 
-            className="text-[12px] font-sans font-black tracking-wider" 
-            style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF', opacity: 0.6 }}
-          >
-            {formattedIndex}
-          </span>
+      <div className="flex justify-between items-end" style={{ marginBottom: '8px', width: '100%' }}>
+        <div className="flex items-baseline gap-2 text-left">
           <span 
             className="text-[28px] font-sans font-black tracking-tighter uppercase" 
             style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF', lineHeight: '1.0' }}
           >
-            / {template.name}
+            {formattedIndex} / {template.name}
           </span>
         </div>
-        <div 
-          className="text-[10px] font-sans uppercase tracking-widest opacity-60 font-black" 
-          style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF' }}
+        <span 
+          className="text-[11px] font-sans uppercase tracking-wider opacity-60 font-medium" 
+          style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF', paddingBottom: '2px', textAlign: 'right' }}
         >
           {aspectRatio.split(' ')[0]}
-        </div>
+        </span>
       </div>
 
       {/* Line 2: Prompt Text & Action Buttons (3-line clamp, padded spacing for clarity) */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4" style={{ marginTop: '16px' }}>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4" style={{ marginTop: '8px' }}>
         {/* Padded prompt display, limited to exactly 3 lines with ellipsis */}
         <p 
           className="text-[11px] font-sans leading-relaxed flex-1 m-0 text-justify"
