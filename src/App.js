@@ -6,7 +6,35 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { db, auth, storage } from './firebase';
 import { collection, addDoc, deleteDoc, updateDoc, doc, getDocs, getDoc, setDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { signInAnonymously, signOut } from 'firebase/auth';
-import { ref, uploadString, getDownloadURL, deleteObject } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+
+// Helper: base64 Data URL을 Blob 객체로 변환 (uploadBytes 연계로 Storage 전송 안정화)
+const dataURLtoBlob = (dataurl) => {
+  try {
+    const arr = dataurl.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+  } catch (e) {
+    console.error("❌ DataURL to Blob conversion failed:", e);
+    throw new Error("이미지 데이터 변환 실패");
+  }
+};
+
+// Helper: Promise에 타임아웃 적용 (Firebase Storage 무한 대기 멈춤 방지)
+const withTimeout = (promise, ms = 15000) => {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => 
+      setTimeout(() => reject(new Error("서버 응답 시간 초과 (CORS/네트워크 상태를 확인해 주세요)")), ms)
+    )
+  ]);
+};
 
 // Modular Components
 import OptionSelect from './components/OptionSelect';
@@ -316,7 +344,7 @@ export default function App() {
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.3 Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.63c Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -874,8 +902,9 @@ export default function App() {
       const fileName = `gallery/img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.png`;
       const storageRef = ref(storage, fileName);
       
-      // Upload base64 data to Firebase Storage
-      await uploadString(storageRef, base64Url, 'data_url');
+      // Upload Blob to Firebase Storage with a 15-second timeout safeguard
+      const blob = dataURLtoBlob(base64Url);
+      await withTimeout(uploadBytes(storageRef, blob), 15000);
       
       // Retrieve public download URL
       const downloadUrl = await getDownloadURL(storageRef);
@@ -943,7 +972,8 @@ export default function App() {
         try {
           const fileName = `gallery/img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.png`;
           const storageRef = ref(storage, fileName);
-          await uploadString(storageRef, finalPreviewImage, 'data_url');
+          const blob = dataURLtoBlob(finalPreviewImage);
+          await withTimeout(uploadBytes(storageRef, blob), 15000);
           const downloadUrl = await getDownloadURL(storageRef);
           
           // Firestore gallery 컬렉션에도 등록해줍니다 (어디서나 볼 수 있게 백업)
@@ -1391,7 +1421,8 @@ export default function App() {
               const fileName = `gallery/img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.png`;
               const storageRef = ref(storage, fileName);
               
-              await uploadString(storageRef, base64Url, 'data_url');
+              const blob = dataURLtoBlob(base64Url);
+              await withTimeout(uploadBytes(storageRef, blob), 15000);
               const downloadUrl = await getDownloadURL(storageRef);
               
               // 업로드 완료 전 사용자가 이미지를 삭제했는지 확인
@@ -1499,7 +1530,7 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.63a | Lower Layout Optimized
+              v0.63c | Lower Layout Optimized
             </div>
           </div>
         </div>
@@ -3484,7 +3515,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.63a | Lower Layout Optimized
+      v0.63c | Lower Layout Optimized
     </footer>
     <div className="h-12"></div>
     </div>

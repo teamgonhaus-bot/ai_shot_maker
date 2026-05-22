@@ -400,14 +400,15 @@ body.dark-mode .ios-apply-preset-btn:active {
   width: 100% !important;
   background-color: #0022FF !important;
   color: #FFFFFF !important;
-  border: none !important;
-  border-radius: 12px !important;
+  border: 2px solid #0022FF !important;
+  border-radius: 2px !important;
   padding: 20px 24px !important;
   font-size: 16px !important;
-  font-weight: 900 !important;
-  letter-spacing: 0.04em !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
   cursor: pointer !important;
-  transition: all 0.2s ease !important;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -416,12 +417,22 @@ body.dark-mode .ios-apply-preset-btn:active {
   box-shadow: none !important;
 }
 
+.generate-btn:hover {
+  background-color: #FFFFFF !important;
+  color: #0022FF !important;
+  border-color: #0022FF !important;
+}
+
 .generate-btn:active {
-  transform: scale(0.97) !important;
+  background-color: rgba(0, 34, 255, 0.1) !important;
+  color: #0022FF !important;
   box-shadow: none !important;
 }
 
 .generate-btn:disabled {
+  background-color: #E5E5EA !important;
+  color: #8E8E93 !important;
+  border-color: #D1D1D6 !important;
   opacity: 0.6 !important;
   cursor: not-allowed !important;
 }
@@ -1350,13 +1361,23 @@ body.dark-mode .template-index {
 body.dark-mode .generate-btn {
   background-color: #FFFFFF !important;
   color: #0022FF !important;
-  border: 1px solid #FFFFFF !important;
+  border: 2px solid #FFFFFF !important;
 }
 body.dark-mode .generate-btn:hover {
-  background-color: rgba(255, 255, 255, 0.9) !important;
+  background-color: #0022FF !important;
+  color: #FFFFFF !important;
+  border-color: #FFFFFF !important;
 }
 body.dark-mode .generate-btn:active {
-  transform: scale(0.97) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+  box-shadow: none !important;
+}
+body.dark-mode .generate-btn:disabled {
+  background-color: #3A3A3C !important;
+  color: #8E8E93 !important;
+  border-color: #48484A !important;
+  opacity: 0.6 !important;
 }
 
 /* =============================================
@@ -1668,21 +1689,34 @@ body.dark-mode .ios-pill-mini.active {
 .generate-btn.point-color {
   background: #1a2b4b !important;
   color: #FFFFFF !important;
-  box-shadow: 0 10px 25px rgba(26, 43, 75, 0.25) !important;
+  border: 2px solid #1a2b4b !important;
+  box-shadow: none !important;
 }
 
 .generate-btn.point-color:hover {
-  background: #243b66 !important;
-  box-shadow: 0 12px 30px rgba(26, 43, 75, 0.35) !important;
+  background: #FFFFFF !important;
+  color: #1a2b4b !important;
+  border-color: #1a2b4b !important;
+  box-shadow: none !important;
 }
 
 body.dark-mode .generate-btn.point-color {
-  background: #2C3E50 !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+  background: #FFFFFF !important;
+  color: #1a2b4b !important;
+  border: 2px solid #FFFFFF !important;
+  box-shadow: none !important;
+}
+
+body.dark-mode .generate-btn.point-color:hover {
+  background: #1a2b4b !important;
+  color: #FFFFFF !important;
+  border-color: #FFFFFF !important;
+  box-shadow: none !important;
 }
 
 .generate-btn.point-color:active {
-  transform: scale(0.96);
+  opacity: 0.8 !important;
+  box-shadow: none !important;
 }
 
 /* =============================================
