@@ -262,6 +262,35 @@ export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [moveTarget, setMoveTarget] = useState(null);
 
+  // v0.63b Gallery states
+  const [galleryImages, setGalleryImages] = useState(() => {
+    try {
+      const saved = localStorage.getItem('shot_maker_gallery');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+  const [galleryFolders, setGalleryFolders] = useState(() => {
+    try {
+      const saved = localStorage.getItem('shot_maker_gallery_folders');
+      return saved ? JSON.parse(saved) : ['기본', '인물', '공간', '사물'];
+    } catch (e) {
+      return ['기본', '인물', '공간', '사물'];
+    }
+  });
+  const [activeGalleryFolder, setActiveGalleryFolder] = useState('기본');
+  const [newFolderName, setNewFolderName] = useState('');
+
+  // Sync Gallery with localStorage
+  useEffect(() => {
+    localStorage.setItem('shot_maker_gallery', JSON.stringify(galleryImages));
+  }, [galleryImages]);
+
+  useEffect(() => {
+    localStorage.setItem('shot_maker_gallery_folders', JSON.stringify(galleryFolders));
+  }, [galleryFolders]);
+
   // Rename Modal State
   const [renameTarget, setRenameTarget] = useState(null); // { id, name }
   const [newPresetName, setNewPresetName] = useState("");
@@ -295,6 +324,8 @@ export default function App() {
       setActiveMarquee("LIBRARY Active: Manage and apply your saved premium presets...");
     } else if (currentMode === 'about') {
       setActiveMarquee("ABOUT: Learn the core concepts and workflows of Professional Shot Maker...");
+    } else if (currentMode === 'gallery') {
+      setActiveMarquee("GALLERY Active: Organize and browse your generated images by custom folders...");
     } else if (currentMode === 'smart') {
       if (!activeMarquee.includes("SCENE") && !activeMarquee.includes("Shuffle")) {
         setActiveMarquee("SMART MODE Active: Select a template for instant commercial setup...");
@@ -1066,6 +1097,10 @@ export default function App() {
       return true;
     });
 
+    if (useImageRef) {
+      filteredParts.push("highly preserve the original structure, do not add or alter any elements, strictly keep the original shape intact");
+    }
+
     // 4. 요구사항에 맞춘 완벽한 순서 고정 재조합
     let prefixParts = [];
     if (productVar) {
@@ -1184,7 +1219,19 @@ export default function App() {
       for (const part of responseParts) {
         if (part.inlineData) {
           const mimeType = part.inlineData.mimeType || "image/png";
-          setGeneratedImage(`data:${mimeType};base64,${part.inlineData.data}`);
+          const base64Url = `data:${mimeType};base64,${part.inlineData.data}`;
+          setGeneratedImage(base64Url);
+          
+          // Auto-save to gallery
+          const newImg = {
+            id: `img_${Date.now()}`,
+            url: base64Url,
+            prompt: promptToUse,
+            timestamp: new Date().toISOString(),
+            folder: '기본'
+          };
+          setGalleryImages(prev => [newImg, ...prev]);
+          
           imageFound = true;
           break;
         }
@@ -1880,6 +1927,12 @@ export default function App() {
           onClick={() => setCurrentMode('about')}
         >
           About
+        </button>
+        <button
+          className={`mode-nav-btn ${currentMode === 'gallery' ? 'active' : ''}`}
+          onClick={() => setCurrentMode('gallery')}
+        >
+          Gallery
         </button>
       </div>
 
@@ -2702,7 +2755,153 @@ export default function App() {
                 <strong style={{ fontWeight: 900, color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>Tip</strong>: `Mix Mode`에서 적합한 공간과 여백을 확보한 뒤 타 AI 툴과 조합해 고품질 상업용 연출 샷을 쉽게 완성해 보세요.
               </p>
             </div>
+          </motion.div>
+        )}
+        
+        {currentMode === 'gallery' && (
+          <motion.div key="gallery" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6 relative pb-20">
+            <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>Gallery</h2>
+            
+            <div className="gallery-workspace">
+              {/* Left sidebar: Folders */}
+              <div className="gallery-sidebar">
+                <div className="gallery-sidebar-title">FOLDERS</div>
+                <div className="gallery-folder-list">
+                  {galleryFolders.map(folder => (
+                    <div 
+                      key={folder}
+                      className={`gallery-folder-item ${activeGalleryFolder === folder ? 'active' : ''}`}
+                      onClick={() => setActiveGalleryFolder(folder)}
+                    >
+                      <span className="folder-name">{folder}</span>
+                      {folder !== '기본' && (
+                        <button 
+                          className="folder-delete-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm(`'${folder}' 폴더를 삭제하시겠습니까? (폴더 내 이미지는 '기본' 폴더로 이동합니다)`)) {
+                              setGalleryImages(prev => prev.map(img => 
+                                img.folder === folder ? { ...img, folder: '기본' } : img
+                              ));
+                              setGalleryFolders(prev => prev.filter(f => f !== folder));
+                              if (activeGalleryFolder === folder) {
+                                setActiveGalleryFolder('기본');
+                              }
+                            }
+                          }}
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="gallery-add-folder">
+                  <input
+                    type="text"
+                    placeholder="New folder..."
+                    value={newFolderName}
+                    onChange={(e) => setNewFolderName(e.target.value)}
+                    className="gallery-folder-input"
+                  />
+                  <button 
+                    onClick={() => {
+                      const trimmed = newFolderName.trim();
+                      if (!trimmed) return;
+                      if (galleryFolders.includes(trimmed)) {
+                        triggerToast("이미 존재하는 폴더 이름입니다.");
+                        return;
+                      }
+                      setGalleryFolders(prev => [...prev, trimmed]);
+                      setNewFolderName('');
+                      triggerToast(`'${trimmed}' 폴더가 추가되었습니다.`);
+                    }}
+                    className="gallery-folder-add-btn"
+                  >
+                    + ADD FOLDER
+                  </button>
+                </div>
+              </div>
 
+              {/* Right panel: Active folder images */}
+              <div className="gallery-main">
+                <div className="gallery-main-header">
+                  <span className="gallery-folder-indicator">{activeGalleryFolder.toUpperCase()}</span>
+                  <span className="gallery-image-count">
+                    {galleryImages.filter(img => img.folder === activeGalleryFolder).length} ITEMS
+                  </span>
+                </div>
+
+                <div className="gallery-grid-container">
+                  {galleryImages.filter(img => img.folder === activeGalleryFolder).length === 0 ? (
+                    <div className="gallery-empty-state">
+                      <span className="gallery-empty-text">NO IMAGES IN THIS FOLDER</span>
+                    </div>
+                  ) : (
+                    <div className="gallery-grid">
+                      {galleryImages.filter(img => img.folder === activeGalleryFolder).map(img => (
+                        <div key={img.id} className="gallery-item-card">
+                          <div className="gallery-image-wrapper">
+                            <img 
+                              src={img.url} 
+                              alt="Gallery Item" 
+                              onClick={() => setLightboxImage(img.url)}
+                              className="gallery-thumbnail cursor-zoom-in"
+                            />
+                          </div>
+                          
+                          <div className="gallery-item-meta">
+                            <p className="gallery-item-prompt" title={img.prompt}>
+                              {img.prompt || 'No Prompt Info'}
+                            </p>
+                            <div className="gallery-item-actions">
+                              <button 
+                                className="gallery-item-btn" 
+                                onClick={() => {
+                                  navigator.clipboard.writeText(img.prompt);
+                                  triggerToast("프롬프트가 복사되었습니다!");
+                                }}
+                              >
+                                COPY
+                              </button>
+                              
+                              <select 
+                                className="gallery-move-select"
+                                value={img.folder || '기본'}
+                                onChange={(e) => {
+                                  const destFolder = e.target.value;
+                                  setGalleryImages(prev => prev.map(i => 
+                                    i.id === img.id ? { ...i, folder: destFolder } : i
+                                  ));
+                                  triggerToast(`이미지가 '${destFolder}' 폴더로 이동되었습니다.`);
+                                }}
+                              >
+                                {galleryFolders.map(f => (
+                                  <option key={f} value={f}>{f}</option>
+                                ))}
+                              </select>
+
+                              <button 
+                                className="gallery-item-delete"
+                                onClick={() => {
+                                  if (window.confirm("이 이미지를 삭제하시겠습니까?")) {
+                                    setGalleryImages(prev => prev.filter(i => i.id !== img.id));
+                                    triggerToast("이미지가 삭제되었습니다.");
+                                  }
+                                }}
+                              >
+                                DEL
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -2858,7 +3057,7 @@ export default function App() {
               }}
             >
               <ImageIcon className="w-5 h-5 text-white" />
-              <span>
+              <span className="text-white">
                 {isImageGenerating ? 'GENERATING...' :
                   cooldownTime > 0 ? `COOLDOWN (${cooldownTime}s)` : 'GENERATE IMAGE'}
               </span>

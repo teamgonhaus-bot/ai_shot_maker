@@ -97,7 +97,15 @@ export default function SwissSpecificationSheet({
   
   // High-end technical ID generation based on config hash
   const getSpecId = () => {
-    const spaceCode = safeConfig.spaceType ? String(safeConfig.spaceType).slice(0, 2).toUpperCase() : 'MX';
+    const spaceMap = {
+      "스튜디오": "STUDIO",
+      "오피스": "OFFICE",
+      "홈": "HOME",
+      "리테일": "RETAIL",
+      "라운지": "LOUNGE",
+      "야외": "OUTDOOR"
+    };
+    const spaceCode = safeConfig.spaceType ? (spaceMap[safeConfig.spaceType] || String(safeConfig.spaceType).toUpperCase()) : 'MIX';
     return `EU-SM63-${spaceCode}`;
   };
 

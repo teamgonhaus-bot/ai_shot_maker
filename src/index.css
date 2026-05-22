@@ -2553,9 +2553,435 @@ body.dark-mode .swiss-copy-btn {
   border: 1px solid #FFFFFF !important;
 }
 
-body.dark-mode .swiss-copy-btn:hover {
-  background-color: #FFFFFF !important;
+/* =============================================
+   v0.63b GALLERY WORKSPACE STYLES
+   ============================================= */
+.gallery-workspace {
+  display: flex !important;
+  width: 100% !important;
+  border: 1.5px solid #0022FF !important;
+  background: #FFFFFF !important;
+  margin-top: 16px !important;
+  box-sizing: border-box !important;
+  min-height: 550px !important;
+}
+
+body.dark-mode .gallery-workspace {
+  border: 1.5px solid #FFFFFF !important;
+  background: #0022FF !important;
+}
+
+/* Sidebar for folders - matching 100px width constraint from folders tab or similar option rows */
+.gallery-sidebar {
+  width: 120px !important;
+  min-width: 120px !important;
+  border-right: 1.5px solid #0022FF !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+  background: #FFFFFF !important;
+  padding: 16px 8px !important;
+}
+
+body.dark-mode .gallery-sidebar {
+  border-right: 1.5px solid #FFFFFF !important;
+  background: #0022FF !important;
+}
+
+.gallery-sidebar-title {
+  font-size: 10px !important;
+  font-weight: 900 !important;
   color: #0022FF !important;
+  letter-spacing: 0.1em !important;
+  margin-bottom: 16px !important;
+  padding-left: 4px !important;
+  opacity: 0.8 !important;
+}
+
+body.dark-mode .gallery-sidebar-title {
+  color: #FFFFFF !important;
+}
+
+.gallery-folder-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  flex-grow: 1 !important;
+  overflow-y: auto !important;
+}
+
+.gallery-folder-item {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 8px 6px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #8E8E93 !important;
+  cursor: pointer !important;
+  border-bottom: 1px solid transparent !important;
+  transition: all 0.2s ease !important;
+}
+
+.gallery-folder-item:hover {
+  color: #0022FF !important;
+}
+
+body.dark-mode .gallery-folder-item:hover {
+  color: #FFFFFF !important;
+}
+
+.gallery-folder-item.active {
+  color: #0022FF !important;
+  font-weight: 900 !important;
+  background-color: rgba(0, 34, 255, 0.05) !important;
+  border-left: 3px solid #0022FF !important;
+  padding-left: 3px !important;
+}
+
+body.dark-mode .gallery-folder-item.active {
+  color: #FFFFFF !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-left: 3px solid #FFFFFF !important;
+}
+
+.folder-delete-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #FF3B30 !important;
+  font-weight: 900 !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  padding: 0 4px !important;
+  line-height: 1 !important;
+  opacity: 0.7 !important;
+  transition: opacity 0.2s !important;
+}
+
+.folder-delete-btn:hover {
+  opacity: 1 !important;
+}
+
+.gallery-add-folder {
+  margin-top: auto !important;
+  padding-top: 16px !important;
+  border-top: 1px solid rgba(0, 34, 255, 0.2) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+body.dark-mode .gallery-add-folder {
+  border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.gallery-folder-input {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  border: 1px solid #0022FF !important;
+  background: transparent !important;
+  color: #0022FF !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 6px !important;
+  outline: none !important;
+}
+
+body.dark-mode .gallery-folder-input {
+  border: 1px solid #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+.gallery-folder-add-btn {
+  width: 100% !important;
+  background: #0022FF !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  font-size: 9px !important;
+  font-weight: 900 !important;
+  padding: 8px 4px !important;
+  cursor: pointer !important;
+  letter-spacing: 0.05em !important;
+  transition: opacity 0.2s !important;
+}
+
+.gallery-folder-add-btn:hover {
+  opacity: 0.9 !important;
+}
+
+body.dark-mode .gallery-folder-add-btn {
+  background: #FFFFFF !important;
+  color: #0022FF !important;
+}
+
+/* Main Area */
+.gallery-main {
+  flex-grow: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+  background: #FFFFFF !important;
+}
+
+body.dark-mode .gallery-main {
+  background: #0022FF !important;
+}
+
+.gallery-main-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 16px 20px !important;
+  border-bottom: 1.5px solid #0022FF !important;
+}
+
+body.dark-mode .gallery-main-header {
+  border-bottom: 1.5px solid #FFFFFF !important;
+}
+
+.gallery-folder-indicator {
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  color: #0022FF !important;
+  letter-spacing: -0.01em !important;
+}
+
+body.dark-mode .gallery-folder-indicator {
+  color: #FFFFFF !important;
+}
+
+.gallery-image-count {
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  color: #8E8E93 !important;
+  letter-spacing: 0.08em !important;
+}
+
+body.dark-mode .gallery-image-count {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.gallery-grid-container {
+  flex-grow: 1 !important;
+  padding: 20px !important;
+  overflow-y: auto !important;
+  max-height: 480px !important;
+}
+
+.gallery-empty-state {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 250px !important;
+}
+
+.gallery-empty-text {
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  color: #8E8E93 !important;
+  letter-spacing: 0.1em !important;
+}
+
+body.dark-mode .gallery-empty-text {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.gallery-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+  gap: 20px !important;
+}
+
+.gallery-item-card {
+  border: 1px solid #0022FF !important;
+  background: #FFFFFF !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+}
+
+body.dark-mode .gallery-item-card {
+  border: 1px solid #FFFFFF !important;
+  background: #0022FF !important;
+}
+
+.gallery-image-wrapper {
+  width: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  overflow: hidden !important;
+  border-bottom: 1px solid #0022FF !important;
+}
+
+body.dark-mode .gallery-image-wrapper {
+  border-bottom: 1px solid #FFFFFF !important;
+}
+
+.gallery-thumbnail {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  transition: transform 0.3s ease !important;
+}
+
+.gallery-thumbnail:hover {
+  transform: scale(1.05) !important;
+}
+
+.gallery-item-meta {
+  padding: 8px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.gallery-item-prompt {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  color: #48484A !important;
+  margin: 0 !important;
+  line-height: 1.4 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  min-height: 28px !important;
+}
+
+body.dark-mode .gallery-item-prompt {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.gallery-item-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.gallery-item-btn {
+  background: transparent !important;
+  border: 1px solid #0022FF !important;
+  color: #0022FF !important;
+  font-size: 9px !important;
+  font-weight: 900 !important;
+  padding: 4px 6px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.gallery-item-btn:hover {
+  background: #0022FF !important;
+  color: #FFFFFF !important;
+}
+
+body.dark-mode .gallery-item-btn {
+  border: 1px solid #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+body.dark-mode .gallery-item-btn:hover {
+  background: #FFFFFF !important;
+  color: #0022FF !important;
+}
+
+.gallery-move-select {
+  flex-grow: 1 !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  border: 1px solid #0022FF !important;
+  background: transparent !important;
+  color: #0022FF !important;
+  padding: 3px !important;
+  outline: none !important;
+  cursor: pointer !important;
+  max-width: 70px !important;
+}
+
+body.dark-mode .gallery-move-select {
+  border: 1px solid #FFFFFF !important;
+  color: #FFFFFF !important;
+  background: #0022FF !important;
+}
+
+.gallery-move-select option {
+  background: #FFFFFF !important;
+  color: #0022FF !important;
+}
+
+body.dark-mode .gallery-move-select option {
+  background: #0022FF !important;
+  color: #FFFFFF !important;
+}
+
+.gallery-item-delete {
+  background: transparent !important;
+  border: 1px solid #FF3B30 !important;
+  color: #FF3B30 !important;
+  font-size: 9px !important;
+  font-weight: 900 !important;
+  padding: 4px 6px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.gallery-item-delete:hover {
+  background: #FF3B30 !important;
+  color: #FFFFFF !important;
+}
+
+body.dark-mode .gallery-item-delete {
+  border: 1px solid #FF453A !important;
+  color: #FF453A !important;
+}
+
+body.dark-mode .gallery-item-delete:hover {
+  background: #FF453A !important;
+  color: #FFFFFF !important;
+}
+
+/* Mobile responsive for gallery grid and workspace structure */
+@media (max-width: 768px) {
+  .gallery-workspace {
+    flex-direction: column !important;
+    min-height: auto !important;
+  }
+  
+  .gallery-sidebar {
+    width: 100% !important;
+    min-width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1.5px solid #0022FF !important;
+  }
+  
+  body.dark-mode .gallery-sidebar {
+    border-bottom: 1.5px solid #FFFFFF !important;
+  }
+  
+  .gallery-folder-list {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    padding-bottom: 8px !important;
+    gap: 12px !important;
+  }
+  
+  .gallery-folder-item {
+    white-space: nowrap !important;
+  }
+  
+  .gallery-folder-item.active {
+    border-left: none !important;
+    border-bottom: 3px solid #0022FF !important;
+    padding-left: 6px !important;
+  }
+  
+  body.dark-mode .gallery-folder-item.active {
+    border-bottom: 3px solid #FFFFFF !important;
+  }
+  
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+    gap: 12px !important;
+  }
 }
 
 
