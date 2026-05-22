@@ -1350,7 +1350,7 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.61 | Total Swiss Architecture
+              v0.62 | Smart Grid Unified
             </div>
           </div>
         </div>
@@ -2085,37 +2085,45 @@ export default function App() {
               </div>
             </div>
 
-            {/* Smart Templates */}
+            {/* Smart Template Grid — Swiss Line Grid Box (v0.62) */}
             <div className="template-grid">
               <button className={`ios-smart-template-btn ${activeTemplate === 'TITLE SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('TITLE SCENE')}>
+                <div className="template-index">01 /</div>
                 <div className="template-title">Title</div>
                 <div className="template-desc">초현실주의 공중 부양</div>
               </button>
               <button className={`ios-smart-template-btn ${activeTemplate === 'DETAIL SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('DETAIL SCENE')}>
+                <div className="template-index">02 /</div>
                 <div className="template-title">Detail</div>
                 <div className="template-desc">질감 강조 초접사</div>
               </button>
               <button className={`ios-smart-template-btn ${activeTemplate === 'INSTA SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('INSTA SCENE')}>
+                <div className="template-index">03 /</div>
                 <div className="template-title">Insta</div>
                 <div className="template-desc">MZ SNS 감성 스냅</div>
               </button>
               <button className={`ios-smart-template-btn ${activeTemplate === 'USAGE SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('USAGE SCENE')}>
+                <div className="template-index">04 /</div>
                 <div className="template-title">User</div>
                 <div className="template-desc">유저 사용 장면</div>
               </button>
               <button className={`ios-smart-template-btn ${activeTemplate === 'HOME LIVING' ? 'active' : ''}`} onClick={() => handleSmartTemplate('HOME LIVING')}>
+                <div className="template-index">05 /</div>
                 <div className="template-title">Home</div>
                 <div className="template-desc">포근한 가정용 연출</div>
               </button>
               <button className={`ios-smart-template-btn ${activeTemplate === 'OFFICE TECH' ? 'active' : ''}`} onClick={() => handleSmartTemplate('OFFICE TECH')}>
+                <div className="template-index">06 /</div>
                 <div className="template-title">Office</div>
                 <div className="template-desc">데스크셋업 비즈니스</div>
               </button>
               <button className={`ios-smart-template-btn ${activeTemplate === 'RETAIL SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('RETAIL SCENE')}>
+                <div className="template-index">07 /</div>
                 <div className="template-title">Retail</div>
                 <div className="template-desc">상업용 쇼룸 연출</div>
               </button>
               <button className={`ios-smart-template-btn ${activeTemplate === 'NATURE ORGANIC' ? 'active' : ''}`} onClick={() => handleSmartTemplate('NATURE ORGANIC')}>
+                <div className="template-index">08 /</div>
                 <div className="template-title">Outdoor</div>
                 <div className="template-desc">야외 자연 연출</div>
               </button>
@@ -3045,7 +3053,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.61 | Total Swiss Architecture
+      v0.62 | Smart Grid Unified
     </footer>
     <div className="h-12"></div>
     </div>
