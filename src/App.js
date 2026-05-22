@@ -344,7 +344,7 @@ export default function App() {
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.63c Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.64a Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -964,34 +964,37 @@ export default function App() {
     }
     
     const tempId = `upload_${Date.now()}`;
-    const localReader = new FileReader();
-    localReader.onload = () => {
-      const tempImg = {
-        id: tempId,
-        url: localReader.result,
-        prompt: `Uploading: ${file.name}`,
-        timestamp: new Date().toISOString(),
-        folder: activeGalleryFolder,
-        isTemp: true,
-        isUploading: true
-      };
-      setGalleryImages(prev => [tempImg, ...prev]);
-    };
-    localReader.readAsDataURL(file);
+    const localUrl = URL.createObjectURL(file);
     
+    const tempImg = {
+      id: tempId,
+      url: localUrl,
+      prompt: `Uploading: ${file.name}`,
+      timestamp: new Date().toISOString(),
+      folder: activeGalleryFolder,
+      isTemp: true,
+      isUploading: true
+    };
+    
+    // 동기식으로 즉시 로컬 프리뷰를 설정하여 비동기 레이스 컨디션을 예방합니다.
+    setGalleryImages(prev => [tempImg, ...prev]);
     triggerToast("클라우드 서버에 이미지를 업로드하는 중...");
     
     try {
-      const fileName = `gallery/ext_${Date.now()}_${Math.random().toString(36).substring(2, 9)}_${file.name}`;
-      const storageRef = ref(storage, fileName);
+      const fileExt = file.name.split('.').pop() || 'png';
+      const safeFileName = `gallery/ext_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+      const storageRef = ref(storage, safeFileName);
       
-      await withTimeout(uploadBytes(storageRef, file), 15000);
+      // HTML File 객체를 순수 이진 Blob으로 안전하게 감싸서 전송합니다.
+      const fileBlob = new Blob([file], { type: file.type });
+      
+      await withTimeout(uploadBytes(storageRef, fileBlob), 15000);
       
       const downloadUrl = await getDownloadURL(storageRef);
       
       const firestoreData = {
         url: downloadUrl,
-        storagePath: fileName,
+        storagePath: safeFileName,
         prompt: `Uploaded Image: ${file.name}`,
         timestamp: new Date().toISOString(),
         folder: activeGalleryFolder
@@ -1002,18 +1005,26 @@ export default function App() {
       const finalImg = {
         id: docRef.id,
         url: downloadUrl,
-        storagePath: fileName,
+        storagePath: safeFileName,
         prompt: firestoreData.prompt,
         timestamp: firestoreData.timestamp,
         folder: activeGalleryFolder,
         isTemp: false
       };
       
+      // 가상 URL 해제
+      URL.revokeObjectURL(localUrl);
+      
       setGalleryImages(prev => prev.map(img => img.id === tempId ? finalImg : img));
       triggerToast("외부 이미지 클라우드 업로드 성공!");
     } catch (err) {
       console.error("❌ External image upload failed:", err);
       triggerToast("업로드 실패: " + err.message);
+      
+      // 가상 URL 해제
+      URL.revokeObjectURL(localUrl);
+      
+      // 에러 발생 시 리스트에서 완전히 제거합니다.
       setGalleryImages(prev => prev.filter(img => img.id !== tempId));
     } finally {
       e.target.value = '';
@@ -1596,7 +1607,7 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.63c | Lower Layout Optimized
+              v0.64a | Cloud Sync & External Upload Safeguard
             </div>
           </div>
         </div>
@@ -3615,7 +3626,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.63c | Lower Layout Optimized
+      v0.64a | Cloud Sync & External Upload Safeguard
     </footer>
     <div className="h-12"></div>
     </div>
