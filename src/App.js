@@ -3,9 +3,10 @@ import {
   Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders, Zap, Shuffle, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { db, auth } from './firebase';
-import { collection, addDoc, deleteDoc, updateDoc, doc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { db, auth, storage } from './firebase';
+import { collection, addDoc, deleteDoc, updateDoc, doc, getDocs, getDoc, setDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { signInAnonymously, signOut } from 'firebase/auth';
+import { ref, uploadString, getDownloadURL, deleteObject } from 'firebase/storage';
 
 // Modular Components
 import OptionSelect from './components/OptionSelect';
@@ -262,34 +263,12 @@ export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [moveTarget, setMoveTarget] = useState(null);
 
-  // v0.63b Gallery states
-  const [galleryImages, setGalleryImages] = useState(() => {
-    try {
-      const saved = localStorage.getItem('shot_maker_gallery');
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      return [];
-    }
-  });
-  const [galleryFolders, setGalleryFolders] = useState(() => {
-    try {
-      const saved = localStorage.getItem('shot_maker_gallery_folders');
-      return saved ? JSON.parse(saved) : ['기본', '인물', '공간', '사물'];
-    } catch (e) {
-      return ['기본', '인물', '공간', '사물'];
-    }
-  });
+  // v0.64 Gallery states
+  const [galleryImages, setGalleryImages] = useState([]);
+  const [galleryFolders, setGalleryFolders] = useState(['기본', '인물', '공간', '사물']);
+  const [isGalleryLoading, setIsGalleryLoading] = useState(true);
   const [activeGalleryFolder, setActiveGalleryFolder] = useState('기본');
   const [newFolderName, setNewFolderName] = useState('');
-
-  // Sync Gallery with localStorage
-  useEffect(() => {
-    localStorage.setItem('shot_maker_gallery', JSON.stringify(galleryImages));
-  }, [galleryImages]);
-
-  useEffect(() => {
-    localStorage.setItem('shot_maker_gallery_folders', JSON.stringify(galleryFolders));
-  }, [galleryFolders]);
 
   // Rename Modal State
   const [renameTarget, setRenameTarget] = useState(null); // { id, name }
@@ -379,7 +358,41 @@ export default function App() {
       }
     };
 
+    // 3. Firebase Gallery & Folders Load
+    const fetchGalleryData = async () => {
+      try {
+        setIsGalleryLoading(true);
+        const foldersDocRef = doc(db, "gallery_meta", "folders");
+        const foldersDocSnap = await getDoc(foldersDocRef);
+        let currentFolders = ['기본', '인물', '공간', '사물'];
+        if (foldersDocSnap.exists()) {
+          const data = foldersDocSnap.data();
+          if (data && Array.isArray(data.list)) {
+            currentFolders = data.list;
+            setGalleryFolders(currentFolders);
+          } else {
+            await setDoc(foldersDocRef, { list: currentFolders });
+            setGalleryFolders(currentFolders);
+          }
+        } else {
+          await setDoc(foldersDocRef, { list: currentFolders });
+          setGalleryFolders(currentFolders);
+        }
+
+        const galleryQ = query(collection(db, "gallery"), orderBy("timestamp", "desc"));
+        const gallerySnap = await getDocs(galleryQ);
+        const images = gallerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setGalleryImages(images);
+        console.log(`✅ Firebase Gallery Loaded: ${images.length} images loaded.`);
+      } catch (error) {
+        console.error("❌ Firebase gallery load error:", error);
+      } finally {
+        setIsGalleryLoading(false);
+      }
+    };
+
     fetchTemplates();
+    fetchGalleryData();
   }, []);
 
   // ⏳ Splash Intro Timer (at least 1.2s exposure + 0.3s smooth fade out)
@@ -1222,15 +1235,54 @@ export default function App() {
           const base64Url = `data:${mimeType};base64,${part.inlineData.data}`;
           setGeneratedImage(base64Url);
           
-          // Auto-save to gallery
-          const newImg = {
-            id: `img_${Date.now()}`,
+          // Auto-save to gallery (temporary local display with uploading flag for Zero-Lag UX)
+          const tempId = `temp_${Date.now()}`;
+          const tempImg = {
+            id: tempId,
             url: base64Url,
             prompt: promptToUse,
             timestamp: new Date().toISOString(),
-            folder: '기본'
+            folder: '기본',
+            isUploading: true
           };
-          setGalleryImages(prev => [newImg, ...prev]);
+          setGalleryImages(prev => [tempImg, ...prev]);
+          
+          // Background upload pipeline to Firebase Storage and Firestore sync
+          (async () => {
+            try {
+              const fileName = `gallery/img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.png`;
+              const storageRef = ref(storage, fileName);
+              
+              // Upload base64 data to Firebase Storage
+              await uploadString(storageRef, base64Url, 'data_url');
+              
+              // Retrieve public download URL
+              const downloadUrl = await getDownloadURL(storageRef);
+              
+              // Write image record to Firestore 'gallery' collection
+              const firestoreData = {
+                url: downloadUrl,
+                storagePath: fileName,
+                prompt: promptToUse,
+                timestamp: new Date().toISOString(),
+                folder: '기본'
+              };
+              
+              const docRef = await addDoc(collection(db, "gallery"), firestoreData);
+              
+              // Replace temporary image state with the completed Firestore document
+              setGalleryImages(prev => prev.map(img => 
+                img.id === tempId ? { id: docRef.id, ...firestoreData } : img
+              ));
+              
+              console.log(`✅ Background sync completed. Document ID: ${docRef.id}`);
+            } catch (uploadError) {
+              console.error("❌ Background upload/sync error:", uploadError);
+              triggerToast("구글 클라우드 이미지 동기화 중 오류가 발생했습니다.");
+              // Rollback temporary image if upload failed
+              setGalleryImages(prev => prev.filter(img => img.id !== tempId));
+            }
+          })();
           
           imageFound = true;
           break;
@@ -2794,22 +2846,68 @@ export default function App() {
                               triggerToast("이미 존재하는 폴더명입니다.");
                               return;
                             }
-                            setGalleryFolders(prev => prev.map(f => f === activeGalleryFolder ? trimmed : f));
-                            setGalleryImages(prev => prev.map(img => 
-                              img.folder === activeGalleryFolder ? { ...img, folder: trimmed } : img
-                            ));
-                            setActiveGalleryFolder(trimmed);
-                            triggerToast(`폴더명이 '${trimmed}'(으)로 변경되었습니다.`);
+                            
+                            // Firestore sync for folder renaming
+                            (async () => {
+                              try {
+                                const nextFolders = galleryFolders.map(f => f === activeGalleryFolder ? trimmed : f);
+                                const foldersDocRef = doc(db, "gallery_meta", "folders");
+                                await setDoc(foldersDocRef, { list: nextFolders });
+
+                                // Update all images in the old folder to the new folder in Firestore
+                                const oldFolder = activeGalleryFolder;
+                                const affectedImages = galleryImages.filter(img => img.folder === oldFolder);
+                                
+                                for (const img of affectedImages) {
+                                  if (!img.isUploading) {
+                                    const imgDocRef = doc(db, "gallery", img.id);
+                                    await updateDoc(imgDocRef, { folder: trimmed });
+                                  }
+                                }
+
+                                setGalleryFolders(nextFolders);
+                                setGalleryImages(prev => prev.map(img => 
+                                  img.folder === oldFolder ? { ...img, folder: trimmed } : img
+                                ));
+                                setActiveGalleryFolder(trimmed);
+                                triggerToast(`폴더명이 '${trimmed}'(으)로 변경되었습니다.`);
+                              } catch (e) {
+                                console.error("Error renaming folder in Firebase:", e);
+                                triggerToast("클라우드 폴더 변경 중 오류가 발생했습니다.");
+                              }
+                            })();
                           }
                         } else if (opt === '2') {
                           if (window.confirm(`선택된 '${activeGalleryFolder}' 폴더를 정말 삭제하시겠습니까?\n폴더 내 모든 이미지는 '기본' 폴더로 안전하게 이동됩니다.`)) {
                             const folderToDelete = activeGalleryFolder;
-                            setGalleryImages(prev => prev.map(img => 
-                              img.folder === folderToDelete ? { ...img, folder: '기본' } : img
-                            ));
-                            setGalleryFolders(prev => prev.filter(f => f !== folderToDelete));
-                            setActiveGalleryFolder('기본');
-                            triggerToast(`'${folderToDelete}' 폴더가 삭제되었습니다.`);
+                            
+                            // Firestore sync for folder deletion
+                            (async () => {
+                              try {
+                                const nextFolders = galleryFolders.filter(f => f !== folderToDelete);
+                                const foldersDocRef = doc(db, "gallery_meta", "folders");
+                                await setDoc(foldersDocRef, { list: nextFolders });
+
+                                // Update all images in deleted folder to '기본' in Firestore
+                                const affectedImages = galleryImages.filter(img => img.folder === folderToDelete);
+                                for (const img of affectedImages) {
+                                  if (!img.isUploading) {
+                                    const imgDocRef = doc(db, "gallery", img.id);
+                                    await updateDoc(imgDocRef, { folder: '기본' });
+                                  }
+                                }
+
+                                setGalleryImages(prev => prev.map(img => 
+                                  img.folder === folderToDelete ? { ...img, folder: '기본' } : img
+                                ));
+                                setGalleryFolders(nextFolders);
+                                setActiveGalleryFolder('기본');
+                                triggerToast(`'${folderToDelete}' 폴더가 삭제되었습니다.`);
+                              } catch (e) {
+                                console.error("Error deleting folder in Firebase:", e);
+                                triggerToast("클라우드 폴더 삭제 중 오류가 발생했습니다.");
+                              }
+                            })();
                           }
                         }
                       }}
@@ -2835,9 +2933,22 @@ export default function App() {
                         triggerToast("이미 존재하는 폴더 이름입니다.");
                         return;
                       }
-                      setGalleryFolders(prev => [...prev, trimmed]);
-                      setNewFolderName('');
-                      triggerToast(`'${trimmed}' 폴더가 추가되었습니다.`);
+                      
+                      // Firestore sync for folder creation
+                      (async () => {
+                        try {
+                          const nextFolders = [...galleryFolders, trimmed];
+                          const foldersDocRef = doc(db, "gallery_meta", "folders");
+                          await setDoc(foldersDocRef, { list: nextFolders });
+                          
+                          setGalleryFolders(nextFolders);
+                          setNewFolderName('');
+                          triggerToast(`'${trimmed}' 폴더가 추가되었습니다.`);
+                        } catch (e) {
+                          console.error("Error adding folder in Firebase:", e);
+                          triggerToast("클라우드 폴더 추가 중 오류가 발생했습니다.");
+                        }
+                      })();
                     }}
                     className="gallery-folder-add-btn"
                   >
@@ -2856,7 +2967,22 @@ export default function App() {
                 </div>
 
                 <div className="gallery-grid-container">
-                  {galleryImages.filter(img => img.folder === activeGalleryFolder).length === 0 ? (
+                  {isGalleryLoading ? (
+                    <div className="gallery-empty-state" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '200px' }}>
+                      <div 
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          border: '2px solid rgba(0, 34, 255, 0.2)',
+                          borderTop: isDarkMode ? '2px solid #FFFFFF' : '2px solid #0022FF',
+                          borderRadius: '50%',
+                          animation: 'spin 1s linear infinite',
+                          marginBottom: '16px'
+                        }}
+                      />
+                      <span className="gallery-empty-text">LOADING CLOUD GALLERY...</span>
+                    </div>
+                  ) : galleryImages.filter(img => img.folder === activeGalleryFolder).length === 0 ? (
                     <div className="gallery-empty-state">
                       <span className="gallery-empty-text">NO IMAGES IN THIS FOLDER</span>
                     </div>
@@ -2864,13 +2990,32 @@ export default function App() {
                     <div className="gallery-grid">
                       {galleryImages.filter(img => img.folder === activeGalleryFolder).map(img => (
                         <div key={img.id} className="gallery-item-card">
-                          <div className="gallery-image-wrapper">
+                          <div className="gallery-image-wrapper" style={{ position: 'relative' }}>
                             <img 
                               src={img.url} 
                               alt="Gallery Item" 
-                              onClick={() => setLightboxImage(img.url)}
+                              onClick={() => !img.isUploading && setLightboxImage(img.url)}
                               className="gallery-thumbnail cursor-zoom-in"
+                              style={img.isUploading ? { opacity: 0.4, filter: 'blur(3px)' } : {}}
                             />
+                            {img.isUploading && (
+                              <div style={{
+                                position: 'absolute',
+                                inset: 0,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                background: 'rgba(0, 0, 0, 0.1)',
+                                color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                                fontSize: '10px',
+                                fontWeight: 'bold',
+                                tracking: '0.1em',
+                                animation: 'pulse 1.5s infinite'
+                              }}>
+                                <span>UPLOADING...</span>
+                              </div>
+                            )}
                           </div>
                           
                           <div className="gallery-item-meta">
@@ -2891,12 +3036,23 @@ export default function App() {
                               <select 
                                 className="gallery-move-select"
                                 value={img.folder || '기본'}
+                                disabled={img.isUploading}
                                 onChange={(e) => {
+                                  if (img.isUploading) return;
                                   const destFolder = e.target.value;
-                                  setGalleryImages(prev => prev.map(i => 
-                                    i.id === img.id ? { ...i, folder: destFolder } : i
-                                  ));
-                                  triggerToast(`이미지가 '${destFolder}' 폴더로 이동되었습니다.`);
+                                  (async () => {
+                                    try {
+                                      const imgDocRef = doc(db, "gallery", img.id);
+                                      await updateDoc(imgDocRef, { folder: destFolder });
+                                      setGalleryImages(prev => prev.map(i => 
+                                        i.id === img.id ? { ...i, folder: destFolder } : i
+                                      ));
+                                      triggerToast(`이미지가 '${destFolder}' 폴더로 이동되었습니다.`);
+                                    } catch (err) {
+                                      console.error("Error moving image in Firestore:", err);
+                                      triggerToast("클라우드 이미지 이동 중 오류가 발생했습니다.");
+                                    }
+                                  })();
                                 }}
                               >
                                 {galleryFolders.map(f => (
@@ -2906,10 +3062,31 @@ export default function App() {
 
                               <button 
                                 className="gallery-item-delete"
+                                disabled={img.isUploading}
                                 onClick={() => {
+                                  if (img.isUploading) return;
                                   if (window.confirm("이 이미지를 삭제하시겠습니까?")) {
-                                    setGalleryImages(prev => prev.filter(i => i.id !== img.id));
-                                    triggerToast("이미지가 삭제되었습니다.");
+                                    (async () => {
+                                      try {
+                                        // Delete Firestore Document
+                                        const imgDocRef = doc(db, "gallery", img.id);
+                                        await deleteDoc(imgDocRef);
+                                        
+                                        // Delete Firebase Storage Object if storagePath exists
+                                        if (img.storagePath) {
+                                          const storageRef = ref(storage, img.storagePath);
+                                          await deleteObject(storageRef).catch(err => {
+                                            console.warn("Storage file delete failed or didn't exist:", err);
+                                          });
+                                        }
+                                        
+                                        setGalleryImages(prev => prev.filter(i => i.id !== img.id));
+                                        triggerToast("이미지가 삭제되었습니다.");
+                                      } catch (err) {
+                                        console.error("Error deleting image in Firebase:", err);
+                                        triggerToast("클라우드 이미지 삭제 중 오류가 발생했습니다.");
+                                      }
+                                    })();
                                   }
                                 }}
                               >
