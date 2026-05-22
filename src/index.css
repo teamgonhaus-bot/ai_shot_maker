@@ -2075,11 +2075,13 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
 .folder-content-envelope {
   background: #FFFFFF !important;
   border: 1px solid #0022FF !important;
-  border-radius: 0 0 16px 16px !important; /* Perfectly flat top corners to align with leftmost and rightmost tabs */
+  border-top: none !important; /* Tab container's bottom border serves as the top edge */
+  border-radius: 0 0 16px 16px !important;
   padding: 12px !important;
   position: relative !important;
   z-index: 2 !important; /* Lower than tabs so their bottom border sits on top */
   margin-top: 0 !important;
+  overflow: hidden !important; /* Clip AnimatePresence exit animations to prevent border flicker */
 }
 
 /* 🔵 블루모드 (body.dark-mode) 대응 반전 */
@@ -2105,6 +2107,7 @@ body.dark-mode .folder-tab.active {
 body.dark-mode .folder-content-envelope {
   background: #0022FF !important;
   border: 1px solid #FFFFFF !important;
+  border-top: none !important; /* Tab container's 2px white border serves as top edge */
 }
 
 /* Library grid tighter spacing inside envelope */

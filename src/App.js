@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders, Zap
+  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders, Zap, Shuffle, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { InferenceClient } from "@huggingface/inference";
@@ -2057,13 +2057,13 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* 2. Circular R Random Button */}
+                {/* 2. Shuffle Random Button */}
                 <button
                   onClick={handleSmartRandomShuffle}
                   title="랜덤 셔플"
                   style={{
-                    width: '32px',
-                    height: '32px',
+                    width: '30px',
+                    height: '30px',
                     borderRadius: '50%',
                     backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
                     color: isDarkMode ? '#0022FF' : '#FFFFFF',
@@ -2072,21 +2072,20 @@ export default function App() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    fontWeight: '900',
-                    fontSize: '14px',
                     boxShadow: 'none',
                     transition: 'all 0.2s ease',
-                    outline: 'none'
+                    outline: 'none',
+                    flexShrink: 0,
                   }}
-                  className="hover:scale-105 active:scale-95 hover:opacity-90"
+                  className="hover:scale-105 active:scale-90 hover:opacity-90"
                 >
-                  R
+                  <Shuffle size={13} strokeWidth={2.5} />
                 </button>
               </div>
             </div>
 
             {/* Smart Template Grid — Swiss Line Grid Box (v0.62) */}
-            <div className="template-grid">
+            <div className="template-grid" style={{ marginTop: '0' }}>
               <button className={`ios-smart-template-btn ${activeTemplate === 'TITLE SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('TITLE SCENE')}>
                 <div className="template-index">01 /</div>
                 <div className="template-title">Title</div>
@@ -2163,8 +2162,8 @@ export default function App() {
               )}
             </div>
 
-            {/* Category Tabs & Content Wrapper (eliminates space-y-6 top margin gap) */}
-            <div>
+            {/* Category Tabs & Content Wrapper */}
+            <div style={{ position: 'relative' }}>
               <div className="folder-tabs-container">
               <button className={`folder-tab ${activeCategory === 'subject' ? 'active' : ''}`} onClick={() => setActiveCategory('subject')}>인물</button>
               <button className={`folder-tab ${activeCategory === 'space' ? 'active' : ''}`} onClick={() => setActiveCategory('space')}>공간</button>
@@ -2174,7 +2173,7 @@ export default function App() {
 
             <AnimatePresence mode="wait">
               {activeCategory === 'subject' && (
-                <motion.section key="subject" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} style={{ position: 'relative', zIndex: 1 }}>
+                <motion.section key="subject" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ position: 'relative', zIndex: 1 }}>
                   <div className="folder-content-envelope">
                     <OptionSelect label="인원" value={config.subjectNum} onChange={(v) => handleConfigChange('subjectNum', v)} options={OPTIONS_DATA.subjectNum} theme="red" />
                     {config.subjectNum !== "없음" && (
@@ -2256,7 +2255,7 @@ export default function App() {
               )}
 
               {activeCategory === 'space' && (
-                <motion.section key="space" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} style={{ position: 'relative', zIndex: 1 }}>
+                <motion.section key="space" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ position: 'relative', zIndex: 1 }}>
                   <div className="folder-content-envelope">
                     <OptionSelect label="공간 종류" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} theme="green" />
                     <OptionSelect label="세부 공간" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} theme="green" />
@@ -2353,7 +2352,7 @@ export default function App() {
               )}
 
               {activeCategory === 'camera' && (
-                <motion.section key="camera" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} style={{ position: 'relative', zIndex: 1 }}>
+                <motion.section key="camera" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ position: 'relative', zIndex: 1 }}>
                   <div className="folder-content-envelope">
                     <div className="mb-4 space-y-4">
                       <IOSToggle
@@ -2475,7 +2474,7 @@ export default function App() {
               )}
 
               {activeCategory === 'style' && (
-                <motion.section key="style" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} style={{ position: 'relative', zIndex: 1 }}>
+                <motion.section key="style" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ position: 'relative', zIndex: 1 }}>
                   <div className="folder-content-envelope">
                     <OptionSelect
                       label="연출 샷 스타일 (다중 선택)"
@@ -2603,37 +2602,67 @@ export default function App() {
                         </div>
                       )}
                       {totalPages > 1 && (
-                        <div className="col-span-2 flex items-center justify-center gap-3 pt-2 pb-1">
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          gap: '12px', 
+                          marginTop: '24px',
+                          paddingTop: '16px',
+                          borderTop: isDarkMode ? '1px solid rgba(255,255,255,0.25)' : '1px solid rgba(0,34,255,0.2)',
+                          paddingBottom: '4px'
+                        }}>
                           <button
                             onClick={() => setLibraryPage(p => Math.max(0, p - 1))}
                             disabled={libraryPage === 0}
                             style={{
-                              width: '32px', height: '32px', borderRadius: '50%',
-                              border: '1.5px solid #0022FF', background: libraryPage === 0 ? '#F2F2F7' : '#0022FF',
-                              color: libraryPage === 0 ? '#999' : '#FFF',
+                              width: '32px', 
+                              height: '32px', 
+                              borderRadius: '0px',
+                              border: libraryPage === 0 
+                                ? (isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(0,34,255,0.2)') 
+                                : (isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF'),
+                              background: 'transparent',
+                              color: libraryPage === 0 
+                                ? (isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,34,255,0.2)') 
+                                : (isDarkMode ? '#FFFFFF' : '#0022FF'),
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
                               cursor: libraryPage === 0 ? 'default' : 'pointer',
-                              fontSize: '14px', fontWeight: '700', transition: 'all 0.2s'
+                              transition: 'all 0.15s'
                             }}
                           >
-                            ‹
+                            <ChevronLeft size={14} strokeWidth={2.5} />
                           </button>
-                          <span style={{ fontSize: '12px', fontWeight: '700', color: '#0022FF', minWidth: '40px', textAlign: 'center' }}>
+                          <span style={{ 
+                            fontSize: '11px', 
+                            fontWeight: '800', 
+                            color: isDarkMode ? '#FFFFFF' : '#0022FF', 
+                            letterSpacing: '0.08em',
+                            minWidth: '48px', 
+                            textAlign: 'center' 
+                          }}>
                             {libraryPage + 1} / {totalPages}
                           </span>
                           <button
                             onClick={() => setLibraryPage(p => Math.min(totalPages - 1, p + 1))}
                             disabled={libraryPage === totalPages - 1}
                             style={{
-                              width: '32px', height: '32px', borderRadius: '50%',
-                              border: '1.5px solid #0022FF', background: libraryPage === totalPages - 1 ? '#F2F2F7' : '#0022FF',
-                              color: libraryPage === totalPages - 1 ? '#999' : '#FFF',
+                              width: '32px', 
+                              height: '32px', 
+                              borderRadius: '0px',
+                              border: libraryPage === totalPages - 1 
+                                ? (isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(0,34,255,0.2)') 
+                                : (isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF'),
+                              background: 'transparent',
+                              color: libraryPage === totalPages - 1 
+                                ? (isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,34,255,0.2)') 
+                                : (isDarkMode ? '#FFFFFF' : '#0022FF'),
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
                               cursor: libraryPage === totalPages - 1 ? 'default' : 'pointer',
-                              fontSize: '14px', fontWeight: '700', transition: 'all 0.2s'
+                              transition: 'all 0.15s'
                             }}
                           >
-                            ›
+                            <ChevronRight size={14} strokeWidth={2.5} />
                           </button>
                         </div>
                       )}
