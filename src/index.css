@@ -2130,6 +2130,12 @@ body.dark-mode .ios-template-card-footer {
 .ios-library-grid .ios-apply-preset-btn {
   width: 32px !important;
   height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  flex-shrink: 0 !important;
+  aspect-ratio: 1 / 1 !important;
+  box-sizing: border-box !important;
+  border-radius: 50% !important;
 }
 
 /* =============================================

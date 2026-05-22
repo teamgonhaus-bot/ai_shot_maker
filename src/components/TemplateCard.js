@@ -84,6 +84,7 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
             onClick={(e) => { e.stopPropagation(); onApply(template); }}
             className="ios-apply-preset-btn"
             title="Apply preset"
+            style={{ flexShrink: 0 }}
           >
             <ArrowRight size={14} strokeWidth={2.5} />
           </button>
@@ -93,6 +94,7 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
             onClick={(e) => { e.stopPropagation(); onDelete(template.id); }}
             className="ios-card-icon-btn"
             title="Delete"
+            style={{ flexShrink: 0 }}
           >
             <Trash2 size={14} strokeWidth={2} />
           </button>
@@ -102,6 +104,7 @@ export default function TemplateCard({ template, onSelect, onApply, onDelete, on
             onClick={(e) => { e.stopPropagation(); onRename(template.id, template.name); }}
             className="ios-card-icon-btn"
             title="Rename"
+            style={{ flexShrink: 0 }}
           >
             <Edit2 size={14} strokeWidth={2} />
           </button>
