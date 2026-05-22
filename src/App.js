@@ -1671,82 +1671,57 @@ export default function App() {
                       style={{
                         paddingBottom: idx === aboutModalTarget.content.length - 1 ? '0' : '20px',
                         borderBottom: idx === aboutModalTarget.content.length - 1 ? 'none' : (isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)'),
-                        textAlign: 'left',
-                        display: 'flex',
-                        gap: '14px',
-                        position: 'relative'
+                        textAlign: 'left'
                       }}
                     >
-                      {/* Dynamic vertical accent bar */}
-                      <div 
+                      <h4 
                         style={{ 
-                          width: '4px', 
-                          borderRadius: '2px', 
-                          backgroundColor: getValidHexColor(aboutModalTarget.color), 
-                          flexShrink: 0,
-                          alignSelf: 'stretch'
-                        }} 
-                      />
-                      <div style={{ flex: 1 }}>
-                        <h4 
-                          style={{ 
-                            fontSize: '15px', 
-                            fontWeight: '800', 
-                            color: isDarkMode ? '#FFFFFF' : '#0022FF', 
-                            margin: '0 0 6px 0',
-                            letterSpacing: '-0.02em'
-                          }}
-                        >
-                          {item.label}
-                        </h4>
-                        <p 
-                          style={{ 
-                            fontSize: '12.5px', 
-                            color: isDarkMode ? '#FFFFFFB3' : '#4E5B85', 
-                            fontWeight: '500', 
-                            lineHeight: '1.65', 
-                            margin: 0,
-                            textAlign: 'left',
-                            wordBreak: 'keep-all'
-                          }}
-                        >
-                          {item.text}
-                        </p>
-                      </div>
+                          fontSize: '15px', 
+                          fontWeight: '800', 
+                          color: isDarkMode ? '#FFFFFF' : '#0022FF', 
+                          margin: '0 0 8px 0',
+                          letterSpacing: '-0.02em'
+                        }}
+                      >
+                        {item.label}
+                      </h4>
+                      <p 
+                        style={{ 
+                          fontSize: '12.5px', 
+                          color: isDarkMode ? '#FFFFFFB3' : '#4E5B85', 
+                          fontWeight: '500', 
+                          lineHeight: '1.65', 
+                          margin: 0,
+                          textAlign: 'left',
+                          wordBreak: 'keep-all'
+                        }}
+                      >
+                        {item.text}
+                      </p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Footer text inside modal */}
               {aboutModalTarget.footer && (
                 <div style={{
                   paddingTop: '16px',
                   borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)',
                   marginTop: '4px'
                 }}>
-                  <div 
-                    style={{
-                      backgroundColor: isDarkMode ? 'rgba(0, 34, 255, 0.2)' : '#F2F2F7',
-                      border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(0, 34, 255, 0.1)',
-                      borderRadius: '12px',
-                      padding: '12px 16px',
-                      textAlign: 'left'
+                  <p 
+                    style={{ 
+                      fontSize: '11px', 
+                      color: isDarkMode ? '#FFFFFFB3' : '#0022FFCC', 
+                      fontWeight: '600', 
+                      lineHeight: '1.5', 
+                      textAlign: 'left',
+                      margin: 0,
+                      wordBreak: 'keep-all'
                     }}
                   >
-                    <p 
-                      style={{ 
-                        fontSize: '12px', 
-                        color: isDarkMode ? '#FFFFFF' : '#0022FF', 
-                        fontWeight: '600', 
-                        lineHeight: '1.5', 
-                        margin: 0,
-                        wordBreak: 'keep-all'
-                      }}
-                    >
-                      💡 <span style={{ fontWeight: 800 }}>Tip:</span> {aboutModalTarget.footer}
-                    </p>
-                  </div>
+                    💡 {aboutModalTarget.footer}
+                  </p>
                 </div>
               )}
             </motion.div>
