@@ -2261,10 +2261,10 @@ export default function App() {
                     <OptionSelect label="공간 종류" value={config.spaceType} onChange={(v) => handleConfigChange('spaceType', v)} options={OPTIONS_DATA.spaceType} theme="green" />
                     <OptionSelect label="세부 공간" value={config.spaceDetail} onChange={(v) => handleConfigChange('spaceDetail', v)} options={OPTIONS_DATA.spaceDetail[config.spaceType] || []} theme="green" />
                     {config.spaceType === '스튜디오' && (config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경') && (
-                      <div className="mt-2 mb-4 p-4 rounded-2xl bg-gray-50 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700">
-                        <div className="ios-option-label mb-2 text-[12px] font-bold">배경 컬러 선택 (Monochrome Color)</div>
+                      <div className="mt-2 mb-4" style={{ padding: '16px', background: isDarkMode ? 'rgba(255,255,255,0.06)' : '#F8F8FF', border: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(0,34,255,0.12)' }}>
+                        <div className="ios-option-label mb-3 text-[12px] font-bold">배경 컬러 선택 (Monochrome Color)</div>
 
-                        <div className="flex flex-wrap" style={{ gap: '10px 12px', marginBottom: '24px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '20px' }}>
                           {['Cobalt Blue', 'Terracotta', 'Sage Green', 'Warm Sand', 'Matte Black', 'Pure White', 'Ash Gray', 'Ruby Red'].map(color => (
                             <button
                               key={color}
@@ -2274,16 +2274,20 @@ export default function App() {
                                 display: 'inline-flex',
                                 alignItems: 'center',
                                 gap: '6px',
-                                padding: '6px 12px',
-                                fontSize: '12px',
-                                border: config.monochromeColor === color ? '1px solid #34C759' : '1px solid rgba(0,0,0,0.08)',
+                                padding: '7px 10px',
+                                fontSize: '11px',
+                                border: config.monochromeColor === color ? '1px solid #34C759' : '1px solid rgba(0,0,0,0.1)',
                                 backgroundColor: config.monochromeColor === color ? 'rgba(52, 199, 89, 0.1)' : undefined,
-                                color: config.monochromeColor === color ? '#34C759' : undefined
+                                color: config.monochromeColor === color ? '#34C759' : undefined,
+                                borderRadius: '0px',
+                                justifyContent: 'flex-start',
+                                width: '100%',
                               }}
                             >
                               <span style={{
                                 width: '10px',
                                 height: '10px',
+                                flexShrink: 0,
                                 borderRadius: '50%',
                                 backgroundColor: getColorHex(color),
                                 border: '1px solid rgba(0,0,0,0.1)'
@@ -2293,16 +2297,16 @@ export default function App() {
                           ))}
                         </div>
 
-                        <div className="flex items-center gap-3">
-                          <div style={{ position: 'relative', width: '36px', height: '36px', borderRadius: '50%', overflow: 'hidden', border: '2px solid #E5E5EA', flexShrink: 0 }}>
+                        <div className="flex items-center gap-4" style={{ padding: '12px 0 4px 0' }}>
+                          <div style={{ position: 'relative', width: '52px', height: '52px', borderRadius: '50%', overflow: 'hidden', border: isDarkMode ? '2px solid rgba(255,255,255,0.3)' : '2px solid rgba(0,34,255,0.25)', flexShrink: 0 }}>
                             <input
                               type="color"
                               value={getValidHexColor(config.monochromeColor)}
                               onChange={(e) => handleConfigChange('monochromeColor', e.target.value)}
-                              style={{ position: 'absolute', top: '-10px', left: '-10px', width: '60px', height: '60px', cursor: 'pointer', border: 'none', padding: 0 }}
+                              style={{ position: 'absolute', top: '-10px', left: '-10px', width: '72px', height: '72px', cursor: 'pointer', border: 'none', padding: 0 }}
                             />
                           </div>
-                          <div className="save-bar flex-1" style={{ padding: '4px 12px' }}>
+                          <div className="save-bar flex-1" style={{ padding: '8px 14px' }}>
                             <input
                               type="text"
                               placeholder="직접 입력 (예: Sage Green, Crimson)"

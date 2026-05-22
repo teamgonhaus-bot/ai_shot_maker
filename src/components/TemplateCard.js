@@ -76,95 +76,103 @@ export default function TemplateCard({
           {template.prompt}
         </p>
 
-        {/* Action Buttons: Solid Swiss Block Style (Copied from spec sheet Copy tab specs) */}
-        <div className="flex flex-wrap items-center gap-4 mt-3 md:mt-0 flex-shrink-0 self-end w-full md:w-auto justify-end">
+        {/* Action Buttons: APPLY primary solid, others minimal underline text */}
+        <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+          {/* APPLY — primary CTA, solid fill */}
           <button
             onClick={(e) => {
               e.stopPropagation();
               onApply(template);
             }}
-            className="hover:opacity-90 active:scale-95 transition-all duration-200"
+            className="hover:opacity-90 active:scale-95 transition-all duration-150"
             style={{
               backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
               color: isDarkMode ? '#0022FF' : '#FFFFFF',
               border: 'none',
               borderRadius: '0px',
-              padding: '6px 14px',
-              fontSize: '10px',
+              padding: '8px 20px',
+              fontSize: '11px',
               fontWeight: '900',
-              letterSpacing: '0.08em',
+              letterSpacing: '0.1em',
               textTransform: 'uppercase',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              flexShrink: 0,
             }}
           >
             APPLY
           </button>
-          
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onMoveRequest(template);
-            }}
-            className="hover:opacity-90 active:scale-95 transition-all duration-200"
-            style={{
-              backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-              color: isDarkMode ? '#0022FF' : '#FFFFFF',
-              border: 'none',
-              borderRadius: '0px',
-              padding: '6px 14px',
-              fontSize: '10px',
-              fontWeight: '900',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              cursor: 'pointer'
-            }}
-          >
-            MOVE
-          </button>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onRename(template.id, template.name);
-            }}
-            className="hover:opacity-90 active:scale-95 transition-all duration-200"
-            style={{
-              backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-              color: isDarkMode ? '#0022FF' : '#FFFFFF',
-              border: 'none',
-              borderRadius: '0px',
-              padding: '6px 14px',
-              fontSize: '10px',
-              fontWeight: '900',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              cursor: 'pointer'
-            }}
-          >
-            RENAME
-          </button>
+          {/* Secondary actions — simple underline text style */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexShrink: 0 }}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onMoveRequest(template);
+              }}
+              className="hover:opacity-100 active:opacity-60 transition-opacity"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                borderBottom: isDarkMode ? '1px solid rgba(255,255,255,0.5)' : '1px solid rgba(0,34,255,0.4)',
+                borderRadius: '0px',
+                padding: '2px 0',
+                fontSize: '10px',
+                fontWeight: '700',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+                color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,34,255,0.55)',
+              }}
+            >
+              MOVE
+            </button>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(template.id);
-            }}
-            className="hover:opacity-90 active:scale-95 transition-all duration-200"
-            style={{
-              backgroundColor: '#FF3B30',
-              color: '#FFFFFF',
-              border: 'none',
-              borderRadius: '0px',
-              padding: '6px 14px',
-              fontSize: '10px',
-              fontWeight: '900',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              cursor: 'pointer'
-            }}
-          >
-            DELETE
-          </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onRename(template.id, template.name);
+              }}
+              className="hover:opacity-100 active:opacity-60 transition-opacity"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                borderBottom: isDarkMode ? '1px solid rgba(255,255,255,0.5)' : '1px solid rgba(0,34,255,0.4)',
+                borderRadius: '0px',
+                padding: '2px 0',
+                fontSize: '10px',
+                fontWeight: '700',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+                color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,34,255,0.55)',
+              }}
+            >
+              RENAME
+            </button>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(template.id);
+              }}
+              className="hover:opacity-100 active:opacity-60 transition-opacity"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                borderBottom: '1px solid rgba(255,59,48,0.5)',
+                borderRadius: '0px',
+                padding: '2px 0',
+                fontSize: '10px',
+                fontWeight: '700',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+                color: 'rgba(255,59,48,0.7)',
+              }}
+            >
+              DELETE
+            </button>
+          </div>
         </div>
       </div>
     </div>
