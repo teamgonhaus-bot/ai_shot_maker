@@ -1249,76 +1249,43 @@ export default function App() {
         if (part.inlineData) {
           const mimeType = part.inlineData.mimeType || "image/png";
           const base64Url = `data:${mimeType};base64,${part.inlineData.data}`;
-          setGeneratedImage(base64Url);
           
-          // Auto-save to gallery (saved instantly locally for Zero-Lag UX)
-          const tempId = `temp_${Date.now()}`;
-          const tempImg = {
-            id: tempId,
-            url: base64Url,
+          // 1. Firebase Storage에 즉시 동기식 업로드 진행
+          const fileName = `gallery/img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.png`;
+          const storageRef = ref(storage, fileName);
+          
+          await uploadString(storageRef, base64Url, 'data_url');
+          
+          // 2. Public Download URL 획득
+          const downloadUrl = await getDownloadURL(storageRef);
+          
+          // 3. Firestore 'gallery' 컬렉션에 메타데이터 저장
+          const firestoreData = {
+            url: downloadUrl,
+            storagePath: fileName,
             prompt: promptToUse,
             timestamp: new Date().toISOString(),
             folder: '기본'
           };
-          setGalleryImages(prev => [tempImg, ...prev]);
           
-          // Background upload pipeline to Firebase Storage and Firestore sync
-          (async () => {
-            try {
-              const fileName = `gallery/img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.png`;
-              const storageRef = ref(storage, fileName);
-              
-              // Upload base64 data to Firebase Storage
-              await uploadString(storageRef, base64Url, 'data_url');
-              
-              // Retrieve public download URL
-              const downloadUrl = await getDownloadURL(storageRef);
-              
-              // Check if the image has been deleted by the user in the meantime
-              let isStillPresent = false;
-              setGalleryImages(prev => {
-                isStillPresent = prev.some(img => img.id === tempId);
-                return prev;
-              });
-              
-              if (!isStillPresent) {
-                console.log("ℹ️ Image was deleted by user before upload completed. Cleaning up cloud storage.");
-                await deleteObject(storageRef).catch(() => {});
-                return;
-              }
-
-              // Get current folder (in case user moved it while uploading)
-              let currentFolder = '기본';
-              setGalleryImages(prev => {
-                const found = prev.find(img => img.id === tempId);
-                if (found) {
-                  currentFolder = found.folder || '기본';
-                }
-                return prev;
-              });
-
-              // Write image record to Firestore 'gallery' collection
-              const firestoreData = {
-                url: downloadUrl,
-                storagePath: fileName,
-                prompt: promptToUse,
-                timestamp: new Date().toISOString(),
-                folder: currentFolder
-              };
-              
-              const docRef = await addDoc(collection(db, "gallery"), firestoreData);
-              
-              // Replace temporary image state with the completed Firestore document
-              setGalleryImages(prev => prev.map(img => 
-                img.id === tempId ? { ...img, id: docRef.id, url: downloadUrl, storagePath: fileName } : img
-              ));
-              
-              console.log(`✅ Background sync completed silently. Document ID: ${docRef.id}`);
-            } catch (uploadError) {
-              console.error("❌ Background upload/sync error:", uploadError);
-              // We do not remove the local image on error so the user doesn't lose their generated image during the session!
-            }
-          })();
+          const docRef = await addDoc(collection(db, "gallery"), firestoreData);
+          
+          // 4. 메인 이미지 및 갤러리 상태 업데이트
+          setGeneratedImage(downloadUrl);
+          
+          const finalImg = {
+            id: docRef.id,
+            url: downloadUrl,
+            storagePath: fileName,
+            prompt: promptToUse,
+            timestamp: firestoreData.timestamp,
+            folder: '기본'
+          };
+          
+          setGalleryImages(prev => [finalImg, ...prev]);
+          
+          triggerToast("이미지가 성공적으로 생성되어 서버에 저장되었습니다.");
+          console.log(`✅ Image generated, uploaded to Storage, and recorded in Firestore. Document ID: ${docRef.id}`);
           
           imageFound = true;
           break;
