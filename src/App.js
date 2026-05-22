@@ -391,8 +391,24 @@ export default function App() {
       }
     };
 
-    fetchTemplates();
-    fetchGalleryData();
+    // 4. Auto sign-in anonymously to ensure active Auth context for Storage/Firestore uploads
+    const autoSignIn = async () => {
+      try {
+        if (!auth.currentUser) {
+          await signInAnonymously(auth);
+          console.log("🔑 Anonymous sign-in successful.");
+        }
+      } catch (err) {
+        console.error("🔑 Anonymous sign-in failed:", err);
+      }
+    };
+
+    const initFirebase = async () => {
+      await autoSignIn();
+      fetchTemplates();
+      fetchGalleryData();
+    };
+    initFirebase();
   }, []);
 
   // ⏳ Splash Intro Timer (at least 1.2s exposure + 0.3s smooth fade out)
@@ -1235,15 +1251,14 @@ export default function App() {
           const base64Url = `data:${mimeType};base64,${part.inlineData.data}`;
           setGeneratedImage(base64Url);
           
-          // Auto-save to gallery (temporary local display with uploading flag for Zero-Lag UX)
+          // Auto-save to gallery (saved instantly locally for Zero-Lag UX)
           const tempId = `temp_${Date.now()}`;
           const tempImg = {
             id: tempId,
             url: base64Url,
             prompt: promptToUse,
             timestamp: new Date().toISOString(),
-            folder: '기본',
-            isUploading: true
+            folder: '기본'
           };
           setGalleryImages(prev => [tempImg, ...prev]);
           
@@ -1259,28 +1274,49 @@ export default function App() {
               // Retrieve public download URL
               const downloadUrl = await getDownloadURL(storageRef);
               
+              // Check if the image has been deleted by the user in the meantime
+              let isStillPresent = false;
+              setGalleryImages(prev => {
+                isStillPresent = prev.some(img => img.id === tempId);
+                return prev;
+              });
+              
+              if (!isStillPresent) {
+                console.log("ℹ️ Image was deleted by user before upload completed. Cleaning up cloud storage.");
+                await deleteObject(storageRef).catch(() => {});
+                return;
+              }
+
+              // Get current folder (in case user moved it while uploading)
+              let currentFolder = '기본';
+              setGalleryImages(prev => {
+                const found = prev.find(img => img.id === tempId);
+                if (found) {
+                  currentFolder = found.folder || '기본';
+                }
+                return prev;
+              });
+
               // Write image record to Firestore 'gallery' collection
               const firestoreData = {
                 url: downloadUrl,
                 storagePath: fileName,
                 prompt: promptToUse,
                 timestamp: new Date().toISOString(),
-                folder: '기본'
+                folder: currentFolder
               };
               
               const docRef = await addDoc(collection(db, "gallery"), firestoreData);
               
               // Replace temporary image state with the completed Firestore document
               setGalleryImages(prev => prev.map(img => 
-                img.id === tempId ? { id: docRef.id, ...firestoreData } : img
+                img.id === tempId ? { ...img, id: docRef.id, url: downloadUrl, storagePath: fileName } : img
               ));
               
-              console.log(`✅ Background sync completed. Document ID: ${docRef.id}`);
+              console.log(`✅ Background sync completed silently. Document ID: ${docRef.id}`);
             } catch (uploadError) {
               console.error("❌ Background upload/sync error:", uploadError);
-              triggerToast("구글 클라우드 이미지 동기화 중 오류가 발생했습니다.");
-              // Rollback temporary image if upload failed
-              setGalleryImages(prev => prev.filter(img => img.id !== tempId));
+              // We do not remove the local image on error so the user doesn't lose their generated image during the session!
             }
           })();
           
@@ -2990,32 +3026,13 @@ export default function App() {
                     <div className="gallery-grid">
                       {galleryImages.filter(img => img.folder === activeGalleryFolder).map(img => (
                         <div key={img.id} className="gallery-item-card">
-                          <div className="gallery-image-wrapper" style={{ position: 'relative' }}>
+                          <div className="gallery-image-wrapper">
                             <img 
                               src={img.url} 
                               alt="Gallery Item" 
-                              onClick={() => !img.isUploading && setLightboxImage(img.url)}
+                              onClick={() => setLightboxImage(img.url)}
                               className="gallery-thumbnail cursor-zoom-in"
-                              style={img.isUploading ? { opacity: 0.4, filter: 'blur(3px)' } : {}}
                             />
-                            {img.isUploading && (
-                              <div style={{
-                                position: 'absolute',
-                                inset: 0,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                background: 'rgba(0, 0, 0, 0.1)',
-                                color: isDarkMode ? '#FFFFFF' : '#0022FF',
-                                fontSize: '10px',
-                                fontWeight: 'bold',
-                                tracking: '0.1em',
-                                animation: 'pulse 1.5s infinite'
-                              }}>
-                                <span>UPLOADING...</span>
-                              </div>
-                            )}
                           </div>
                           
                           <div className="gallery-item-meta">
@@ -3036,10 +3053,16 @@ export default function App() {
                               <select 
                                 className="gallery-move-select"
                                 value={img.folder || '기본'}
-                                disabled={img.isUploading}
                                 onChange={(e) => {
-                                  if (img.isUploading) return;
                                   const destFolder = e.target.value;
+                                  if (img.id.startsWith('temp_')) {
+                                    setGalleryImages(prev => prev.map(i => 
+                                      i.id === img.id ? { ...i, folder: destFolder } : i
+                                    ));
+                                    triggerToast(`이미지가 '${destFolder}' 폴더로 이동되었습니다.`);
+                                    return;
+                                  }
+
                                   (async () => {
                                     try {
                                       const imgDocRef = doc(db, "gallery", img.id);
@@ -3062,10 +3085,14 @@ export default function App() {
 
                               <button 
                                 className="gallery-item-delete"
-                                disabled={img.isUploading}
                                 onClick={() => {
-                                  if (img.isUploading) return;
                                   if (window.confirm("이 이미지를 삭제하시겠습니까?")) {
+                                    if (img.id.startsWith('temp_')) {
+                                      setGalleryImages(prev => prev.filter(i => i.id !== img.id));
+                                      triggerToast("이미지가 삭제되었습니다.");
+                                      return;
+                                    }
+
                                     (async () => {
                                       try {
                                         // Delete Firestore Document
