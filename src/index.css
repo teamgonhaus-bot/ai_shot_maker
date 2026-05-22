@@ -2561,7 +2561,7 @@ body.dark-mode .swiss-copy-btn {
   width: 100% !important;
   border: 1.5px solid #0022FF !important;
   background: #FFFFFF !important;
-  margin-top: 16px !important;
+  margin-top: 24px !important;
   box-sizing: border-box !important;
   min-height: 550px !important;
 }
@@ -2569,6 +2569,36 @@ body.dark-mode .swiss-copy-btn {
 body.dark-mode .gallery-workspace {
   border: 1.5px solid #FFFFFF !important;
   background: #0022FF !important;
+}
+
+.gallery-folder-edit-btn-action {
+  width: 100% !important;
+  background: transparent !important;
+  border: 1.5px solid #0022FF !important;
+  color: #0022FF !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  padding: 8px 4px !important;
+  cursor: pointer !important;
+  letter-spacing: 0.05em !important;
+  transition: all 0.2s ease !important;
+  text-align: center !important;
+  border-radius: 0px !important;
+}
+
+.gallery-folder-edit-btn-action:hover {
+  background: #0022FF !important;
+  color: #FFFFFF !important;
+}
+
+body.dark-mode .gallery-folder-edit-btn-action {
+  border: 1.5px solid #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+body.dark-mode .gallery-folder-edit-btn-action:hover {
+  background: #FFFFFF !important;
+  color: #0022FF !important;
 }
 
 /* Sidebar for folders - matching 100px width constraint from folders tab or similar option rows */

@@ -2774,28 +2774,50 @@ export default function App() {
                       onClick={() => setActiveGalleryFolder(folder)}
                     >
                       <span className="folder-name">{folder}</span>
-                      {folder !== '기본' && (
-                        <button 
-                          className="folder-delete-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (window.confirm(`'${folder}' 폴더를 삭제하시겠습니까? (폴더 내 이미지는 '기본' 폴더로 이동합니다)`)) {
-                              setGalleryImages(prev => prev.map(img => 
-                                img.folder === folder ? { ...img, folder: '기본' } : img
-                              ));
-                              setGalleryFolders(prev => prev.filter(f => f !== folder));
-                              if (activeGalleryFolder === folder) {
-                                setActiveGalleryFolder('기본');
-                              }
-                            }
-                          }}
-                        >
-                          ×
-                        </button>
-                      )}
                     </div>
                   ))}
                 </div>
+                
+                {activeGalleryFolder !== '기본' && (
+                  <div style={{ marginTop: '8px', marginBottom: '8px' }}>
+                    <button 
+                      className="gallery-folder-edit-btn-action"
+                      onClick={() => {
+                        const opt = window.prompt(
+                          `선택된 '${activeGalleryFolder}' 폴더 수정/삭제:\n1을 입력하면 폴더명 변경, 2를 입력하면 폴더 삭제를 진행합니다.`
+                        );
+                        if (opt === '1') {
+                          const newName = window.prompt("새로운 폴더명을 입력하세요:", activeGalleryFolder);
+                          if (newName && newName.trim()) {
+                            const trimmed = newName.trim();
+                            if (galleryFolders.includes(trimmed)) {
+                              triggerToast("이미 존재하는 폴더명입니다.");
+                              return;
+                            }
+                            setGalleryFolders(prev => prev.map(f => f === activeGalleryFolder ? trimmed : f));
+                            setGalleryImages(prev => prev.map(img => 
+                              img.folder === activeGalleryFolder ? { ...img, folder: trimmed } : img
+                            ));
+                            setActiveGalleryFolder(trimmed);
+                            triggerToast(`폴더명이 '${trimmed}'(으)로 변경되었습니다.`);
+                          }
+                        } else if (opt === '2') {
+                          if (window.confirm(`선택된 '${activeGalleryFolder}' 폴더를 정말 삭제하시겠습니까?\n폴더 내 모든 이미지는 '기본' 폴더로 안전하게 이동됩니다.`)) {
+                            const folderToDelete = activeGalleryFolder;
+                            setGalleryImages(prev => prev.map(img => 
+                              img.folder === folderToDelete ? { ...img, folder: '기본' } : img
+                            ));
+                            setGalleryFolders(prev => prev.filter(f => f !== folderToDelete));
+                            setActiveGalleryFolder('기본');
+                            triggerToast(`'${folderToDelete}' 폴더가 삭제되었습니다.`);
+                          }
+                        }
+                      }}
+                    >
+                      폴더 수정/삭제
+                    </button>
+                  </div>
+                )}
                 
                 <div className="gallery-add-folder">
                   <input
