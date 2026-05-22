@@ -22,25 +22,18 @@ export default function OptionSelect({ label, value, onChange, options, icon: Ic
   };
 
   return (
-    <div className="flex flex-col ios-option-group">
-      {label && <label className="ios-option-label">{label}</label>}
-      <div className="flex flex-wrap" style={{ gap: '8px' }}>
+    <div className="swiss-option-row">
+      {label && <label className="swiss-option-label">{label}</label>}
+      <div className="swiss-option-list">
         {options.map((opt) => {
           const active = isSelected(opt);
           return (
             <button
               key={opt}
               onClick={() => handleClick(opt)}
-              className={`ios-pill ios-interact ${
-                active ? `selected-${theme}` : ''
-              }`}
-              style={{
-                paddingTop: '6px',
-                paddingBottom: '6px',
-                minWidth: '60px'
-              }}
+              className={`swiss-option-btn ${active ? 'active' : ''}`}
             >
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1">
                 {Icon && <Icon className="w-3.5 h-3.5" />} {opt}
               </span>
             </button>
@@ -50,3 +43,4 @@ export default function OptionSelect({ label, value, onChange, options, icon: Ic
     </div>
   );
 }
+

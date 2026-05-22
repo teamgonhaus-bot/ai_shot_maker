@@ -1,115 +1,150 @@
 import React from 'react';
-import { Trash2, FolderInput, Edit2, ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
 
-export default function TemplateCard({ template, onSelect, onApply, onDelete, onRename, onMoveRequest, onViewPrompt, categories, isSelected, isDarkMode }) {
+export default function TemplateCard({
+  template,
+  index,
+  isSelected,
+  isDarkMode,
+  onSelect,
+  onApply,
+  onDelete,
+  onRename,
+  onMoveRequest,
+  onViewPrompt,
+  categories
+}) {
+  const formattedIndex = String(index).padStart(2, '0');
+  
+  // Extract info from config if available
+  const aspectRatio = template.config?.aspectRatio || 'FLUX';
+  const modelType = 'FLUX';
+
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4, boxShadow: '0 12px 28px rgba(0,0,0,0.10)' }}
-      className={`ios-bento-card flex flex-col justify-between overflow-hidden relative transition-all duration-300 ${isSelected ? 'ring-2 ring-[#0022FF]' : ''}`}
-      style={{ padding: '0', minHeight: '125px', marginBottom: '0', cursor: 'pointer' }}
+    <div
       onClick={() => {
-        onSelect(template);
-        onViewPrompt(template);
+        if (onSelect) onSelect(template);
+        if (onViewPrompt) onViewPrompt(template);
+      }}
+      className={`swiss-spec-row flex flex-col w-full text-left transition-all duration-200 cursor-pointer ${
+        isSelected ? 'bg-blue-50/40 dark:bg-zinc-800/40' : 'hover:bg-gray-50/50 dark:hover:bg-zinc-800/20'
+      }`}
+      style={{
+        borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #0022FF',
+        padding: '12px 4px',
       }}
     >
-      {template.previewImage && (
-        <div className="w-full h-32 bg-gray-100">
-          <img 
-            src={template.previewImage} 
-            alt={template.name} 
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
-      
-      <div className="flex-1 p-1.5 pb-0">
-        <div className="flex items-center justify-between mb-0.5">
-          <div className="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
-            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: template.thumbnailColor || '#000' }} />
-            <h4 className="font-bold text-[13px] text-black truncate min-w-0">
-              {template.name}
-            </h4>
-          </div>
-          <button 
-            onClick={(e) => { e.stopPropagation(); onMoveRequest(template); }}
-            className="ios-card-icon-btn flex-shrink-0 ml-1"
-            title="Move to category"
-            style={{ width: '28px', height: '28px' }}
+      {/* Line 1: Split Justification */}
+      <div className="flex justify-between items-baseline mb-2">
+        <div className="flex items-baseline gap-2">
+          <span 
+            className="text-[11px] font-mono tracking-wider" 
+            style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF', opacity: 0.6 }}
           >
-            <FolderInput size={13} />
-          </button>
+            {formattedIndex}
+          </span>
+          <span 
+            className="text-xs font-mono font-bold tracking-tight" 
+            style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF' }}
+          >
+            / {template.name}
+          </span>
         </div>
-        
-        {/* Prompt: true 4-line clamp with 10.5px font and tight line-height */}
-        <p style={{
-          fontSize: '10.5px',
-          fontWeight: 500,
-          color: '#9CA3AF',
-          lineHeight: 1.3,
-          margin: 0,
-          overflow: 'hidden',
-          display: '-webkit-box',
-          WebkitLineClamp: 4,
-          WebkitBoxOrient: 'vertical',
-          wordBreak: 'break-word',
-        }}>
+        <div 
+          className="text-[10px] font-mono uppercase tracking-widest opacity-60" 
+          style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF' }}
+        >
+          {aspectRatio.split(' ')[0]} | {modelType}
+        </div>
+      </div>
+
+      {/* Line 2: Full Prompt Text & Action Buttons */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-3 mt-1">
+        {/* Full prompt display as specification sheet detail */}
+        <p 
+          className="text-[11px] font-sans leading-relaxed flex-1 m-0 text-justify"
+          style={{ 
+            color: isDarkMode ? '#E5E5EA' : '#2C2C2E',
+            wordBreak: 'break-all'
+          }}
+        >
           {template.prompt}
         </p>
 
-        {/* Purpose Tag */}
-        {template.config && (
-          <div style={{ marginTop: '1px', marginBottom: '0px' }}>
-            <span className="inline-block px-1 py-0 bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 text-[9px] font-bold tracking-wider rounded-full border border-gray-200 dark:border-zinc-700">
-              {(() => {
-                const c = template.config;
-                if (c.aspectRatio === '1:1 (Square)' && c.subjectNum === '없음') return 'Title';
-                if (c.cameraAngle === '익스트림 클로즈업' || c.productLayout === '액체 스플래시') return 'Detail';
-                if (c.aspectRatio === '4:5 (SNS)' || c.spaceDetail === '힙한곳') return 'SNS';
-                if (c.spaceType === '홈' || c.spaceType === '오피스' || c.spaceDetail === '워크룸') return 'Usage';
-                return 'General';
-              })()}
-            </span>
-          </div>
-        )}
-      </div>
-
-      <div className="ios-template-card-footer flex items-center justify-between mt-0" style={{ paddingLeft: '6px', paddingRight: '6px' }}>
-        <div className="flex items-center w-full justify-start" style={{ gap: '8px' }}>
-          {/* 원형 Apply Preset 서클 버튼 - 일반: 블루원형/화이트아이콘, 블루모드: 화이트원형/블루아이콘 */}
+        {/* Action Buttons: Minimal Text-Only Underlined */}
+        <div className="flex items-center gap-3 mt-2 md:mt-0 flex-shrink-0 self-end">
           <button
-            onClick={(e) => { e.stopPropagation(); onApply(template); }}
-            className="ios-apply-preset-btn"
-            title="Apply preset"
-            style={{ flexShrink: 0 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onApply(template);
+            }}
+            className="text-[10px] font-bold tracking-wider hover:opacity-70 transition-opacity"
+            style={{
+              color: isDarkMode ? '#FFFFFF' : '#0022FF',
+              borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+              paddingBottom: '1px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer'
+            }}
           >
-            <ArrowRight size={14} strokeWidth={2.5} />
+            APPLY
+          </button>
+          
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveRequest(template);
+            }}
+            className="text-[10px] font-bold tracking-wider hover:opacity-70 transition-opacity"
+            style={{
+              color: isDarkMode ? '#FFFFFF' : '#0022FF',
+              borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+              paddingBottom: '1px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            MOVE
           </button>
 
-          {/* Delete 버튼 */}
           <button
-            onClick={(e) => { e.stopPropagation(); onDelete(template.id); }}
-            className="ios-card-icon-btn"
-            title="Delete"
-            style={{ flexShrink: 0 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRename(template.id, template.name);
+            }}
+            className="text-[10px] font-bold tracking-wider hover:opacity-70 transition-opacity"
+            style={{
+              color: isDarkMode ? '#FFFFFF' : '#0022FF',
+              borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+              paddingBottom: '1px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer'
+            }}
           >
-            <Trash2 size={14} strokeWidth={2} />
+            RENAME
           </button>
 
-          {/* Rename/Edit 버튼 */}
           <button
-            onClick={(e) => { e.stopPropagation(); onRename(template.id, template.name); }}
-            className="ios-card-icon-btn"
-            title="Rename"
-            style={{ flexShrink: 0 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(template.id);
+            }}
+            className="text-[10px] font-bold tracking-wider hover:opacity-70 transition-opacity"
+            style={{
+              color: '#FF3B30',
+              borderBottom: '1px solid #FF3B30',
+              paddingBottom: '1px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer'
+            }}
           >
-            <Edit2 size={14} strokeWidth={2} />
+            DELETE
           </button>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

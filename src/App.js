@@ -1350,7 +1350,7 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.60 | Swiss Adaptive Workspace
+              v0.61 | Total Swiss Architecture
             </div>
           </div>
         </div>
@@ -1543,23 +1543,24 @@ export default function App() {
               initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }}
               className="settings-modal"
               style={{
-                display: 'flex', flexDirection: 'column', maxHeight: '80vh', padding: '24px', borderRadius: '24px',
-                backgroundColor: isDarkMode ? '#0022FF' : '#FFFFFF',
-                border: isDarkMode ? '2px solid #FFFFFF' : '1px solid #E5E7EB',
+                display: 'flex', flexDirection: 'column', maxHeight: '80vh', padding: '24px', borderRadius: '0px',
+                backgroundColor: isDarkMode ? '#000000' : '#FFFFFF',
+                border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                boxShadow: 'none',
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 style={{ color: isDarkMode ? '#FFFFFF' : '#000000' }} className="text-[20px] font-black mb-4 tracking-tight text-center">Prompt Detail</h3>
+              <h3 style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF' }} className="text-[20px] font-black mb-4 tracking-tight text-center uppercase">Prompt Detail</h3>
               <div className="flex-1 overflow-y-auto" style={{
-                padding: '16px',
-                backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.25)' : '#F2F2F7',
-                borderRadius: '16px',
+                padding: '16px 0',
+                backgroundColor: 'transparent',
+                borderRadius: '0px',
                 marginBottom: '20px',
-                border: isDarkMode ? '1px solid rgba(255,255,255,0.15)' : 'none',
+                borderBottom: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid #0022FF',
               }}>
                 <p style={{
                   fontSize: '13px', fontWeight: 600,
-                  color: isDarkMode ? '#FFFFFF' : '#374151',
+                  color: isDarkMode ? '#FFFFFF' : '#2C2C2E',
                   lineHeight: 1.7, margin: 0, wordBreak: 'break-word',
                 }}>
                   {promptModalTarget.prompt}
@@ -1575,28 +1576,32 @@ export default function App() {
                   }}
                   className="save-btn flex-1"
                   style={{
-                    backgroundColor: promptCopied ? '#34C759' : (isDarkMode ? '#FFFFFF' : '#000000'),
-                    color: isDarkMode ? '#0022FF' : '#FFFFFF',
-                    borderRadius: '9999px', display: 'flex', justifyContent: 'center', alignItems: 'center',
-                    gap: '8px', height: '48px', border: 'none', cursor: 'pointer', outline: 'none',
+                    backgroundColor: 'transparent',
+                    color: promptCopied ? '#34C759' : (isDarkMode ? '#FFFFFF' : '#0022FF'),
+                    border: 'none',
+                    borderBottom: promptCopied ? '1px solid #34C759' : (isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF'),
+                    borderRadius: '0px',
+                    display: 'flex', justifyContent: 'center', alignItems: 'center',
+                    gap: '8px', height: '40px', cursor: 'pointer', outline: 'none',
                     fontWeight: 800,
                   }}
                 >
-                  {promptCopied ? <span className="font-black">✓ Copied</span> : <><Copy size={16} /> Copy Prompt</>}
+                  {promptCopied ? <span className="font-black">✓ COPIED</span> : <><Copy size={14} /> COPY PROMPT</>}
                 </button>
                 <button
                   onClick={() => setPromptModalTarget(null)}
                   style={{
-                    width: '48px', height: '48px', padding: 0, display: 'flex', justifyContent: 'center',
-                    alignItems: 'center', borderRadius: '50%',
-                    backgroundColor: isDarkMode ? 'rgba(255,255,255,0.2)' : '#F2F2F7',
-                    border: isDarkMode ? '1px solid rgba(255,255,255,0.4)' : 'none',
+                    width: '40px', height: '40px', padding: 0, display: 'flex', justifyContent: 'center',
+                    alignItems: 'center', borderRadius: '0px',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
                     cursor: 'pointer',
-                    color: isDarkMode ? '#FFFFFF' : '#000000',
+                    color: isDarkMode ? '#FFFFFF' : '#0022FF',
                     flexShrink: 0, outline: 'none',
                   }}
                 >
-                  <X size={20} strokeWidth={2.5} />
+                  <X size={16} strokeWidth={2.5} />
                 </button>
               </div>
             </motion.div>
@@ -2555,10 +2560,11 @@ export default function App() {
                   const paged = filtered.slice(libraryPage * PAGE_SIZE, (libraryPage + 1) * PAGE_SIZE);
                   return (
                     <>
-                      {paged.map(template => (
+                      {paged.map((template, idx) => (
                         <TemplateCard
                           key={template.id}
                           template={template}
+                          index={libraryPage * PAGE_SIZE + idx + 1}
                           isSelected={activeLibraryTemplateId === template.id}
                           isDarkMode={isDarkMode}
                           onSelect={handleSelectTemplate}
@@ -2963,7 +2969,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.60 | Swiss Adaptive Workspace
+      v0.61 | Total Swiss Architecture
     </footer>
     <div className="h-12"></div>
     </div>

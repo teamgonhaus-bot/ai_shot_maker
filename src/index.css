@@ -683,9 +683,9 @@ body.dark-mode .ios-summary-tag {
    LIBRARY GRID
    ============================================= */
 .ios-library-grid {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 8px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0px !important;
   padding: 2px 0 !important;
 }
 
@@ -766,7 +766,7 @@ body.dark-mode .ios-summary-tag {
 .overflow-y-auto { overflow-y: auto !important; }
 .about-modal { max-width: 540px !important; padding: 32px !important; }
 @media (max-width: 480px) {
-  .about-modal { padding: 20px 16px !important; border-radius: 24px !important; }
+  .about-modal { padding: 20px 16px !important; border-radius: 0px !important; }
 }
 
 /* =============================================
@@ -808,17 +808,17 @@ body.dark-mode .ios-summary-tag {
 
 .settings-modal {
   background: #FFFFFF !important;
-  border-radius: 32px !important;
+  border-radius: 0px !important;
   width: 90% !important;
   max-width: 420px !important;
   padding: 32px !important;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: none !important;
+  border: 1px solid #0022FF !important;
 }
 
 body.dark-mode .settings-modal {
-  background: #1C1C1E !important;
-  border-color: rgba(255, 255, 255, 0.05) !important;
+  background: #000000 !important;
+  border: 1px solid #FFFFFF !important;
 }
 
 .settings-header {
@@ -1122,65 +1122,73 @@ body.dark-mode .engine-radio::after {
 }
 
 .modal-pill-btn {
-  padding: 14px !important;
-  border-radius: 20px !important;
-  font-size: 14px !important;
-  font-weight: 800 !important;
+  padding: 8px 0 !important;
+  border-radius: 0px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
   transition: all 0.2s ease !important;
   border: none !important;
   cursor: pointer !important;
   text-align: center !important;
+  background: transparent !important;
+  border-bottom: 2px solid transparent !important;
 }
 
 .modal-pill-btn.active {
-  background: #000000 !important;
-  color: #FFFFFF !important;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+  background: transparent !important;
+  color: #0022FF !important;
+  font-weight: 800 !important;
+  border-bottom: 2px solid #0022FF !important;
+  box-shadow: none !important;
 }
 
 body.dark-mode .modal-pill-btn.active {
-  background: #FFFFFF !important;
-  color: #000000 !important;
+  background: transparent !important;
+  color: #FFFFFF !important;
+  border-bottom: 2px solid #FFFFFF !important;
 }
 
 .modal-pill-btn.inactive {
-  background: #F2F2F7 !important;
+  background: transparent !important;
   color: #8E8E93 !important;
 }
 
 body.dark-mode .modal-pill-btn.inactive {
-  background: #2C2C2E !important;
-  color: #8E8E93 !important;
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.4) !important;
 }
 
 .modal-pill-btn:active {
-  transform: scale(0.95) !important;
+  transform: scale(0.98) !important;
 }
 
 .cancel-pill-btn {
   width: 100% !important;
-  padding: 16px !important;
-  border-radius: 20px !important;
-  background: #E5E5EA !important;
-  color: #48484A !important;
-  font-size: 15px !important;
+  padding: 8px 0 !important;
+  border-radius: 0px !important;
+  background: transparent !important;
+  color: #8E8E93 !important;
+  border-bottom: 1px solid #8E8E93 !important;
+  font-size: 13px !important;
   font-weight: 800 !important;
   border: none !important;
+  border-bottom: 1px solid #8E8E93 !important;
   cursor: pointer !important;
   transition: all 0.2s ease !important;
 }
 
 body.dark-mode .cancel-pill-btn {
-  background: #3A3A3C !important;
-  color: #AEAEB2 !important;
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6) !important;
 }
 
 .cancel-pill-btn:hover {
-  background: #D1D1D6 !important;
+  opacity: 0.8 !important;
 }
 
 body.dark-mode .cancel-pill-btn:hover {
-  background: #48484A !important;
+  opacity: 0.8 !important;
 }
 
 body.dark-mode .settings-input:focus {
@@ -2109,7 +2117,7 @@ body.dark-mode .folder-content-envelope {
 
 /* Library grid tighter spacing inside envelope */
 body.dark-mode .folder-content-envelope .ios-library-grid {
-  gap: 10px !important;
+  gap: 0px !important;
 }
 
 /* =============================================
@@ -2290,5 +2298,275 @@ body.dark-mode .workspace-left {
     align-self: start !important;
   }
 }
+
+/* =============================================
+   v0.61 TOTAL SWISS LINE-BASED ARCHITECTURE
+   ============================================= */
+
+/* 1. Eliminate legacy bento cards, shadows, rounded pills inside workspace */
+.ios-bento-card, 
+.ios-bento-card-compact, 
+.ios-bento-card-expanded,
+.folder-content-envelope,
+.about-card,
+.save-card {
+  background-color: transparent !important;
+  border-radius: 0px !important;
+  box-shadow: none !important;
+  border: none !important;
+  border-bottom: 1.5px solid #0022FF !important;
+  padding: 16px 0 !important;
+  margin-bottom: 0 !important;
+}
+
+body.dark-mode .ios-bento-card, 
+body.dark-mode .ios-bento-card-compact, 
+body.dark-mode .ios-bento-card-expanded,
+body.dark-mode .folder-content-envelope,
+body.dark-mode .about-card,
+body.dark-mode .save-card {
+  border-bottom: 1.5px solid #FFFFFF !important;
+}
+
+/* Specific overwrite for space-y-6 inside workspace-left */
+.workspace-left .space-y-4 > *, 
+.workspace-left .space-y-6 > * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* 2. Unified Modal Redesign - sharp edges, 1px solid blue border, no shadows */
+.settings-modal {
+  border-radius: 0px !important;
+  box-shadow: none !important;
+  border: 1px solid #0022FF !important;
+  background-color: #FFFFFF !important;
+}
+
+body.dark-mode .settings-modal {
+  border: 1px solid #FFFFFF !important;
+  background-color: #000000 !important;
+}
+
+/* 3. Swiss Option Select Grid (OptionSelect component mappings) */
+.swiss-option-row {
+  display: flex !important;
+  align-items: flex-start !important;
+  border-bottom: 1px solid #0022FF !important;
+  padding: 12px 0 !important;
+  margin-bottom: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+body.dark-mode .swiss-option-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.swiss-option-label {
+  width: 100px !important;
+  min-width: 100px !important;
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  color: #0022FF !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  margin: 0 !important;
+  padding-top: 4px !important;
+  flex-shrink: 0 !important;
+}
+
+body.dark-mode .swiss-option-label {
+  color: #FFFFFF !important;
+}
+
+.swiss-option-list {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px 16px !important;
+  flex-grow: 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.swiss-option-btn {
+  background: transparent !important;
+  border: none !important;
+  padding: 4px 0 !important;
+  margin: 0 !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  color: #8E8E93 !important;
+  cursor: pointer !important;
+  outline: none !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-bottom: 2px solid transparent !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+.swiss-option-btn:hover {
+  color: #0022FF !important;
+}
+
+body.dark-mode .swiss-option-btn:hover {
+  color: #FFFFFF !important;
+}
+
+.swiss-option-btn.active {
+  font-weight: 800 !important;
+  color: #0022FF !important;
+  border-bottom: 2px solid #0022FF !important;
+}
+
+body.dark-mode .swiss-option-btn.active {
+  color: #FFFFFF !important;
+  border-bottom: 2px solid #FFFFFF !important;
+}
+
+/* 4. Current Option Summary Refactoring - Commas and slashes instead of pills */
+.ios-summary-panel {
+  background: transparent !important;
+  border: none !important;
+  border-top: 1px solid #0022FF !important;
+  border-bottom: 1px solid #0022FF !important;
+  padding: 12px 0 !important;
+  border-radius: 0px !important;
+  box-shadow: none !important;
+}
+
+body.dark-mode .ios-summary-panel {
+  border-top: 1px solid #FFFFFF !important;
+  border-bottom: 1px solid #FFFFFF !important;
+}
+
+.ios-summary-tag {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: #0022FF !important;
+  border-radius: 0px !important;
+}
+
+body.dark-mode .ios-summary-tag {
+  color: #FFFFFF !important;
+}
+
+/* Slashes divider after each summary tag */
+.ios-summary-tag::after {
+  content: "  /  " !important;
+  font-weight: 400 !important;
+  color: #8E8E93 !important;
+  margin-left: 6px !important;
+  margin-right: 6px !important;
+}
+
+.ios-summary-tag:last-child::after {
+  content: "" !important;
+}
+
+/* 5. Flat Save Preset Input */
+.save-input {
+  border-radius: 0px !important;
+  border: none !important;
+  border-bottom: 1px solid #0022FF !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 8px 0 !important;
+  color: #0022FF !important;
+  font-weight: 700 !important;
+}
+
+body.dark-mode .save-input {
+  border-bottom: 1px solid #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+/* 6. Save bar container layout */
+.save-bar {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0px !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Save / Apply button text-only underline style */
+.save-btn, .cancel-pill-btn {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid #0022FF !important;
+  border-radius: 0px !important;
+  color: #0022FF !important;
+  font-weight: 800 !important;
+  font-size: 12px !important;
+  padding: 4px 0 !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+}
+
+body.dark-mode .save-btn, body.dark-mode .cancel-pill-btn {
+  border-bottom: 1px solid #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+/* Switch styling for flat Swiss look */
+.ios-switch {
+  background: #E5E5EA !important;
+  border-radius: 9999px !important;
+  border: 1px solid #0022FF !important;
+}
+
+body.dark-mode .ios-switch {
+  border: 1px solid #FFFFFF !important;
+  background: rgba(255,255,255,0.1) !important;
+}
+
+.ios-switch.active {
+  background: #0022FF !important;
+}
+
+body.dark-mode .ios-switch.active {
+  background: #FFFFFF !important;
+}
+
+/* Clean folder tabs line */
+.folder-tabs-container {
+  display: flex !important;
+  gap: 16px !important;
+  border-bottom: 1px solid #0022FF !important;
+  padding-bottom: 4px !important;
+  margin-bottom: 16px !important;
+}
+
+body.dark-mode .folder-tabs-container {
+  border-bottom: 1px solid #FFFFFF !important;
+}
+
+.folder-tab {
+  background: transparent !important;
+  border: none !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #8E8E93 !important;
+  cursor: pointer !important;
+  padding: 8px 0 !important;
+  border-bottom: 2px solid transparent !important;
+}
+
+.folder-tab.active {
+  color: #0022FF !important;
+  font-weight: 900 !important;
+  border-bottom: 2px solid #0022FF !important;
+}
+
+body.dark-mode .folder-tab.active {
+  color: #FFFFFF !important;
+  border-bottom: 2px solid #FFFFFF !important;
+}
+
 
 
