@@ -8,6 +8,12 @@ import { collection, addDoc, deleteDoc, updateDoc, doc, getDocs, getDoc, setDoc,
 import { signInAnonymously, signOut } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
+// Modular Components
+import OptionSelect from './components/OptionSelect';
+import IOSToggle from './components/IOSToggle';
+import SwissSpecificationSheet from './components/SwissSpecificationSheet';
+import TemplateCard from './components/TemplateCard';
+
 // Helper: base64 Data URL을 Blob 객체로 변환 (uploadBytes 연계로 Storage 전송 안정화)
 const dataURLtoBlob = (dataurl) => {
   try {
@@ -35,12 +41,6 @@ const withTimeout = (promise, ms = 15000) => {
     )
   ]);
 };
-
-// Modular Components
-import OptionSelect from './components/OptionSelect';
-import IOSToggle from './components/IOSToggle';
-import SwissSpecificationSheet from './components/SwissSpecificationSheet';
-import TemplateCard from './components/TemplateCard';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
