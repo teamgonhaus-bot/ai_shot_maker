@@ -2039,7 +2039,7 @@ export default function App() {
                         {config.subjectGender === '혼성' ? (
                           <>
                             <div className={`mt-6 mb-3 pt-4 border-t ${isDarkMode ? 'border-white/30' : 'border-[#0022FF]/30'} flex items-center`}>
-                              <span className={`text-[16px] font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-[#0022FF]'}`}>/ 여성 의상</span>
+                              <span className={`text-[13px] font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-[#0022FF]'}`}>/ 여성 의상</span>
                             </div>
                             <OptionSelect
                               label="상의"
@@ -2057,7 +2057,7 @@ export default function App() {
                             />
 
                             <div className={`mt-6 mb-3 pt-4 border-t ${isDarkMode ? 'border-white/30' : 'border-[#0022FF]/30'} flex items-center`}>
-                              <span className={`text-[16px] font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-[#0022FF]'}`}>/ 남성 의상</span>
+                              <span className={`text-[13px] font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-[#0022FF]'}`}>/ 남성 의상</span>
                             </div>
                             <OptionSelect
                               label="상의"
@@ -2078,7 +2078,7 @@ export default function App() {
                           <>
                             {config.subjectGender !== "선택안함" && (
                               <div className={`mt-6 mb-3 pt-4 border-t ${isDarkMode ? 'border-white/30' : 'border-[#0022FF]/30'} flex items-center`}>
-                                <span className={`text-[16px] font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-[#0022FF]'}`}>
+                                <span className={`text-[13px] font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-[#0022FF]'}`}>
                                   / {config.subjectGender === '여성' ? '여성 의상' : '남성 의상'}
                                 </span>
                               </div>
@@ -2148,7 +2148,7 @@ export default function App() {
                           ))}
                         </div>
 
-                        <div className="flex items-center gap-4" style={{ padding: '12px 0 4px 0' }}>
+                        <div className="flex items-center" style={{ padding: '12px 0 4px 0', gap: '24px' }}>
                           <div style={{ position: 'relative', width: '52px', height: '52px', borderRadius: '50%', overflow: 'hidden', border: isDarkMode ? '2px solid rgba(255,255,255,0.3)' : '2px solid rgba(0,34,255,0.25)', flexShrink: 0 }}>
                             <input
                               type="color"
@@ -2299,7 +2299,7 @@ export default function App() {
                 <motion.section key="style" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ position: 'relative', zIndex: 1 }}>
                   <div className="folder-content-envelope">
                     <OptionSelect
-                      label="연출 샷 스타일 (다중 선택)"
+                      label={<>연출 스타일<br />(다중 선택)</>}
                       value={config.shotStyle}
                       onChange={(v) => handleConfigChange('shotStyle', v)}
                       options={OPTIONS_DATA.shotStyle}
