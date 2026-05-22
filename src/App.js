@@ -954,6 +954,72 @@ export default function App() {
     }
   };
 
+  const handleExternalImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith("image/")) {
+      triggerToast("이미지 파일만 업로드할 수 있습니다.");
+      return;
+    }
+    
+    const tempId = `upload_${Date.now()}`;
+    const localReader = new FileReader();
+    localReader.onload = () => {
+      const tempImg = {
+        id: tempId,
+        url: localReader.result,
+        prompt: `Uploading: ${file.name}`,
+        timestamp: new Date().toISOString(),
+        folder: activeGalleryFolder,
+        isTemp: true,
+        isUploading: true
+      };
+      setGalleryImages(prev => [tempImg, ...prev]);
+    };
+    localReader.readAsDataURL(file);
+    
+    triggerToast("클라우드 서버에 이미지를 업로드하는 중...");
+    
+    try {
+      const fileName = `gallery/ext_${Date.now()}_${Math.random().toString(36).substring(2, 9)}_${file.name}`;
+      const storageRef = ref(storage, fileName);
+      
+      await withTimeout(uploadBytes(storageRef, file), 15000);
+      
+      const downloadUrl = await getDownloadURL(storageRef);
+      
+      const firestoreData = {
+        url: downloadUrl,
+        storagePath: fileName,
+        prompt: `Uploaded Image: ${file.name}`,
+        timestamp: new Date().toISOString(),
+        folder: activeGalleryFolder
+      };
+      
+      const docRef = await addDoc(collection(db, "gallery"), firestoreData);
+      
+      const finalImg = {
+        id: docRef.id,
+        url: downloadUrl,
+        storagePath: fileName,
+        prompt: firestoreData.prompt,
+        timestamp: firestoreData.timestamp,
+        folder: activeGalleryFolder,
+        isTemp: false
+      };
+      
+      setGalleryImages(prev => prev.map(img => img.id === tempId ? finalImg : img));
+      triggerToast("외부 이미지 클라우드 업로드 성공!");
+    } catch (err) {
+      console.error("❌ External image upload failed:", err);
+      triggerToast("업로드 실패: " + err.message);
+      setGalleryImages(prev => prev.filter(img => img.id !== tempId));
+    } finally {
+      e.target.value = '';
+    }
+  };
+
   const handleSaveTemplate = async () => {
     if (!isAdmin) {
       triggerToast("저장 권한이 없습니다.");
@@ -3148,10 +3214,44 @@ export default function App() {
               {/* Right panel: Active folder images */}
               <div className="gallery-main">
                 <div className="gallery-main-header">
-                  <span className="gallery-folder-indicator">{activeGalleryFolder.toUpperCase()}</span>
-                  <span className="gallery-image-count">
-                    {galleryImages.filter(img => img.folder === activeGalleryFolder).length} ITEMS
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <span className="gallery-folder-indicator">{activeGalleryFolder.toUpperCase()}</span>
+                    <span className="gallery-image-count">
+                      {galleryImages.filter(img => img.folder === activeGalleryFolder).length} ITEMS
+                    </span>
+                  </div>
+                  <div>
+                    <label 
+                      htmlFor="gallery-file-upload" 
+                      className="swiss-copy-tab" 
+                      style={{ 
+                        cursor: 'pointer', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '6px', 
+                        backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+                        color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                        border: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
+                        borderRadius: '2px',
+                        padding: '6px 14px',
+                        fontSize: '10px',
+                        fontWeight: '900',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <Zap size={11} />
+                      <span>Upload Image</span>
+                    </label>
+                    <input 
+                      id="gallery-file-upload" 
+                      type="file" 
+                      accept="image/*" 
+                      style={{ display: 'none' }} 
+                      onChange={handleExternalImageUpload}
+                    />
+                  </div>
                 </div>
 
                 <div className="gallery-grid-container">
