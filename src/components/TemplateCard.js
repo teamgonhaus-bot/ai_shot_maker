@@ -17,7 +17,6 @@ export default function TemplateCard({
   
   // Extract info from config if available
   const aspectRatio = template.config?.aspectRatio || 'FLUX';
-  const modelType = 'FLUX';
 
   return (
     <div
@@ -33,9 +32,9 @@ export default function TemplateCard({
         padding: '16px 8px',
       }}
     >
-      {/* Line 1: Split Justification (Preset name is bold blue like right spec sheet) */}
-      <div className="flex justify-between items-baseline" style={{ marginBottom: '14px' }}>
-        <div className="flex items-baseline gap-1.5">
+      {/* Line 1: Split Justification (Preset name is massive bold blue like right spec sheet) */}
+      <div className="flex justify-between items-end" style={{ marginBottom: '14px' }}>
+        <div className="flex flex-col items-start gap-1">
           <span 
             className="text-[12px] font-sans font-black tracking-wider" 
             style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF', opacity: 0.6 }}
@@ -43,8 +42,8 @@ export default function TemplateCard({
             {formattedIndex}
           </span>
           <span 
-            className="text-[13px] font-sans font-black tracking-tight uppercase" 
-            style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF' }}
+            className="text-[28px] font-sans font-black tracking-tighter uppercase" 
+            style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF', lineHeight: '1.0' }}
           >
             / {template.name}
           </span>
@@ -53,7 +52,7 @@ export default function TemplateCard({
           className="text-[10px] font-sans uppercase tracking-widest opacity-60 font-black" 
           style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF' }}
         >
-          {aspectRatio.split(' ')[0]} | {modelType}
+          {aspectRatio.split(' ')[0]}
         </div>
       </div>
 

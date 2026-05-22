@@ -10,7 +10,6 @@ export default function SwissSpecificationSheet({
   activeTemplate,
   useProduct,
   isDarkMode,
-  selectedApi,
   simulateUpscale,
   handleDownload,
   isUpscaling,
@@ -99,8 +98,7 @@ export default function SwissSpecificationSheet({
   // High-end technical ID generation based on config hash
   const getSpecId = () => {
     const spaceCode = safeConfig.spaceType ? String(safeConfig.spaceType).slice(0, 2).toUpperCase() : 'MX';
-    const apiCode = selectedApi === 'google' ? 'GEM' : 'FLX';
-    return `EU-SM60-${spaceCode}-${apiCode}`;
+    return `EU-SM63-${spaceCode}`;
   };
 
   const specId = getSpecId();
@@ -324,7 +322,7 @@ export default function SwissSpecificationSheet({
         <div className="skeleton-line">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-current mb-3"></div>
           <span style={{ fontSize: '11px', fontWeight: 900, letterSpacing: '0.1em' }}>
-            GENERATING VIA {selectedApi === 'google' ? 'GEMINI API' : 'FLUX.1 ENGINE'}...
+            GENERATING IMAGE VIA GEMINI API...
           </span>
         </div>
       )}

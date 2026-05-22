@@ -3,7 +3,6 @@ import {
   Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders, Zap, Shuffle, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { InferenceClient } from "@huggingface/inference";
 import { db, auth } from './firebase';
 import { collection, addDoc, deleteDoc, updateDoc, doc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { signInAnonymously, signOut } from 'firebase/auth';
@@ -233,7 +232,6 @@ export default function App() {
   const [useCommercialNegative, setUseCommercialNegative] = useState(false);
   const [useProduct, setUseProduct] = useState(true);
   const [generatedPrompt, setGeneratedPrompt] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
   const [savedTemplates, setSavedTemplates] = useState([]);
   const [templateName, setTemplateName] = useState("");
   const [isSaved, setIsSaved] = useState(false);
@@ -262,10 +260,7 @@ export default function App() {
   const [libraryFilter, setLibraryFilter] = useState('전체');
   const [libraryPage, setLibraryPage] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [selectedApi, setSelectedApi] = useState("google");
-  const [sdApiKey, setSdApiKey] = useState("");
   const [moveTarget, setMoveTarget] = useState(null);
-  const [img2imgStrength, setImg2imgStrength] = useState(0.65); // [INSTRUCTION] Img2Img 강도 상태 분리
 
   // Rename Modal State
   const [renameTarget, setRenameTarget] = useState(null); // { id, name }
@@ -333,10 +328,7 @@ export default function App() {
     const savedCommNeg = localStorage.getItem('shotmaker_useCommercialNegative_v13');
     if (savedCommNeg) setUseCommercialNegative(savedCommNeg === 'true');
 
-    const storedApi = localStorage.getItem('shotmaker_selected_api');
-    if (storedApi) setSelectedApi(storedApi);
-    const storedSdKey = localStorage.getItem('shotmaker_sd_api_key');
-    if (storedSdKey) setSdApiKey(storedSdKey);
+
 
     const storedGen = localStorage.getItem('shotmaker_enableImageGeneration');
     if (storedGen !== null) setEnableImageGeneration(storedGen === 'true');
@@ -917,187 +909,189 @@ export default function App() {
     }
   };
 
-  const generatePrompt = () => {
-    setIsGenerating(true);
-    setTimeout(() => {
-      const activeProductName = useProduct ? config.productName : "";
-      const parts = [];
-      const isSolidBackground = (config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경') && config.subjectNum === '없음';
+  // Auto-sync prompt reactive pipeline (v0.63 Real-Time Auto-Sync Engine)
+  useEffect(() => {
+    const activeProductName = useProduct ? config.productName : "";
+    const parts = [];
+    const isSolidBackground = (config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경') && config.subjectNum === '없음';
 
+    if (isSolidBackground) {
+      const product = activeProductName || 'product';
+      const color = config.monochromeColor || 'Cobalt Blue';
 
-      if (isSolidBackground) {
-        const product = activeProductName || 'product';
-        const color = config.monochromeColor || 'Cobalt Blue';
+      parts.push(`A floating ${product}, suspended diagonally in mid-air`);
+      const bgDesc = config.spaceDetail === '그라데이션 배경'
+        ? `Background is a perfect ${color} gradient background with soft, diffused lighting`
+        : `Background is a perfect ${color} monochrome solid color with soft, diffused lighting`;
+      parts.push(bgDesc);
+      parts.push(`product levitation, clean lines, impeccable product finish, flawless production`);
 
-        parts.push(`A floating ${product}, suspended diagonally in mid-air`);
-        const bgDesc = config.spaceDetail === '그라데이션 배경'
-          ? `Background is a perfect ${color} gradient background with soft, diffused lighting`
-          : `Background is a perfect ${color} monochrome solid color with soft, diffused lighting`;
-        parts.push(bgDesc);
-        parts.push(`product levitation, clean lines, impeccable product finish, flawless production`);
-
-        if (activeTemplate !== 'TITLE SCENE') {
-          if (config.cameraAngle && config.cameraAngle !== "선택안함") {
-            parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
-          }
-          if (config.shotStyle && config.shotStyle.length > 0) {
-            const styles = config.shotStyle.map(s => DICTIONARY.shotStyle[s]);
-            parts.push(`rendered with ${styles.join(", ")}`);
-          }
-          if (config.useLight && config.light !== "선택안함") {
-            parts.push(`illuminated by ${DICTIONARY.light[config.light]} with ${config.brightness} brightness`);
-          }
+      if (activeTemplate !== 'TITLE SCENE') {
+        if (config.cameraAngle && config.cameraAngle !== "선택안함") {
+          parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
         }
-        if (removeText) {
-          parts.push("textless, no text, no watermarks, clear image");
-        }
-        if (activeTemplate !== 'TITLE SCENE') {
-          parts.push("photorealistic");
-        }
-      } else {
-        let subjectStr = activeProductName ? `a high-end ${activeProductName}` : "a high-end masterpiece";
-
-        if (config.subjectNum !== "없음") {
-          const traits = [];
-          if (config.subjectAge !== "선택안함") traits.push(DICTIONARY.subjectAge[config.subjectAge]);
-          if (config.subjectGender !== "선택안함") traits.push(DICTIONARY.subjectGender[config.subjectGender]);
-          if (config.subjectRegion !== "선택안함") traits.push(DICTIONARY.subjectRegion[config.subjectRegion]);
-
-          let humanStr = DICTIONARY.subjectNum[config.subjectNum];
-          if (traits.length > 0) humanStr += ` (${traits.join(", ")})`;
-
-          const details = [];
-          if (config.subjectHair !== "선택안함") details.push(DICTIONARY.subjectHair[config.subjectHair]);
-          if (config.subjectClothesStyle !== "선택안함") details.push(DICTIONARY.subjectClothesStyle[config.subjectClothesStyle]);
-
-          if (config.subjectGender === "혼성") {
-            const fTop = DICTIONARY.subjectClothesTop[config.femaleClothesTop];
-            const fBot = DICTIONARY.subjectClothesBottom[config.femaleClothesBottom];
-            const mTop = DICTIONARY.subjectClothesTop[config.maleClothesTop];
-            const mBot = DICTIONARY.subjectClothesBottom[config.maleClothesBottom];
-
-            let fClothes = [];
-            if (fTop) fClothes.push(fTop);
-            if (fBot) fClothes.push(fBot);
-
-            let mClothes = [];
-            if (mTop) mClothes.push(mTop);
-            if (mBot) mClothes.push(mBot);
-
-            if (fClothes.length > 0) details.push(`females ${fClothes.join(" and ")}`);
-            if (mClothes.length > 0) details.push(`males ${mClothes.join(" and ")}`);
-          } else {
-            const top = DICTIONARY.subjectClothesTop[config.subjectClothesTop];
-            const bot = DICTIONARY.subjectClothesBottom[config.subjectClothesBottom];
-            if (top) details.push(top);
-            if (bot) details.push(bot);
-          }
-
-          if (details.length > 0) humanStr += ` ${details.join(", ")}`;
-
-          let actionStr = "posing naturally";
-          if (config.subjectAction && config.subjectAction !== "선택안함" && config.subjectAction !== "기본") {
-            actionStr = DICTIONARY.subjectAction[config.subjectAction];
-          } else if (config.subjectAction === "기본") {
-            actionStr = "posing naturally";
-          }
-          parts.push(`featuring ${humanStr} ${actionStr} with ${subjectStr}`);
-
-          if (useImageRef && refImage) {
-            parts.push("The person is naturally interacting with/holding the product in the attached image");
-          }
-        } else {
-          if (activeProductName) {
-            parts.push(`a scene using ${activeProductName}`);
-          } else {
-            parts.push(`professional architectural photography of ${subjectStr}`);
-          }
-        }
-
-        let envStr = DICTIONARY.spaceType[config.spaceType];
-        if (config.spaceDetail) {
-          if (config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경') {
-            const color = config.monochromeColor || 'Cobalt Blue';
-            const bgType = config.spaceDetail === '그라데이션 배경' ? 'gradient' : 'monochrome solid color';
-            envStr += `, with a perfect ${color} ${bgType} background`;
-          } else {
-            envStr += `, ${DICTIONARY.spaceDetail[config.spaceDetail]}`;
-          }
-        }
-        if (config.spaceType !== '스튜디오') {
-          if (config.locationContext && config.locationContext !== "선택안함") {
-            envStr += `, ${DICTIONARY.locationContext[config.locationContext]}`;
-          }
-          if (config.country !== "선택안함") envStr += ` in ${DICTIONARY.country[config.country]}`;
-        }
-        parts.push(`set in ${envStr}`);
-
-        if (config.spaceType !== '스튜디오' && config.interiorStyle !== "선택안함") {
-          parts.push(`designed with ${DICTIONARY.interiorStyle[config.interiorStyle]}`);
-        }
-
-        if (config.spaceType !== '스튜디오' && useDetailMaterial) {
-          const materials = [];
-          if (config.detailFloor) materials.push(DICTIONARY.detailFloor[config.detailFloor]);
-          if (config.detailWood) materials.push(DICTIONARY.detailWood[config.detailWood]);
-          if (config.detailMetal) materials.push(DICTIONARY.detailMetal[config.detailMetal]);
-          if (config.detailWall) materials.push(DICTIONARY.detailWall[config.detailWall]);
-          if (materials.length > 0) {
-            parts.push(`highlighting ${materials.join(", ")}`);
-          }
-        }
-
-        if (config.useLight && config.light !== "선택안함") {
-          parts.push(`illuminated by ${DICTIONARY.light[config.light]} with ${config.brightness} brightness`);
-        }
-        if (config.productLayout && config.productLayout !== "선택안함") parts.push(DICTIONARY.productLayout[config.productLayout]);
-        if (config.copySpace && config.copySpace !== "선택안함") parts.push(DICTIONARY.copySpace[config.copySpace]);
-        if (config.productAnchor && config.productAnchor !== "선택안함") parts.push(DICTIONARY.productAnchor[config.productAnchor]);
-        if (config.cameraAngle !== "선택안함") parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
-        if (config.shotStyle.length > 0) {
+        if (config.shotStyle && config.shotStyle.length > 0) {
           const styles = config.shotStyle.map(s => DICTIONARY.shotStyle[s]);
           parts.push(`rendered with ${styles.join(", ")}`);
         }
-        if (removeText) parts.push("textless, no text, no watermarks, clear image");
-        parts.push("photorealistic, interior design magazine cover");
+        if (config.useLight && config.light !== "선택안함") {
+          parts.push(`illuminated by ${DICTIONARY.light[config.light]} with ${config.brightness} brightness`);
+        }
+      }
+      if (removeText) {
+        parts.push("textless, no text, no watermarks, clear image");
+      }
+      if (activeTemplate !== 'TITLE SCENE') {
+        parts.push("photorealistic");
+      }
+    } else {
+      let subjectStr = activeProductName ? `a high-end ${activeProductName}` : "a high-end masterpiece";
+
+      if (config.subjectNum !== "없음") {
+        const traits = [];
+        if (config.subjectAge !== "선택안함") traits.push(DICTIONARY.subjectAge[config.subjectAge]);
+        if (config.subjectGender !== "선택안함") traits.push(DICTIONARY.subjectGender[config.subjectGender]);
+        if (config.subjectRegion !== "선택안함") traits.push(DICTIONARY.subjectRegion[config.subjectRegion]);
+
+        let humanStr = DICTIONARY.subjectNum[config.subjectNum];
+        if (traits.length > 0) humanStr += ` (${traits.join(", ")})`;
+
+        const details = [];
+        if (config.subjectHair !== "선택안함") details.push(DICTIONARY.subjectHair[config.subjectHair]);
+        if (config.subjectClothesStyle !== "선택안함") details.push(DICTIONARY.subjectClothesStyle[config.subjectClothesStyle]);
+
+        if (config.subjectGender === "혼성") {
+          const fTop = DICTIONARY.subjectClothesTop[config.femaleClothesTop];
+          const fBot = DICTIONARY.subjectClothesBottom[config.femaleClothesBottom];
+          const mTop = DICTIONARY.subjectClothesTop[config.maleClothesTop];
+          const mBot = DICTIONARY.subjectClothesBottom[config.maleClothesBottom];
+
+          let fClothes = [];
+          if (fTop) fClothes.push(fTop);
+          if (fBot) fClothes.push(fBot);
+
+          let mClothes = [];
+          if (mTop) mClothes.push(mTop);
+          if (mBot) mClothes.push(mBot);
+
+          if (fClothes.length > 0) details.push(`females ${fClothes.join(" and ")}`);
+          if (mClothes.length > 0) details.push(`males ${mClothes.join(" and ")}`);
+        } else {
+          const top = DICTIONARY.subjectClothesTop[config.subjectClothesTop];
+          const bot = DICTIONARY.subjectClothesBottom[config.subjectClothesBottom];
+          if (top) details.push(top);
+          if (bot) details.push(bot);
+        }
+
+        if (details.length > 0) humanStr += ` ${details.join(", ")}`;
+
+        let actionStr = "posing naturally";
+        if (config.subjectAction && config.subjectAction !== "선택안함" && config.subjectAction !== "기본") {
+          actionStr = DICTIONARY.subjectAction[config.subjectAction];
+        } else if (config.subjectAction === "기본") {
+          actionStr = "posing naturally";
+        }
+        parts.push(`featuring ${humanStr} ${actionStr} with ${subjectStr}`);
+
+        if (useImageRef && refImage) {
+          parts.push("The person is naturally interacting with/holding the product in the attached image");
+        }
+      } else {
+        if (activeProductName) {
+          parts.push(`a scene using ${activeProductName}`);
+        } else {
+          parts.push(`professional architectural photography of ${subjectStr}`);
+        }
       }
 
-      // 1. 핵심 개체명 추출 및 정제
-      const productVar = activeProductName ? activeProductName.trim() : "";
-
-      // 2. 성공 프롬프트 삼총사 정의
-      const successTriad = "professional architectural photography, clear unobstructed view, clean sharp edges";
-
-      // 3. 기존 parts 배열 내 삼총사와 겹치는 표현 중복 방지를 위한 필터링
-      let filteredParts = parts.filter(p => {
-        if (!p) return false;
-        const lower = p.toLowerCase();
-        if (lower.includes("professional architectural photography")) return false;
-        return true;
-      });
-
-      // 4. 요구사항에 맞춘 완벽한 순서 고정 재조합
-      // [1순위: 핵심 개체명] -> [2순위: 성공 삼총사 세트(단색/그라데이션 배경 아닐 때만)] -> [3순위: 나머지 세부 옵션들]
-      let prefixParts = [];
-      if (productVar) {
-        prefixParts.push(productVar);
+      let envStr = DICTIONARY.spaceType[config.spaceType];
+      if (config.spaceDetail) {
+        if (config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경') {
+          const color = config.monochromeColor || 'Cobalt Blue';
+          const bgType = config.spaceDetail === '그라데이션 배경' ? 'gradient' : 'monochrome solid color';
+          envStr += `, with a perfect ${color} ${bgType} background`;
+        } else {
+          envStr += `, ${DICTIONARY.spaceDetail[config.spaceDetail]}`;
+        }
       }
-      if (!isSolidBackground) {
-        prefixParts.push(successTriad);
+      if (config.spaceType !== '스튜디오') {
+        if (config.locationContext && config.locationContext !== "선택안함") {
+          envStr += `, ${DICTIONARY.locationContext[config.locationContext]}`;
+        }
+        if (config.country !== "선택안함") envStr += ` in ${DICTIONARY.country[config.country]}`;
+      }
+      parts.push(`set in ${envStr}`);
+
+      if (config.spaceType !== '스튜디오' && config.interiorStyle !== "선택안함") {
+        parts.push(`designed with ${DICTIONARY.interiorStyle[config.interiorStyle]}`);
       }
 
-      let finalPrompt = [...prefixParts, ...filteredParts].join(", ");
-
-      if (useCommercialNegative) {
-        finalPrompt += " --no text, watermark, bad label, blurry, ugly shape, deformed packaging";
+      if (config.spaceType !== '스튜디오' && useDetailMaterial) {
+        const materials = [];
+        if (config.detailFloor) materials.push(DICTIONARY.detailFloor[config.detailFloor]);
+        if (config.detailWood) materials.push(DICTIONARY.detailWood[config.detailWood]);
+        if (config.detailMetal) materials.push(DICTIONARY.detailMetal[config.detailMetal]);
+        if (config.detailWall) materials.push(DICTIONARY.detailWall[config.detailWall]);
+        if (materials.length > 0) {
+          parts.push(`highlighting ${materials.join(", ")}`);
+        }
       }
 
-      setGeneratedPrompt(finalPrompt);
-      setGeneratedImage(null);
-      setIsGenerating(false);
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    }, 800);
-  };
+      if (config.useLight && config.light !== "선택안함") {
+        parts.push(`illuminated by ${DICTIONARY.light[config.light]} with ${config.brightness} brightness`);
+      }
+      if (config.productLayout && config.productLayout !== "선택안함") parts.push(DICTIONARY.productLayout[config.productLayout]);
+      if (config.copySpace && config.copySpace !== "선택안함") parts.push(DICTIONARY.copySpace[config.copySpace]);
+      if (config.productAnchor && config.productAnchor !== "선택안함") parts.push(DICTIONARY.productAnchor[config.productAnchor]);
+      if (config.cameraAngle !== "선택안함") parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
+      if (config.shotStyle.length > 0) {
+        const styles = config.shotStyle.map(s => DICTIONARY.shotStyle[s]);
+        parts.push(`rendered with ${styles.join(", ")}`);
+      }
+      if (removeText) parts.push("textless, no text, no watermarks, clear image");
+      parts.push("photorealistic, interior design magazine cover");
+    }
+
+    // 1. 핵심 개체명 추출 및 정제
+    const productVar = activeProductName ? activeProductName.trim() : "";
+
+    // 2. 성공 프롬프트 삼총사 정의
+    const successTriad = "professional architectural photography, clear unobstructed view, clean sharp edges";
+
+    // 3. 기존 parts 배열 내 삼총사와 겹치는 표현 중복 방지를 위한 필터링
+    let filteredParts = parts.filter(p => {
+      if (!p) return false;
+      const lower = p.toLowerCase();
+      if (lower.includes("professional architectural photography")) return false;
+      return true;
+    });
+
+    // 4. 요구사항에 맞춘 완벽한 순서 고정 재조합
+    let prefixParts = [];
+    if (productVar) {
+      prefixParts.push(productVar);
+    }
+    if (!isSolidBackground) {
+      prefixParts.push(successTriad);
+    }
+
+    let finalPrompt = [...prefixParts, ...filteredParts].join(", ");
+
+    if (useCommercialNegative) {
+      finalPrompt += " --no text, watermark, bad label, blurry, ugly shape, deformed packaging";
+    }
+
+    setGeneratedPrompt(finalPrompt);
+  }, [
+    config,
+    activeTemplate,
+    useProduct,
+    useDetailMaterial,
+    removeText,
+    useCommercialNegative,
+    useImageRef,
+    refImage
+  ]);
 
   const triggerToast = (msg) => {
     setToastMessage(msg);
@@ -1106,108 +1100,7 @@ export default function App() {
   };
 
   const generateImage = async (prompt) => {
-    if (selectedApi === 'google') {
-      await generateImageFromGoogle(prompt);
-    } else {
-      await generateImageFromSD(prompt);
-    }
-  };
-
-  const generateImageFromSD = async (prompt) => {
-    const hfToken = sdApiKey?.trim() || process.env.REACT_APP_HF_TOKEN;
-
-    if (!hfToken) {
-      triggerToast("Hugging Face API 키를 설정해 주세요.");
-      return;
-    }
-    const rawPrompt = prompt || generatedPrompt;
-    if (!rawPrompt) {
-      triggerToast("먼저 프롬프트를 생성해 주세요.");
-      return;
-    }
-
-    // [INSTRUCTION 2] 상업용 화질/질감 부스트 프롬프트 주입
-    const promptToUse = enhancePrompt(rawPrompt);
-
-    setCooldownTime(5);
-    setIsImageGenerating(true);
-
-    let retryCount = 0;
-    const maxRetries = 3;
-
-    const executeInference = async () => {
-      try {
-        console.log(`🚀 Generating via InferenceClient (FLUX.1-dev)... Retry: ${retryCount}`);
-        const client = new InferenceClient(hfToken.trim());
-
-        let blob;
-        // [INSTRUCTION 1] Text-to-Image와 Image-to-Image 분기 처리
-        if (useImageRef && refImage) {
-          console.log("🎨 Attempting Image-to-Image with Flux.1...");
-          // Base64 데이터를 Blob으로 변환하거나 직접 전달
-          const imageBlob = await (await fetch(`data:${refImage.mimeType};base64,${refImage.data}`)).blob();
-
-          blob = await client.imageToImage({
-            model: "black-forest-labs/FLUX.1-dev", // 고품질 dev 모델 권장
-            inputs: {
-              image: imageBlob,
-              prompt: promptToUse,
-            },
-            parameters: {
-              // [INSTRUCTION 3] Image-to-Image 파라미터 최적화
-              strength: img2imgStrength,
-              // [INSTRUCTION 2] Flux.1 Schnell 최적화된 4스텝 설정
-              num_inference_steps: 4,
-              width: 1024,
-              height: 1024,
-            },
-          });
-        } else {
-          console.log("📝 Attempting Text-to-Image with Flux.1...");
-          blob = await client.textToImage({
-            model: "black-forest-labs/FLUX.1-dev",
-            inputs: promptToUse,
-            parameters: {
-              num_inference_steps: 4,
-              width: 1024,
-              height: 1024,
-            },
-          });
-        }
-
-        const imageUrl = URL.createObjectURL(blob);
-        setGeneratedImage(imageUrl);
-        triggerToast("Hugging Face (FLUX.1) 생성 성공!");
-      } catch (e) {
-        const errorMsg = e.message?.toLowerCase() || "";
-
-        // [INSTRUCTION 4] Model Loading (503) 발생 시 자동 재시도
-        if ((errorMsg.includes('503') || errorMsg.includes('loading')) && retryCount < maxRetries) {
-          retryCount++;
-          console.warn(`⚠️ Model loading. Retrying... (${retryCount}/${maxRetries})`);
-          await new Promise(resolve => setTimeout(resolve, 5000));
-          return executeInference();
-        }
-        throw e;
-      }
-    };
-
-    try {
-      await executeInference();
-    } catch (e) {
-      console.error("SD Generation Error:", e);
-      const errorMsg = e.message?.toLowerCase() || "";
-
-      if (errorMsg.includes('401') || errorMsg.includes('unauthorized')) {
-        triggerToast("토큰 권한 확인이 필요합니다 (401 Unauthorized)");
-      } else if (errorMsg.includes('403')) {
-        triggerToast("토큰 권한(Inference)이 부족합니다.");
-      } else {
-        triggerToast(`Hugging Face 오류: ${e.message}`);
-      }
-    } finally {
-      setIsImageGenerating(false);
-    }
+    await generateImageFromGoogle(prompt);
   };
 
   const generateImageFromGoogle = async (prompt) => {
@@ -1350,7 +1243,7 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.62 | Smart Grid Unified
+              v0.63 | Ultimate Swiss Workspace
             </div>
           </div>
         </div>
@@ -1811,72 +1704,33 @@ export default function App() {
                   />
                 </div>
 
-                {/* Generate API Section */}
+                {/* Google Gemini API Key Section */}
                 <div style={{ paddingTop: '16px', marginTop: '0px' }}>
-                  <label className="settings-prop-label">Generate API</label>
-                  <p className="settings-desc-text" style={{ marginBottom: '36px' }}>사용할 이미지 생성 AI 엔진을 선택하세요.</p>
-
-                  {/* Google Gemini Row */}
-                  <div
-                    className={`engine-row ${selectedApi === 'google' ? 'active' : 'inactive'} ${!isAdmin ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'}`}
-                    onClick={() => {
-                      if (!isAdmin) {
-                        triggerToast("관리자 로그인이 필요합니다.");
-                        return;
-                      }
-                      setSelectedApi('google');
-                      localStorage.setItem('shotmaker_selected_api', 'google');
+                  <label className="settings-prop-label">Gemini API Key</label>
+                  <p className="settings-desc-text" style={{ marginBottom: '16px' }}>구글 Gemini 모델을 사용하기 위한 API 키를 입력하세요.</p>
+                  <input
+                    type="password"
+                    value={googleApiKey}
+                    onChange={(e) => {
+                      if (!isAdmin) return;
+                      setGoogleApiKey(e.target.value);
+                      localStorage.setItem('shotmaker_api_key', e.target.value);
                     }}
-                  >
-                    <div className="engine-label">
-                      <div className="engine-radio" />
-                      <span style={{ fontSize: '0.72rem', fontWeight: 900, color: 'inherit', whiteSpace: 'nowrap' }}>Google AI</span>
-                    </div>
-                    <input
-                      type="password"
-                      value={googleApiKey}
-                      onChange={(e) => {
-                        if (!isAdmin) return;
-                        setGoogleApiKey(e.target.value);
-                        localStorage.setItem('shotmaker_api_key', e.target.value);
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                      placeholder={isAdmin ? "Enter Gemini API Key..." : "🔒 Restricted"}
-                      className="settings-input settings-input-sm"
-                      readOnly={!isAdmin}
-                    />
-                  </div>
-
-                  {/* Hugging Face Row */}
-                  <div
-                    className={`engine-row ${selectedApi === 'stable-diffusion' ? 'active' : 'inactive'} ${!isAdmin ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'}`}
-                    onClick={() => {
-                      if (!isAdmin) {
-                        triggerToast("관리자 로그인이 필요합니다.");
-                        return;
-                      }
-                      setSelectedApi('stable-diffusion');
-                      localStorage.setItem('shotmaker_selected_api', 'stable-diffusion');
+                    placeholder={isAdmin ? "Enter Gemini API Key..." : "🔒 Restricted"}
+                    className="settings-input"
+                    readOnly={!isAdmin}
+                    style={{
+                      width: '100%',
+                      marginTop: '8px',
+                      background: isDarkMode ? '#1C1C1E' : '#F2F2F7',
+                      color: isDarkMode ? '#FFFFFF' : '#000000',
+                      border: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid #0022FF',
+                      borderRadius: '0px',
+                      padding: '10px 14px',
+                      fontSize: '13px',
+                      fontFamily: 'monospace'
                     }}
-                  >
-                    <div className="engine-label" style={{ width: 'auto', flexShrink: 0 }}>
-                      <div className="engine-radio" />
-                      <span style={{ fontSize: '0.72rem', fontWeight: 900, color: 'inherit', whiteSpace: 'nowrap' }}>Hugging Face</span>
-                    </div>
-                    <input
-                      type="password"
-                      value={sdApiKey}
-                      onChange={(e) => {
-                        if (!isAdmin) return;
-                        setSdApiKey(e.target.value);
-                        localStorage.setItem('shotmaker_sd_api_key', e.target.value);
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                      placeholder={isAdmin ? "Enter HF Token..." : "🔒 Restricted"}
-                      className="settings-input settings-input-sm"
-                      readOnly={!isAdmin}
-                    />
-                  </div>
+                  />
                 </div>
               </div>
             </motion.div>
@@ -2427,37 +2281,7 @@ export default function App() {
                             )}
                           </div>
 
-                          <div 
-                            style={{
-                              borderTop: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
-                              paddingTop: '16px',
-                              marginTop: '16px',
-                            }}
-                          >
-                            <div className="flex justify-between items-center mb-2">
-                              <label style={{ fontSize: '11px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', letterSpacing: '0.1em' }}>STRENGTH</label>
-                              <span style={{ fontSize: '11px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>{img2imgStrength}</span>
-                            </div>
-                            <input
-                              type="range"
-                              min="0.1"
-                              max="0.95"
-                              step="0.05"
-                              value={img2imgStrength}
-                              onChange={(e) => setImg2imgStrength(parseFloat(e.target.value))}
-                              className="w-full cursor-pointer appearance-none"
-                              style={{ 
-                                accentColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                                height: '2px',
-                                background: isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,34,255,0.3)',
-                                outline: 'none'
-                              }}
-                            />
-                            <div className="flex justify-between mt-1.5">
-                              <span style={{ fontSize: '9px', fontWeight: '800', color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,34,255,0.6)' }}>ORIGIN</span>
-                              <span style={{ fontSize: '9px', fontWeight: '800', color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,34,255,0.6)' }}>CREATIVE</span>
-                            </div>
-                          </div>
+
                         </div>
                       )}
                     </div>
@@ -2887,9 +2711,22 @@ export default function App() {
 
       {/* Action Area with Summary Panel - Left column bottom */}
       <div style={{ paddingTop: '24px', paddingBottom: '32px' }}>
-        <div className="ios-option-label mb-2 px-1">Current Option Summary</div>
+        <div 
+          style={{ 
+            fontSize: '20px', 
+            fontWeight: 900, 
+            color: isDarkMode ? '#FFFFFF' : '#0022FF', 
+            textAlign: 'left', 
+            textTransform: 'uppercase', 
+            letterSpacing: '-0.02em', 
+            paddingLeft: '4px', 
+            marginBottom: '12px' 
+          }}
+        >
+          Option summary
+        </div>
         <div className="ios-summary-panel">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center', alignContent: 'flex-start' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'flex-start', alignContent: 'flex-start' }}>
             {(() => {
               const tags = [];
 
@@ -3005,16 +2842,7 @@ export default function App() {
 
         {/* Unified Button Container — flex-col with gap */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px' }}>
-          <button
-            onClick={generatePrompt}
-            disabled={isGenerating}
-            className="generate-btn"
-          >
-            <Wand2 className={`w-5 h-5 ${isDarkMode ? 'text-[#0022FF]' : 'text-white'}`} />
-            <span>{isGenerating ? 'GENERATING...' : 'GENERATE PROMPT'}</span>
-          </button>
-
-          {generatedPrompt && (selectedApi === 'google' ? googleApiKey : sdApiKey) && enableImageGeneration && (
+          {generatedPrompt && googleApiKey && enableImageGeneration && (
             <button
               onClick={() => {
                 if (!isAdmin) {
@@ -3062,6 +2890,30 @@ export default function App() {
             </div>
           </div>
         )}
+
+        {/* ⚡ Swiss Status Bar at the bottom of Left Column */}
+        <div 
+          style={{
+            marginTop: '48px',
+            borderTop: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+            paddingTop: '20px',
+            textAlign: 'left'
+          }}
+        >
+          <div 
+            style={{
+              fontSize: 'clamp(28px, 4.5vw, 42px)',
+              fontWeight: 900,
+              color: isDarkMode ? '#FFFFFF' : '#0022FF',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              letterSpacing: '-0.07em',
+              lineHeight: 0.9,
+              textTransform: 'uppercase'
+            }}
+          >
+            ● LIVE SYNCED
+          </div>
+        </div>
       </div>
 
       </div>
@@ -3076,7 +2928,6 @@ export default function App() {
           activeTemplate={activeTemplate}
           useProduct={useProduct}
           isDarkMode={isDarkMode}
-          selectedApi={selectedApi}
           simulateUpscale={simulateUpscale}
           handleDownload={handleDownload}
           isUpscaling={isUpscaling}
@@ -3086,7 +2937,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.62 | Smart Grid Unified
+      v0.63 | Ultimate Swiss Workspace
     </footer>
     <div className="h-12"></div>
     </div>
