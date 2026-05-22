@@ -2067,8 +2067,8 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   color: #FFFFFF !important;
   z-index: 10 !important; /* Highest priority to cover adjacent tabs and envelope border */
   border: 1px solid #0022FF !important;
-  border-bottom: 2px solid #0022FF !important; /* Match container height so active tab covers the container line */
-  margin-bottom: -2px !important; /* Pull down to cover the 2px container border */
+  border-bottom: none !important; /* Merge seamlessly with container border without extra thickness */
+  margin-bottom: 0 !important;
 }
 
 /* 아래 서류 봉투 내부 컨테이너 */
@@ -2100,8 +2100,8 @@ body.dark-mode .folder-tab.active {
   background: #FFFFFF !important;
   color: #0022FF !important;
   border: 1px solid #FFFFFF !important;
-  border-bottom: 2px solid #FFFFFF !important; /* Match and cover container border */
-  margin-bottom: -2px !important;
+  border-bottom: none !important;
+  margin-bottom: 0 !important;
 }
 
 body.dark-mode .folder-content-envelope {
