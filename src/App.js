@@ -1467,12 +1467,10 @@ export default function App() {
                     setPromptCopied(true);
                     setTimeout(() => setPromptCopied(false), 2000);
                   }}
-                  className="save-btn flex-1"
+                  className="swiss-copy-btn flex-1"
                   style={{
-                    backgroundColor: 'transparent',
-                    color: promptCopied ? '#34C759' : (isDarkMode ? '#FFFFFF' : '#0022FF'),
-                    border: 'none',
-                    borderBottom: promptCopied ? '1px solid #34C759' : (isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF'),
+                    color: promptCopied ? '#34C759' : undefined,
+                    border: promptCopied ? '1px solid #34C759' : undefined,
                     borderRadius: '0px',
                     display: 'flex', justifyContent: 'center', alignItems: 'center',
                     gap: '8px', height: '40px', cursor: 'pointer', outline: 'none',
@@ -2372,7 +2370,7 @@ export default function App() {
 
             {/* Library Tabs & Envelope Wrapper (eliminates space-y-6 top margin gap) */}
             <div>
-              <div className="folder-tabs-container no-scrollbar" style={{ marginTop: '0', marginBottom: '0', overflowX: 'auto', whiteSpace: 'nowrap', padding: '0', gap: '0' }}>
+              <div className="folder-tabs-container no-scrollbar" style={{ marginTop: '0', marginBottom: '0', overflowX: 'auto', whiteSpace: 'nowrap', padding: '0', gap: '0', touchAction: 'pan-x', overscrollBehavior: 'contain' }}>
                 <button className={`folder-tab ${libraryFilter === '전체' ? 'active' : ''}`} style={{ padding: '8px 12px', flexShrink: 0, flex: 'none' }} onClick={() => { setLibraryFilter('전체'); setLibraryPage(0); }}>전체</button>
               {OPTIONS_DATA.spaceType.map(space => (
                 <button

@@ -2516,6 +2516,39 @@ body.dark-mode .ios-switch.active {
   background: #FFFFFF !important;
 }
 
+/* Swiss Option Button Contrast Patch in Dark Mode */
+body.dark-mode .swiss-option-btn {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+/* Custom Swiss Copy Button Hover & Contrast Patch */
+.swiss-copy-btn {
+  background-color: transparent !important;
+  color: #0022FF !important;
+  border: 1px solid #0022FF !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.swiss-copy-btn:hover {
+  background-color: #0022FF !important;
+  color: #FFFFFF !important;
+}
+
+.swiss-copy-btn:active {
+  transform: scale(0.96) !important;
+}
+
+/* Dark mode overrides for copy button */
+body.dark-mode .swiss-copy-btn {
+  color: #FFFFFF !important;
+  border: 1px solid #FFFFFF !important;
+}
+
+body.dark-mode .swiss-copy-btn:hover {
+  background-color: #FFFFFF !important;
+  color: #0022FF !important;
+}
+
 
 
 
