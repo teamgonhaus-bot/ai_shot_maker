@@ -14,6 +14,37 @@ import IOSToggle from './components/IOSToggle';
 import SwissSpecificationSheet from './components/SwissSpecificationSheet';
 import TemplateCard from './components/TemplateCard';
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error("ErrorBoundary caught an error", error, errorInfo);
+    this.setState({ error, errorInfo });
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '40px', color: '#FF3B30', fontFamily: 'monospace', backgroundColor: '#1C1C1E', minHeight: '100vh' }}>
+          <h2 style={{ color: '#FF453A' }}>Rendering Error Detected</h2>
+          <p style={{ color: '#AEAEB2' }}>Please check the stack trace below:</p>
+          <pre style={{ whiteSpace: 'pre-wrap', backgroundColor: '#2C2C2E', padding: '20px', borderRadius: '12px', color: '#FF453A' }}>
+            {this.state.error && this.state.error.toString()}
+            {"\n\n"}
+            {this.state.errorInfo && this.state.errorInfo.componentStack}
+          </pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+
 /**
  * [ROLE: AI/React Senior Engineer]
  * Face Distortion (얼굴 일그러짐) 방지 고품질 렌더링 프롬프트 헬퍼
@@ -1304,7 +1335,8 @@ export default function App() {
   };
 
   return (
-    <div className="app-container">
+    <ErrorBoundary>
+      <div className="app-container">
       {showSplash && (
         <div 
           className={`ios-splash-screen ${splashFade ? 'fade-out' : ''}`}
@@ -2935,5 +2967,6 @@ export default function App() {
     </footer>
     <div className="h-12"></div>
     </div>
+    </ErrorBoundary>
   );
 }

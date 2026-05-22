@@ -6,7 +6,7 @@ export default function SwissSpecificationSheet({
   prompt,
   image,
   isImageGenerating,
-  config,
+  config = {},
   activeTemplate,
   useProduct,
   isDarkMode,
@@ -16,6 +16,8 @@ export default function SwissSpecificationSheet({
   isUpscaling,
   setLightboxImage
 }) {
+  // Guard: if config is null/undefined, use empty object
+  const safeConfig = config || {};
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -43,47 +45,50 @@ export default function SwissSpecificationSheet({
     const specs = [];
     
     // 1. Ratio
-    if (config.aspectRatio && config.aspectRatio !== "선택안함") {
-      specs.push({ label: 'RATIO', value: config.aspectRatio.split(' ')[0] });
+    if (safeConfig.aspectRatio && safeConfig.aspectRatio !== "선택안함") {
+      specs.push({ label: 'RATIO', value: String(safeConfig.aspectRatio).split(' ')[0] });
     }
     
     // 2. Space / Environment
-    if (config.spaceType && config.spaceType !== "선택안함") {
-      let spaceVal = config.spaceType;
-      if (config.spaceDetail && config.spaceDetail !== "선택안함") {
-        spaceVal += ` / ${config.spaceDetail}`;
+    if (safeConfig.spaceType && safeConfig.spaceType !== "선택안함") {
+      let spaceVal = String(safeConfig.spaceType);
+      if (safeConfig.spaceDetail && safeConfig.spaceDetail !== "선택안함") {
+        spaceVal += ` / ${safeConfig.spaceDetail}`;
       }
       specs.push({ label: 'SPACE', value: spaceVal });
     }
 
     // 3. Subject
-    if (config.subjectNum && config.subjectNum !== "없음") {
+    if (safeConfig.subjectNum && safeConfig.subjectNum !== "없음") {
       specs.push({ 
         label: 'SUBJECT', 
-        value: `${config.subjectNum} (${config.subjectGender || '단일'})` 
+        value: `${safeConfig.subjectNum} (${safeConfig.subjectGender || 'SOLO'})` 
       });
-    } else {
-      specs.push({ label: 'SUBJECT', value: 'NONE' });
     }
 
     // 4. Camera Angle / Depth
-    if (config.cameraAngle && config.cameraAngle !== "선택안함") {
-      specs.push({ label: 'CAMERA', value: config.cameraAngle });
+    if (safeConfig.cameraAngle && safeConfig.cameraAngle !== "선택안함") {
+      specs.push({ label: 'CAMERA', value: String(safeConfig.cameraAngle) });
     }
 
     // 5. Lighting
-    if (config.useLight && config.light && config.light !== "선택안함") {
-      specs.push({ label: 'LIGHTING', value: config.light });
+    if (safeConfig.useLight && safeConfig.light && safeConfig.light !== "선택안함") {
+      specs.push({ label: 'LIGHTING', value: String(safeConfig.light) });
     }
 
-    // 6. Style
-    if (config.shotStyle && config.shotStyle !== "선택안함") {
-      specs.push({ label: 'STYLE', value: config.shotStyle });
+    // 6. Style — shotStyle may be an array
+    if (safeConfig.shotStyle) {
+      const styleVal = Array.isArray(safeConfig.shotStyle)
+        ? safeConfig.shotStyle.join(', ')
+        : safeConfig.shotStyle;
+      if (styleVal && styleVal !== "선택안함") {
+        specs.push({ label: 'STYLE', value: styleVal });
+      }
     }
 
     // 7. Brand Anchor
-    if (useProduct && config.productAnchor && config.productAnchor !== "선택안함") {
-      specs.push({ label: 'ANCHOR', value: config.productAnchor });
+    if (useProduct && safeConfig.productAnchor && safeConfig.productAnchor !== "선택안함") {
+      specs.push({ label: 'ANCHOR', value: String(safeConfig.productAnchor) });
     }
 
     return specs;
@@ -93,7 +98,7 @@ export default function SwissSpecificationSheet({
   
   // High-end technical ID generation based on config hash
   const getSpecId = () => {
-    const spaceCode = config.spaceType ? config.spaceType.slice(0, 2).toUpperCase() : 'MX';
+    const spaceCode = safeConfig.spaceType ? String(safeConfig.spaceType).slice(0, 2).toUpperCase() : 'MX';
     const apiCode = selectedApi === 'google' ? 'GEM' : 'FLX';
     return `EU-SM60-${spaceCode}-${apiCode}`;
   };
@@ -304,7 +309,7 @@ export default function SwissSpecificationSheet({
       {specs.map((spec, i) => (
         <div key={i} className="swiss-spec-row">
           <span className="swiss-spec-label">{spec.label}</span>
-          <span className="swiss-spec-value">{spec.value.toUpperCase()}</span>
+          <span className="swiss-spec-value">{spec.value ? String(spec.value).toUpperCase() : ''}</span>
         </div>
       ))}
 
