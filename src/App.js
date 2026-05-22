@@ -249,6 +249,7 @@ export default function App() {
   const [generatedImage, setGeneratedImage] = useState(null);
   const [isImageGenerating, setIsImageGenerating] = useState(false);
   const [isUpscaling, setIsUpscaling] = useState(false);
+  const [isSyncingToCloud, setIsSyncingToCloud] = useState(false);
   const [cooldownTime, setCooldownTime] = useState(0);
   const [activeCategory, setActiveCategory] = useState('subject');
   const [activeTemplate, setActiveTemplate] = useState(null);
@@ -857,6 +858,73 @@ export default function App() {
     }
   };
 
+  const handleSyncToCloud = async () => {
+    if (!generatedImage) return;
+    if (!generatedImage.startsWith("data:image/")) {
+      triggerToast("이미 서버와 동기화된 이미지입니다.");
+      return;
+    }
+    
+    setIsSyncingToCloud(true);
+    triggerToast("클라우드 서버에 이미지를 저장하는 중...");
+    console.log("☁️ Manual Cloud Sync initiated...");
+    
+    try {
+      const base64Url = generatedImage;
+      const fileName = `gallery/img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.png`;
+      const storageRef = ref(storage, fileName);
+      
+      // Upload base64 data to Firebase Storage
+      await uploadString(storageRef, base64Url, 'data_url');
+      
+      // Retrieve public download URL
+      const downloadUrl = await getDownloadURL(storageRef);
+      
+      // Write image record to Firestore 'gallery' collection
+      const firestoreData = {
+        url: downloadUrl,
+        storagePath: fileName,
+        prompt: generatedPrompt || 'No Prompt Info',
+        timestamp: new Date().toISOString(),
+        folder: '기본'
+      };
+      
+      const docRef = await addDoc(collection(db, "gallery"), firestoreData);
+      
+      // Update Main image state to server URL
+      setGeneratedImage(downloadUrl);
+      
+      // Replace any temporary gallery items with the completed Firestore document
+      const finalImg = {
+        id: docRef.id,
+        url: downloadUrl,
+        storagePath: fileName,
+        prompt: firestoreData.prompt,
+        timestamp: firestoreData.timestamp,
+        folder: '기본',
+        isTemp: false
+      };
+      
+      // If there's an existing temp entry for this base64 in gallery, replace it. Otherwise prepend it.
+      setGalleryImages(prev => {
+        const hasTemp = prev.some(img => img.url === base64Url);
+        if (hasTemp) {
+          return prev.map(img => img.url === base64Url ? finalImg : img);
+        } else {
+          return [finalImg, ...prev];
+        }
+      });
+      
+      triggerToast("클라우드 서버 저장 완료!");
+      console.log(`✅ Manual cloud sync completed successfully. Document ID: ${docRef.id}`);
+    } catch (err) {
+      console.error("❌ Manual cloud sync failed:", err);
+      triggerToast("서버 저장 실패: " + err.message);
+    } finally {
+      setIsSyncingToCloud(false);
+    }
+  };
+
   const handleSaveTemplate = async () => {
     if (!isAdmin) {
       triggerToast("저장 권한이 없습니다.");
@@ -867,6 +935,58 @@ export default function App() {
     setIsSaving(true);
     console.log(`💾 Attempting to save template: "${templateName}"...`);
     try {
+      let finalPreviewImage = generatedImage || null;
+      
+      // [CRITICAL] 템플릿 저장 시 이미지가 여전히 로컬 base64 상태이면 저장 프로세스 중 선-동기식으로 Storage 업로드를 처리합니다.
+      if (finalPreviewImage && finalPreviewImage.startsWith("data:image/")) {
+        console.log("☁️ Template preview image is base64. Initiating synchronous cloud sync before save...");
+        try {
+          const fileName = `gallery/img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.png`;
+          const storageRef = ref(storage, fileName);
+          await uploadString(storageRef, finalPreviewImage, 'data_url');
+          const downloadUrl = await getDownloadURL(storageRef);
+          
+          // Firestore gallery 컬렉션에도 등록해줍니다 (어디서나 볼 수 있게 백업)
+          const firestoreData = {
+            url: downloadUrl,
+            storagePath: fileName,
+            prompt: generatedPrompt,
+            timestamp: new Date().toISOString(),
+            folder: '기본'
+          };
+          const galleryDoc = await addDoc(collection(db, "gallery"), firestoreData);
+          
+          // 상태 및 갤러리 리스트 갱신
+          setGeneratedImage(downloadUrl);
+          
+          const finalImg = {
+            id: galleryDoc.id,
+            url: downloadUrl,
+            storagePath: fileName,
+            prompt: generatedPrompt,
+            timestamp: firestoreData.timestamp,
+            folder: '기본',
+            isTemp: false
+          };
+          
+          setGalleryImages(prev => {
+            const base64Url = finalPreviewImage;
+            const hasTemp = prev.some(img => img.url === base64Url);
+            if (hasTemp) {
+              return prev.map(img => img.url === base64Url ? finalImg : img);
+            } else {
+              return [finalImg, ...prev];
+            }
+          });
+          
+          finalPreviewImage = downloadUrl;
+          console.log("✅ Synchronous template preview sync completed.");
+        } catch (uploadErr) {
+          console.error("❌ Failed to sync preview image to cloud during template save:", uploadErr);
+          triggerToast("경고: 이미지 서버 저장 실패. 기본 미리보기로 저장됩니다.");
+        }
+      }
+
       const newTemplate = {
         name: templateName,
         prompt: generatedPrompt,
@@ -875,7 +995,7 @@ export default function App() {
         removeText,
         createdAt: serverTimestamp(),
         thumbnailColor: ['#FF3B30', '#34C759', '#AF52DE', '#FF9500', '#007AFF'][Math.floor(Math.random() * 5)],
-        previewImage: generatedImage || null
+        previewImage: finalPreviewImage
       };
 
       const docRef = await addDoc(collection(db, "templates"), newTemplate);
@@ -1250,42 +1370,76 @@ export default function App() {
           const mimeType = part.inlineData.mimeType || "image/png";
           const base64Url = `data:${mimeType};base64,${part.inlineData.data}`;
           
-          // 1. Firebase Storage에 즉시 동기식 업로드 진행
-          const fileName = `gallery/img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.png`;
-          const storageRef = ref(storage, fileName);
+          // [Zero-Lag UX] 생성 즉시 화면에 노출 (생성창 즉시 닫힘)
+          setGeneratedImage(base64Url);
           
-          await uploadString(storageRef, base64Url, 'data_url');
-          
-          // 2. Public Download URL 획득
-          const downloadUrl = await getDownloadURL(storageRef);
-          
-          // 3. Firestore 'gallery' 컬렉션에 메타데이터 저장
-          const firestoreData = {
-            url: downloadUrl,
-            storagePath: fileName,
+          const tempId = `temp_${Date.now()}`;
+          const tempImg = {
+            id: tempId,
+            url: base64Url,
             prompt: promptToUse,
             timestamp: new Date().toISOString(),
-            folder: '기본'
+            folder: '기본',
+            isTemp: true
           };
+          setGalleryImages(prev => [tempImg, ...prev]);
           
-          const docRef = await addDoc(collection(db, "gallery"), firestoreData);
-          
-          // 4. 메인 이미지 및 갤러리 상태 업데이트
-          setGeneratedImage(downloadUrl);
-          
-          const finalImg = {
-            id: docRef.id,
-            url: downloadUrl,
-            storagePath: fileName,
-            prompt: promptToUse,
-            timestamp: firestoreData.timestamp,
-            folder: '기본'
-          };
-          
-          setGalleryImages(prev => [finalImg, ...prev]);
-          
-          triggerToast("이미지가 성공적으로 생성되어 서버에 저장되었습니다.");
-          console.log(`✅ Image generated, uploaded to Storage, and recorded in Firestore. Document ID: ${docRef.id}`);
+          // 백그라운드 자동 업로드 및 Firestore 싱크
+          (async () => {
+            try {
+              console.log("☁️ Background upload started automatically...");
+              const fileName = `gallery/img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.png`;
+              const storageRef = ref(storage, fileName);
+              
+              await uploadString(storageRef, base64Url, 'data_url');
+              const downloadUrl = await getDownloadURL(storageRef);
+              
+              // 업로드 완료 전 사용자가 이미지를 삭제했는지 확인
+              let isStillPresent = false;
+              setGalleryImages(prev => {
+                isStillPresent = prev.some(img => img.id === tempId);
+                return prev;
+              });
+              
+              if (!isStillPresent) {
+                console.log("ℹ️ Image was deleted by user before background upload completed. Cleaning up Storage.");
+                await deleteObject(storageRef).catch(() => {});
+                return;
+              }
+              
+              // 현재 지정된 폴더 획득 (혹시 업로드 중 이동했을 수 있으므로)
+              let currentFolder = '기본';
+              setGalleryImages(prev => {
+                const found = prev.find(img => img.id === tempId);
+                if (found) {
+                  currentFolder = found.folder || '기본';
+                }
+                return prev;
+              });
+              
+              const firestoreData = {
+                url: downloadUrl,
+                storagePath: fileName,
+                prompt: promptToUse,
+                timestamp: new Date().toISOString(),
+                folder: currentFolder
+              };
+              
+              const docRef = await addDoc(collection(db, "gallery"), firestoreData);
+              
+              // 갤러리 이미지 완성형으로 갱신
+              setGalleryImages(prev => prev.map(img => 
+                img.id === tempId ? { ...img, id: docRef.id, url: downloadUrl, storagePath: fileName, isTemp: false } : img
+              ));
+              
+              // 메인 이미지 상태도 서버 URL로 즉시 승격
+              setGeneratedImage(downloadUrl);
+              console.log(`✅ Background upload sync completed silently. Document ID: ${docRef.id}`);
+            } catch (uploadError) {
+              console.error("❌ Background auto-upload/sync error:", uploadError);
+              // 자동 업로드가 실패해도 로컬 이미지는 살려두며, 사용자는 수동 클라우드 저장 버튼을 이용해 서버에 저장할 수 있습니다.
+            }
+          })();
           
           imageFound = true;
           break;
@@ -3323,6 +3477,8 @@ export default function App() {
           handleDownload={handleDownload}
           isUpscaling={isUpscaling}
           setLightboxImage={setLightboxImage}
+          isSyncingToCloud={isSyncingToCloud}
+          handleSyncToCloud={handleSyncToCloud}
         />
       </div>
     </div>

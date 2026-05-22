@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Copy, Check, Download, Zap } from 'lucide-react';
+import { Copy, Check, Download, Zap, Cloud } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function SwissSpecificationSheet({
@@ -13,7 +13,9 @@ export default function SwissSpecificationSheet({
   simulateUpscale,
   handleDownload,
   isUpscaling,
-  setLightboxImage
+  setLightboxImage,
+  isSyncingToCloud = false,
+  handleSyncToCloud
 }) {
   // Guard: if config is null/undefined, use empty object
   const safeConfig = config || {};
@@ -350,12 +352,23 @@ export default function SwissSpecificationSheet({
           <div className="swiss-image-controls">
             <button onClick={simulateUpscale} className="swiss-image-btn" disabled={isUpscaling}>
               <Zap size={11} />
-              <span>{isUpscaling ? 'Upscaling...' : '2x Upscale'}</span>
+              <span>{isUpscaling ? 'Upscaling...' : '2x'}</span>
             </button>
             <button onClick={handleDownload} className="swiss-image-btn">
               <Download size={11} />
               <span>Download</span>
             </button>
+            {image && image.startsWith("data:image/") ? (
+              <button onClick={handleSyncToCloud} className="swiss-image-btn" disabled={isSyncingToCloud} style={{ color: '#007AFF', fontWeight: 900 }}>
+                <Cloud size={11} />
+                <span>{isSyncingToCloud ? 'Syncing...' : 'Cloud Sync'}</span>
+              </button>
+            ) : (
+              <button className="swiss-image-btn" disabled style={{ opacity: 0.6 }}>
+                <Cloud size={11} />
+                <span>Synced ✓</span>
+              </button>
+            )}
           </div>
         </motion.div>
       )}
