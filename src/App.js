@@ -19,7 +19,7 @@ import TemplateCard from './components/TemplateCard';
  * Face Distortion (얼굴 일그러짐) 방지 고품질 렌더링 프롬프트 헬퍼
  */
 const enhancePrompt = (prompt) => {
-  const qualitySuffix = ", highly detailed face, sharp focus, 8k resolution, perfect symmetry, masterpiece, photorealistic, intricate facial features";
+  const qualitySuffix = ", sharp focus, perfect symmetry, photorealistic, intricate facial features";
   return `${prompt}${qualitySuffix}`;
 };
 
@@ -28,7 +28,7 @@ const DICTIONARY = {
   subjectGender: { "선택안함": "", "여성": "female", "남성": "male", "혼성": "mixed gender" },
   subjectAge: { "선택안함": "", "10대": "teenager", "20대": "in their 20s", "30대": "in their 30s", "40대": "in their 40s", "중장년": "middle-aged" },
   subjectRegion: { "선택안함": "", "한국": "Korean", "일본": "Japanese", "북유럽": "Northern European", "북미": "North American" },
-  subjectAction: { "선택안함": "", "기본": "posing naturally", "차분함": "with a calm demeanor", "활발함": "with energetic and active movement", "공간에 어울리게": "interacting naturally with the surrounding space" },
+  subjectAction: { "선택안함": "", "기본": "posing naturally", "차분함": "with a calm demeanor", "활발함": "with energetic and active movement" },
   subjectClothesStyle: { "선택안함": "", "캐주얼": "casual style", "비즈니스": "business style", "스트릿": "streetwear style", "미니멀": "minimalist style", "포멀/정장": "formal suit style" },
   subjectClothesTop: {
     "선택안함": "", "반팔티": "wearing a short sleeve t-shirt", "긴팔티": "wearing a long sleeve t-shirt", "자켓": "wearing a jacket", "아우터": "wearing outerwear", "원피스": "wearing a dress", "스포츠 복장": "wearing sportswear", "아웃도어": "wearing outdoor apparel"
@@ -40,7 +40,7 @@ const DICTIONARY = {
 
   spaceType: { "스튜디오": "a professional studio environment", "오피스": "a modern office space", "홈": "a cozy home interior", "리테일": "a retail commercial space", "라운지": "a luxury lounge area", "야외": "an outdoor setting" },
   spaceDetail: {
-    "단색 배경": "with a solid color background", "인테리어 세트장": "within a designed interior set", "그라데이션 배경": "with a gradient background", "화이트벽 빈공간": "in a clean studio with an empty white wall backdrop", "쇼케이스": "in a showcase display area", "크로마키 그린 배경": "with a chroma key green screen background",
+    "단색 배경": "with a solid color background", "인테리어 세트장": "within a designed interior set", "그라데이션 배경": "with a gradient background", "쇼케이스": "in a showcase display area", "크로마키 배경": "with a chroma key background",
     "사무실": "in a standard office setup", "회의실": "in a formal meeting room", "중역실": "in an executive office suite", "오피스 라운지": "in a relaxed office lounge", "트레이닝룸": "in a training or lecture room", "공유오피스": "in a modern coworking space",
     "리빙": "in a living room area", "다이닝": "in a dining room setting", "룸": "in a private room", "워크룸": "in a dedicated workroom or study", "베드룸": "in a comfortable bedroom setting", "테라스": "on a scenic terrace",
     "카페": "in a trendy cafe", "식당": "in a modern restaurant", "쇼룸": "in a premium showroom", "로비": "in a grand lobby area", "쇼핑몰": "in a bustling shopping mall", "박람회": "at a professional exhibition or fair", "갤러리": "in a minimalist art gallery", "도서관": "in a quiet library environment", "강의실": "in a modern classroom",
@@ -76,7 +76,7 @@ const OPTIONS_DATA = {
   subjectGender: ["선택안함", "여성", "남성", "혼성"],
   subjectAge: ["선택안함", "10대", "20대", "30대", "40대", "중장년"],
   subjectRegion: ["선택안함", "한국", "일본", "북유럽", "북미"],
-  subjectAction: ["선택안함", "기본", "차분함", "활발함", "공간에 어울리게"],
+  subjectAction: ["선택안함", "기본", "차분함", "활발함"],
   subjectClothesStyle: ["선택안함", "캐주얼", "비즈니스", "스트릿", "미니멀", "포멀/정장"],
   subjectClothesTop: {
     female: ["선택안함", "반팔티", "긴팔티", "자켓", "아우터", "원피스", "스포츠 복장", "아웃도어"],
@@ -89,10 +89,10 @@ const OPTIONS_DATA = {
   subjectHair: ["선택안함", "긴머리", "짧은머리", "단발", "펌", "염색", "묶은머리"],
   spaceType: ["스튜디오", "오피스", "홈", "리테일", "라운지", "야외"],
   spaceDetail: {
-    "스튜디오": ["단색 배경", "그라데이션 배경", "화이트벽 빈공간", "인테리어 세트장", "쇼케이스", "크로마키 그린 배경"],
+    "스튜디오": ["단색 배경", "그라데이션 배경", "인테리어 세트장", "크로마키 배경"],
     "오피스": ["사무실", "회의실", "중역실", "오피스 라운지", "트레이닝룸", "공유오피스"],
     "홈": ["리빙", "다이닝", "룸", "워크룸", "베드룸", "테라스"],
-    "리테일": ["카페", "식당", "쇼룸", "로비", "쇼핑몰", "박람회", "갤러리", "도서관", "강의실"],
+    "리테일": ["카페", "식당", "쇼룸", "쇼케이스", "로비", "쇼핑몰", "박람회", "갤러리", "도서관", "강의실"],
     "라운지": ["호텔 라운지", "공항 라운지", "쇼핑몰라운지", "쇼케이스 라운지"],
     "야외": ["도심", "자연", "테라스", "공원", "강가", "쇼핑가", "힙한곳"]
   },
@@ -374,6 +374,13 @@ export default function App() {
     }
   }, [config, useDetailMaterial, smartUseSubject, removeText, useCommercialNegative, enableImageGeneration, isLoading]);
 
+  // config.spaceType이 '스튜디오'일 때 세부소재(useDetailMaterial)를 자동으로 OFF로 설정
+  useEffect(() => {
+    if (config.spaceType === '스튜디오') {
+      setUseDetailMaterial(false);
+    }
+  }, [config.spaceType]);
+
   const handleConfigChange = (key, value) => {
     setActiveTemplate(null);
     setActiveLibraryTemplateId(null);
@@ -460,9 +467,9 @@ export default function App() {
       targetConfig.subjectNum = '혼자';
       targetConfig.subjectGender = '여성';
       targetConfig.subjectAge = '20대';
-      targetConfig.subjectAction = '공간에 어울리게';
+      targetConfig.subjectAction = '기본';
       targetConfig.spaceType = '스튜디오';
-      targetConfig.spaceDetail = '화이트벽 빈공간';
+      targetConfig.spaceDetail = '단색 배경';
       targetConfig.cameraAngle = '풀 샷';
       targetConfig.copySpace = '선택안함';
       targetConfig.productLayout = '선택안함';
@@ -546,7 +553,7 @@ export default function App() {
         targetConfig.subjectNum = '혼자';
         if (targetConfig.subjectGender === '선택안함') targetConfig.subjectGender = '여성';
         if (targetConfig.subjectAge === '선택안함') targetConfig.subjectAge = '20대';
-        if (targetConfig.subjectAction === '선택안함') targetConfig.subjectAction = '공간에 어울리게';
+        if (targetConfig.subjectAction === '선택안함') targetConfig.subjectAction = '기본';
       } else {
         targetConfig.subjectNum = '없음';
       }
@@ -587,7 +594,7 @@ export default function App() {
         subjectNum: isOn ? '혼자' : '없음',
         subjectGender: isOn && prev.subjectGender === '선택안함' ? '여성' : prev.subjectGender,
         subjectAge: isOn && prev.subjectAge === '선택안함' ? '20대' : prev.subjectAge,
-        subjectAction: isOn && prev.subjectAction === '선택안함' ? '공간에 어울리게' : prev.subjectAction
+        subjectAction: isOn && prev.subjectAction === '선택안함' ? '기본' : prev.subjectAction
       }));
     } else {
       setConfig(prev => ({
@@ -647,7 +654,7 @@ export default function App() {
 
     } else if (activeTemplate === 'USAGE SCENE') {
       const genders = ['여성', '남성'];
-      const actions = ['공간에 어울리게', '차분함', '활발함'];
+      const actions = ['기본', '차분함', '활발함'];
       const ages = ['20대', '30대', '40대'];
       const hairs = ['긴머리', '짧은머리', '단발', '묶은머리'];
       const clothesStyles = ['캐주얼', '비즈니스', '미니멀'];
@@ -658,9 +665,9 @@ export default function App() {
       targetConfig.subjectHair = hairs[Math.floor(Math.random() * hairs.length)];
       targetConfig.subjectClothesStyle = clothesStyles[Math.floor(Math.random() * clothesStyles.length)];
 
-      // 인물 외 공간(스튜디오, 화이트벽 빈공간) 및 주요 세팅은 바뀌지 않도록 명시적 고정
+      // 인물 외 공간(스튜디오, 단색 배경) 및 주요 세팅은 바뀌지 않도록 명시적 고정
       targetConfig.spaceType = '스튜디오';
-      targetConfig.spaceDetail = '화이트벽 빈공간';
+      targetConfig.spaceDetail = '단색 배경';
       targetConfig.cameraAngle = '풀 샷';
       targetConfig.light = '균일하게 비치는 조명';
       targetConfig.useLight = true;
@@ -717,7 +724,7 @@ export default function App() {
         targetConfig.subjectNum = '혼자';
         if (targetConfig.subjectGender === '선택안함') targetConfig.subjectGender = '여성';
         if (targetConfig.subjectAge === '선택안함') targetConfig.subjectAge = '20대';
-        if (targetConfig.subjectAction === '선택안함') targetConfig.subjectAction = '공간에 어울리게';
+        if (targetConfig.subjectAction === '선택안함') targetConfig.subjectAction = '기본';
       } else {
         targetConfig.subjectNum = '없음';
       }
@@ -914,7 +921,7 @@ export default function App() {
           parts.push("textless, no text, no watermarks, clear image");
         }
         if (activeTemplate !== 'TITLE SCENE') {
-          parts.push("8k resolution, highly detailed, masterpiece, photorealistic");
+          parts.push("photorealistic");
         }
       } else {
         let subjectStr = activeProductName ? `a high-end ${activeProductName}` : "a high-end masterpiece";
@@ -986,17 +993,19 @@ export default function App() {
             envStr += `, ${DICTIONARY.spaceDetail[config.spaceDetail]}`;
           }
         }
-        if (config.locationContext && config.locationContext !== "선택안함") {
-          envStr += `, ${DICTIONARY.locationContext[config.locationContext]}`;
+        if (config.spaceType !== '스튜디오') {
+          if (config.locationContext && config.locationContext !== "선택안함") {
+            envStr += `, ${DICTIONARY.locationContext[config.locationContext]}`;
+          }
+          if (config.country !== "선택안함") envStr += ` in ${DICTIONARY.country[config.country]}`;
         }
-        if (config.country !== "선택안함") envStr += ` in ${DICTIONARY.country[config.country]}`;
         parts.push(`set in ${envStr}`);
 
-        if (config.interiorStyle !== "선택안함") {
+        if (config.spaceType !== '스튜디오' && config.interiorStyle !== "선택안함") {
           parts.push(`designed with ${DICTIONARY.interiorStyle[config.interiorStyle]}`);
         }
 
-        if (useDetailMaterial) {
+        if (config.spaceType !== '스튜디오' && useDetailMaterial) {
           const materials = [];
           if (config.detailFloor) materials.push(DICTIONARY.detailFloor[config.detailFloor]);
           if (config.detailWood) materials.push(DICTIONARY.detailWood[config.detailWood]);
@@ -1019,7 +1028,7 @@ export default function App() {
           parts.push(`rendered with ${styles.join(", ")}`);
         }
         if (removeText) parts.push("textless, no text, no watermarks, clear image");
-        parts.push("8k resolution, highly detailed, masterpiece, photorealistic, interior design magazine cover");
+        parts.push("photorealistic, interior design magazine cover");
       }
 
       // 1. 핵심 개체명 추출 및 정제
@@ -1309,7 +1318,7 @@ export default function App() {
               SHOT MAKER
             </div>
             <div class="ios-splash-version">
-              v0.52c | Swiss Minimalist
+              v0.52d | Swiss Minimalist
             </div>
           </div>
         </div>
@@ -1511,14 +1520,14 @@ export default function App() {
               <h3 style={{ color: isDarkMode ? '#FFFFFF' : '#000000' }} className="text-[20px] font-black mb-4 tracking-tight text-center">Prompt Detail</h3>
               <div className="flex-1 overflow-y-auto" style={{
                 padding: '16px',
-                backgroundColor: isDarkMode ? 'rgba(255,255,255,0.12)' : '#F2F2F7',
+                backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.25)' : '#F2F2F7',
                 borderRadius: '16px',
                 marginBottom: '20px',
-                border: isDarkMode ? '1px solid rgba(255,255,255,0.3)' : 'none',
+                border: isDarkMode ? '1px solid rgba(255,255,255,0.15)' : 'none',
               }}>
                 <p style={{
-                  fontSize: '13px', fontWeight: 500,
-                  color: isDarkMode ? '#FFFFFF' : '#4B5563',
+                  fontSize: '13px', fontWeight: 600,
+                  color: isDarkMode ? '#FFFFFF' : '#374151',
                   lineHeight: 1.7, margin: 0, wordBreak: 'break-word',
                 }}>
                   {promptModalTarget.prompt}
@@ -1660,35 +1669,50 @@ export default function App() {
                     <div 
                       key={idx} 
                       style={{
-                        paddingBottom: '20px',
-                        borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)',
-                        textAlign: 'left'
+                        paddingBottom: idx === aboutModalTarget.content.length - 1 ? '0' : '20px',
+                        borderBottom: idx === aboutModalTarget.content.length - 1 ? 'none' : (isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)'),
+                        textAlign: 'left',
+                        display: 'flex',
+                        gap: '14px',
+                        position: 'relative'
                       }}
                     >
-                      <h4 
+                      {/* Dynamic vertical accent bar */}
+                      <div 
                         style={{ 
-                          fontSize: '15px', 
-                          fontWeight: '800', 
-                          color: isDarkMode ? '#FFFFFF' : '#0022FF', 
-                          margin: '0 0 8px 0',
-                          letterSpacing: '-0.02em'
-                        }}
-                      >
-                        {item.label}
-                      </h4>
-                      <p 
-                        style={{ 
-                          fontSize: '12.5px', 
-                          color: isDarkMode ? '#FFFFFFB3' : '#4E5B85', 
-                          fontWeight: '500', 
-                          lineHeight: '1.65', 
-                          margin: 0,
-                          textAlign: 'left',
-                          wordBreak: 'keep-all'
-                        }}
-                      >
-                        {item.text}
-                      </p>
+                          width: '4px', 
+                          borderRadius: '2px', 
+                          backgroundColor: getValidHexColor(aboutModalTarget.color), 
+                          flexShrink: 0,
+                          alignSelf: 'stretch'
+                        }} 
+                      />
+                      <div style={{ flex: 1 }}>
+                        <h4 
+                          style={{ 
+                            fontSize: '15px', 
+                            fontWeight: '800', 
+                            color: isDarkMode ? '#FFFFFF' : '#0022FF', 
+                            margin: '0 0 6px 0',
+                            letterSpacing: '-0.02em'
+                          }}
+                        >
+                          {item.label}
+                        </h4>
+                        <p 
+                          style={{ 
+                            fontSize: '12.5px', 
+                            color: isDarkMode ? '#FFFFFFB3' : '#4E5B85', 
+                            fontWeight: '500', 
+                            lineHeight: '1.65', 
+                            margin: 0,
+                            textAlign: 'left',
+                            wordBreak: 'keep-all'
+                          }}
+                        >
+                          {item.text}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -1701,19 +1725,28 @@ export default function App() {
                   borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)',
                   marginTop: '4px'
                 }}>
-                  <p 
-                    style={{ 
-                      fontSize: '11px', 
-                      color: isDarkMode ? '#FFFFFFB3' : '#0022FFCC', 
-                      fontWeight: '600', 
-                      lineHeight: '1.5', 
-                      textAlign: 'left',
-                      margin: 0,
-                      wordBreak: 'keep-all'
+                  <div 
+                    style={{
+                      backgroundColor: isDarkMode ? 'rgba(0, 34, 255, 0.2)' : '#F2F2F7',
+                      border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(0, 34, 255, 0.1)',
+                      borderRadius: '12px',
+                      padding: '12px 16px',
+                      textAlign: 'left'
                     }}
                   >
-                    💡 {aboutModalTarget.footer}
-                  </p>
+                    <p 
+                      style={{ 
+                        fontSize: '12px', 
+                        color: isDarkMode ? '#FFFFFF' : '#0022FF', 
+                        fontWeight: '600', 
+                        lineHeight: '1.5', 
+                        margin: 0,
+                        wordBreak: 'keep-all'
+                      }}
+                    >
+                      💡 <span style={{ fontWeight: 800 }}>Tip:</span> {aboutModalTarget.footer}
+                    </p>
+                  </div>
                 </div>
               )}
             </motion.div>
@@ -2081,9 +2114,9 @@ export default function App() {
             <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>Mix</h2>
 
             {/* Product Name Input */}
-            <div className="ios-bento-card" style={{ padding: useProduct ? '10px 14px 10px' : '5px 14px', marginBottom: '8px', borderRadius: useProduct ? '20px' : '9999px', transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)' }}>
+            <div className={useProduct ? "ios-bento-card-expanded" : "ios-bento-card-compact"}>
               <div className="flex items-center justify-between" style={{ minHeight: '26px' }}>
-                <label className="ios-option-label" style={{ margin: 0, fontSize: useProduct ? undefined : '11px' }}>대상 제품명 (Product Name)</label>
+                <label className="ios-product-label" style={{ fontSize: useProduct ? '12px' : '11px' }}>대상 제품명 (Product Name)</label>
                 <div 
                   onClick={() => setUseProduct(!useProduct)}
                   className={`ios-switch ${useProduct ? 'active' : 'inactive'}`}
@@ -2258,31 +2291,35 @@ export default function App() {
                         </div>
                       </div>
                     )}
-                    <div style={{ borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)', margin: '24px 0' }} />
-                    <OptionSelect label="인테리어 양식" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} theme="green" />
-                    <div className="mt-4 border-t border-gray-100">
-                      <OptionSelect label="국가/지역 (Country)" value={config.country} onChange={(v) => handleConfigChange('country', v)} options={OPTIONS_DATA.country} theme="green" />
-                      <OptionSelect label="장소 맥락 (Location Context)" value={config.locationContext || "선택안함"} onChange={(v) => handleConfigChange('locationContext', v)} options={OPTIONS_DATA.locationContext} theme="green" />
-
+                    {config.spaceType !== '스튜디오' && (
                       <>
-                        <IOSToggle
-                          label="세부 소재 및 컬러 (Materials)"
-                          isOn={useDetailMaterial}
-                          onToggle={() => setUseDetailMaterial(!useDetailMaterial)}
-                          activeColor="#0055FF"
-                        />
-                        <AnimatePresence>
-                          {useDetailMaterial && (
-                            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="flex flex-col overflow-hidden">
-                              <OptionSelect label="바닥 소재" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} theme="green" />
-                              <OptionSelect label="우드 소재" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} theme="green" />
-                              <OptionSelect label="메탈 소재" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} theme="green" />
-                              <OptionSelect label="벽 소재/마감" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} theme="green" />
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                        <div style={{ borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)', margin: '24px 0' }} />
+                        <OptionSelect label="인테리어 양식" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} theme="green" />
+                        <div className="mt-4 border-t border-gray-100">
+                          <OptionSelect label="국가/지역 (Country)" value={config.country} onChange={(v) => handleConfigChange('country', v)} options={OPTIONS_DATA.country} theme="green" />
+                          <OptionSelect label="장소 맥락 (Location Context)" value={config.locationContext || "선택안함"} onChange={(v) => handleConfigChange('locationContext', v)} options={OPTIONS_DATA.locationContext} theme="green" />
+
+                          <>
+                            <IOSToggle
+                              label="세부 소재 및 컬러 (Materials)"
+                              isOn={useDetailMaterial}
+                              onToggle={() => setUseDetailMaterial(!useDetailMaterial)}
+                              activeColor="#0055FF"
+                            />
+                            <AnimatePresence>
+                              {useDetailMaterial && (
+                                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="flex flex-col overflow-hidden">
+                                  <OptionSelect label="바닥 소재" value={config.detailFloor} onChange={(v) => handleConfigChange('detailFloor', v)} options={OPTIONS_DATA.detailFloor} theme="green" />
+                                  <OptionSelect label="우드 소재" value={config.detailWood} onChange={(v) => handleConfigChange('detailWood', v)} options={OPTIONS_DATA.detailWood} theme="green" />
+                                  <OptionSelect label="메탈 소재" value={config.detailMetal} onChange={(v) => handleConfigChange('detailMetal', v)} options={OPTIONS_DATA.detailMetal} theme="green" />
+                                  <OptionSelect label="벽 소재/마감" value={config.detailWall} onChange={(v) => handleConfigChange('detailWall', v)} options={OPTIONS_DATA.detailWall} theme="green" />
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </>
+                        </div>
                       </>
-                    </div>
+                    )}
                   </div>
                 </motion.section>
               )}
@@ -2613,7 +2650,7 @@ export default function App() {
                   <span className="about-card-badge" style={{ backgroundColor: 'rgba(255, 149, 0, 0.08)', color: '#FF9500' }}>Auto</span>
                 </div>
                 <div style={{ marginTop: '16px' }}>
-                  <h3 className="font-black text-gray-900 dark:text-white m-0" style={{ fontSize: 'clamp(16px, 4vw, 20px)' }}>Smart Mode</h3>
+                  <h3 className="font-black text-gray-900 dark:text-white m-0" style={{ fontSize: 'clamp(20px, 5vw, 24px)' }}>Smart Mode</h3>
                   <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">스마트 모드 자동화</p>
                 </div>
               </div>
@@ -2642,7 +2679,7 @@ export default function App() {
                   <span className="about-card-badge" style={{ backgroundColor: 'rgba(0, 122, 255, 0.08)', color: '#007AFF' }}>Master</span>
                 </div>
                 <div style={{ marginTop: '16px' }}>
-                  <h3 className="font-black text-gray-900 dark:text-white m-0" style={{ fontSize: 'clamp(16px, 4vw, 20px)' }}>Mix Mode</h3>
+                  <h3 className="font-black text-gray-900 dark:text-white m-0" style={{ fontSize: 'clamp(20px, 5vw, 24px)' }}>Mix Mode</h3>
                   <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">속성 마스터 가이드</p>
                 </div>
               </div>
@@ -2669,7 +2706,7 @@ export default function App() {
                   <span className="about-card-badge" style={{ backgroundColor: 'rgba(175, 82, 222, 0.08)', color: '#AF52DE' }}>Save</span>
                 </div>
                 <div style={{ marginTop: '16px' }}>
-                  <h3 className="font-black text-gray-900 dark:text-white m-0" style={{ fontSize: 'clamp(16px, 4vw, 20px)' }}>Library</h3>
+                  <h3 className="font-black text-gray-900 dark:text-white m-0" style={{ fontSize: 'clamp(20px, 5vw, 24px)' }}>Library</h3>
                   <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">커스텀 프리셋 사용</p>
                 </div>
               </div>
@@ -2696,7 +2733,7 @@ export default function App() {
                   <span className="about-card-badge" style={{ backgroundColor: 'rgba(52, 199, 89, 0.08)', color: '#34C759' }}>Quick</span>
                 </div>
                 <div style={{ marginTop: '16px' }}>
-                  <h3 className="font-black text-gray-900 dark:text-white m-0" style={{ fontSize: 'clamp(16px, 4vw, 20px)' }}>Workflow</h3>
+                  <h3 className="font-black text-gray-900 dark:text-white m-0" style={{ fontSize: 'clamp(20px, 5vw, 24px)' }}>Workflow</h3>
                   <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-bold m-0 mt-0.5">생성 및 복사 활용법</p>
                 </div>
               </div>
@@ -2756,6 +2793,9 @@ export default function App() {
                 if (Array.isArray(val) && val.length === 0) return;
                 // Skip internal/toggle-only keys that shouldn't appear as pills
                 if (['brightness', 'useLight', 'useImageRef', 'productName', 'monochromeColor'].includes(key)) return;
+
+                // 스튜디오일 경우 인테리어 양식, 국가/지역, 장소맥락 제외
+                if (config.spaceType === '스튜디오' && ['interiorStyle', 'country', 'locationContext'].includes(key)) return;
 
                 // 1. 인물없음 일때 인물관련 속성 제거
                 if (config.subjectNum === "없음" && (key.startsWith('subject') || key.startsWith('female') || key.startsWith('male'))) return;
@@ -2939,7 +2979,7 @@ export default function App() {
       </div>
 
       <footer className="ios-footer">
-        v0.51b | Developed by Gony
+        v0.52d | Developed by Gony
       </footer>
       <div className="h-12"></div>
     </div>

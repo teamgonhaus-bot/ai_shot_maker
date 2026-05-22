@@ -2152,4 +2152,66 @@ body.dark-mode .ios-template-card-footer {
     font-size: 8px !important;
     padding: 2px 6px !important;
   }
-}
+}
+
+/* =============================================
+   V0.52D COMPACT UI IMPROVEMENTS
+   ============================================= */
+
+/* Reduce vertical space inside folders to solve scrolling issue */
+.folder-content-envelope .ios-option-group {
+  margin-bottom: 12px !important;
+}
+
+.folder-content-envelope .ios-option-label {
+  margin-bottom: 6px !important;
+}
+
+/* Custom compact product name bento card */
+.ios-bento-card-compact {
+  background-color: #FFFFFF !important;
+  border-radius: 9999px !important;
+  padding: 4px 16px !important;
+  box-shadow: none !important;
+  border: 1px solid #0022FF !important;
+  margin-bottom: 8px !important;
+  position: relative !important;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+.ios-bento-card-expanded {
+  background-color: #FFFFFF !important;
+  border-radius: 20px !important;
+  padding: 10px 14px !important;
+  box-shadow: none !important;
+  border: 1px solid #0022FF !important;
+  margin-bottom: 8px !important;
+  position: relative !important;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+body.dark-mode .ios-bento-card-compact,
+body.dark-mode .ios-bento-card-expanded {
+  background-color: #0022FF !important;
+  border: 1px solid #FFFFFF !important;
+}
+
+/* Label specific to compact product container to override important margin-bottom */
+.ios-product-label {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #0022FF !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  margin: 0 !important;
+  display: inline-block !important;
+  line-height: 1.2 !important;
+}
+
+body.dark-mode .ios-product-label {
+  color: #FFFFFF !important;
+}
+
