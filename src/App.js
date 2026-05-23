@@ -259,7 +259,10 @@ export default function App() {
   const [smartUseSubject, setSmartUseSubject] = useState(false);
   const [removeText, setRemoveText] = useState(true);
   const [useCommercialNegative, setUseCommercialNegative] = useState(false);
-  const [useProduct, setUseProduct] = useState(true);
+  const [useProduct, setUseProduct] = useState(() => {
+    const saved = localStorage.getItem('shotmaker_useProduct_v13');
+    return saved === 'true'; // 기본값은 false, 로컬 저장값이 'true'일 때만 복원
+  });
   const [generatedPrompt, setGeneratedPrompt] = useState("");
   const [savedTemplates, setSavedTemplates] = useState([]);
   const [templateName, setTemplateName] = useState("");
@@ -423,6 +426,11 @@ export default function App() {
     }
   };
 
+  // Sync useProduct state to localStorage
+  useEffect(() => {
+    localStorage.setItem('shotmaker_useProduct_v13', useProduct);
+  }, [useProduct]);
+
   // ESC Key Listener for Modals
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -455,7 +463,7 @@ export default function App() {
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.64c Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.64d Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -1700,7 +1708,7 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.64c | Swiss Cobalt Blue I2I & Bento Layout Optimization
+              v0.64d | Swiss Cobalt Blue I2I & State Persistence Update
             </div>
           </div>
         </div>
@@ -3824,7 +3832,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.64c | Swiss Cobalt Blue I2I & Bento Layout Optimization
+      v0.64d | Swiss Cobalt Blue I2I & State Persistence Update
     </footer>
     <div className="h-12"></div>
     </div>
