@@ -455,7 +455,7 @@ export default function App() {
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.64b Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.64c Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -1700,7 +1700,7 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.64b | Swiss Cobalt Blue I2I & Manual Sync Update
+              v0.64c | Swiss Cobalt Blue I2I & Bento Layout Optimization
             </div>
           </div>
         </div>
@@ -3424,7 +3424,7 @@ export default function App() {
                               zIndex: 10,
                               letterSpacing: '0.05em'
                             }}>
-                              LOCAL ONLY
+                              LOCAL
                             </div>
                           ) : (
                             <div style={{
@@ -3440,7 +3440,7 @@ export default function App() {
                               zIndex: 10,
                               letterSpacing: '0.05em'
                             }}>
-                              CLOUD SECURED
+                              SYNCED
                             </div>
                           )}
 
@@ -3458,24 +3458,22 @@ export default function App() {
                               {img.prompt || 'No Prompt Info'}
                             </p>
 
-                            {/* 추가 버튼 그룹: SYNC 및 USE REF */}
-                            <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
+                            <div className="gallery-item-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
                               <button
                                 onClick={() => handleApplyAsReference(img.url)}
                                 className="gallery-item-btn"
                                 style={{
-                                  flex: 1,
-                                  background: 'transparent',
+                                  background: '#0022FF',
                                   border: '1px solid #0022FF',
-                                  color: '#0022FF',
+                                  color: '#FFFFFF',
                                   fontWeight: '900',
-                                  fontSize: '10px',
-                                  padding: '5px 0',
+                                  fontSize: '9px',
+                                  padding: '3px 5px',
                                   borderRadius: '0px',
                                   cursor: 'pointer'
                                 }}
                               >
-                                USE REF
+                                REF
                               </button>
 
                               {(img.isTemp || img.id.startsWith('temp_')) && (
@@ -3484,40 +3482,24 @@ export default function App() {
                                   onClick={() => handleGalleryManualSync(img)}
                                   className="gallery-item-btn"
                                   style={{
-                                    flex: 1,
-                                    background: '#0022FF',
-                                    border: '1px solid #0022FF',
+                                    background: '#FF3B30',
+                                    border: '1px solid #FF3B30',
                                     color: '#FFFFFF',
                                     fontWeight: '900',
-                                    fontSize: '10px',
-                                    padding: '5px 0',
+                                    fontSize: '9px',
+                                    padding: '3px 5px',
                                     borderRadius: '0px',
                                     cursor: img.isUploading ? 'not-allowed' : 'pointer',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    gap: '4px'
+                                    gap: '2px'
                                   }}
                                 >
-                                  {img.isUploading ? (
-                                    <>
-                                      <div style={{
-                                        width: '8px',
-                                        height: '8px',
-                                        border: '1.5px solid rgba(255,255,255,0.3)',
-                                        borderTop: '1.5px solid #FFFFFF',
-                                        borderRadius: '50%',
-                                        animation: 'spin 0.6s linear infinite'
-                                      }} />
-                                      <span>SYNCING</span>
-                                    </>
-                                  ) : (
-                                    <span>SYNC</span>
-                                  )}
+                                  {img.isUploading ? '...' : 'SYNC'}
                                 </button>
                               )}
-                            </div>
-                            <div className="gallery-item-actions">
+
                               <button 
                                 className="gallery-item-btn" 
                                 onClick={() => {
@@ -3555,6 +3537,7 @@ export default function App() {
                                     }
                                   })();
                                 }}
+                                style={{ flexGrow: 1, minWidth: '45px', padding: '2px' }}
                               >
                                 {galleryFolders.map(f => (
                                   <option key={f} value={f}>{f}</option>
@@ -3841,7 +3824,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.64b | Swiss Cobalt Blue I2I & Manual Sync Update
+      v0.64c | Swiss Cobalt Blue I2I & Bento Layout Optimization
     </footer>
     <div className="h-12"></div>
     </div>
