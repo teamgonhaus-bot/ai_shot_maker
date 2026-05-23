@@ -345,7 +345,7 @@ export default function App() {
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.65a Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.65b Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -1036,7 +1036,13 @@ export default function App() {
       console.log(`✅ Manual cloud sync completed successfully. Document ID: ${dbId}`);
     } catch (err) {
       console.error("❌ Manual cloud sync failed:", err);
-      triggerToast("서버 저장 실패: " + err.message);
+      let detailedMsg = err.message;
+      if (detailedMsg.includes("row-level security") || detailedMsg.includes("violates row-level security")) {
+        detailedMsg = "Supabase 보안 규칙(RLS)이 차단했습니다. SQL Editor에서 RLS 비활성화 스크립트를 기동해 주세요.";
+      } else if (detailedMsg.includes("Bucket not found") || detailedMsg.includes("does not exist") || detailedMsg.includes("Storage 버킷")) {
+        detailedMsg = "Supabase Storage에 'gallery' Public 버킷을 개설해 주셔야 합니다.";
+      }
+      triggerToast("서버 저장 실패: " + detailedMsg);
     } finally {
       setIsSyncingToCloud(false);
     }
@@ -1124,7 +1130,13 @@ export default function App() {
       triggerToast("외부 이미지 클라우드 업로드 성공!");
     } catch (err) {
       console.error("❌ External image upload failed:", err);
-      triggerToast("업로드 실패: " + err.message);
+      let detailedMsg = err.message;
+      if (detailedMsg.includes("row-level security") || detailedMsg.includes("violates row-level security")) {
+        detailedMsg = "Supabase 보안 규칙(RLS)이 차단했습니다. SQL Editor에서 RLS 비활성화 스크립트를 기동해 주세요.";
+      } else if (detailedMsg.includes("Bucket not found") || detailedMsg.includes("does not exist") || detailedMsg.includes("Storage 버킷")) {
+        detailedMsg = "Supabase Storage에 'gallery' Public 버킷을 개설해 주셔야 합니다.";
+      }
+      triggerToast("업로드 실패: " + detailedMsg);
       
       // 가상 URL 해제
       URL.revokeObjectURL(localUrl);
@@ -1731,7 +1743,7 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.65a | Supabase Storage & Database Migration
+              v0.65b | Supabase Storage & RLS Safeguard
             </div>
           </div>
         </div>
@@ -3762,7 +3774,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.65a | Supabase Storage & Database Migration
+      v0.65b | Supabase Storage & RLS Safeguard
     </footer>
     <div className="h-12"></div>
     </div>
