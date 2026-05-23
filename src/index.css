@@ -1594,13 +1594,6 @@ body.dark-mode .ios-upload-capsule {
 .ios-upload-remove-btn:hover {
   background: #0011CC !important;
 }
-  align-items: center !important;
-  justify-content: center !important;
-  font-size: 12px !important;
-  border: none !important;
-  cursor: pointer !important;
-  backdrop-filter: blur(4px) !important;
-}
 
 /* =============================================
    iOS LIGHTBOX (Full Screen View)
