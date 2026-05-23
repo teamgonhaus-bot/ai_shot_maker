@@ -312,6 +312,117 @@ export default function App() {
   const [activeLibraryTemplateId, setActiveLibraryTemplateId] = useState(null);
   const [aboutModalTarget, setAboutModalTarget] = useState(null);
 
+  // 1. Firebase Gallery & Folders Load (컴포넌트 레벨 공용 함수)
+  const fetchGalleryData = async () => {
+    try {
+      setIsGalleryLoading(true);
+      const foldersDocRef = doc(db, "gallery_meta", "folders");
+      const foldersDocSnap = await getDoc(foldersDocRef);
+      let currentFolders = ['기본', '인물', '공간', '사물'];
+      if (foldersDocSnap.exists()) {
+        const data = foldersDocSnap.data();
+        if (data && Array.isArray(data.list)) {
+          currentFolders = data.list;
+          setGalleryFolders(currentFolders);
+        } else {
+          await setDoc(foldersDocRef, { list: currentFolders });
+          setGalleryFolders(currentFolders);
+        }
+      } else {
+        await setDoc(foldersDocRef, { list: currentFolders });
+        setGalleryFolders(currentFolders);
+      }
+
+      const galleryQ = query(collection(db, "gallery"), orderBy("timestamp", "desc"));
+      const gallerySnap = await getDocs(galleryQ);
+      const images = gallerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setGalleryImages(images);
+      console.log(`✅ Firebase Gallery Loaded: ${images.length} images loaded.`);
+    } catch (error) {
+      console.error("❌ Firebase gallery load error:", error);
+    } finally {
+      setIsGalleryLoading(false);
+    }
+  };
+
+  // 2. 다이렉트 이미지 참조 지정 헬퍼 (USE REF)
+  const handleApplyAsReference = async (imageUrl) => {
+    try {
+      triggerToast("이미지를 참조 이미지로 변환 중...");
+      
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setRefImage({
+          mimeType: blob.type || 'image/png',
+          data: reader.result.split(',')[1]
+        });
+        setUseImageRef(true);
+        setCurrentMode('mix'); // 즉시 Mix 모드로 전환하여 이미지 확인 지원
+        triggerToast("이미지 참조 모드로 지정되었습니다!");
+      };
+      reader.readAsDataURL(blob);
+    } catch (err) {
+      console.error("❌ Gallery to Ref conversion failed:", err);
+      triggerToast("변환 실패: 외부 리소스의 CORS 구성을 확인해 주세요.");
+    }
+  };
+
+  // 3. 갤러리 피드 내 즉시 개별 수동 싱크 (SYNC)
+  const handleGalleryManualSync = async (img) => {
+    if (img.isUploading || isSyncingToCloud) return;
+    
+    // 개별 카드 로딩 스피너 작동
+    setGalleryImages(prev => prev.map(i => i.id === img.id ? { ...i, isUploading: true } : i));
+    triggerToast("클라우드 서버에 동기화하는 중...");
+    
+    try {
+      const base64Url = img.url;
+      const fileName = `gallery/img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.png`;
+      const storageRef = ref(storage, fileName);
+      
+      const blob = dataURLtoBlob(base64Url);
+      await withTimeout(uploadBytes(storageRef, blob), 15000);
+      
+      const downloadUrl = await getDownloadURL(storageRef);
+      
+      const firestoreData = {
+        url: downloadUrl,
+        storagePath: fileName,
+        prompt: img.prompt || 'No Prompt Info',
+        timestamp: new Date().toISOString(),
+        folder: img.folder || '기본'
+      };
+      
+      const docRef = await addDoc(collection(db, "gallery"), firestoreData);
+      
+      const finalImg = {
+        id: docRef.id,
+        url: downloadUrl,
+        storagePath: fileName,
+        prompt: firestoreData.prompt,
+        timestamp: firestoreData.timestamp,
+        folder: img.folder || '기본',
+        isTemp: false,
+        isUploading: false
+      };
+      
+      // 메인 이미지 뷰어의 활성화 상태도 동기화
+      if (generatedImage === base64Url) {
+        setGeneratedImage(downloadUrl);
+      }
+      
+      setGalleryImages(prev => prev.map(i => i.id === img.id ? finalImg : i));
+      triggerToast("클라우드 동기화 완료!");
+    } catch (err) {
+      console.error("❌ Gallery manual sync failed:", err);
+      triggerToast("싱크 실패: " + err.message);
+      setGalleryImages(prev => prev.map(i => i.id === img.id ? { ...i, isUploading: false } : i));
+    }
+  };
+
   // ESC Key Listener for Modals
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -387,38 +498,7 @@ export default function App() {
       }
     };
 
-    // 3. Firebase Gallery & Folders Load
-    const fetchGalleryData = async () => {
-      try {
-        setIsGalleryLoading(true);
-        const foldersDocRef = doc(db, "gallery_meta", "folders");
-        const foldersDocSnap = await getDoc(foldersDocRef);
-        let currentFolders = ['기본', '인물', '공간', '사물'];
-        if (foldersDocSnap.exists()) {
-          const data = foldersDocSnap.data();
-          if (data && Array.isArray(data.list)) {
-            currentFolders = data.list;
-            setGalleryFolders(currentFolders);
-          } else {
-            await setDoc(foldersDocRef, { list: currentFolders });
-            setGalleryFolders(currentFolders);
-          }
-        } else {
-          await setDoc(foldersDocRef, { list: currentFolders });
-          setGalleryFolders(currentFolders);
-        }
 
-        const galleryQ = query(collection(db, "gallery"), orderBy("timestamp", "desc"));
-        const gallerySnap = await getDocs(galleryQ);
-        const images = gallerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setGalleryImages(images);
-        console.log(`✅ Firebase Gallery Loaded: ${images.length} images loaded.`);
-      } catch (error) {
-        console.error("❌ Firebase gallery load error:", error);
-      } finally {
-        setIsGalleryLoading(false);
-      }
-    };
 
     // 4. Auto sign-in anonymously to ensure active Auth context for Storage/Firestore uploads
     const autoSignIn = async () => {
