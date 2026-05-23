@@ -7,7 +7,6 @@ import { db, auth, storage } from './firebase';
 import { collection, addDoc, deleteDoc, updateDoc, doc, getDocs, getDoc, setDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { signInAnonymously, signOut } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { supabase } from './supabase';
 
 // Modular Components
 import OptionSelect from './components/OptionSelect';
@@ -345,7 +344,7 @@ export default function App() {
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.65b Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.64a Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -388,7 +387,7 @@ export default function App() {
       }
     };
 
-    // 3. Firebase & Supabase 하이브리드 로드 및 자동 복사 이전
+    // 3. Firebase Gallery & Folders Load
     const fetchGalleryData = async () => {
       try {
         setIsGalleryLoading(true);
@@ -409,85 +408,13 @@ export default function App() {
           setGalleryFolders(currentFolders);
         }
 
-        // 3-1. Supabase에서 현재 데이터 로드
-        console.log("☁️ Supabase: Loading gallery images...");
-        const { data: supabaseImages, error: sbError } = await supabase
-          .from('gallery')
-          .select('*')
-          .order('timestamp', { ascending: false });
-
-        if (sbError) {
-          throw new Error("Supabase 갤러리 로드 실패: " + sbError.message);
-        }
-
-        // 3-2. Firebase Firestore의 기존 갤러리 데이터 로드
         const galleryQ = query(collection(db, "gallery"), orderBy("timestamp", "desc"));
-        const gallerySnap = await getDocs(galleryQ).catch(() => null);
-        const firebaseImages = gallerySnap ? gallerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) : [];
-
-        // 3-3. Firebase 데이터 중 Supabase에 누락된 대상을 판별해 자동 복사 (Upsert/Insert)
-        const supabasePaths = new Set(supabaseImages ? supabaseImages.map(img => img.storage_path) : []);
-        const supabaseIds = new Set(supabaseImages ? supabaseImages.map(img => img.id) : []);
-
-        const missingImages = firebaseImages.filter(img => !supabasePaths.has(img.storagePath) && !supabaseIds.has(img.id));
-
-        if (missingImages.length > 0) {
-          console.log(`☁️ Supabase Auto-Migration: Copying ${missingImages.length} images from Firebase to Supabase Database...`);
-          const migrationPayload = missingImages.map(img => ({
-            id: img.id, // 기존 Firestore Doc ID를 그대로 사용해 무결성 보장
-            url: img.url,
-            storage_path: img.storagePath || `gallery/ext_migrated_${Date.now()}_${img.id}.png`,
-            prompt: img.prompt || 'No Prompt',
-            timestamp: img.timestamp || new Date().toISOString(),
-            folder: img.folder || '기본'
-          }));
-
-          const { error: insertError } = await supabase
-            .from('gallery')
-            .insert(migrationPayload);
-
-          if (insertError) {
-            console.error("❌ Supabase Auto-Migration Insert failed:", insertError);
-          } else {
-            console.log(`✅ Supabase Auto-Migration Complete. ${missingImages.length} images safely copied.`);
-            // 복사 완료 후 즉시 갱신 목록 로드
-            const { data: updatedImages } = await supabase
-              .from('gallery')
-              .select('*')
-              .order('timestamp', { ascending: false });
-
-            if (updatedImages) {
-              const mapped = updatedImages.map(img => ({
-                id: img.id,
-                url: img.url,
-                storagePath: img.storage_path,
-                prompt: img.prompt,
-                timestamp: img.timestamp,
-                folder: img.folder,
-                isTemp: false
-              }));
-              setGalleryImages(mapped);
-              return;
-            }
-          }
-        }
-
-        // 3-4. 최종적으로 Supabase 목록을 React 상태로 바인딩
-        if (supabaseImages) {
-          const mapped = supabaseImages.map(img => ({
-            id: img.id,
-            url: img.url,
-            storagePath: img.storage_path,
-            prompt: img.prompt,
-            timestamp: img.timestamp,
-            folder: img.folder,
-            isTemp: false
-          }));
-          setGalleryImages(mapped);
-          console.log(`✅ Supabase Gallery Loaded: ${mapped.length} images loaded.`);
-        }
+        const gallerySnap = await getDocs(galleryQ);
+        const images = gallerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setGalleryImages(images);
+        console.log(`✅ Firebase Gallery Loaded: ${images.length} images loaded.`);
       } catch (error) {
-        console.error("❌ Supabase/Firebase 하이브리드 로드 실패:", error);
+        console.error("❌ Firebase gallery load error:", error);
       } finally {
         setIsGalleryLoading(false);
       }
@@ -968,54 +895,38 @@ export default function App() {
     
     setIsSyncingToCloud(true);
     triggerToast("클라우드 서버에 이미지를 저장하는 중...");
-    console.log("☁️ Manual Cloud Sync initiated (Supabase)...");
+    console.log("☁️ Manual Cloud Sync initiated...");
     
     try {
       const base64Url = generatedImage;
       const fileName = `gallery/img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.png`;
+      const storageRef = ref(storage, fileName);
       
-      // 1. Data URL을 Blob으로 변환
+      // Upload Blob to Firebase Storage with a 15-second timeout safeguard
       const blob = dataURLtoBlob(base64Url);
-      const fileBlob = new Blob([blob], { type: 'image/png' });
+      await withTimeout(uploadBytes(storageRef, blob), 15000);
       
-      // 2. Supabase Storage 'gallery' 버킷에 업로드
-      const { data: storageData, error: storageError } = await supabase.storage
-        .from('gallery')
-        .upload(fileName, fileBlob, {
-          contentType: 'image/png',
-          upsert: true
-        });
-
-      if (storageError) throw new Error("Supabase Storage 업로드 실패: " + storageError.message);
+      // Retrieve public download URL
+      const downloadUrl = await getDownloadURL(storageRef);
       
-      // 3. Public Download URL 획득
-      const { data: { publicUrl } } = supabase.storage
-        .from('gallery')
-        .getPublicUrl(fileName);
-      
-      // 4. Supabase DB 'gallery' 테이블에 이미지 정보 입력
-      const dbId = `img_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+      // Write image record to Firestore 'gallery' collection
       const firestoreData = {
-        id: dbId,
-        url: publicUrl,
-        storage_path: fileName,
+        url: downloadUrl,
+        storagePath: fileName,
         prompt: generatedPrompt || 'No Prompt Info',
         timestamp: new Date().toISOString(),
         folder: '기본'
       };
       
-      const { error: dbError } = await supabase
-        .from('gallery')
-        .insert([firestoreData]);
-
-      if (dbError) throw new Error("Supabase Database 저장 실패: " + dbError.message);
+      const docRef = await addDoc(collection(db, "gallery"), firestoreData);
       
-      // 메인 이미지 뷰어 URL 갱신
-      setGeneratedImage(publicUrl);
+      // Update Main image state to server URL
+      setGeneratedImage(downloadUrl);
       
+      // Replace any temporary gallery items with the completed Firestore document
       const finalImg = {
-        id: dbId,
-        url: publicUrl,
+        id: docRef.id,
+        url: downloadUrl,
         storagePath: fileName,
         prompt: firestoreData.prompt,
         timestamp: firestoreData.timestamp,
@@ -1023,6 +934,7 @@ export default function App() {
         isTemp: false
       };
       
+      // If there's an existing temp entry for this base64 in gallery, replace it. Otherwise prepend it.
       setGalleryImages(prev => {
         const hasTemp = prev.some(img => img.url === base64Url);
         if (hasTemp) {
@@ -1032,17 +944,11 @@ export default function App() {
         }
       });
       
-      triggerToast("Supabase 클라우드 저장 완료!");
-      console.log(`✅ Manual cloud sync completed successfully. Document ID: ${dbId}`);
+      triggerToast("클라우드 서버 저장 완료!");
+      console.log(`✅ Manual cloud sync completed successfully. Document ID: ${docRef.id}`);
     } catch (err) {
       console.error("❌ Manual cloud sync failed:", err);
-      let detailedMsg = err.message;
-      if (detailedMsg.includes("row-level security") || detailedMsg.includes("violates row-level security")) {
-        detailedMsg = "Supabase 보안 규칙(RLS)이 차단했습니다. SQL Editor에서 RLS 비활성화 스크립트를 기동해 주세요.";
-      } else if (detailedMsg.includes("Bucket not found") || detailedMsg.includes("does not exist") || detailedMsg.includes("Storage 버킷")) {
-        detailedMsg = "Supabase Storage에 'gallery' Public 버킷을 개설해 주셔야 합니다.";
-      }
-      triggerToast("서버 저장 실패: " + detailedMsg);
+      triggerToast("서버 저장 실패: " + err.message);
     } finally {
       setIsSyncingToCloud(false);
     }
@@ -1077,45 +983,28 @@ export default function App() {
     try {
       const fileExt = file.name.split('.').pop() || 'png';
       const safeFileName = `gallery/ext_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+      const storageRef = ref(storage, safeFileName);
       
       // HTML File 객체를 순수 이진 Blob으로 안전하게 감싸서 전송합니다.
       const fileBlob = new Blob([file], { type: file.type });
       
-      // 1. Supabase Storage에 업로드
-      const { data: storageData, error: storageError } = await supabase.storage
-        .from('gallery')
-        .upload(safeFileName, fileBlob, {
-          contentType: file.type,
-          upsert: true
-        });
-
-      if (storageError) throw new Error("Supabase Storage 업로드 실패: " + storageError.message);
+      await withTimeout(uploadBytes(storageRef, fileBlob), 15000);
       
-      // 2. Public URL 획득
-      const { data: { publicUrl } } = supabase.storage
-        .from('gallery')
-        .getPublicUrl(safeFileName);
+      const downloadUrl = await getDownloadURL(storageRef);
       
-      // 3. Supabase Database 'gallery' 테이블에 이미지 메타데이터 추가
-      const dbId = `ext_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
       const firestoreData = {
-        id: dbId,
-        url: publicUrl,
-        storage_path: safeFileName,
+        url: downloadUrl,
+        storagePath: safeFileName,
         prompt: `Uploaded Image: ${file.name}`,
         timestamp: new Date().toISOString(),
         folder: activeGalleryFolder
       };
       
-      const { error: dbError } = await supabase
-        .from('gallery')
-        .insert([firestoreData]);
-
-      if (dbError) throw new Error("Supabase Database 저장 실패: " + dbError.message);
+      const docRef = await addDoc(collection(db, "gallery"), firestoreData);
       
       const finalImg = {
-        id: dbId,
-        url: publicUrl,
+        id: docRef.id,
+        url: downloadUrl,
         storagePath: safeFileName,
         prompt: firestoreData.prompt,
         timestamp: firestoreData.timestamp,
@@ -1130,13 +1019,7 @@ export default function App() {
       triggerToast("외부 이미지 클라우드 업로드 성공!");
     } catch (err) {
       console.error("❌ External image upload failed:", err);
-      let detailedMsg = err.message;
-      if (detailedMsg.includes("row-level security") || detailedMsg.includes("violates row-level security")) {
-        detailedMsg = "Supabase 보안 규칙(RLS)이 차단했습니다. SQL Editor에서 RLS 비활성화 스크립트를 기동해 주세요.";
-      } else if (detailedMsg.includes("Bucket not found") || detailedMsg.includes("does not exist") || detailedMsg.includes("Storage 버킷")) {
-        detailedMsg = "Supabase Storage에 'gallery' Public 버킷을 개설해 주셔야 합니다.";
-      }
-      triggerToast("업로드 실패: " + detailedMsg);
+      triggerToast("업로드 실패: " + err.message);
       
       // 가상 URL 해제
       URL.revokeObjectURL(localUrl);
@@ -1608,29 +1491,16 @@ export default function App() {
           };
           setGalleryImages(prev => [tempImg, ...prev]);
           
-          // 백그라운드 자동 업로드 및 Supabase 싱크
+          // 백그라운드 자동 업로드 및 Firestore 싱크
           (async () => {
             try {
-              console.log("☁️ Background upload started automatically (Supabase)...");
+              console.log("☁️ Background upload started automatically...");
               const fileName = `gallery/img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.png`;
+              const storageRef = ref(storage, fileName);
               
               const blob = dataURLtoBlob(base64Url);
-              const fileBlob = new Blob([blob], { type: 'image/png' });
-              
-              // 1. Supabase Storage에 업로드
-              const { data: storageData, error: storageError } = await supabase.storage
-                .from('gallery')
-                .upload(fileName, fileBlob, {
-                  contentType: 'image/png',
-                  upsert: true
-                });
-
-              if (storageError) throw new Error("Supabase Storage 업로드 실패: " + storageError.message);
-              
-              // 2. Public URL 획득
-              const { data: { publicUrl } } = supabase.storage
-                .from('gallery')
-                .getPublicUrl(fileName);
+              await withTimeout(uploadBytes(storageRef, blob), 15000);
+              const downloadUrl = await getDownloadURL(storageRef);
               
               // 업로드 완료 전 사용자가 이미지를 삭제했는지 확인
               let isStillPresent = false;
@@ -1640,8 +1510,8 @@ export default function App() {
               });
               
               if (!isStillPresent) {
-                console.log("ℹ️ Image was deleted by user before background upload completed. Cleaning up Supabase Storage.");
-                await supabase.storage.from('gallery').remove([fileName]).catch(() => {});
+                console.log("ℹ️ Image was deleted by user before background upload completed. Cleaning up Storage.");
+                await deleteObject(storageRef).catch(() => {});
                 return;
               }
               
@@ -1655,30 +1525,24 @@ export default function App() {
                 return prev;
               });
               
-              const dbId = `img_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
               const firestoreData = {
-                id: dbId,
-                url: publicUrl,
-                storage_path: fileName,
+                url: downloadUrl,
+                storagePath: fileName,
                 prompt: promptToUse,
                 timestamp: new Date().toISOString(),
                 folder: currentFolder
               };
               
-              const { error: dbError } = await supabase
-                .from('gallery')
-                .insert([firestoreData]);
-
-              if (dbError) throw new Error("Supabase Database 저장 실패: " + dbError.message);
+              const docRef = await addDoc(collection(db, "gallery"), firestoreData);
               
               // 갤러리 이미지 완성형으로 갱신
               setGalleryImages(prev => prev.map(img => 
-                img.id === tempId ? { ...img, id: dbId, url: publicUrl, storagePath: fileName, isTemp: false } : img
+                img.id === tempId ? { ...img, id: docRef.id, url: downloadUrl, storagePath: fileName, isTemp: false } : img
               ));
               
               // 메인 이미지 상태도 서버 URL로 즉시 승격
-              setGeneratedImage(publicUrl);
-              console.log(`✅ Background upload sync completed silently. Document ID: ${dbId}`);
+              setGeneratedImage(downloadUrl);
+              console.log(`✅ Background upload sync completed silently. Document ID: ${docRef.id}`);
             } catch (uploadError) {
               console.error("❌ Background auto-upload/sync error:", uploadError);
               // 자동 업로드가 실패해도 로컬 이미지는 살려두며, 사용자는 수동 클라우드 저장 버튼을 이용해 서버에 저장할 수 있습니다.
@@ -1743,7 +1607,7 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.65b | Supabase Storage & RLS Safeguard
+              v0.64a | Cloud Sync & External Upload Safeguard
             </div>
           </div>
         </div>
@@ -3464,20 +3328,14 @@ export default function App() {
 
                                   (async () => {
                                     try {
-                                      // Firestore ➔ Supabase 이미지 폴더 정보 업데이트
-                                      const { error: updateError } = await supabase
-                                        .from('gallery')
-                                        .update({ folder: destFolder })
-                                        .eq('id', img.id);
-
-                                      if (updateError) throw new Error("Supabase 폴더 이동 실패: " + updateError.message);
-
+                                      const imgDocRef = doc(db, "gallery", img.id);
+                                      await updateDoc(imgDocRef, { folder: destFolder });
                                       setGalleryImages(prev => prev.map(i => 
                                         i.id === img.id ? { ...i, folder: destFolder } : i
                                       ));
                                       triggerToast(`이미지가 '${destFolder}' 폴더로 이동되었습니다.`);
                                     } catch (err) {
-                                      console.error("Error moving image in Supabase:", err);
+                                      console.error("Error moving image in Firestore:", err);
                                       triggerToast("클라우드 이미지 이동 중 오류가 발생했습니다.");
                                     }
                                   })();
@@ -3500,28 +3358,22 @@ export default function App() {
 
                                     (async () => {
                                       try {
-                                        // 1. Supabase Database 레코드 삭제
-                                        const { error: dbError } = await supabase
-                                          .from('gallery')
-                                          .delete()
-                                          .eq('id', img.id);
-
-                                        if (dbError) throw new Error("Supabase 레코드 삭제 실패: " + dbError.message);
+                                        // Delete Firestore Document
+                                        const imgDocRef = doc(db, "gallery", img.id);
+                                        await deleteDoc(imgDocRef);
                                         
-                                        // 2. Supabase Storage 바이너리 삭제
+                                        // Delete Firebase Storage Object if storagePath exists
                                         if (img.storagePath) {
-                                          await supabase.storage
-                                            .from('gallery')
-                                            .remove([img.storagePath])
-                                            .catch(err => {
-                                              console.warn("Supabase storage file delete failed or didn't exist:", err);
-                                            });
+                                          const storageRef = ref(storage, img.storagePath);
+                                          await deleteObject(storageRef).catch(err => {
+                                            console.warn("Storage file delete failed or didn't exist:", err);
+                                          });
                                         }
                                         
                                         setGalleryImages(prev => prev.filter(i => i.id !== img.id));
                                         triggerToast("이미지가 삭제되었습니다.");
                                       } catch (err) {
-                                        console.error("Error deleting image in Supabase:", err);
+                                        console.error("Error deleting image in Firebase:", err);
                                         triggerToast("클라우드 이미지 삭제 중 오류가 발생했습니다.");
                                       }
                                     })();
@@ -3774,7 +3626,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.65b | Supabase Storage & RLS Safeguard
+      v0.64a | Cloud Sync & External Upload Safeguard
     </footer>
     <div className="h-12"></div>
     </div>
