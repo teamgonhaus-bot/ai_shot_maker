@@ -344,7 +344,7 @@ export default function App() {
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.64a Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.64b Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -611,7 +611,10 @@ export default function App() {
       setActiveMarquee("HOME LIVING Active: Cozy living room and bedroom backdrop for real-life domestic setup...");
 
     } else if (templateType === 'OFFICE TECH') {
-      targetConfig.subjectNum = '없음';
+      targetConfig.subjectNum = '다수';
+      targetConfig.subjectGender = '여성';
+      targetConfig.subjectAge = '20대';
+      targetConfig.subjectAction = '기본';
       targetConfig.spaceType = '오피스';
       targetConfig.spaceDetail = '공유오피스';
       targetConfig.cameraAngle = '미디움 샷';
@@ -643,7 +646,10 @@ export default function App() {
       setActiveMarquee("OUTDOOR SCENE Active: Eco-friendly outdoor natural environment snap with natural elements...");
 
     } else if (templateType === 'RETAIL SCENE') {
-      targetConfig.subjectNum = '없음';
+      targetConfig.subjectNum = '다수';
+      targetConfig.subjectGender = '여성';
+      targetConfig.subjectAge = '20대';
+      targetConfig.subjectAction = '기본';
       targetConfig.spaceType = '리테일';
       targetConfig.spaceDetail = '쇼룸';
       targetConfig.cameraAngle = '정면';
@@ -659,13 +665,20 @@ export default function App() {
       setActiveMarquee("RETAIL SCENE Active: Premium commercial showroom and luxury retail display photography...");
     }
 
-    // Title 씬과 Detail 씬을 제외한 스마트 씬에 대해 인물 유무 스위치(smartUseSubject) 최종 반영
+    // Title 씬 and Detail 씬을 제외한 스마트 씬에 대해 인물 유무 스위치(smartUseSubject) 최종 반영
     if (templateType !== 'TITLE SCENE' && templateType !== 'DETAIL SCENE') {
       if (smartUseSubject) {
-        targetConfig.subjectNum = '혼자';
-        if (targetConfig.subjectGender === '선택안함') targetConfig.subjectGender = '여성';
-        if (targetConfig.subjectAge === '선택안함') targetConfig.subjectAge = '20대';
-        if (targetConfig.subjectAction === '선택안함') targetConfig.subjectAction = '기본';
+        if (templateType === 'OFFICE TECH' || templateType === 'RETAIL SCENE') {
+          targetConfig.subjectNum = '다수';
+          targetConfig.subjectGender = '여성';
+          if (targetConfig.subjectAge === '선택안함') targetConfig.subjectAge = '20대';
+          if (targetConfig.subjectAction === '선택안함') targetConfig.subjectAction = '기본';
+        } else {
+          targetConfig.subjectNum = '혼자';
+          if (targetConfig.subjectGender === '선택안함') targetConfig.subjectGender = '여성';
+          if (targetConfig.subjectAge === '선택안함') targetConfig.subjectAge = '20대';
+          if (targetConfig.subjectAction === '선택안함') targetConfig.subjectAction = '기본';
+        }
       } else {
         targetConfig.subjectNum = '없음';
       }
@@ -1607,7 +1620,7 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.64a | Cloud Sync & External Upload Safeguard
+              v0.64b | Swiss Cobalt Blue I2I & Manual Sync Update
             </div>
           </div>
         </div>
@@ -2384,6 +2397,86 @@ export default function App() {
               )}
             </div>
 
+            {/* Image Reference Mode (Image-to-Image) - 수직 이설 */}
+            <div className={useImageRef ? "ios-bento-card-expanded" : "ios-bento-card-compact"} style={{ marginTop: '12px' }}>
+              <div className="flex items-center justify-between" style={{ minHeight: '26px' }}>
+                <label className="ios-product-label" style={{ fontSize: useImageRef ? '12px' : '11px', color: '#0022FF', fontWeight: '800' }}>이미지 참조 모드 (Image-to-Image)</label>
+                <div 
+                  onClick={() => setUseImageRef(!useImageRef)}
+                  className={`ios-switch ${useImageRef ? 'active' : 'inactive'}`}
+                  style={{ flexShrink: 0 }}
+                >
+                  <div className="ios-switch-handle" />
+                </div>
+              </div>
+              {useImageRef && (
+                <div className="mt-4 space-y-4">
+                  <div
+                    className={`ios-upload-zone ${isDragging ? 'dragging' : ''}`}
+                    onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                    onDragLeave={() => setIsDragging(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsDragging(false);
+                      const file = e.dataTransfer.files[0];
+                      if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setRefImage({
+                            mimeType: file.type,
+                            data: reader.result.split(',')[1]
+                          });
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="ref-image-upload"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            setRefImage({
+                              mimeType: file.type,
+                              data: reader.result.split(',')[1]
+                            });
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                    {!refImage ? (
+                      <label htmlFor="ref-image-upload" className="ios-upload-placeholder">
+                        <div className="upload-sub-text">DRAG & DROP</div>
+                        <div className="ios-upload-capsule">
+                          <span>SELECT</span>
+                        </div>
+                      </label>
+                    ) : (
+                      <div className="relative group w-full flex justify-center">
+                        <img
+                          src={`data:${refImage.mimeType};base64,${refImage.data}`}
+                          alt="Ref Preview"
+                          className="ios-upload-preview"
+                        />
+                        <button
+                          onClick={() => setRefImage(null)}
+                          className="ios-upload-remove-btn"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Category Tabs & Content Wrapper */}
             <div style={{ position: 'relative' }}>
               <div className="folder-tabs-container">
@@ -2576,84 +2669,6 @@ export default function App() {
               {activeCategory === 'camera' && (
                 <motion.section key="camera" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ position: 'relative', zIndex: 1 }}>
                   <div className="folder-content-envelope">
-                    <div className="mb-4 space-y-4">
-                      <IOSToggle
-                        label="이미지 참조 모드 (Image-to-Image)"
-                        isOn={useImageRef}
-                        onToggle={() => setUseImageRef(!useImageRef)}
-                        activeColor="#0055FF"
-                      />
-
-                      {useImageRef && (
-                        <div className="space-y-4">
-                          <div
-                            className={`ios-upload-zone ${isDragging ? 'dragging' : ''}`}
-                            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                            onDragLeave={() => setIsDragging(false)}
-                            onDrop={(e) => {
-                              e.preventDefault();
-                              setIsDragging(false);
-                              const file = e.dataTransfer.files[0];
-                              if (file && file.type.startsWith('image/')) {
-                                const reader = new FileReader();
-                                reader.onloadend = () => {
-                                  setRefImage({
-                                    mimeType: file.type,
-                                    data: reader.result.split(',')[1]
-                                  });
-                                };
-                                reader.readAsDataURL(file);
-                              }
-                            }}
-                          >
-                            <input
-                              type="file"
-                              accept="image/*"
-                              id="ref-image-upload"
-                              className="hidden"
-                              onChange={(e) => {
-                                const file = e.target.files[0];
-                                if (file) {
-                                  const reader = new FileReader();
-                                  reader.onloadend = () => {
-                                    setRefImage({
-                                      mimeType: file.type,
-                                      data: reader.result.split(',')[1]
-                                    });
-                                  };
-                                  reader.readAsDataURL(file);
-                                }
-                              }}
-                            />
-                            {!refImage ? (
-                              <label htmlFor="ref-image-upload" className="ios-upload-placeholder">
-                                <div className="upload-sub-text">DRAG & DROP</div>
-                                <div className="ios-upload-capsule">
-                                  <span>SELECT</span>
-                                </div>
-                              </label>
-                            ) : (
-                              <div className="relative group w-full flex justify-center">
-                                <img
-                                  src={`data:${refImage.mimeType};base64,${refImage.data}`}
-                                  alt="Ref Preview"
-                                  className="ios-upload-preview"
-                                />
-                                <button
-                                  onClick={() => setRefImage(null)}
-                                  className="ios-upload-remove-btn"
-                                >
-                                  ✕
-                                </button>
-                              </div>
-                            )}
-                          </div>
-
-
-                        </div>
-                      )}
-                    </div>
-
                     <OptionSelect label="이미지 비율" value={config.aspectRatio} onChange={(v) => handleConfigChange('aspectRatio', v)} options={OPTIONS_DATA.aspectRatio} theme="blue" />
                     <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
                     <OptionSelect label="화면 여백 (Copy Space)" value={config.copySpace || "선택안함"} onChange={(v) => handleConfigChange('copySpace', v)} options={OPTIONS_DATA.copySpace} theme="blue" />
@@ -3231,7 +3246,31 @@ export default function App() {
                       {galleryImages.filter(img => img.folder === activeGalleryFolder).length} ITEMS
                     </span>
                   </div>
-                  <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button
+                      onClick={() => fetchGalleryData()}
+                      disabled={isGalleryLoading}
+                      style={{
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '6px', 
+                        backgroundColor: 'transparent',
+                        color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                        border: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
+                        borderRadius: '2px',
+                        padding: '6px 14px',
+                        fontSize: '10px',
+                        fontWeight: '900',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
+                        transition: 'all 0.2s',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <span style={{ fontSize: '11px', fontWeight: 'bold' }}>↻</span>
+                      <span>Refresh</span>
+                    </button>
+
                     <label 
                       htmlFor="gallery-file-upload" 
                       className="swiss-copy-tab" 
@@ -3249,7 +3288,8 @@ export default function App() {
                         fontWeight: '900',
                         textTransform: 'uppercase',
                         letterSpacing: '0.08em',
-                        transition: 'all 0.2s'
+                        transition: 'all 0.2s',
+                        margin: 0
                       }}
                     >
                       <Zap size={11} />
@@ -3288,7 +3328,42 @@ export default function App() {
                   ) : (
                     <div className="gallery-grid">
                       {galleryImages.filter(img => img.folder === activeGalleryFolder).map(img => (
-                        <div key={img.id} className="gallery-item-card">
+                        <div key={img.id} className="gallery-item-card" style={{ position: 'relative' }}>
+                          {/* 뱃지 배치 */}
+                          {(img.isTemp || img.id.startsWith('temp_')) ? (
+                            <div style={{
+                              position: 'absolute',
+                              top: '8px',
+                              right: '8px',
+                              backgroundColor: '#FF3B30',
+                              color: '#FFFFFF',
+                              fontSize: '9px',
+                              fontWeight: '900',
+                              padding: '3px 6px',
+                              borderRadius: '0px',
+                              zIndex: 10,
+                              letterSpacing: '0.05em'
+                            }}>
+                              LOCAL ONLY
+                            </div>
+                          ) : (
+                            <div style={{
+                              position: 'absolute',
+                              top: '8px',
+                              right: '8px',
+                              backgroundColor: '#0022FF',
+                              color: '#FFFFFF',
+                              fontSize: '9px',
+                              fontWeight: '900',
+                              padding: '3px 6px',
+                              borderRadius: '0px',
+                              zIndex: 10,
+                              letterSpacing: '0.05em'
+                            }}>
+                              CLOUD SECURED
+                            </div>
+                          )}
+
                           <div className="gallery-image-wrapper">
                             <img 
                               src={img.url} 
@@ -3302,6 +3377,66 @@ export default function App() {
                             <p className="gallery-item-prompt" title={img.prompt}>
                               {img.prompt || 'No Prompt Info'}
                             </p>
+
+                            {/* 추가 버튼 그룹: SYNC 및 USE REF */}
+                            <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
+                              <button
+                                onClick={() => handleApplyAsReference(img.url)}
+                                className="gallery-item-btn"
+                                style={{
+                                  flex: 1,
+                                  background: 'transparent',
+                                  border: '1px solid #0022FF',
+                                  color: '#0022FF',
+                                  fontWeight: '900',
+                                  fontSize: '10px',
+                                  padding: '5px 0',
+                                  borderRadius: '0px',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                USE REF
+                              </button>
+
+                              {(img.isTemp || img.id.startsWith('temp_')) && (
+                                <button
+                                  disabled={img.isUploading}
+                                  onClick={() => handleGalleryManualSync(img)}
+                                  className="gallery-item-btn"
+                                  style={{
+                                    flex: 1,
+                                    background: '#0022FF',
+                                    border: '1px solid #0022FF',
+                                    color: '#FFFFFF',
+                                    fontWeight: '900',
+                                    fontSize: '10px',
+                                    padding: '5px 0',
+                                    borderRadius: '0px',
+                                    cursor: img.isUploading ? 'not-allowed' : 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '4px'
+                                  }}
+                                >
+                                  {img.isUploading ? (
+                                    <>
+                                      <div style={{
+                                        width: '8px',
+                                        height: '8px',
+                                        border: '1.5px solid rgba(255,255,255,0.3)',
+                                        borderTop: '1.5px solid #FFFFFF',
+                                        borderRadius: '50%',
+                                        animation: 'spin 0.6s linear infinite'
+                                      }} />
+                                      <span>SYNCING</span>
+                                    </>
+                                  ) : (
+                                    <span>SYNC</span>
+                                  )}
+                                </button>
+                              )}
+                            </div>
                             <div className="gallery-item-actions">
                               <button 
                                 className="gallery-item-btn" 
@@ -3626,7 +3761,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.64a | Cloud Sync & External Upload Safeguard
+      v0.64b | Swiss Cobalt Blue I2I & Manual Sync Update
     </footer>
     <div className="h-12"></div>
     </div>

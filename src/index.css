@@ -1484,38 +1484,38 @@ body.dark-mode .category-tab.active {
    iOS UPLOAD ZONE (Image-to-Image)
    ============================================= */
 .ios-upload-zone {
-  background: #FFFFFF !important;
-  border: 1px dashed #0022FF !important; /* 1px 파란색 점선 */
-  border-radius: 16px !important;
+  background: transparent !important;
+  border: 2px dashed #0022FF !important; /* 2px 코발트 블루 대시 보더 */
+  border-radius: 2px !important; /* 직각 엣지 2px */
   padding: 16px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   min-height: 120px !important;
-  transition: all 0.3s ease !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
   position: relative !important;
   overflow: hidden !important;
 }
 
 .ios-upload-zone:hover {
   border-color: #0022FF !important;
-  background: rgba(0, 34, 255, 0.03) !important;
+  background: rgba(0, 34, 255, 0.06) !important; /* 드래그 오버 투명 블루 트랜지션 */
 }
 
 .ios-upload-zone.dragging {
   border-color: #0022FF !important;
-  background: rgba(0, 34, 255, 0.03) !important;
-  transform: scale(1.02) !important;
+  background: rgba(0, 34, 255, 0.12) !important;
+  transform: scale(1.01) !important;
 }
 
 body.dark-mode .ios-upload-zone {
-  background: #0022FF !important; /* 블루모드 시 파란 배경 */
-  border-color: #FFFFFF !important; /* 흰색 보더 */
+  background: transparent !important; /* 다크모드에서도 심플한 투명 코발트 */
+  border-color: #0022FF !important;
 }
 
 body.dark-mode .ios-upload-zone.dragging {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border-color: #FFFFFF !important;
+  background: rgba(0, 34, 255, 0.18) !important;
+  border-color: #0022FF !important;
 }
 
 .ios-upload-placeholder {
@@ -1534,12 +1534,12 @@ body.dark-mode .ios-upload-zone.dragging {
   font-weight: 900 !important;
   color: #0022FF !important; /* 파란 글자 */
   margin-bottom: 12px !important;
-  letter-spacing: 0.1em !important;
+  letter-spacing: 0.12em !important;
   text-transform: uppercase !important;
 }
 
 body.dark-mode .upload-sub-text {
-  color: #FFFFFF !important; /* 블루모드 시 흰 글자 */
+  color: #0022FF !important; /* 다크모드에서도 고대비 코발트 블루 */
 }
 
 .ios-upload-capsule {
@@ -1549,8 +1549,8 @@ body.dark-mode .upload-sub-text {
   background: #0022FF !important; /* 파란색 배경 */
   color: #FFFFFF !important; /* 흰 글자 */
   border: 1px solid #0022FF !important;
-  border-radius: 9999px !important;
-  padding: 8px 20px !important;
+  border-radius: 2px !important; /* 엣지 2px */
+  padding: 6px 18px !important;
   font-size: 11px !important;
   font-weight: 900 !important;
   box-shadow: none !important;
@@ -1558,31 +1558,42 @@ body.dark-mode .upload-sub-text {
 }
 
 body.dark-mode .ios-upload-capsule {
-  background: #FFFFFF !important; /* 블루모드 시 흰색 배경 */
-  color: #0022FF !important; /* 파란 글자 */
-  border: 1px solid #FFFFFF !important;
+  background: #0022FF !important;
+  color: #FFFFFF !important;
+  border: 1px solid #0022FF !important;
 }
 
 .ios-upload-zone:hover .ios-upload-capsule {
-  transform: translateY(-1px) !important;
+  background: #0011CC !important;
 }
 
 .ios-upload-preview {
   max-height: 120px !important;
-  border-radius: 12px !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  border-radius: 2px !important; /* 엣지 2px */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
 }
 
 .ios-upload-remove-btn {
   position: absolute !important;
   top: 8px !important;
   right: 8px !important;
-  background: rgba(0,0,0,0.5) !important;
+  background: #0022FF !important;
   color: white !important;
   width: 24px !important;
   height: 24px !important;
-  border-radius: 50% !important;
+  border-radius: 2px !important; /* 엣지 2px */
   display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: none !important;
+  font-size: 11px !important;
+  cursor: pointer !important;
+  transition: background 0.2s ease !important;
+}
+
+.ios-upload-remove-btn:hover {
+  background: #0011CC !important;
+}
   align-items: center !important;
   justify-content: center !important;
   font-size: 12px !important;
