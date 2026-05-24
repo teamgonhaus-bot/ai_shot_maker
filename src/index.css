@@ -2153,6 +2153,10 @@ body.dark-mode .folder-content-envelope .ios-library-grid {
   gap: 0px !important;
 }
 
+.folder-content-envelope.gallery-envelope {
+  padding: 0px !important;
+}
+
 /* =============================================
    LIBRARY CARD FOOTER & SIZING ADJUSTMENTS
    ============================================= */
@@ -2597,16 +2601,15 @@ body.dark-mode .swiss-copy-btn {
 .gallery-workspace {
   display: flex !important;
   width: 100% !important;
-  border: 1.5px solid #0022FF !important;
-  background: #FFFFFF !important;
+  border: none !important;
+  background: transparent !important;
   margin-top: 24px !important;
   box-sizing: border-box !important;
-  min-height: 550px !important;
 }
 
 body.dark-mode .gallery-workspace {
-  border: 1.5px solid #FFFFFF !important;
-  background: #0022FF !important;
+  border: none !important;
+  background: transparent !important;
 }
 
 .gallery-folder-edit-btn-action {
@@ -2799,12 +2802,12 @@ body.dark-mode .gallery-main {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  padding: 16px 20px !important;
-  border-bottom: 1.5px solid #0022FF !important;
+  padding: 8px 16px !important;
+  border-bottom: 1px solid #0022FF !important;
 }
 
 body.dark-mode .gallery-main-header {
-  border-bottom: 1.5px solid #FFFFFF !important;
+  border-bottom: 1px solid #FFFFFF !important;
 }
 
 .gallery-folder-indicator {
@@ -2840,7 +2843,7 @@ body.dark-mode .gallery-image-count {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  height: 250px !important;
+  height: 200px !important;
 }
 
 .gallery-empty-text {

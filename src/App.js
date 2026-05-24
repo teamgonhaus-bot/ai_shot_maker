@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders, Zap, Shuffle, ChevronLeft, ChevronRight, FolderOpen
+  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders, Zap, Shuffle, ChevronLeft, ChevronRight, FolderOpen, RotateCw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db, auth, storage } from './firebase';
@@ -3292,8 +3292,8 @@ export default function App() {
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'space-between',
-                borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
-                marginBottom: '12px',
+                borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                marginBottom: '0px',
                 paddingBottom: '0px',
                 gap: '12px'
               }}>
@@ -3348,7 +3348,7 @@ export default function App() {
                       width: '36px',
                       height: '36px',
                       border: 'none',
-                      borderLeft: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
+                      borderLeft: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
                       borderRadius: '0px',
                       background: 'transparent',
                       color: isDarkMode ? '#FFFFFF' : '#0022FF',
@@ -3612,73 +3612,74 @@ export default function App() {
                 )}
               </AnimatePresence>
 
-              {/* Right panel: Active folder images */}
-              <div className="gallery-main">
-                <div className="gallery-main-header">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span className="gallery-folder-indicator">{activeGalleryFolder.toUpperCase()}</span>
-                    <span className="gallery-image-count">
-                      {galleryImages.filter(img => img.folder === activeGalleryFolder).length} ITEMS
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <button
-                      onClick={() => fetchGalleryData()}
-                      disabled={isGalleryLoading}
-                      style={{
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '6px', 
-                        backgroundColor: 'transparent',
-                        color: isDarkMode ? '#FFFFFF' : '#0022FF',
-                        border: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
-                        borderRadius: '2px',
-                        padding: '6px 14px',
-                        fontSize: '10px',
-                        fontWeight: '900',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.08em',
-                        transition: 'all 0.2s',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <span style={{ fontSize: '11px', fontWeight: 'bold' }}>↻</span>
-                      <span>Refresh</span>
-                    </button>
+              {/* Right panel: Active folder images wrapped in folder-content-envelope */}
+              <div className="folder-content-envelope gallery-envelope" style={{ padding: '0px' }}>
+                <div className="gallery-main" style={{ border: 'none', background: 'transparent' }}>
+                  <div className="gallery-main-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 16px', borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span className="gallery-image-count" style={{ fontSize: '24px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', lineHeight: '1' }}>
+                        {galleryImages.filter(img => img.folder === activeGalleryFolder).length}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <button
+                        onClick={() => fetchGalleryData()}
+                        disabled={isGalleryLoading}
+                        style={{
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          backgroundColor: 'transparent',
+                          color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                          border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                          borderRadius: '2px',
+                          padding: '6px 10px',
+                          height: '32px',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          margin: 0
+                        }}
+                        title="Refresh"
+                      >
+                        <RotateCw size={14} style={{ animation: isGalleryLoading ? 'spin 1s linear infinite' : 'none' }} />
+                      </button>
 
-                    <label 
-                      htmlFor="gallery-file-upload" 
-                      className="swiss-copy-tab" 
-                      style={{ 
-                        cursor: 'pointer', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '6px', 
-                        backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                        color: isDarkMode ? '#0022FF' : '#FFFFFF',
-                        border: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
-                        borderRadius: '2px',
-                        padding: '6px 14px',
-                        fontSize: '10px',
-                        fontWeight: '900',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.08em',
-                        transition: 'all 0.2s',
-                        margin: 0
-                      }}
-                    >
-                      <Zap size={11} />
-                      <span>Upload Image</span>
-                    </label>
-                    <input 
-                      id="gallery-file-upload" 
-                      type="file" 
-                      accept="image/*" 
-                      style={{ display: 'none' }} 
-                      onChange={handleExternalImageUpload}
-                    />
+                      <label 
+                        htmlFor="gallery-file-upload" 
+                        className="swiss-copy-tab" 
+                        style={{ 
+                          cursor: 'pointer', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center',
+                          gap: '6px', 
+                          backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+                          color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                          border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                          borderRadius: '2px',
+                          padding: '6px 14px',
+                          fontSize: '11px',
+                          fontWeight: '900',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.08em',
+                          transition: 'all 0.2s',
+                          margin: 0,
+                          height: '32px',
+                          boxSizing: 'border-box'
+                        }}
+                      >
+                        <Zap size={11} />
+                        <span>UPLOAD</span>
+                      </label>
+                      <input 
+                        id="gallery-file-upload" 
+                        type="file" 
+                        accept="image/*" 
+                        style={{ display: 'none' }} 
+                        onChange={handleExternalImageUpload}
+                      />
+                    </div>
                   </div>
-                </div>
 
                 <div className="gallery-grid-container">
                   {isGalleryLoading ? (
@@ -3898,7 +3899,8 @@ export default function App() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
+        </motion.div>
         )}
       </AnimatePresence>
 
