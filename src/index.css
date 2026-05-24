@@ -2048,7 +2048,7 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   gap: 0 !important; /* Touch adjacent borders seamlessly */
   position: relative !important;
   z-index: 5 !important; /* Higher than envelope body (z-index: 2) */
-  overflow-y: visible !important; /* Prevent bottom border clipping and vertical scrollbars */
+  overflow-y: hidden !important; /* Changed from visible to hidden to prevent vertical scroll jitters! */
   border-bottom: 2px solid #0022FF !important; /* Consistently thick, drawn once by container */
   
   /* Prevent text dragging layout scrolling issues */
@@ -2822,14 +2822,15 @@ body.dark-mode .gallery-folder-indicator {
 }
 
 .gallery-image-count {
-  font-size: 10px !important;
+  font-size: 18px !important;
   font-weight: 900 !important;
-  color: #8E8E93 !important;
-  letter-spacing: 0.08em !important;
+  color: #0022FF !important;
+  letter-spacing: -0.02em !important;
+  white-space: nowrap !important;
 }
 
 body.dark-mode .gallery-image-count {
-  color: rgba(255, 255, 255, 0.7) !important;
+  color: #FFFFFF !important;
 }
 
 .gallery-grid-container {

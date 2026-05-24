@@ -3287,82 +3287,48 @@ export default function App() {
             <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>Gallery</h2>
             
             <div className="gallery-workspace" style={{ display: 'flex', flexDirection: 'column', gap: '0px' }}>
-              {/* 📁 Gallery Folders Horizontal Tab Bar & Administrative Menu (v0.65c) */}
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between',
-                borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
-                marginBottom: '0px',
-                paddingBottom: '0px',
-                gap: '12px'
-              }}>
-                {/* Horizontal Scrollable Tabs */}
-                <div 
-                  className="folder-tabs-container no-scrollbar" 
-                  style={{ 
-                    display: 'flex',
-                    overflowX: 'auto', 
-                    whiteSpace: 'nowrap', 
-                    padding: '0', 
-                    margin: '0',
-                    gap: '0', 
-                    touchAction: 'pan-x', 
-                    overscrollBehavior: 'contain',
-                    flex: 1
-                  }}
-                >
-                  {galleryFolders.map(folder => (
-                    <button
-                      key={folder}
-                      className={`folder-tab ${activeGalleryFolder === folder ? 'active' : ''}`}
-                      style={{ 
-                        padding: '10px 16px', 
-                        flexShrink: 0, 
-                        fontSize: '12px',
-                        fontWeight: '900',
-                        letterSpacing: '0.04em',
-                        textTransform: 'uppercase',
-                        background: 'transparent',
-                        border: 'none',
-                        color: activeGalleryFolder === folder 
-                          ? (isDarkMode ? '#FFFFFF' : '#0022FF') 
-                          : (isDarkMode ? 'rgba(255,255,255,0.45)' : 'rgba(0,34,255,0.45)'),
-                        borderBottom: activeGalleryFolder === folder 
-                          ? `3px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}` 
-                          : '3px solid transparent',
-                        borderRadius: '0px'
-                      }}
-                      onClick={() => setActiveGalleryFolder(folder)}
-                    >
-                      {folder}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Folder Administrative Gear/Hamburger Icon */}
-                <div style={{ position: 'relative', flexShrink: 0 }}>
+              {/* 📁 Gallery Folders Horizontal Tab Bar (Aligned to right edge like Mix tabs, v0.65d refinements) */}
+              <div 
+                className="folder-tabs-container no-scrollbar" 
+                style={{ 
+                  marginTop: '0px',
+                  marginBottom: '0px',
+                  overflowX: 'auto', 
+                  overflowY: 'hidden', 
+                  whiteSpace: 'nowrap', 
+                  padding: '0', 
+                  gap: '0', 
+                  touchAction: 'pan-x', 
+                  overscrollBehavior: 'contain',
+                  width: '100%'
+                }}
+              >
+                {galleryFolders.map(folder => (
                   <button
-                    onClick={() => setIsFolderModalOpen(true)}
-                    style={{
-                      width: '36px',
-                      height: '36px',
-                      border: 'none',
-                      borderLeft: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
-                      borderRadius: '0px',
+                    key={folder}
+                    className={`folder-tab ${activeGalleryFolder === folder ? 'active' : ''}`}
+                    style={{ 
+                      padding: '10px 16px', 
+                      flexShrink: 0, 
+                      fontSize: '12px',
+                      fontWeight: '900',
+                      letterSpacing: '0.04em',
+                      textTransform: 'uppercase',
                       background: 'transparent',
-                      color: isDarkMode ? '#FFFFFF' : '#0022FF',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      outline: 'none'
+                      border: 'none',
+                      color: activeGalleryFolder === folder 
+                        ? (isDarkMode ? '#FFFFFF' : '#0022FF') 
+                        : (isDarkMode ? 'rgba(255,255,255,0.45)' : 'rgba(0,34,255,0.45)'),
+                      borderBottom: activeGalleryFolder === folder 
+                        ? `3px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}` 
+                        : '3px solid transparent',
+                      borderRadius: '0px'
                     }}
-                    title="Manage Tabs"
+                    onClick={() => setActiveGalleryFolder(folder)}
                   >
-                    <Menu size={18} />
+                    {folder}
                   </button>
-                </div>
+                ))}
               </div>
 
               {/* 📁 Global Folder Manager Modal (v0.65c) */}
@@ -3617,8 +3583,8 @@ export default function App() {
                 <div className="gallery-main" style={{ border: 'none', background: 'transparent' }}>
                   <div className="gallery-main-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 16px', borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <span className="gallery-image-count" style={{ fontSize: '24px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', lineHeight: '1' }}>
-                        {galleryImages.filter(img => img.folder === activeGalleryFolder).length}
+                      <span className="gallery-image-count">
+                        {galleryImages.filter(img => img.folder === activeGalleryFolder).length} images
                       </span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -3678,6 +3644,28 @@ export default function App() {
                         style={{ display: 'none' }} 
                         onChange={handleExternalImageUpload}
                       />
+
+                      {/* Folder Administrative Hamburger Icon (Bare icon, v0.65d refinements) */}
+                      <button
+                        onClick={() => setIsFolderModalOpen(true)}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          border: 'none',
+                          background: 'transparent',
+                          color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          outline: 'none',
+                          margin: 0,
+                          padding: 0
+                        }}
+                        title="Manage Tabs"
+                      >
+                        <Menu size={18} />
+                      </button>
                     </div>
                   </div>
 
