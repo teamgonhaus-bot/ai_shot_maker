@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Copy, Check, Download, Zap, Cloud } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -20,6 +20,14 @@ export default function SwissSpecificationSheet({
   // Guard: if config is null/undefined, use empty object
   const safeConfig = config || {};
   const [copied, setCopied] = useState(false);
+  const [shimmerActive, setShimmerActive] = useState(false);
+
+  // Trigger cinematic line shimmer on configuration updates (v0.65)
+  useEffect(() => {
+    setShimmerActive(true);
+    const timer = setTimeout(() => setShimmerActive(false), 1200);
+    return () => clearTimeout(timer);
+  }, [config]);
 
   const handleCopy = () => {
     if (!prompt) return;
@@ -160,6 +168,22 @@ export default function SwissSpecificationSheet({
           align-items: flex-end;
           padding: 24px 0 6px 0;
           border-bottom: 1px solid ${isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,34,255,0.4)'};
+          position: relative !important;
+          overflow: hidden !important;
+        }
+        @keyframes glow-shimmer {
+          0% { left: -150%; }
+          100% { left: 150%; }
+        }
+        .shimmer-line-glow {
+          position: absolute !important;
+          bottom: 0 !important;
+          left: -150% !important;
+          width: 50% !important;
+          height: 1.5px !important;
+          background: linear-gradient(90deg, transparent, ${isDarkMode ? '#FFFFFF' : '#0022FF'}, transparent) !important;
+          animation: glow-shimmer 1.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+          z-index: 5 !important;
         }
         .swiss-spec-label {
           font-size: 11px;
@@ -318,6 +342,7 @@ export default function SwissSpecificationSheet({
         <div key={i} className="swiss-spec-row">
           <span className="swiss-spec-label">{spec.label}</span>
           <span className="swiss-spec-value">{spec.value ? String(spec.value).toUpperCase() : ''}</span>
+          {shimmerActive && <div className="shimmer-line-glow" />}
         </div>
       ))}
 

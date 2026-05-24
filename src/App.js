@@ -14,6 +14,25 @@ import IOSToggle from './components/IOSToggle';
 import SwissSpecificationSheet from './components/SwissSpecificationSheet';
 import TemplateCard from './components/TemplateCard';
 
+// 갤러리 라이브러리 레이지 로드 및 페이드인 이미지 컴포넌트 (v0.65 성능 최적화)
+const GalleryImage = ({ src, alt, onClick, className }) => {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      onLoad={() => setLoaded(true)}
+      onClick={onClick}
+      className={className}
+      style={{
+        opacity: loaded ? 1 : 0,
+        transition: 'opacity 0.4s ease',
+      }}
+    />
+  );
+};
+
 // Helper: base64 Data URL을 Blob 객체로 변환 (uploadBytes 연계로 Storage 전송 안정화)
 const dataURLtoBlob = (dataurl) => {
   try {
@@ -463,7 +482,7 @@ export default function App() {
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.64d Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.65 Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -1708,7 +1727,7 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.64d | Swiss Cobalt Blue I2I & State Persistence Update
+              v0.65 | Shot Maker Workspace
             </div>
           </div>
         </div>
@@ -2214,6 +2233,25 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
+      {/* Neo-Brutalism Background Geometric Outlines (v0.65) */}
+      <div 
+        style={{ 
+          position: 'absolute', 
+          top: '12px', 
+          right: '8%', 
+          zIndex: 0, 
+          opacity: isDarkMode ? 0.22 : 0.12, 
+          pointerEvents: 'none',
+          overflow: 'hidden',
+          width: '280px',
+          height: '240px'
+        }}
+      >
+        <svg width="280" height="240" viewBox="0 0 280 240" fill="none">
+          <circle cx="140" cy="120" r="90" stroke={isDarkMode ? '#FFFFFF' : '#0022FF'} strokeWidth="1" strokeDasharray="6 4" />
+          <polygon points="140,20 230,190 50,190" stroke={isDarkMode ? '#FFFFFF' : '#0022FF'} strokeWidth="1" />
+          <rect x="70" y="50" width="140" height="140" stroke={isDarkMode ? '#FFFFFF' : '#0022FF'} strokeWidth="1" />
+        </svg>
       </div>
 
       <header className="app-header">
@@ -2407,48 +2445,137 @@ export default function App() {
               </div>
             </div>
 
-            {/* Smart Template Grid — Swiss Line Grid Box (v0.62) */}
-            <div className="template-grid" style={{ marginTop: '0' }}>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'TITLE SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('TITLE SCENE')}>
-                <div className="template-index">01 /</div>
-                <div className="template-title">Title</div>
-                <div className="template-desc">초현실주의 공중 부양</div>
-              </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'DETAIL SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('DETAIL SCENE')}>
-                <div className="template-index">02 /</div>
-                <div className="template-title">Detail</div>
-                <div className="template-desc">질감 강조 초접사</div>
-              </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'INSTA SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('INSTA SCENE')}>
-                <div className="template-index">03 /</div>
-                <div className="template-title">Insta</div>
-                <div className="template-desc">MZ SNS 감성 스냅</div>
-              </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'USAGE SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('USAGE SCENE')}>
-                <div className="template-index">04 /</div>
-                <div className="template-title">User</div>
-                <div className="template-desc">유저 사용 장면</div>
-              </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'HOME LIVING' ? 'active' : ''}`} onClick={() => handleSmartTemplate('HOME LIVING')}>
-                <div className="template-index">05 /</div>
-                <div className="template-title">Home</div>
-                <div className="template-desc">포근한 가정용 연출</div>
-              </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'OFFICE TECH' ? 'active' : ''}`} onClick={() => handleSmartTemplate('OFFICE TECH')}>
-                <div className="template-index">06 /</div>
-                <div className="template-title">Office</div>
-                <div className="template-desc">데스크셋업 비즈니스</div>
-              </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'RETAIL SCENE' ? 'active' : ''}`} onClick={() => handleSmartTemplate('RETAIL SCENE')}>
-                <div className="template-index">07 /</div>
-                <div className="template-title">Retail</div>
-                <div className="template-desc">상업용 쇼룸 연출</div>
-              </button>
-              <button className={`ios-smart-template-btn ${activeTemplate === 'NATURE ORGANIC' ? 'active' : ''}`} onClick={() => handleSmartTemplate('NATURE ORGANIC')}>
-                <div className="template-index">08 /</div>
-                <div className="template-title">Outdoor</div>
-                <div className="template-desc">야외 자연 연출</div>
-              </button>
+            {/* Smart Template Grid — Neo-Brutalism 4x2 Grid Overhaul (v0.65) */}
+            <div 
+              style={{ 
+                marginTop: '12px',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: '0px',
+                borderTop: '1px solid #0022FF',
+                borderLeft: '1px solid #0022FF',
+                margin: '0px',
+                padding: '0px',
+              }}
+            >
+              {[
+                { id: 'TITLE SCENE', num: '01', title: 'Title', desc: '초현실주의 공중 부양', shape: 'circle' },
+                { id: 'DETAIL SCENE', num: '02', title: 'Detail', desc: '질감 강조 초접사', shape: 'square' },
+                { id: 'INSTA SCENE', num: '03', title: 'Insta', desc: 'MZ SNS 감성 스냅', shape: 'triangle' },
+                { id: 'USAGE SCENE', num: '04', title: 'User', desc: '유저 사용 장면', shape: 'semicircle' },
+                { id: 'HOME LIVING', num: '05', title: 'Home', desc: '포근한 가정용 연출', shape: 'diamond' },
+                { id: 'OFFICE TECH', num: '06', title: 'Office', desc: '데스크셋업 비즈니스', shape: 'parallelogram' },
+                { id: 'RETAIL SCENE', num: '07', title: 'Retail', desc: '상업용 쇼룸 연출', shape: 'pentagon' },
+                { id: 'NATURE ORGANIC', num: '08', title: 'Outdoor', desc: '야외 자연 연출', shape: 'hexagon' }
+              ].map(item => {
+                const isActive = activeTemplate === item.id;
+                
+                // 각 도형의 CSS 렌더링 헬퍼
+                const getShapeStyle = () => {
+                  const base = {
+                    width: '28px',
+                    height: '28px',
+                    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                    marginBottom: '12px',
+                    flexShrink: 0
+                  };
+                  
+                  // Active일 때는 화이트로 반전, Idle일 때는 투명 코발트 블루 혹은 투명 화이트
+                  const color = isActive 
+                    ? '#FFFFFF' 
+                    : (isDarkMode ? 'rgba(255, 255, 255, 0.45)' : 'rgba(0, 34, 255, 0.35)');
+                    
+                  if (item.shape === 'circle') {
+                    return { ...base, backgroundColor: color, borderRadius: '50%' };
+                  }
+                  if (item.shape === 'square') {
+                    return { ...base, backgroundColor: color, borderRadius: '0px' };
+                  }
+                  if (item.shape === 'triangle') {
+                    return { ...base, backgroundColor: color, clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' };
+                  }
+                  if (item.shape === 'semicircle') {
+                    return { ...base, backgroundColor: color, borderRadius: '14px 14px 0 0' };
+                  }
+                  if (item.shape === 'diamond') {
+                    return { ...base, backgroundColor: color, transform: 'rotate(45deg) scale(0.8)' };
+                  }
+                  if (item.shape === 'parallelogram') {
+                    return { ...base, backgroundColor: color, transform: 'skewX(-20deg) scale(0.85)' };
+                  }
+                  if (item.shape === 'pentagon') {
+                    return { ...base, backgroundColor: color, clipPath: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)' };
+                  }
+                  if (item.shape === 'hexagon') {
+                    return { ...base, backgroundColor: color, clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)' };
+                  }
+                  return base;
+                };
+
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleSmartTemplate(item.id)}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      height: '115px',
+                      padding: '12px 6px',
+                      margin: '0px',
+                      background: isActive ? '#0022FF' : 'transparent',
+                      borderBottom: '1px solid #0022FF',
+                      borderRight: '1px solid #0022FF',
+                      color: isActive ? '#FFFFFF' : (isDarkMode ? '#FFFFFF' : '#0022FF'),
+                      cursor: 'pointer',
+                      transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                      outline: 'none',
+                      borderRadius: '0px',
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}
+                    className="group"
+                  >
+                    {/* 기하학 도형 */}
+                    <div style={getShapeStyle()} className="group-hover:scale-110" />
+
+                    {/* 타이포그래피 (영문 씬 타이틀 Bold 산세리프) */}
+                    <div style={{
+                      fontSize: '12px',
+                      fontWeight: '900',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      marginBottom: '2px',
+                      fontFamily: "'Outfit', 'Inter', sans-serif"
+                    }}>
+                      {item.title}
+                    </div>
+
+                    {/* 한글 보조 설명 */}
+                    <div style={{
+                      fontSize: '9px',
+                      opacity: isActive ? 0.8 : 0.6,
+                      fontWeight: '500',
+                      letterSpacing: '-0.02em'
+                    }}>
+                      {item.desc}
+                    </div>
+
+                    {/* 인덱스 표기 (좌상단) */}
+                    <div style={{
+                      position: 'absolute',
+                      top: '6px',
+                      left: '8px',
+                      fontSize: '8px',
+                      fontWeight: '800',
+                      opacity: isActive ? 0.7 : 0.4
+                    }}>
+                      {item.num}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
 
           </motion.div>
@@ -3428,11 +3555,11 @@ export default function App() {
                               fontSize: '9px',
                               fontWeight: '900',
                               padding: '3px 6px',
-                              borderRadius: '0px',
+                              borderRadius: '2px',
                               zIndex: 10,
                               letterSpacing: '0.05em'
                             }}>
-                              LOCAL
+                              LOCAL ONLY
                             </div>
                           ) : (
                             <div style={{
@@ -3444,16 +3571,16 @@ export default function App() {
                               fontSize: '9px',
                               fontWeight: '900',
                               padding: '3px 6px',
-                              borderRadius: '0px',
+                              borderRadius: '2px',
                               zIndex: 10,
                               letterSpacing: '0.05em'
                             }}>
-                              SYNCED
+                              CLOUD SECURED
                             </div>
                           )}
 
                           <div className="gallery-image-wrapper">
-                            <img 
+                            <GalleryImage 
                               src={img.url} 
                               alt="Gallery Item" 
                               onClick={() => setLightboxImage(img.url)}
@@ -3471,17 +3598,17 @@ export default function App() {
                                 onClick={() => handleApplyAsReference(img.url)}
                                 className="gallery-item-btn"
                                 style={{
-                                  background: '#0022FF',
+                                  background: 'transparent',
                                   border: '1px solid #0022FF',
-                                  color: '#FFFFFF',
+                                  color: '#0022FF',
                                   fontWeight: '900',
                                   fontSize: '9px',
                                   padding: '3px 5px',
-                                  borderRadius: '0px',
+                                  borderRadius: '2px',
                                   cursor: 'pointer'
                                 }}
                               >
-                                REF
+                                USE REF
                               </button>
 
                               {(img.isTemp || img.id.startsWith('temp_')) && (
@@ -3490,21 +3617,35 @@ export default function App() {
                                   onClick={() => handleGalleryManualSync(img)}
                                   className="gallery-item-btn"
                                   style={{
-                                    background: '#FF3B30',
-                                    border: '1px solid #FF3B30',
+                                    background: '#0022FF',
+                                    border: '1px solid #0022FF',
                                     color: '#FFFFFF',
                                     fontWeight: '900',
                                     fontSize: '9px',
                                     padding: '3px 5px',
-                                    borderRadius: '0px',
+                                    borderRadius: '2px',
                                     cursor: img.isUploading ? 'not-allowed' : 'pointer',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    gap: '2px'
+                                    gap: '4px'
                                   }}
                                 >
-                                  {img.isUploading ? '...' : 'SYNC'}
+                                  {img.isUploading ? (
+                                    <>
+                                      <div style={{
+                                        width: '8px',
+                                        height: '8px',
+                                        border: '1.5px solid rgba(255,255,255,0.3)',
+                                        borderTop: '1.5px solid #FFFFFF',
+                                        borderRadius: '50%',
+                                        animation: 'spin 0.6s linear infinite'
+                                      }} />
+                                      <span>SYNCING</span>
+                                    </>
+                                  ) : (
+                                    <span>SYNC</span>
+                                  )}
                                 </button>
                               )}
 
@@ -3832,7 +3973,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.64d | Swiss Cobalt Blue I2I & State Persistence Update
+      v0.65 | Shot Maker Workspace
     </footer>
     <div className="h-12"></div>
     </div>
