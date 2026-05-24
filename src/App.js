@@ -2220,19 +2220,6 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <div className="ios-toast-container">
-        <AnimatePresence>
-          {showToast && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="ios-toast"
-            >
-              {toastMessage}
-            </motion.div>
-          )}
-        </AnimatePresence>
       {/* Neo-Brutalism Background Geometric Outlines (v0.65) */}
       <div 
         style={{ 
