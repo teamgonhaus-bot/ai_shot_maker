@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders, Zap, Shuffle, ChevronLeft, ChevronRight
+  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders, Zap, Shuffle, ChevronLeft, ChevronRight, FolderOpen
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db, auth, storage } from './firebase';
@@ -320,6 +320,7 @@ export default function App() {
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
   const [activeGalleryFolder, setActiveGalleryFolder] = useState('기본');
   const [newFolderName, setNewFolderName] = useState('');
+  const [isFolderMenuOpen, setIsFolderMenuOpen] = useState(false);
 
   // Rename Modal State
   const [renameTarget, setRenameTarget] = useState(null); // { id, name }
@@ -2220,26 +2221,7 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Neo-Brutalism Background Geometric Outlines (v0.65) */}
-      <div 
-        style={{ 
-          position: 'absolute', 
-          top: '12px', 
-          right: '8%', 
-          zIndex: 0, 
-          opacity: isDarkMode ? 0.22 : 0.12, 
-          pointerEvents: 'none',
-          overflow: 'hidden',
-          width: '280px',
-          height: '240px'
-        }}
-      >
-        <svg width="280" height="240" viewBox="0 0 280 240" fill="none">
-          <circle cx="140" cy="120" r="90" stroke={isDarkMode ? '#FFFFFF' : '#0022FF'} strokeWidth="1" strokeDasharray="6 4" />
-          <polygon points="140,20 230,190 50,190" stroke={isDarkMode ? '#FFFFFF' : '#0022FF'} strokeWidth="1" />
-          <rect x="70" y="50" width="140" height="140" stroke={isDarkMode ? '#FFFFFF' : '#0022FF'} strokeWidth="1" />
-        </svg>
-      </div>
+
 
       <header className="app-header">
         <h1 
@@ -2439,8 +2421,8 @@ export default function App() {
                 display: 'grid',
                 gridTemplateColumns: 'repeat(4, 1fr)',
                 gap: '0px',
-                borderTop: '1px solid #0022FF',
-                borderLeft: '1px solid #0022FF',
+                borderTop: `1px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+                borderLeft: `1px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
                 margin: '0px',
                 padding: '0px',
               }}
@@ -2456,6 +2438,7 @@ export default function App() {
                 { id: 'NATURE ORGANIC', num: '08', title: 'Outdoor', desc: '야외 자연 연출', shape: 'hexagon' }
               ].map(item => {
                 const isActive = activeTemplate === item.id;
+                const borderColor = isDarkMode ? '#FFFFFF' : '#0022FF';
                 
                 // 각 도형의 CSS 렌더링 헬퍼
                 const getShapeStyle = () => {
@@ -2467,9 +2450,9 @@ export default function App() {
                     flexShrink: 0
                   };
                   
-                  // Active일 때는 화이트로 반전, Idle일 때는 투명 코발트 블루 혹은 투명 화이트
+                  // Active일 때는 다크모드 시 코발트 블루, 라이트모드 시 화이트
                   const color = isActive 
-                    ? '#FFFFFF' 
+                    ? (isDarkMode ? '#0022FF' : '#FFFFFF') 
                     : (isDarkMode ? 'rgba(255, 255, 255, 0.45)' : 'rgba(0, 34, 255, 0.35)');
                     
                   if (item.shape === 'circle') {
@@ -2511,10 +2494,14 @@ export default function App() {
                       height: '115px',
                       padding: '12px 6px',
                       margin: '0px',
-                      background: isActive ? '#0022FF' : 'transparent',
-                      borderBottom: '1px solid #0022FF',
-                      borderRight: '1px solid #0022FF',
-                      color: isActive ? '#FFFFFF' : (isDarkMode ? '#FFFFFF' : '#0022FF'),
+                      background: isActive 
+                        ? (isDarkMode ? '#FFFFFF' : '#0022FF') 
+                        : 'transparent',
+                      borderBottom: `1px solid ${borderColor}`,
+                      borderRight: `1px solid ${borderColor}`,
+                      color: isActive 
+                        ? (isDarkMode ? '#0022FF' : '#FFFFFF') 
+                        : (isDarkMode ? '#FFFFFF' : '#0022FF'),
                       cursor: 'pointer',
                       transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
                       outline: 'none',
@@ -3296,146 +3283,260 @@ export default function App() {
           <motion.div key="gallery" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6 relative pb-20">
             <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>Gallery</h2>
             
-            <div className="gallery-workspace">
-              {/* Left sidebar: Folders */}
-              <div className="gallery-sidebar">
-                <div className="gallery-sidebar-title">FOLDERS</div>
-                <div className="gallery-folder-list">
+            <div className="gallery-workspace" style={{ display: 'flex', flexDirection: 'column', gap: '0px' }}>
+              {/* 📁 Gallery Folders Horizontal Tab Bar & Administrative Menu (v0.65b) */}
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between',
+                borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
+                marginBottom: '20px',
+                paddingBottom: '0px',
+                gap: '12px'
+              }}>
+                {/* Horizontal Scrollable Tabs */}
+                <div 
+                  className="folder-tabs-container no-scrollbar" 
+                  style={{ 
+                    display: 'flex',
+                    overflowX: 'auto', 
+                    whiteSpace: 'nowrap', 
+                    padding: '0', 
+                    margin: '0',
+                    gap: '0', 
+                    touchAction: 'pan-x', 
+                    overscrollBehavior: 'contain',
+                    flex: 1
+                  }}
+                >
                   {galleryFolders.map(folder => (
-                    <div 
+                    <button
                       key={folder}
-                      className={`gallery-folder-item ${activeGalleryFolder === folder ? 'active' : ''}`}
+                      className={`folder-tab ${activeGalleryFolder === folder ? 'active' : ''}`}
+                      style={{ 
+                        padding: '10px 16px', 
+                        flexShrink: 0, 
+                        fontSize: '12px',
+                        fontWeight: '900',
+                        letterSpacing: '0.04em',
+                        textTransform: 'uppercase'
+                      }}
                       onClick={() => setActiveGalleryFolder(folder)}
                     >
-                      <span className="folder-name">{folder}</span>
-                    </div>
+                      {folder}
+                    </button>
                   ))}
                 </div>
-                
-                {activeGalleryFolder !== '기본' && (
-                  <div style={{ marginTop: '8px', marginBottom: '8px' }}>
-                    <button 
-                      className="gallery-folder-edit-btn-action"
-                      onClick={() => {
-                        const opt = window.prompt(
-                          `선택된 '${activeGalleryFolder}' 폴더 수정/삭제:\n1을 입력하면 폴더명 변경, 2를 입력하면 폴더 삭제를 진행합니다.`
-                        );
-                        if (opt === '1') {
-                          const newName = window.prompt("새로운 폴더명을 입력하세요:", activeGalleryFolder);
-                          if (newName && newName.trim()) {
-                            const trimmed = newName.trim();
-                            if (galleryFolders.includes(trimmed)) {
-                              triggerToast("이미 존재하는 폴더명입니다.");
-                              return;
-                            }
-                            
-                            // Firestore sync for folder renaming
-                            (async () => {
-                              try {
-                                const nextFolders = galleryFolders.map(f => f === activeGalleryFolder ? trimmed : f);
-                                const foldersDocRef = doc(db, "gallery_meta", "folders");
-                                await setDoc(foldersDocRef, { list: nextFolders });
 
-                                // Update all images in the old folder to the new folder in Firestore
-                                const oldFolder = activeGalleryFolder;
-                                const affectedImages = galleryImages.filter(img => img.folder === oldFolder);
-                                
-                                for (const img of affectedImages) {
-                                  if (!img.isUploading) {
-                                    const imgDocRef = doc(db, "gallery", img.id);
-                                    await updateDoc(imgDocRef, { folder: trimmed });
-                                  }
-                                }
-
-                                setGalleryFolders(nextFolders);
-                                setGalleryImages(prev => prev.map(img => 
-                                  img.folder === oldFolder ? { ...img, folder: trimmed } : img
-                                ));
-                                setActiveGalleryFolder(trimmed);
-                                triggerToast(`폴더명이 '${trimmed}'(으)로 변경되었습니다.`);
-                              } catch (e) {
-                                console.error("Error renaming folder in Firebase:", e);
-                                triggerToast("클라우드 폴더 변경 중 오류가 발생했습니다.");
-                              }
-                            })();
-                          }
-                        } else if (opt === '2') {
-                          if (window.confirm(`선택된 '${activeGalleryFolder}' 폴더를 정말 삭제하시겠습니까?\n폴더 내 모든 이미지는 '기본' 폴더로 안전하게 이동됩니다.`)) {
-                            const folderToDelete = activeGalleryFolder;
-                            
-                            // Firestore sync for folder deletion
-                            (async () => {
-                              try {
-                                const nextFolders = galleryFolders.filter(f => f !== folderToDelete);
-                                const foldersDocRef = doc(db, "gallery_meta", "folders");
-                                await setDoc(foldersDocRef, { list: nextFolders });
-
-                                // Update all images in deleted folder to '기본' in Firestore
-                                const affectedImages = galleryImages.filter(img => img.folder === folderToDelete);
-                                for (const img of affectedImages) {
-                                  if (!img.isUploading) {
-                                    const imgDocRef = doc(db, "gallery", img.id);
-                                    await updateDoc(imgDocRef, { folder: '기본' });
-                                  }
-                                }
-
-                                setGalleryImages(prev => prev.map(img => 
-                                  img.folder === folderToDelete ? { ...img, folder: '기본' } : img
-                                ));
-                                setGalleryFolders(nextFolders);
-                                setActiveGalleryFolder('기본');
-                                triggerToast(`'${folderToDelete}' 폴더가 삭제되었습니다.`);
-                              } catch (e) {
-                                console.error("Error deleting folder in Firebase:", e);
-                                triggerToast("클라우드 폴더 삭제 중 오류가 발생했습니다.");
-                              }
-                            })();
-                          }
-                        }
-                      }}
-                    >
-                      폴더 수정/삭제
-                    </button>
-                  </div>
-                )}
-                
-                <div className="gallery-add-folder">
-                  <input
-                    type="text"
-                    placeholder="New folder..."
-                    value={newFolderName}
-                    onChange={(e) => setNewFolderName(e.target.value)}
-                    className="gallery-folder-input"
-                  />
-                  <button 
-                    onClick={() => {
-                      const trimmed = newFolderName.trim();
-                      if (!trimmed) return;
-                      if (galleryFolders.includes(trimmed)) {
-                        triggerToast("이미 존재하는 폴더 이름입니다.");
-                        return;
-                      }
-                      
-                      // Firestore sync for folder creation
-                      (async () => {
-                        try {
-                          const nextFolders = [...galleryFolders, trimmed];
-                          const foldersDocRef = doc(db, "gallery_meta", "folders");
-                          await setDoc(foldersDocRef, { list: nextFolders });
-                          
-                          setGalleryFolders(nextFolders);
-                          setNewFolderName('');
-                          triggerToast(`'${trimmed}' 폴더가 추가되었습니다.`);
-                        } catch (e) {
-                          console.error("Error adding folder in Firebase:", e);
-                          triggerToast("클라우드 폴더 추가 중 오류가 발생했습니다.");
-                        }
-                      })();
+                {/* Folder Administrative Gear/Hamburger Icon */}
+                <div style={{ position: 'relative', flexShrink: 0 }}>
+                  <button
+                    onClick={() => setIsFolderMenuOpen(!isFolderMenuOpen)}
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      border: 'none',
+                      borderLeft: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
+                      borderRadius: '0px',
+                      background: 'transparent',
+                      color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      outline: 'none'
                     }}
-                    className="gallery-folder-add-btn"
+                    title="Folder Manager"
                   >
-                    + ADD FOLDER
+                    <FolderOpen size={18} />
                   </button>
+
+                  {/* Folder Manager Dropdown Portal */}
+                  <AnimatePresence>
+                    {isFolderMenuOpen && (
+                      <>
+                        <div 
+                          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10000 }}
+                          onClick={() => setIsFolderMenuOpen(false)}
+                        />
+                        <motion.div
+                          initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                          transition={{ duration: 0.15 }}
+                          style={{
+                            position: 'absolute',
+                            top: '42px',
+                            right: '0',
+                            zIndex: 10001,
+                            width: '260px',
+                            backgroundColor: isDarkMode ? '#000000' : '#FFFFFF',
+                            border: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
+                            padding: '16px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '12px',
+                            borderRadius: '0px',
+                            boxShadow: 'none'
+                          }}
+                        >
+                          {/* Rename / Delete Folder Action */}
+                          {activeGalleryFolder !== '기본' && (
+                            <button
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                backgroundColor: 'transparent',
+                                border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                                color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                                fontSize: '11px',
+                                fontWeight: '900',
+                                textTransform: 'uppercase',
+                                cursor: 'pointer',
+                                textAlign: 'center',
+                                outline: 'none'
+                              }}
+                              onClick={() => {
+                                setIsFolderMenuOpen(false);
+                                const opt = window.prompt(
+                                  `선택된 '${activeGalleryFolder}' 폴더 수정/삭제:\n1을 입력하면 폴더명 변경, 2를 입력하면 폴더 삭제를 진행합니다.`
+                                );
+                                if (opt === '1') {
+                                  const newName = window.prompt("새로운 폴더명을 입력하세요:", activeGalleryFolder);
+                                  if (newName && newName.trim()) {
+                                    const trimmed = newName.trim();
+                                    if (galleryFolders.includes(trimmed)) {
+                                      triggerToast("이미 존재하는 폴더명입니다.");
+                                      return;
+                                    }
+                                    (async () => {
+                                      try {
+                                        const nextFolders = galleryFolders.map(f => f === activeGalleryFolder ? trimmed : f);
+                                        const foldersDocRef = doc(db, "gallery_meta", "folders");
+                                        await setDoc(foldersDocRef, { list: nextFolders });
+                                        
+                                        const oldFolder = activeGalleryFolder;
+                                        const affectedImages = galleryImages.filter(img => img.folder === oldFolder);
+                                        for (const img of affectedImages) {
+                                          if (!img.isUploading) {
+                                            const imgDocRef = doc(db, "gallery", img.id);
+                                            await updateDoc(imgDocRef, { folder: trimmed });
+                                          }
+                                        }
+                                        
+                                        setGalleryFolders(nextFolders);
+                                        setGalleryImages(prev => prev.map(img => 
+                                          img.folder === oldFolder ? { ...img, folder: trimmed } : img
+                                        ));
+                                        setActiveGalleryFolder(trimmed);
+                                        triggerToast(`폴더명이 '${trimmed}'(으)로 변경되었습니다.`);
+                                      } catch (e) {
+                                        console.error("Error renaming folder in Firebase:", e);
+                                        triggerToast("클라우드 폴더 변경 중 오류가 발생했습니다.");
+                                      }
+                                    })();
+                                  }
+                                } else if (opt === '2') {
+                                  if (window.confirm(`선택된 '${activeGalleryFolder}' 폴더를 정말 삭제하시겠습니까?\n폴더 내 모든 이미지는 '기본' 폴더로 안전하게 이동됩니다.`)) {
+                                    const folderToDelete = activeGalleryFolder;
+                                    (async () => {
+                                      try {
+                                        const nextFolders = galleryFolders.filter(f => f !== folderToDelete);
+                                        const foldersDocRef = doc(db, "gallery_meta", "folders");
+                                        await setDoc(foldersDocRef, { list: nextFolders });
+                                        
+                                        const affectedImages = galleryImages.filter(img => img.folder === folderToDelete);
+                                        for (const img of affectedImages) {
+                                          if (!img.isUploading) {
+                                            const imgDocRef = doc(db, "gallery", img.id);
+                                            await updateDoc(imgDocRef, { folder: '기본' });
+                                          }
+                                        }
+                                        
+                                        setGalleryImages(prev => prev.map(img => 
+                                          img.folder === folderToDelete ? { ...img, folder: '기본' } : img
+                                        ));
+                                        setGalleryFolders(nextFolders);
+                                        setActiveGalleryFolder('기본');
+                                        triggerToast(`'${folderToDelete}' 폴더가 삭제되었습니다.`);
+                                      } catch (e) {
+                                        console.error("Error deleting folder in Firebase:", e);
+                                        triggerToast("클라우드 폴더 삭제 중 오류가 발생했습니다.");
+                                      }
+                                    })();
+                                  }
+                                }
+                              }}
+                            >
+                              📁 MODIFY/DELETE FOLDER
+                            </button>
+                          )}
+
+                          {activeGalleryFolder !== '기본' && <div style={{ height: '1px', backgroundColor: isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,34,255,0.2)' }} />}
+
+                          {/* Add New Folder Sub-panel */}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', textTransform: 'uppercase', textAlign: 'left' }}>Add Folder</div>
+                            <input
+                              type="text"
+                              placeholder="Folder name..."
+                              value={newFolderName}
+                              onChange={(e) => setNewFolderName(e.target.value)}
+                              style={{
+                                width: '100%',
+                                padding: '8px 10px',
+                                fontSize: '12px',
+                                backgroundColor: isDarkMode ? '#111111' : '#F9F9F9',
+                                border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                                color: isDarkMode ? '#FFFFFF' : '#000000',
+                                outline: 'none',
+                                borderRadius: '0px'
+                              }}
+                            />
+                            <button
+                              style={{
+                                width: '100%',
+                                padding: '8px',
+                                backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+                                color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                                fontSize: '11px',
+                                fontWeight: '900',
+                                border: 'none',
+                                cursor: 'pointer',
+                                textTransform: 'uppercase'
+                              }}
+                              onClick={() => {
+                                const trimmed = newFolderName.trim();
+                                if (!trimmed) return;
+                                if (galleryFolders.includes(trimmed)) {
+                                  triggerToast("이미 존재하는 폴더 이름입니다.");
+                                  return;
+                                }
+                                (async () => {
+                                  try {
+                                    const nextFolders = [...galleryFolders, trimmed];
+                                    const foldersDocRef = doc(db, "gallery_meta", "folders");
+                                    await setDoc(foldersDocRef, { list: nextFolders });
+                                    
+                                    setGalleryFolders(nextFolders);
+                                    setNewFolderName('');
+                                    setIsFolderMenuOpen(false);
+                                    setActiveGalleryFolder(trimmed);
+                                    triggerToast(`'${trimmed}' 폴더가 추가되었습니다.`);
+                                  } catch (e) {
+                                    console.error("Error adding folder in Firebase:", e);
+                                    triggerToast("클라우드 폴더 추가 중 오류가 발생했습니다.");
+                                  }
+                                })();
+                              }}
+                            >
+                              + ADD FOLDER
+                            </button>
+                          </div>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
 
