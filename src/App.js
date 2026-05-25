@@ -327,6 +327,7 @@ export default function App() {
   const [lightboxLoaded, setLightboxLoaded] = useState(false);
   const [gallerySortOrder, setGallerySortOrder] = useState('newest');
   const [isZoomed, setIsZoomed] = useState(false);
+  const [isShaking, setIsShaking] = useState(false);
   const lastTapRef = useRef(0);
   const touchStartXRef = useRef(0);
 
@@ -1063,6 +1064,10 @@ export default function App() {
       triggerToast("먼저 스마트 씬을 선택해주세요!");
       return;
     }
+
+    // 셔플 시 기하 도형 좌우 까딱 모션 활성화 (duration: 400ms)
+    setIsShaking(true);
+    setTimeout(() => setIsShaking(false), 400);
 
     let targetConfig = { ...config };
     let marqueeMsg = "";
@@ -2086,6 +2091,7 @@ export default function App() {
                 )}
 
                 <motion.img 
+                  key={lightboxImage}
                   drag="x"
                   dragConstraints={{ left: 0, right: 0 }}
                   dragElastic={0.6}
@@ -3199,10 +3205,15 @@ export default function App() {
                     {/* 기하학 도형 회전/스케일 팝 모션 래퍼 */}
                     <motion.div
                       animate={{ 
-                        rotate: isActive ? 180 : 0, 
+                        rotate: isShaking 
+                          ? (isActive ? [180, 195, 165, 180] : [0, 15, -15, 0])
+                          : (isActive ? 180 : 0), 
                         scale: isActive ? 1.25 : 1 
                       }}
-                      transition={{ 
+                      transition={isShaking ? {
+                        duration: 0.4,
+                        ease: "easeInOut"
+                      } : { 
                         type: "spring", 
                         stiffness: 180, 
                         damping: 14 
