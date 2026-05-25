@@ -2092,6 +2092,13 @@ export default function App() {
 
                 <motion.img 
                   key={lightboxImage}
+                  ref={(el) => {
+                    if (el) {
+                      if (el.complete) {
+                        setLightboxLoaded(true);
+                      }
+                    }
+                  }}
                   drag="x"
                   dragConstraints={{ left: 0, right: 0 }}
                   dragElastic={0.6}
