@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders, Zap, Shuffle, ChevronLeft, ChevronRight, FolderOpen, RotateCw
+  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders, Zap, Shuffle, ChevronLeft, ChevronRight, FolderOpen, RotateCw, Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db, auth, storage } from './firebase';
@@ -318,9 +318,13 @@ export default function App() {
   const [galleryImages, setGalleryImages] = useState([]);
   const [galleryFolders, setGalleryFolders] = useState(['기본', '인물', '공간', '사물']);
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
-  const [activeGalleryFolder, setActiveGalleryFolder] = useState('기본');
+  const [activeGalleryFolder, setActiveGalleryFolder] = useState('전체');
   const [newFolderName, setNewFolderName] = useState('');
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
+  const [activeEditImage, setActiveEditImage] = useState(null);
+  const [gallerySortOrder, setGallerySortOrder] = useState('newest');
+  const [isZoomed, setIsZoomed] = useState(false);
+  const lastTapRef = useRef(0);
 
   // Rename Modal State
   const [renameTarget, setRenameTarget] = useState(null); // { id, name }
@@ -335,10 +339,12 @@ export default function App() {
   const [activeLibraryTemplateId, setActiveLibraryTemplateId] = useState(null);
   const [aboutModalTarget, setAboutModalTarget] = useState(null);
 
-  // 1. Firebase Gallery & Folders Load (컴포넌트 레벨 공용 함수)
-  const fetchGalleryData = async () => {
+  // 1. Firebase Gallery & Folders Load (컴포넌트 레벨 공용 함수, Stale-While-Revalidate 캐싱)
+  const fetchGalleryData = async (force = false) => {
     try {
-      setIsGalleryLoading(true);
+      if (force || galleryImages.length === 0) {
+        setIsGalleryLoading(true);
+      }
       const foldersDocRef = doc(db, "gallery_meta", "folders");
       const foldersDocSnap = await getDoc(foldersDocRef);
       let currentFolders = ['기본', '인물', '공간', '사물'];
@@ -369,7 +375,7 @@ export default function App() {
   };
 
   // 2. 다이렉트 이미지 참조 지정 헬퍼 (USE REF)
-  const handleApplyAsReference = async (imageUrl) => {
+  const handleApplyAsReference = async (imageUrl, stayInGallery = false) => {
     try {
       triggerToast("이미지를 참조 이미지로 변환 중...");
       
@@ -383,7 +389,9 @@ export default function App() {
           data: reader.result.split(',')[1]
         });
         setUseImageRef(true);
-        setCurrentMode('mix'); // 즉시 Mix 모드로 전환하여 이미지 확인 지원
+        if (!stayInGallery) {
+          setCurrentMode('mix'); // 즉시 Mix 모드로 전환하여 이미지 확인 지원
+        }
         triggerToast("이미지 참조 모드로 지정되었습니다!");
       };
       reader.readAsDataURL(blob);
@@ -391,6 +399,105 @@ export default function App() {
       console.error("❌ Gallery to Ref conversion failed:", err);
       triggerToast("변환 실패: 외부 리소스의 CORS 구성을 확인해 주세요.");
     }
+  };
+
+  // 2.5. ➔ APPLY 버튼 통합 핸들러 (복사 + generatedPrompt + refImage + Mix 이동 배제)
+  const handleApplyImagePromptAndRef = async (img) => {
+    if (img.prompt) {
+      navigator.clipboard.writeText(img.prompt);
+      setGeneratedPrompt(img.prompt);
+    }
+    await handleApplyAsReference(img.url, true);
+    triggerToast("프롬프트 복사 및 참조 이미지 지정 완료!");
+  };
+
+  // 2.6. Cross-Platform 지능형 이미지 다운로더
+  const handleDownloadImage = async (imageUrl) => {
+    try {
+      triggerToast("이미지 다운로드를 시작합니다...");
+      if (imageUrl.startsWith('blob:') || imageUrl.startsWith('data:')) {
+        const link = document.createElement('a');
+        link.href = imageUrl;
+        link.download = `shotmaker_${Date.now()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        triggerToast("다운로드 완료!");
+        return;
+      }
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `shotmaker_${Date.now()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+      triggerToast("다운로드 완료!");
+    } catch (err) {
+      console.warn("Blob downloader failed, using Safari/mobile fallback:", err);
+      window.open(imageUrl, '_blank');
+      triggerToast("새 창이 열렸습니다. 길게 눌러 사진첩에 저장해 주세요!");
+    }
+  };
+
+  // 2.7. 개별 이미지 폴더 이동 헬퍼
+  const handleMoveImageFolder = async (img, destFolder) => {
+    try {
+      if (img.id.startsWith('temp_')) {
+        setGalleryImages(prev => prev.map(i => 
+          i.id === img.id ? { ...i, folder: destFolder } : i
+        ));
+        setActiveEditImage(prev => prev ? { ...prev, folder: destFolder } : null);
+        triggerToast(`이미지가 '${destFolder}' 폴더로 이동되었습니다.`);
+        return;
+      }
+      const imgDocRef = doc(db, "gallery", img.id);
+      await updateDoc(imgDocRef, { folder: destFolder });
+      setGalleryImages(prev => prev.map(i => 
+        i.id === img.id ? { ...i, folder: destFolder } : i
+      ));
+      setActiveEditImage(prev => prev ? { ...prev, folder: destFolder } : null);
+      triggerToast(`이미지가 '${destFolder}' 폴더로 이동되었습니다.`);
+    } catch (err) {
+      console.error("Error moving image in Firestore:", err);
+      triggerToast("클라우드 이미지 이동 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 2.8. 개별 이미지 삭제 헬퍼
+  const handleDeleteGalleryImage = async (img) => {
+    if (!window.confirm("이 이미지를 정말 삭제하시겠습니까?")) return;
+    try {
+      if (img.id.startsWith('temp_')) {
+        setGalleryImages(prev => prev.filter(i => i.id !== img.id));
+        setActiveEditImage(null);
+        triggerToast("이미지가 삭제되었습니다.");
+        return;
+      }
+      const imgDocRef = doc(db, "gallery", img.id);
+      await deleteDoc(imgDocRef);
+      if (img.storagePath) {
+        const storageRef = ref(storage, img.storagePath);
+        await deleteObject(storageRef).catch(err => {
+          console.warn("Storage file delete failed or didn't exist:", err);
+        });
+      }
+      setGalleryImages(prev => prev.filter(i => i.id !== img.id));
+      setActiveEditImage(null);
+      triggerToast("이미지가 삭제되었습니다.");
+    } catch (err) {
+      console.error("Error deleting image in Firebase:", err);
+      triggerToast("클라우드 이미지 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 2.9. 에디트 모달 전용 수동 싱크 연계
+  const handleEditModalSync = async (img) => {
+    setActiveEditImage(null);
+    await handleGalleryManualSync(img);
   };
 
   // 3. 갤러리 피드 내 즉시 개별 수동 싱크 (SYNC)
@@ -473,6 +580,7 @@ export default function App() {
       setActiveMarquee("ABOUT: Learn the core concepts and workflows of Professional Shot Maker...");
     } else if (currentMode === 'gallery') {
       setActiveMarquee("GALLERY Active: Organize and browse your generated images by custom folders...");
+      fetchGalleryData(false);
     } else if (currentMode === 'smart') {
       if (!activeMarquee.includes("SCENE") && !activeMarquee.includes("Shuffle")) {
         setActiveMarquee("SMART MODE Active: Select a template for instant commercial setup...");
@@ -1087,12 +1195,13 @@ export default function App() {
     const tempId = `upload_${Date.now()}`;
     const localUrl = URL.createObjectURL(file);
     
+    const uploadFolder = activeGalleryFolder === '전체' ? '기본' : activeGalleryFolder;
     const tempImg = {
       id: tempId,
       url: localUrl,
       prompt: `Uploading: ${file.name}`,
       timestamp: new Date().toISOString(),
-      folder: activeGalleryFolder,
+      folder: uploadFolder,
       isTemp: true,
       isUploading: true
     };
@@ -1118,7 +1227,7 @@ export default function App() {
         storagePath: safeFileName,
         prompt: `Uploaded Image: ${file.name}`,
         timestamp: new Date().toISOString(),
-        folder: activeGalleryFolder
+        folder: uploadFolder
       };
       
       const docRef = await addDoc(collection(db, "gallery"), firestoreData);
@@ -1129,7 +1238,7 @@ export default function App() {
         storagePath: safeFileName,
         prompt: firestoreData.prompt,
         timestamp: firestoreData.timestamp,
-        folder: activeGalleryFolder,
+        folder: uploadFolder,
         isTemp: false
       };
       
@@ -1728,30 +1837,370 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.65 | Shot Maker Workspace
+              v0.65D | Shot Maker Workspace
             </div>
           </div>
         </div>
       )}
       {/* 🖼️ Lightbox Modal */}
       <AnimatePresence>
-        {lightboxImage && (
+        {lightboxImage && (() => {
+          const filteredSortedImages = [...galleryImages]
+            .filter(img => activeGalleryFolder === '전체' ? true : img.folder === activeGalleryFolder)
+            .sort((a, b) => {
+              const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+              const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+              return gallerySortOrder === 'newest' ? timeB - timeA : timeA - timeB;
+            });
+
+          const activeIndex = filteredSortedImages.findIndex(img => img.url === lightboxImage);
+
+          const handlePrevLightboxImage = (e) => {
+            e.stopPropagation();
+            if (activeIndex > 0) {
+              setLightboxImage(filteredSortedImages[activeIndex - 1].url);
+              setIsZoomed(false);
+            }
+          };
+
+          const handleNextLightboxImage = (e) => {
+            e.stopPropagation();
+            if (activeIndex < filteredSortedImages.length - 1) {
+              setLightboxImage(filteredSortedImages[activeIndex + 1].url);
+              setIsZoomed(false);
+            }
+          };
+
+          const handleImageTap = (e) => {
+            e.stopPropagation();
+            const now = Date.now();
+            const DOUBLE_PRESS_DELAY = 300;
+            if (now - lastTapRef.current < DOUBLE_PRESS_DELAY) {
+              setIsZoomed(prev => !prev);
+            }
+            lastTapRef.current = now;
+          };
+
+          return (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="ios-lightbox"
+              onClick={() => { setLightboxImage(null); setIsZoomed(false); }}
+              style={{ zIndex: 400000 }}
+            >
+              {/* Prev Button */}
+              {activeIndex > 0 && (
+                <button 
+                  onClick={handlePrevLightboxImage}
+                  style={{
+                    position: 'absolute',
+                    left: '20px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '40px',
+                    height: '40px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10
+                  }}
+                  title="Previous Image"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+              )}
+
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="ios-lightbox-content"
+                onClick={(e) => e.stopPropagation()}
+                style={{ position: 'relative', overflow: 'hidden' }}
+              >
+                <img 
+                  src={lightboxImage} 
+                  alt="Fullscreen" 
+                  className="ios-lightbox-img" 
+                  onClick={handleImageTap}
+                  style={{
+                    transform: isZoomed ? 'scale(1.8)' : 'scale(1)',
+                    transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                    cursor: isZoomed ? 'zoom-out' : 'zoom-in',
+                    maxHeight: '80vh',
+                    maxWidth: '90vw',
+                    objectFit: 'contain'
+                  }}
+                />
+                <button 
+                  className="ios-lightbox-close" 
+                  onClick={() => { setLightboxImage(null); setIsZoomed(false); }}
+                  style={{ zIndex: 20 }}
+                >
+                  ✕
+                </button>
+              </motion.div>
+
+              {/* Next Button */}
+              {activeIndex < filteredSortedImages.length - 1 && (
+                <button 
+                  onClick={handleNextLightboxImage}
+                  style={{
+                    position: 'absolute',
+                    right: '20px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '40px',
+                    height: '40px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10
+                  }}
+                  title="Next Image"
+                >
+                  <ChevronRight size={24} />
+                </button>
+              )}
+
+              {/* Downloader & Copy Bar */}
+              <div 
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  position: 'absolute',
+                  bottom: '20px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  backgroundColor: 'rgba(0,0,0,0.75)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  padding: '10px 20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  zIndex: 10,
+                  maxWidth: '90vw'
+                }}
+              >
+                <button
+                  onClick={() => handleDownloadImage(lightboxImage)}
+                  style={{
+                    backgroundColor: '#0022FF',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    padding: '6px 12px',
+                    fontSize: '11px',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <Download size={12} />
+                  <span>DOWNLOAD</span>
+                </button>
+                {filteredSortedImages[activeIndex]?.prompt && (
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(filteredSortedImages[activeIndex].prompt);
+                      triggerToast("프롬프트가 복사되었습니다!");
+                    }}
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: '#FFFFFF',
+                      border: '1px solid rgba(255,255,255,0.5)',
+                      padding: '6px 12px',
+                      fontSize: '11px',
+                      fontWeight: 'bold',
+                      textTransform: 'uppercase',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <Copy size={12} />
+                    <span>COPY PROMPT</span>
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          );
+        })()}
+      </AnimatePresence>
+
+      {/* 📦 Edit Gallery Image Modal */}
+      <AnimatePresence>
+        {activeEditImage && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="ios-lightbox"
-            onClick={() => setLightboxImage(null)}
+            className="settings-modal-overlay"
+            style={{ zIndex: 300000, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}
+            onClick={() => setActiveEditImage(null)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="ios-lightbox-content"
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="settings-modal"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                maxHeight: '85vh',
+                padding: '24px',
+                borderRadius: '0px',
+                backgroundColor: isDarkMode ? '#000000' : '#FFFFFF',
+                border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                boxShadow: 'none',
+                width: '90%',
+                maxWidth: '400px'
+              }}
               onClick={(e) => e.stopPropagation()}
             >
-              <img src={lightboxImage} alt="Fullscreen" className="ios-lightbox-img" />
-              <button className="ios-lightbox-close" onClick={() => setLightboxImage(null)}>✕</button>
+              <h3 style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF', margin: '0 0 4px 0' }} className="text-[20px] font-black tracking-tight text-center uppercase">Edit Image</h3>
+              <p className="text-[11px] font-bold text-gray-400 mb-6 text-center">폴더 이동, 이미지 동기화 및 영구 삭제</p>
+
+              {/* 1. Thumbnail & Prompt preview */}
+              <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', borderBottom: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid #0022FF', paddingBottom: '16px' }}>
+                <img 
+                  src={activeEditImage.url} 
+                  alt="Edit target preview" 
+                  style={{ width: '80px', height: '80px', objectFit: 'cover', border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF' }} 
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div style={{
+                    fontSize: '9px',
+                    fontWeight: '900',
+                    backgroundColor: (activeEditImage.isTemp || activeEditImage.id.startsWith('temp_')) ? '#FF3B30' : '#0022FF',
+                    color: '#FFFFFF',
+                    padding: '2px 6px',
+                    borderRadius: '2px',
+                    width: 'fit-content',
+                    marginBottom: '6px',
+                    letterSpacing: '0.05em'
+                  }}>
+                    {(activeEditImage.isTemp || activeEditImage.id.startsWith('temp_')) ? 'LOCAL ONLY' : 'SYNCED'}
+                  </div>
+                  <p style={{
+                    fontSize: '11px',
+                    color: isDarkMode ? '#FFFFFF' : '#000000',
+                    margin: 0,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    lineHeight: 1.4,
+                    textAlign: 'left'
+                  }}>
+                    {activeEditImage.prompt}
+                  </p>
+                </div>
+              </div>
+
+              {/* 2. Folder Move Selector */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+                <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', textTransform: 'uppercase', textAlign: 'left' }}>Move to Folder</div>
+                <select
+                  value={activeEditImage.folder || '기본'}
+                  onChange={(e) => {
+                    const destFolder = e.target.value;
+                    handleMoveImageFolder(activeEditImage, destFolder);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    backgroundColor: isDarkMode ? '#1C1C1E' : '#F8F8FF',
+                    color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                    border: isDarkMode ? '1px solid rgba(255,255,255,0.3)' : '1px solid #0022FF',
+                    borderRadius: '0px',
+                    fontWeight: 'bold',
+                    fontSize: '12px',
+                    outline: 'none'
+                  }}
+                >
+                  {galleryFolders.map(f => (
+                    <option key={f} value={f}>{f}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 3. Manual sync for local-only */}
+              {(activeEditImage.isTemp || activeEditImage.id.startsWith('temp_')) && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+                  <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', textTransform: 'uppercase', textAlign: 'left' }}>Cloud Backup</div>
+                  <button
+                    onClick={() => handleEditModalSync(activeEditImage)}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+                      color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                      border: 'none',
+                      borderRadius: '0px',
+                      fontWeight: '900',
+                      fontSize: '11px',
+                      textTransform: 'uppercase',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    ☁️ SYNC TO CLOUD
+                  </button>
+                </div>
+              )}
+
+              {/* 4. Action Buttons */}
+              <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
+                <button
+                  onClick={() => handleDeleteGalleryImage(activeEditImage)}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    backgroundColor: '#FF3B30',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '0px',
+                    fontWeight: '900',
+                    fontSize: '11px',
+                    textTransform: 'uppercase',
+                    cursor: 'pointer'
+                  }}
+                >
+                  DELETE IMAGE
+                </button>
+                <button
+                  onClick={() => setActiveEditImage(null)}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    backgroundColor: 'transparent',
+                    color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                    border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                    borderRadius: '0px',
+                    fontWeight: '900',
+                    fontSize: '11px',
+                    textTransform: 'uppercase',
+                    cursor: 'pointer'
+                  }}
+                >
+                  CLOSE
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -3303,27 +3752,11 @@ export default function App() {
                   width: '100%'
                 }}
               >
-                {galleryFolders.map(folder => (
+                {['전체', ...galleryFolders].map(folder => (
                   <button
                     key={folder}
                     className={`folder-tab ${activeGalleryFolder === folder ? 'active' : ''}`}
-                    style={{ 
-                      padding: '10px 16px', 
-                      flexShrink: 0, 
-                      fontSize: '12px',
-                      fontWeight: '900',
-                      letterSpacing: '0.04em',
-                      textTransform: 'uppercase',
-                      background: 'transparent',
-                      border: 'none',
-                      color: activeGalleryFolder === folder 
-                        ? (isDarkMode ? '#FFFFFF' : '#0022FF') 
-                        : (isDarkMode ? 'rgba(255,255,255,0.45)' : 'rgba(0,34,255,0.45)'),
-                      borderBottom: activeGalleryFolder === folder 
-                        ? `3px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}` 
-                        : '3px solid transparent',
-                      borderRadius: '0px'
-                    }}
+                    style={{ padding: '8px 12px', flexShrink: 0, flex: 'none' }}
                     onClick={() => setActiveGalleryFolder(folder)}
                   >
                     {folder}
@@ -3397,6 +3830,10 @@ export default function App() {
                             onClick={() => {
                               const trimmed = newFolderName.trim();
                               if (!trimmed) return;
+                              if (trimmed === '전체') {
+                                triggerToast("'전체'는 예약된 고유 탭 이름입니다.");
+                                return;
+                              }
                               if (galleryFolders.includes(trimmed)) {
                                 triggerToast("이미 존재하는 폴더 이름입니다.");
                                 return;
@@ -3439,13 +3876,15 @@ export default function App() {
                             📁 {activeGalleryFolder.toUpperCase()}
                           </span>
                           <span style={{ fontSize: '10px', fontWeight: '800', color: '#AEAEB2' }}>
-                            {galleryImages.filter(img => img.folder === activeGalleryFolder).length} ITEMS
+                            {activeGalleryFolder === '전체' 
+                              ? galleryImages.length 
+                              : galleryImages.filter(img => img.folder === activeGalleryFolder).length} ITEMS
                           </span>
                         </div>
 
-                        {activeGalleryFolder === '기본' ? (
+                        {(activeGalleryFolder === '기본' || activeGalleryFolder === '전체') ? (
                           <p style={{ fontSize: '11px', color: '#AEAEB2', margin: 0, textAlign: 'left', lineHeight: 1.5 }}>
-                            💡 '기본' 폴더는 고유 탭으로 이름 변경이나 삭제가 비활성화됩니다. 다른 탭을 선택하고 모달을 열면 수정 및 삭제할 수 있습니다.
+                            💡 '기본' 및 '전체' 탭은 시스템 고유 탭으로 이름 변경이나 삭제가 비활성화됩니다. 다른 탭을 선택하고 작업해 주세요.
                           </p>
                         ) : (
                           <div style={{ display: 'flex', gap: '8px' }}>
@@ -3580,311 +4019,279 @@ export default function App() {
 
               {/* Right panel: Active folder images wrapped in folder-content-envelope */}
               <div className="folder-content-envelope gallery-envelope" style={{ padding: '0px' }}>
-                <div className="gallery-main" style={{ border: 'none', background: 'transparent' }}>
-                  <div className="gallery-main-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 16px', borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <span className="gallery-image-count">
-                        {galleryImages.filter(img => img.folder === activeGalleryFolder).length} images
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <button
-                        onClick={() => fetchGalleryData()}
-                        disabled={isGalleryLoading}
-                        style={{
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'center', 
-                          backgroundColor: 'transparent',
-                          color: isDarkMode ? '#FFFFFF' : '#0022FF',
-                          border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
-                          borderRadius: '2px',
-                          padding: '6px 10px',
-                          height: '32px',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s',
-                          margin: 0
-                        }}
-                        title="Refresh"
-                      >
-                        <RotateCw size={14} style={{ animation: isGalleryLoading ? 'spin 1s linear infinite' : 'none' }} />
-                      </button>
+                {(() => {
+                  const sortedImages = [...galleryImages]
+                    .filter(img => activeGalleryFolder === '전체' ? true : img.folder === activeGalleryFolder)
+                    .sort((a, b) => {
+                      const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+                      const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+                      return gallerySortOrder === 'newest' ? timeB - timeA : timeA - timeB;
+                    });
 
-                      <label 
-                        htmlFor="gallery-file-upload" 
-                        className="swiss-copy-tab" 
-                        style={{ 
-                          cursor: 'pointer', 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'center',
-                          gap: '6px', 
-                          backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                          color: isDarkMode ? '#0022FF' : '#FFFFFF',
-                          border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
-                          borderRadius: '2px',
-                          padding: '6px 14px',
-                          fontSize: '11px',
-                          fontWeight: '900',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.08em',
-                          transition: 'all 0.2s',
-                          margin: 0,
-                          height: '32px',
-                          boxSizing: 'border-box'
-                        }}
-                      >
-                        <Zap size={11} />
-                        <span>UPLOAD</span>
-                      </label>
-                      <input 
-                        id="gallery-file-upload" 
-                        type="file" 
-                        accept="image/*" 
-                        style={{ display: 'none' }} 
-                        onChange={handleExternalImageUpload}
-                      />
-
-                      {/* Folder Administrative Hamburger Icon (Bare icon, v0.65d refinements) */}
-                      <button
-                        onClick={() => setIsFolderModalOpen(true)}
-                        style={{
-                          width: '32px',
-                          height: '32px',
-                          border: 'none',
-                          background: 'transparent',
-                          color: isDarkMode ? '#FFFFFF' : '#0022FF',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer',
-                          outline: 'none',
-                          margin: 0,
-                          padding: 0
-                        }}
-                        title="Manage Tabs"
-                      >
-                        <Menu size={18} />
-                      </button>
-                    </div>
-                  </div>
-
-                <div className="gallery-grid-container">
-                  {isGalleryLoading ? (
-                    <div className="gallery-empty-state" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '200px' }}>
-                      <div 
-                        style={{
-                          width: '32px',
-                          height: '32px',
-                          border: '2px solid rgba(0, 34, 255, 0.2)',
-                          borderTop: isDarkMode ? '2px solid #FFFFFF' : '2px solid #0022FF',
-                          borderRadius: '50%',
-                          animation: 'spin 1s linear infinite',
-                          marginBottom: '16px'
-                        }}
-                      />
-                      <span className="gallery-empty-text">LOADING CLOUD GALLERY...</span>
-                    </div>
-                  ) : galleryImages.filter(img => img.folder === activeGalleryFolder).length === 0 ? (
-                    <div className="gallery-empty-state" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '200px' }}>
-                      <span className="gallery-empty-text">NO IMAGES IN THIS FOLDER</span>
-                    </div>
-                  ) : (
-                    <div className="gallery-grid">
-                      {galleryImages.filter(img => img.folder === activeGalleryFolder).map(img => (
-                        <div key={img.id} className="gallery-item-card" style={{ position: 'relative' }}>
-                          {/* 뱃지 배치 */}
-                          {(img.isTemp || img.id.startsWith('temp_')) ? (
-                            <div style={{
-                              position: 'absolute',
-                              top: '8px',
-                              right: '8px',
-                              backgroundColor: '#FF3B30',
-                              color: '#FFFFFF',
-                              fontSize: '9px',
-                              fontWeight: '900',
-                              padding: '3px 6px',
-                              borderRadius: '2px',
-                              zIndex: 10,
-                              letterSpacing: '0.05em'
+                  return (
+                    <div className="gallery-main" style={{ border: 'none', background: 'transparent' }}>
+                      <div className="gallery-main-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 16px', borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <span className="gallery-image-count" style={{ display: 'flex', alignItems: 'baseline', gap: '6px', whiteSpace: 'nowrap' }}>
+                            <span style={{ 
+                              fontSize: '26px', 
+                              fontWeight: '955', 
+                              color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                              fontFamily: 'Inter, sans-serif'
                             }}>
-                              LOCAL ONLY
-                            </div>
-                          ) : (
-                            <div style={{
-                              position: 'absolute',
-                              top: '8px',
-                              right: '8px',
-                              backgroundColor: '#0022FF',
-                              color: '#FFFFFF',
-                              fontSize: '9px',
-                              fontWeight: '900',
-                              padding: '3px 6px',
-                              borderRadius: '2px',
-                              zIndex: 10,
-                              letterSpacing: '0.05em'
+                              {sortedImages.length}
+                            </span>
+                            <span style={{ 
+                              fontSize: '11px', 
+                              fontWeight: '900', 
+                              color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                              letterSpacing: '0.08em',
+                              fontFamily: 'Inter, sans-serif'
                             }}>
-                              CLOUD SECURED
-                            </div>
-                          )}
-
-                          <div className="gallery-image-wrapper">
-                            <GalleryImage 
-                              src={img.url} 
-                              alt="Gallery Item" 
-                              onClick={() => setLightboxImage(img.url)}
-                              className="gallery-thumbnail cursor-zoom-in"
-                            />
-                          </div>
-                          
-                          <div className="gallery-item-meta">
-                            <p className="gallery-item-prompt" title={img.prompt}>
-                              {img.prompt || 'No Prompt Info'}
-                            </p>
-
-                            <div className="gallery-item-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
-                              <button
-                                onClick={() => handleApplyAsReference(img.url)}
-                                className="gallery-item-btn"
-                                style={{
-                                  background: 'transparent',
-                                  border: '1px solid #0022FF',
-                                  color: '#0022FF',
-                                  fontWeight: '900',
-                                  fontSize: '9px',
-                                  padding: '3px 5px',
-                                  borderRadius: '2px',
-                                  cursor: 'pointer'
-                                }}
-                              >
-                                USE REF
-                              </button>
-
-                              {(img.isTemp || img.id.startsWith('temp_')) && (
-                                <button
-                                  disabled={img.isUploading}
-                                  onClick={() => handleGalleryManualSync(img)}
-                                  className="gallery-item-btn"
-                                  style={{
-                                    background: '#0022FF',
-                                    border: '1px solid #0022FF',
-                                    color: '#FFFFFF',
-                                    fontWeight: '900',
-                                    fontSize: '9px',
-                                    padding: '3px 5px',
-                                    borderRadius: '2px',
-                                    cursor: img.isUploading ? 'not-allowed' : 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '4px'
-                                  }}
-                                >
-                                  {img.isUploading ? (
-                                    <>
-                                      <div style={{
-                                        width: '8px',
-                                        height: '8px',
-                                        border: '1.5px solid rgba(255,255,255,0.3)',
-                                        borderTop: '1.5px solid #FFFFFF',
-                                        borderRadius: '50%',
-                                        animation: 'spin 0.6s linear infinite'
-                                      }} />
-                                      <span>SYNCING</span>
-                                    </>
-                                  ) : (
-                                    <span>SYNC</span>
-                                  )}
-                                </button>
-                              )}
-
-                              <button 
-                                className="gallery-item-btn" 
-                                onClick={() => {
-                                  navigator.clipboard.writeText(img.prompt);
-                                  triggerToast("프롬프트가 복사되었습니다!");
-                                }}
-                              >
-                                COPY
-                              </button>
-                              
-                              <select 
-                                className="gallery-move-select"
-                                value={img.folder || '기본'}
-                                onChange={(e) => {
-                                  const destFolder = e.target.value;
-                                  if (img.id.startsWith('temp_')) {
-                                    setGalleryImages(prev => prev.map(i => 
-                                      i.id === img.id ? { ...i, folder: destFolder } : i
-                                    ));
-                                    triggerToast(`이미지가 '${destFolder}' 폴더로 이동되었습니다.`);
-                                    return;
-                                  }
-
-                                  (async () => {
-                                    try {
-                                      const imgDocRef = doc(db, "gallery", img.id);
-                                      await updateDoc(imgDocRef, { folder: destFolder });
-                                      setGalleryImages(prev => prev.map(i => 
-                                        i.id === img.id ? { ...i, folder: destFolder } : i
-                                      ));
-                                      triggerToast(`이미지가 '${destFolder}' 폴더로 이동되었습니다.`);
-                                    } catch (err) {
-                                      console.error("Error moving image in Firestore:", err);
-                                      triggerToast("클라우드 이미지 이동 중 오류가 발생했습니다.");
-                                    }
-                                  })();
-                                }}
-                                style={{ flexGrow: 1, minWidth: '45px', padding: '2px' }}
-                              >
-                                {galleryFolders.map(f => (
-                                  <option key={f} value={f}>{f}</option>
-                                ))}
-                              </select>
-
-                              <button 
-                                className="gallery-item-delete"
-                                onClick={() => {
-                                  if (window.confirm("이 이미지를 삭제하시겠습니까?")) {
-                                    if (img.id.startsWith('temp_')) {
-                                      setGalleryImages(prev => prev.filter(i => i.id !== img.id));
-                                      triggerToast("이미지가 삭제되었습니다.");
-                                      return;
-                                    }
-
-                                    (async () => {
-                                      try {
-                                        // Delete Firestore Document
-                                        const imgDocRef = doc(db, "gallery", img.id);
-                                        await deleteDoc(imgDocRef);
-                                        
-                                        // Delete Firebase Storage Object if storagePath exists
-                                        if (img.storagePath) {
-                                          const storageRef = ref(storage, img.storagePath);
-                                          await deleteObject(storageRef).catch(err => {
-                                            console.warn("Storage file delete failed or didn't exist:", err);
-                                          });
-                                        }
-                                        
-                                        setGalleryImages(prev => prev.filter(i => i.id !== img.id));
-                                        triggerToast("이미지가 삭제되었습니다.");
-                                      } catch (err) {
-                                        console.error("Error deleting image in Firebase:", err);
-                                        triggerToast("클라우드 이미지 삭제 중 오류가 발생했습니다.");
-                                      }
-                                    })();
-                                  }
-                                }}
-                              >
-                                DEL
-                              </button>
-                            </div>
-                          </div>
+                              IMAGES
+                            </span>
+                          </span>
                         </div>
-                      ))}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          {/* ↕️ Sort Order Button */}
+                          <button
+                            onClick={() => setGallerySortOrder(prev => prev === 'newest' ? 'oldest' : 'newest')}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backgroundColor: 'transparent',
+                              color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                              border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                              borderRadius: '2px',
+                              padding: '6px 10px',
+                              height: '32px',
+                              fontSize: '10px',
+                              fontWeight: '900',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              margin: 0
+                            }}
+                            title="Toggle Sort Order"
+                          >
+                            {gallerySortOrder === 'newest' ? 'LATEST' : 'OLDEST'}
+                          </button>
+
+                          <button
+                            onClick={() => fetchGalleryData(true)}
+                            disabled={isGalleryLoading}
+                            style={{
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center', 
+                              backgroundColor: 'transparent',
+                              color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                              border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                              borderRadius: '2px',
+                              padding: '6px 10px',
+                              height: '32px',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              margin: 0
+                            }}
+                            title="Refresh"
+                          >
+                            <RotateCw size={14} style={{ animation: isGalleryLoading ? 'spin 1s linear infinite' : 'none' }} />
+                          </button>
+
+                          <label 
+                            htmlFor="gallery-file-upload" 
+                            className="swiss-copy-tab" 
+                            style={{ 
+                              cursor: 'pointer', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center',
+                              gap: '6px', 
+                              backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+                              color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                              border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                              borderRadius: '2px',
+                              padding: '6px 14px',
+                              fontSize: '11px',
+                              fontWeight: '900',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.08em',
+                              transition: 'all 0.2s',
+                              margin: 0,
+                              height: '32px',
+                              boxSizing: 'border-box'
+                            }}
+                          >
+                            <Zap size={11} />
+                            <span>UPLOAD</span>
+                          </label>
+                          <input 
+                            id="gallery-file-upload" 
+                            type="file" 
+                            accept="image/*" 
+                            style={{ display: 'none' }} 
+                            onChange={handleExternalImageUpload}
+                          />
+
+                          {/* Folder Administrative Hamburger Icon (Bare icon, v0.65d refinements) */}
+                          <button
+                            onClick={() => setIsFolderModalOpen(true)}
+                            style={{
+                              width: '32px',
+                              height: '32px',
+                              border: 'none',
+                              background: 'transparent',
+                              color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              outline: 'none',
+                              margin: 0,
+                              padding: 0
+                            }}
+                            title="Manage Tabs"
+                          >
+                            <Menu size={18} />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="gallery-grid-container">
+                        {isGalleryLoading ? (
+                          <div className="gallery-empty-state" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '200px' }}>
+                            <div 
+                              style={{
+                                width: '32px',
+                                height: '32px',
+                                border: '2px solid rgba(0, 34, 255, 0.2)',
+                                borderTop: isDarkMode ? '2px solid #FFFFFF' : '2px solid #0022FF',
+                                borderRadius: '50%',
+                                animation: 'spin 1s linear infinite',
+                                marginBottom: '16px'
+                              }}
+                            />
+                            <span className="gallery-empty-text">LOADING CLOUD GALLERY...</span>
+                          </div>
+                        ) : sortedImages.length === 0 ? (
+                          <div className="gallery-empty-state" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '200px' }}>
+                            <span className="gallery-empty-text">NO IMAGES IN THIS FOLDER</span>
+                          </div>
+                        ) : (
+                          <div className="gallery-grid">
+                            {sortedImages.map(img => (
+                              <div key={img.id} className="gallery-item-card" style={{ position: 'relative' }}>
+                                {/* 뱃지 배치 - CLOUD SECURED에서 SYNCED로 변경 및 테마 반전 */}
+                                {(img.isTemp || img.id.startsWith('temp_')) ? (
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: '8px',
+                                    right: '8px',
+                                    backgroundColor: '#FF3B30',
+                                    color: '#FFFFFF',
+                                    fontSize: '9px',
+                                    fontWeight: '900',
+                                    padding: '3px 6px',
+                                    borderRadius: '2px',
+                                    zIndex: 10,
+                                    letterSpacing: '0.05em'
+                                  }}>
+                                    LOCAL ONLY
+                                  </div>
+                                ) : (
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: '8px',
+                                    right: '8px',
+                                    backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+                                    color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                                    fontSize: '9px',
+                                    fontWeight: '900',
+                                    padding: '3px 6px',
+                                    borderRadius: '2px',
+                                    zIndex: 10,
+                                    letterSpacing: '0.05em',
+                                    border: isDarkMode ? 'none' : '1px solid #FFFFFF'
+                                  }}>
+                                    SYNCED
+                                  </div>
+                                )}
+
+                                <div className="gallery-image-wrapper">
+                                  <GalleryImage 
+                                    src={img.url} 
+                                    alt="Gallery Item" 
+                                    onClick={() => setLightboxImage(img.url)}
+                                    className="gallery-thumbnail cursor-zoom-in"
+                                  />
+                                </div>
+                                
+                                <div className="gallery-item-meta">
+                                  <p className="gallery-item-prompt" title={img.prompt}>
+                                    {img.prompt || 'No Prompt Info'}
+                                  </p>
+
+                                  <div className="gallery-item-actions" style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
+                                    {/* ➔ APPLY Arrow Button */}
+                                    <button
+                                      onClick={() => handleApplyImagePromptAndRef(img)}
+                                      className="gallery-item-btn"
+                                      style={{
+                                        flex: 1,
+                                        background: 'transparent',
+                                        border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                                        color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                                        fontWeight: '900',
+                                        fontSize: '10px',
+                                        padding: '6px 8px',
+                                        borderRadius: '2px',
+                                        cursor: 'pointer',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.05em',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '4px'
+                                      }}
+                                    >
+                                      <span>➔ APPLY</span>
+                                    </button>
+
+                                    {/* Edit Button */}
+                                    <button
+                                      onClick={() => setActiveEditImage(img)}
+                                      className="gallery-item-btn"
+                                      style={{
+                                        flex: 1,
+                                        backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+                                        color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                                        border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                                        fontWeight: '900',
+                                        fontSize: '10px',
+                                        padding: '6px 8px',
+                                        borderRadius: '2px',
+                                        cursor: 'pointer',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.05em',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '4px'
+                                      }}
+                                    >
+                                      <span>EDIT</span>
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
-                </div>
+                  );
+                })()}
               </div>
             </div>
           </div>
@@ -4123,7 +4530,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.65 | Shot Maker Workspace
+      v0.65D | Shot Maker Workspace
     </footer>
     <div className="h-12"></div>
     </div>

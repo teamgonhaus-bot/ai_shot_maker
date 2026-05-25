@@ -2822,15 +2822,10 @@ body.dark-mode .gallery-folder-indicator {
 }
 
 .gallery-image-count {
-  font-size: 18px !important;
-  font-weight: 900 !important;
-  color: #0022FF !important;
-  letter-spacing: -0.02em !important;
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 6px !important;
   white-space: nowrap !important;
-}
-
-body.dark-mode .gallery-image-count {
-  color: #FFFFFF !important;
 }
 
 .gallery-grid-container {
