@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders, Zap, Shuffle, ChevronLeft, ChevronRight, FolderOpen, RotateCw, Download
+  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders, Zap, Shuffle, ChevronLeft, ChevronRight, FolderOpen, RotateCw, Download, ZoomIn
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db, auth, storage } from './firebase';
@@ -322,9 +322,12 @@ export default function App() {
   const [newFolderName, setNewFolderName] = useState('');
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [activeEditImage, setActiveEditImage] = useState(null);
+  const [editPrompt, setEditPrompt] = useState("");
+  const [lightboxLoaded, setLightboxLoaded] = useState(false);
   const [gallerySortOrder, setGallerySortOrder] = useState('newest');
   const [isZoomed, setIsZoomed] = useState(false);
   const lastTapRef = useRef(0);
+  const touchStartXRef = useRef(0);
 
   // Rename Modal State
   const [renameTarget, setRenameTarget] = useState(null); // { id, name }
@@ -403,17 +406,28 @@ export default function App() {
 
   // 2.5. ➔ APPLY 버튼 통합 핸들러 (복사 + generatedPrompt + refImage + Mix 이동 배제)
   const handleApplyImagePromptAndRef = async (img) => {
-    if (img.prompt) {
+    const hasValidPrompt = img.prompt && img.prompt.trim() !== "" && img.prompt !== "No Prompt Info" && img.prompt !== "등록된 프롬프트 정보가 없습니다.";
+    if (hasValidPrompt) {
       navigator.clipboard.writeText(img.prompt);
       setGeneratedPrompt(img.prompt);
+      triggerToast("프롬프트 복사 및 참조 이미지 지정 완료!");
+    } else {
+      triggerToast("등록된 프롬프트 정보가 없습니다. (기존 프롬프트 보존)");
     }
     await handleApplyAsReference(img.url, true);
-    triggerToast("프롬프트 복사 및 참조 이미지 지정 완료!");
   };
 
   // 2.6. Cross-Platform 지능형 이미지 다운로더
   const handleDownloadImage = async (imageUrl) => {
     try {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      
+      if (isIOS) {
+        triggerToast("아이폰/iOS 기기에서는 이미지를 새 창으로 엽니다. 길게 눌러 '사진 앱에 저장'을 선택하세요!");
+        window.open(imageUrl, '_blank');
+        return;
+      }
+
       triggerToast("이미지 다운로드를 시작합니다...");
       if (imageUrl.startsWith('blob:') || imageUrl.startsWith('data:')) {
         const link = document.createElement('a');
@@ -494,6 +508,44 @@ export default function App() {
     }
   };
 
+  // 별도 업로드 이미지 및 일반 이미지 프롬프트 직접 편집/수정 헬퍼
+  const handleUpdateImagePrompt = async (img, newPrompt) => {
+    try {
+      const trimmedPrompt = newPrompt ? newPrompt.trim() : "";
+      
+      if (img.id.startsWith('temp_')) {
+        // 로컬 전용 이미지인 경우 galleryImages 상태 변경
+        setGalleryImages(prev => {
+          const updated = prev.map(i => 
+            i.id === img.id ? { ...i, prompt: trimmedPrompt } : i
+          );
+          localStorage.setItem('shotmaker_gallery_cache_v5', JSON.stringify(updated));
+          return updated;
+        });
+        setActiveEditImage(prev => prev ? { ...prev, prompt: trimmedPrompt } : null);
+        triggerToast("프롬프트가 수정되었습니다 (로컬 전용).");
+        return;
+      }
+      
+      // 클라우드 싱크된 이미지인 경우 Firestore도 함께 업데이트
+      const imgDocRef = doc(db, "gallery", img.id);
+      await updateDoc(imgDocRef, { prompt: trimmedPrompt });
+      
+      setGalleryImages(prev => {
+        const updated = prev.map(i => 
+          i.id === img.id ? { ...i, prompt: trimmedPrompt } : i
+        );
+        localStorage.setItem('shotmaker_gallery_cache_v5', JSON.stringify(updated));
+        return updated;
+      });
+      setActiveEditImage(prev => prev ? { ...prev, prompt: trimmedPrompt } : null);
+      triggerToast("클라우드 프롬프트 수정이 완료되었습니다.");
+    } catch (err) {
+      console.error("Error updating image prompt in Firestore:", err);
+      triggerToast("프롬프트 수정 중 오류가 발생했습니다.");
+    }
+  };
+
   // 2.9. 에디트 모달 전용 수동 싱크 연계
   const handleEditModalSync = async (img) => {
     setActiveEditImage(null);
@@ -521,7 +573,7 @@ export default function App() {
       const firestoreData = {
         url: downloadUrl,
         storagePath: fileName,
-        prompt: img.prompt || 'No Prompt Info',
+        prompt: img.prompt || '등록된 프롬프트 정보가 없습니다.',
         timestamp: new Date().toISOString(),
         folder: img.folder || '기본'
       };
@@ -558,17 +610,69 @@ export default function App() {
     localStorage.setItem('shotmaker_useProduct_v13', useProduct);
   }, [useProduct]);
 
+  // Initialize editPrompt when activeEditImage opens
+  useEffect(() => {
+    if (activeEditImage) {
+      setEditPrompt(activeEditImage.prompt || "");
+    } else {
+      setEditPrompt("");
+    }
+  }, [activeEditImage]);
+
+  // Reset lightbox loaded state when lightbox image changes
+  useEffect(() => {
+    setLightboxLoaded(false);
+  }, [lightboxImage]);
+
   // ESC Key Listener for Modals
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         if (promptModalTarget) setPromptModalTarget(null);
         if (aboutModalTarget) setAboutModalTarget(null);
+        if (lightboxImage) {
+          setLightboxImage(null);
+          setIsZoomed(false);
+        }
+        if (activeEditImage) setActiveEditImage(null);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [promptModalTarget, aboutModalTarget]);
+  }, [promptModalTarget, aboutModalTarget, lightboxImage, activeEditImage]);
+
+  // Lightbox Keyboard Navigation (ArrowLeft / ArrowRight)
+  useEffect(() => {
+    if (!lightboxImage) return;
+
+    const handleArrowKeys = (e) => {
+      const filteredSortedImages = [...galleryImages]
+        .filter(img => activeGalleryFolder === '전체' ? true : img.folder === activeGalleryFolder)
+        .sort((a, b) => {
+          const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+          const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+          return gallerySortOrder === 'newest' ? timeB - timeA : timeA - timeB;
+        });
+
+      const activeIndex = filteredSortedImages.findIndex(img => img.url === lightboxImage);
+      if (activeIndex === -1) return;
+
+      if (e.key === 'ArrowLeft') {
+        if (activeIndex > 0) {
+          setLightboxImage(filteredSortedImages[activeIndex - 1].url);
+          setIsZoomed(false);
+        }
+      } else if (e.key === 'ArrowRight') {
+        if (activeIndex < filteredSortedImages.length - 1) {
+          setLightboxImage(filteredSortedImages[activeIndex + 1].url);
+          setIsZoomed(false);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleArrowKeys);
+    return () => window.removeEventListener('keydown', handleArrowKeys);
+  }, [lightboxImage, galleryImages, activeGalleryFolder, gallerySortOrder]);
 
   // Sync Marquee text with active tab
   useEffect(() => {
@@ -1142,7 +1246,7 @@ export default function App() {
       const firestoreData = {
         url: downloadUrl,
         storagePath: fileName,
-        prompt: generatedPrompt || 'No Prompt Info',
+        prompt: generatedPrompt || '등록된 프롬프트 정보가 없습니다.',
         timestamp: new Date().toISOString(),
         folder: '기본'
       };
@@ -1856,7 +1960,7 @@ export default function App() {
           const activeIndex = filteredSortedImages.findIndex(img => img.url === lightboxImage);
 
           const handlePrevLightboxImage = (e) => {
-            e.stopPropagation();
+            if (e) e.stopPropagation();
             if (activeIndex > 0) {
               setLightboxImage(filteredSortedImages[activeIndex - 1].url);
               setIsZoomed(false);
@@ -1864,7 +1968,7 @@ export default function App() {
           };
 
           const handleNextLightboxImage = (e) => {
-            e.stopPropagation();
+            if (e) e.stopPropagation();
             if (activeIndex < filteredSortedImages.length - 1) {
               setLightboxImage(filteredSortedImages[activeIndex + 1].url);
               setIsZoomed(false);
@@ -1881,6 +1985,20 @@ export default function App() {
             lastTapRef.current = now;
           };
 
+          const handleTouchStart = (e) => {
+            touchStartXRef.current = e.touches[0].clientX;
+          };
+
+          const handleTouchEnd = (e) => {
+            const diffX = e.changedTouches[0].clientX - touchStartXRef.current;
+            const threshold = 50; // 50px threshold
+            if (diffX > threshold) {
+              handlePrevLightboxImage();
+            } else if (diffX < -threshold) {
+              handleNextLightboxImage();
+            }
+          };
+
           return (
             <motion.div
               initial={{ opacity: 0 }}
@@ -1888,8 +2006,41 @@ export default function App() {
               exit={{ opacity: 0 }}
               className="ios-lightbox"
               onClick={() => { setLightboxImage(null); setIsZoomed(false); }}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
               style={{ zIndex: 400000 }}
             >
+              {/* Floating Close Button on Top-Right */}
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxImage(null);
+                  setIsZoomed(false);
+                }}
+                style={{
+                  position: 'absolute',
+                  top: '20px',
+                  right: '20px',
+                  backgroundColor: 'rgba(0,0,0,0.6)',
+                  backdropFilter: 'blur(10px)',
+                  color: '#FFFFFF',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: '50%',
+                  width: '44px',
+                  height: '44px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 400010,
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                  transition: 'background-color 0.2s'
+                }}
+                title="Close Lightbox (ESC)"
+              >
+                <X size={20} />
+              </button>
+
               {/* Prev Button */}
               {activeIndex > 0 && (
                 <button 
@@ -1923,29 +2074,43 @@ export default function App() {
                 exit={{ scale: 0.9, opacity: 0 }}
                 className="ios-lightbox-content"
                 onClick={(e) => e.stopPropagation()}
-                style={{ position: 'relative', overflow: 'hidden' }}
+                style={{ position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '100px', minHeight: '100px' }}
               >
+                {/* Loader Spinner */}
+                {!lightboxLoaded && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '12px',
+                    color: '#FFFFFF',
+                    zIndex: 5
+                  }}>
+                    <RotateCw style={{ animation: 'spin 1s linear infinite' }} size={32} />
+                    <span style={{ fontSize: '10px', fontWeight: 'bold', letterSpacing: '0.1em' }}>LOADING...</span>
+                  </div>
+                )}
+
                 <img 
                   src={lightboxImage} 
                   alt="Fullscreen" 
                   className="ios-lightbox-img" 
+                  onLoad={() => setLightboxLoaded(true)}
                   onClick={handleImageTap}
                   style={{
                     transform: isZoomed ? 'scale(1.8)' : 'scale(1)',
-                    transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                    transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease',
                     cursor: isZoomed ? 'zoom-out' : 'zoom-in',
                     maxHeight: '80vh',
                     maxWidth: '90vw',
-                    objectFit: 'contain'
+                    objectFit: 'contain',
+                    opacity: lightboxLoaded ? 1 : 0
                   }}
                 />
-                <button 
-                  className="ios-lightbox-close" 
-                  onClick={() => { setLightboxImage(null); setIsZoomed(false); }}
-                  style={{ zIndex: 20 }}
-                >
-                  ✕
-                </button>
               </motion.div>
 
               {/* Next Button */}
@@ -2013,6 +2178,31 @@ export default function App() {
                   <Download size={12} />
                   <span>DOWNLOAD</span>
                 </button>
+
+                {/* 🔍 Zoom Toggle Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsZoomed(prev => !prev);
+                  }}
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: '#FFFFFF',
+                    border: '1px solid rgba(255,255,255,0.5)',
+                    padding: '6px 12px',
+                    fontSize: '11px',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <ZoomIn size={12} />
+                  <span>{isZoomed ? "ZOOM OUT" : "ZOOM IN"}</span>
+                </button>
+
                 {filteredSortedImages[activeIndex]?.prompt && (
                   <button
                     onClick={() => {
@@ -2108,9 +2298,50 @@ export default function App() {
                     lineHeight: 1.4,
                     textAlign: 'left'
                   }}>
-                    {activeEditImage.prompt}
+                    {activeEditImage.prompt || '등록된 프롬프트 정보가 없습니다.'}
                   </p>
                 </div>
+              </div>
+
+              {/* 1.5. Edit Prompt Content */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+                <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', textTransform: 'uppercase', textAlign: 'left' }}>Edit Prompt</div>
+                <textarea
+                  value={editPrompt}
+                  onChange={(e) => setEditPrompt(e.target.value)}
+                  placeholder="등록된 프롬프트가 없습니다. 프롬프트를 입력해 주세요."
+                  style={{
+                    width: '100%',
+                    height: '70px',
+                    padding: '10px 14px',
+                    backgroundColor: isDarkMode ? '#1C1C1E' : '#F8F8FF',
+                    color: isDarkMode ? '#FFFFFF' : '#000000',
+                    border: isDarkMode ? '1px solid rgba(255,255,255,0.3)' : '1px solid #0022FF',
+                    borderRadius: '0px',
+                    fontSize: '12px',
+                    fontWeight: 'normal',
+                    outline: 'none',
+                    resize: 'none',
+                    fontFamily: 'inherit'
+                  }}
+                />
+                <button
+                  onClick={() => handleUpdateImagePrompt(activeEditImage, editPrompt)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+                    color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '0px',
+                    fontWeight: '900',
+                    fontSize: '11px',
+                    textTransform: 'uppercase',
+                    cursor: 'pointer'
+                  }}
+                >
+                  SAVE PROMPT
+                </button>
               </div>
 
               {/* 2. Folder Move Selector */}
@@ -4229,7 +4460,7 @@ export default function App() {
                                 
                                 <div className="gallery-item-meta">
                                   <p className="gallery-item-prompt" title={img.prompt}>
-                                    {img.prompt || 'No Prompt Info'}
+                                    {img.prompt || '등록된 프롬프트 정보가 없습니다.'}
                                   </p>
 
                                   <div className="gallery-item-actions" style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
