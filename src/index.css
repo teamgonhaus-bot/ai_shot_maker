@@ -3051,7 +3051,24 @@ body.dark-mode .gallery-item-delete:hover {
   }
 }
 
+/* =============================================
+   Swiss Line Custom Scrollbar (v0.65D Additions)
+   ============================================= */
+::-webkit-scrollbar {
+  width: 4px !important;
+  height: 4px !important;
+}
 
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
 
+::-webkit-scrollbar-thumb {
+  background: #0022FF !important; /* Swiss Cobalt Blue default */
+  border-radius: 0px !important;
+}
 
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background: #FFFFFF !important; /* White in dark mode */
+}
 

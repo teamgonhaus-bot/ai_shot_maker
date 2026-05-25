@@ -319,6 +319,7 @@ export default function App() {
   const [galleryFolders, setGalleryFolders] = useState(['기본', '인물', '공간', '사물']);
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
   const [activeGalleryFolder, setActiveGalleryFolder] = useState('전체');
+  const [galleryPage, setGalleryPage] = useState(0);
   const [newFolderName, setNewFolderName] = useState('');
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [activeEditImage, setActiveEditImage] = useState(null);
@@ -623,6 +624,11 @@ export default function App() {
   useEffect(() => {
     setLightboxLoaded(false);
   }, [lightboxImage]);
+
+  // Reset gallery page when folder, sort order, or currentMode changes
+  useEffect(() => {
+    setGalleryPage(0);
+  }, [activeGalleryFolder, gallerySortOrder, currentMode]);
 
   // ESC Key Listener for Modals
   useEffect(() => {
@@ -1985,20 +1991,6 @@ export default function App() {
             lastTapRef.current = now;
           };
 
-          const handleTouchStart = (e) => {
-            touchStartXRef.current = e.touches[0].clientX;
-          };
-
-          const handleTouchEnd = (e) => {
-            const diffX = e.changedTouches[0].clientX - touchStartXRef.current;
-            const threshold = 50; // 50px threshold
-            if (diffX > threshold) {
-              handlePrevLightboxImage();
-            } else if (diffX < -threshold) {
-              handleNextLightboxImage();
-            }
-          };
-
           return (
             <motion.div
               initial={{ opacity: 0 }}
@@ -2006,8 +1998,6 @@ export default function App() {
               exit={{ opacity: 0 }}
               className="ios-lightbox"
               onClick={() => { setLightboxImage(null); setIsZoomed(false); }}
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
               style={{ zIndex: 400000 }}
             >
               {/* Floating Close Button on Top-Right */}
@@ -2095,7 +2085,20 @@ export default function App() {
                   </div>
                 )}
 
-                <img 
+                <motion.img 
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.6}
+                  onDragEnd={(event, info) => {
+                    const swipeThreshold = 100; // 100px drag to swipe
+                    if (info.offset.x > swipeThreshold) {
+                      // Dragged right -> Previous Image
+                      handlePrevLightboxImage();
+                    } else if (info.offset.x < -swipeThreshold) {
+                      // Dragged left -> Next Image
+                      handleNextLightboxImage();
+                    }
+                  }}
                   src={lightboxImage} 
                   alt="Fullscreen" 
                   className="ios-lightbox-img" 
@@ -3192,10 +3195,29 @@ export default function App() {
                       position: 'relative',
                       overflow: 'hidden'
                     }}
-                    className="group"
-                  >
-                    {/* 기하학 도형 */}
-                    <div style={getShapeStyle()} className="group-hover:scale-110" />
+                    {/* 기하학 도형 회전/스케일 팝 모션 래퍼 */}
+                    <motion.div
+                      animate={{ 
+                        rotate: isActive ? 180 : 0, 
+                        scale: isActive ? 1.25 : 1 
+                      }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 180, 
+                        damping: 14 
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '28px',
+                        height: '28px',
+                        marginBottom: '12px',
+                        flexShrink: 0
+                      }}
+                    >
+                      <div style={{ ...getShapeStyle(), marginBottom: 0 }} />
+                    </motion.div>
 
                     {/* 타이포그래피 (영문 씬 타이틀 Bold 산세리프) */}
                     <div style={{
@@ -4259,6 +4281,10 @@ export default function App() {
                       return gallerySortOrder === 'newest' ? timeB - timeA : timeA - timeB;
                     });
 
+                  const ITEMS_PER_PAGE = 12;
+                  const totalPages = Math.ceil(sortedImages.length / ITEMS_PER_PAGE);
+                  const paginatedImages = sortedImages.slice(galleryPage * ITEMS_PER_PAGE, (galleryPage + 1) * ITEMS_PER_PAGE);
+
                   return (
                     <div className="gallery-main" style={{ border: 'none', background: 'transparent' }}>
                       <div className="gallery-main-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 16px', borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF' }}>
@@ -4411,7 +4437,7 @@ export default function App() {
                           </div>
                         ) : (
                           <div className="gallery-grid">
-                            {sortedImages.map(img => (
+                            {paginatedImages.map(img => (
                               <div key={img.id} className="gallery-item-card" style={{ position: 'relative' }}>
                                 {/* 뱃지 배치 - CLOUD SECURED에서 SYNCED로 변경 및 테마 반전 */}
                                 {(img.isTemp || img.id.startsWith('temp_')) ? (
@@ -4517,6 +4543,78 @@ export default function App() {
                                 </div>
                               </div>
                             ))}
+                          </div>
+                        )}
+
+                        {/* 🇨🇭 Swiss Minimal Pagination Footer */}
+                        {totalPages > 1 && (
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '12px',
+                            marginTop: '28px',
+                            paddingTop: '20px',
+                            borderTop: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(0, 34, 255, 0.2)',
+                            paddingBottom: '16px'
+                          }}>
+                            <button
+                              disabled={galleryPage === 0}
+                              onClick={() => {
+                                setGalleryPage(prev => Math.max(0, prev - 1));
+                                const mainContainer = document.querySelector('.gallery-grid-container');
+                                if (mainContainer) mainContainer.scrollTop = 0;
+                              }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                color: galleryPage === 0 ? 'rgba(128,128,128,0.4)' : (isDarkMode ? '#FFFFFF' : '#0022FF'),
+                                border: isDarkMode 
+                                  ? `1px solid ${galleryPage === 0 ? 'rgba(255,255,255,0.2)' : '#FFFFFF'}` 
+                                  : `1px solid ${galleryPage === 0 ? 'rgba(0, 34, 255, 0.2)' : '#0022FF'}`,
+                                padding: '6px 14px',
+                                fontSize: '11px',
+                                fontWeight: '900',
+                                cursor: galleryPage === 0 ? 'not-allowed' : 'pointer',
+                                transition: 'all 0.2s ease',
+                                outline: 'none'
+                              }}
+                            >
+                              PREV
+                            </button>
+                            
+                            <span style={{
+                              fontSize: '11px',
+                              fontWeight: '900',
+                              color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                              letterSpacing: '0.08em',
+                              fontFamily: 'Inter, sans-serif'
+                            }}>
+                              PAGE {galleryPage + 1} / {totalPages}
+                            </span>
+                            
+                            <button
+                              disabled={galleryPage >= totalPages - 1}
+                              onClick={() => {
+                                setGalleryPage(prev => Math.min(totalPages - 1, prev + 1));
+                                const mainContainer = document.querySelector('.gallery-grid-container');
+                                if (mainContainer) mainContainer.scrollTop = 0;
+                              }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                color: galleryPage >= totalPages - 1 ? 'rgba(128,128,128,0.4)' : (isDarkMode ? '#FFFFFF' : '#0022FF'),
+                                border: isDarkMode 
+                                  ? `1px solid ${galleryPage >= totalPages - 1 ? 'rgba(255,255,255,0.2)' : '#FFFFFF'}` 
+                                  : `1px solid ${galleryPage >= totalPages - 1 ? 'rgba(0, 34, 255, 0.2)' : '#0022FF'}`,
+                                padding: '6px 14px',
+                                fontSize: '11px',
+                                fontWeight: '900',
+                                cursor: galleryPage >= totalPages - 1 ? 'not-allowed' : 'pointer',
+                                transition: 'all 0.2s ease',
+                                outline: 'none'
+                              }}
+                            >
+                              NEXT
+                            </button>
                           </div>
                         )}
                       </div>
