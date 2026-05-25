@@ -3195,6 +3195,7 @@ export default function App() {
                       position: 'relative',
                       overflow: 'hidden'
                     }}
+                  >
                     {/* 기하학 도형 회전/스케일 팝 모션 래퍼 */}
                     <motion.div
                       animate={{ 
