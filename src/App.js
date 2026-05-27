@@ -1991,6 +1991,8 @@ export default function App() {
             });
 
           const activeIndex = filteredSortedImages.findIndex(img => img.url === lightboxImage);
+          const limitX = typeof window !== 'undefined' ? window.innerWidth * 0.35 : 300;
+          const limitY = typeof window !== 'undefined' ? window.innerHeight * 0.25 : 200;
 
           const handlePrevLightboxImage = (e) => {
             if (e) e.stopPropagation();
@@ -2122,7 +2124,7 @@ export default function App() {
                     }
                   }}
                   drag={isZoomed ? true : "x"}
-                  dragConstraints={isZoomed ? { left: -600, right: 600, top: -500, bottom: 500 } : { left: 0, right: 0 }}
+                  dragConstraints={isZoomed ? { left: -limitX, right: limitX, top: -limitY, bottom: limitY } : { left: 0, right: 0 }}
                   dragElastic={isZoomed ? 0.15 : 0.6}
                   onDragEnd={(event, info) => {
                     if (isZoomed) return; // 줌 상태에서는 스와이프 완전 방어
