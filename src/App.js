@@ -106,7 +106,15 @@ const DICTIONARY = {
   subjectGender: { "선택안함": "", "여성": "female", "남성": "male", "혼성": "mixed gender" },
   subjectAge: { "선택안함": "", "10대": "teenager", "20대": "in their 20s", "30대": "in their 30s", "40대": "in their 40s", "중장년": "middle-aged" },
   subjectRegion: { "선택안함": "", "한국": "Korean", "일본": "Japanese", "북유럽": "Northern European", "북미": "North American" },
-  subjectAction: { "선택안함": "", "기본": "posing naturally", "차분함": "with a calm demeanor", "활발함": "with energetic and active movement" },
+  subjectAction: {
+    "선택안함": "",
+    "기본": "posing naturally",
+    "차분함": "with a calm demeanor",
+    "활발함": "with energetic and active movement",
+    "업무": "focused on work, writing, or using a laptop with professional concentration",
+    "휴식": "relaxing comfortably, sitting back, or enjoying a warm beverage with a peaceful look",
+    "대화": "engaging in a friendly conversation, smiling, talking, and gesturing warmly"
+  },
   subjectClothesStyle: { "선택안함": "", "캐주얼": "casual style", "비즈니스": "business style", "스트릿": "streetwear style", "미니멀": "minimalist style", "포멀/정장": "formal suit style" },
   subjectClothesTop: {
     "선택안함": "", "반팔티": "wearing a short sleeve t-shirt", "긴팔티": "wearing a long sleeve t-shirt", "자켓": "wearing a jacket", "아우터": "wearing outerwear", "원피스": "wearing a dress", "스포츠 복장": "wearing sportswear", "아웃도어": "wearing outdoor apparel"
@@ -154,7 +162,7 @@ const OPTIONS_DATA = {
   subjectGender: ["선택안함", "여성", "남성", "혼성"],
   subjectAge: ["선택안함", "10대", "20대", "30대", "40대", "중장년"],
   subjectRegion: ["선택안함", "한국", "일본", "북유럽", "북미"],
-  subjectAction: ["선택안함", "기본", "차분함", "활발함"],
+  subjectAction: ["선택안함", "기본", "차분함", "활발함", "업무", "휴식", "대화"],
   subjectClothesStyle: ["선택안함", "캐주얼", "비즈니스", "스트릿", "미니멀", "포멀/정장"],
   subjectClothesTop: {
     female: ["선택안함", "반팔티", "긴팔티", "자켓", "아우터", "원피스", "스포츠 복장", "아웃도어"],
@@ -941,7 +949,7 @@ export default function App() {
       targetConfig.subjectNum = '다수';
       targetConfig.subjectGender = '여성';
       targetConfig.subjectAge = '20대';
-      targetConfig.subjectAction = '기본';
+      targetConfig.subjectAction = '업무';
       targetConfig.spaceType = '오피스';
       targetConfig.spaceDetail = '공유오피스';
       targetConfig.cameraAngle = '미디움 샷';
@@ -976,7 +984,7 @@ export default function App() {
       targetConfig.subjectNum = '다수';
       targetConfig.subjectGender = '여성';
       targetConfig.subjectAge = '20대';
-      targetConfig.subjectAction = '기본';
+      targetConfig.subjectAction = '대화';
       targetConfig.spaceType = '리테일';
       targetConfig.spaceDetail = '쇼룸';
       targetConfig.cameraAngle = '정면';
@@ -999,12 +1007,16 @@ export default function App() {
           targetConfig.subjectNum = '다수';
           targetConfig.subjectGender = '여성';
           if (targetConfig.subjectAge === '선택안함') targetConfig.subjectAge = '20대';
-          if (targetConfig.subjectAction === '선택안함') targetConfig.subjectAction = '기본';
+          if (targetConfig.subjectAction === '선택안함') {
+            targetConfig.subjectAction = templateType === 'OFFICE TECH' ? '업무' : '대화';
+          }
         } else {
           targetConfig.subjectNum = '혼자';
           if (targetConfig.subjectGender === '선택안함') targetConfig.subjectGender = '여성';
           if (targetConfig.subjectAge === '선택안함') targetConfig.subjectAge = '20대';
-          if (targetConfig.subjectAction === '선택안함') targetConfig.subjectAction = '기본';
+          if (targetConfig.subjectAction === '선택안함') {
+            targetConfig.subjectAction = templateType === 'HOME LIVING' ? '휴식' : '기본';
+          }
         }
       } else {
         targetConfig.subjectNum = '없음';
@@ -1046,7 +1058,9 @@ export default function App() {
         subjectNum: isOn ? '혼자' : '없음',
         subjectGender: isOn && prev.subjectGender === '선택안함' ? '여성' : prev.subjectGender,
         subjectAge: isOn && prev.subjectAge === '선택안함' ? '20대' : prev.subjectAge,
-        subjectAction: isOn && prev.subjectAction === '선택안함' ? '기본' : prev.subjectAction
+        subjectAction: isOn && prev.subjectAction === '선택안함' 
+          ? (activeTemplate === 'OFFICE TECH' ? '업무' : (activeTemplate === 'RETAIL SCENE' ? '대화' : (activeTemplate === 'HOME LIVING' ? '휴식' : '기본')))
+          : prev.subjectAction
       }));
     } else {
       setConfig(prev => ({
@@ -1110,7 +1124,7 @@ export default function App() {
 
     } else if (activeTemplate === 'USAGE SCENE') {
       const genders = ['여성', '남성'];
-      const actions = ['기본', '차분함', '활발함'];
+      const actions = ['기본', '차분함', '활발함', '업무', '휴식', '대화'];
       const ages = ['20대', '30대', '40대'];
       const hairs = ['긴머리', '짧은머리', '단발', '묶은머리'];
       const clothesStyles = ['캐주얼', '비즈니스', '미니멀'];
@@ -1617,13 +1631,11 @@ export default function App() {
 
         if (details.length > 0) humanStr += ` ${details.join(", ")}`;
 
-        let actionStr = "posing naturally";
-        if (config.subjectAction && config.subjectAction !== "선택안함" && config.subjectAction !== "기본") {
-          actionStr = DICTIONARY.subjectAction[config.subjectAction];
-        } else if (config.subjectAction === "기본") {
-          actionStr = "posing naturally";
+        let actionStr = "";
+        if (config.subjectAction && config.subjectAction !== "선택안함") {
+          actionStr = ` ${DICTIONARY.subjectAction[config.subjectAction]}`;
         }
-        parts.push(`featuring ${humanStr} ${actionStr} with ${subjectStr}`);
+        parts.push(`featuring ${humanStr}${actionStr} with ${subjectStr}`);
 
         if (useImageRef && refImage) {
           parts.push("The person is naturally interacting with/holding the product in the attached image");
@@ -3550,7 +3562,7 @@ export default function App() {
                       <>
                         <div style={{ borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)', margin: '24px 0' }} />
                         <OptionSelect label="인테리어 양식" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} theme="green" />
-                        <div className="mt-4 border-t border-gray-100">
+                        <div className="mt-4">
                           <OptionSelect label="국가/지역 (Country)" value={config.country} onChange={(v) => handleConfigChange('country', v)} options={OPTIONS_DATA.country} theme="green" />
                           <OptionSelect label="장소 맥락 (Location Context)" value={config.locationContext || "선택안함"} onChange={(v) => handleConfigChange('locationContext', v)} options={OPTIONS_DATA.locationContext} theme="green" />
 
