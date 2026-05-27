@@ -732,7 +732,7 @@ export default function App() {
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.65 Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.65E Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -2022,7 +2022,7 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.65D | Shot Maker Workspace
+              v0.65E | Shot Maker Workspace
             </div>
           </div>
         </div>
@@ -4945,7 +4945,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.65D | Shot Maker Workspace
+      v0.65E | Shot Maker Workspace
     </footer>
     <div className="h-12"></div>
     </div>
