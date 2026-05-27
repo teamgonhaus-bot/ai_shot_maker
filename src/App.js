@@ -2091,7 +2091,7 @@ export default function App() {
                 exit={{ scale: 0.9, opacity: 0 }}
                 className="ios-lightbox-content"
                 onClick={(e) => e.stopPropagation()}
-                style={{ position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '100px', minHeight: '100px' }}
+                style={{ position: 'relative', overflow: 'visible', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '100px', minHeight: '100px' }}
               >
                 {/* Loader Spinner */}
                 {!lightboxLoaded && (
@@ -2121,9 +2121,9 @@ export default function App() {
                       }
                     }
                   }}
-                  drag={isZoomed ? false : "x"}
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.6}
+                  drag={isZoomed ? true : "x"}
+                  dragConstraints={isZoomed ? { left: -600, right: 600, top: -500, bottom: 500 } : { left: 0, right: 0 }}
+                  dragElastic={isZoomed ? 0.15 : 0.6}
                   onDragEnd={(event, info) => {
                     if (isZoomed) return; // 줌 상태에서는 스와이프 완전 방어
                     const swipeThreshold = 100; // 100px drag to swipe
@@ -2140,16 +2140,22 @@ export default function App() {
                   className="ios-lightbox-img" 
                   onLoad={() => setLightboxLoaded(true)}
                   onClick={handleImageTap}
-                  animate={{ scale: isZoomed ? 1.8 : 1 }}
-                  transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                  animate={{ 
+                    scale: isZoomed ? 2.0 : 1,
+                    x: isZoomed ? undefined : 0,
+                    y: isZoomed ? undefined : 0
+                  }}
+                  transition={{ type: 'spring', damping: 28, stiffness: 220 }}
                   style={{
-                    cursor: isZoomed ? 'zoom-out' : 'zoom-in',
+                    cursor: isZoomed ? 'grab' : 'zoom-in',
                     maxHeight: '80vh',
                     maxWidth: '90vw',
                     objectFit: 'contain',
                     opacity: lightboxLoaded ? 1 : 0,
-                    touchAction: 'none'
+                    touchAction: 'none',
+                    userSelect: 'none'
                   }}
+                  whileDrag={{ cursor: isZoomed ? 'grabbing' : 'grabbing' }}
                 />
               </motion.div>
 
