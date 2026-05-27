@@ -144,14 +144,14 @@ const DICTIONARY = {
   copySpace: { "선택안함": "", "좌측 여백": "with ample empty copy space on the left side", "우측 여백": "with ample empty copy space on the right side" },
   productAnchor: { "선택안함": "", "라벨 목업": "a blank unbranded minimalist placeholder product container, no text, smooth surface", "전경 클린": "clear unobstructed view of the center item, no foreground occlusion, clean sharp edges", "합성 베이스": "high contrast separation between central item and background, perfect lighting for design composite" },
   productLayout: { "선택안함": "", "공중부양": "product floating in mid-air, levitating with subtle shadow below", "대각선 안착": "product suspended diagonally in mid-air at a dynamic angle", "액체 스플래시": "dramatic liquid splash effect surrounding the product", "파우더 폭발": "powder explosion burst effect around the product" },
-  cameraAngle: { "선택안함": "", "정면": "frontal shot", "미디움 샷": "medium shot", "하이앵글": "high-angle shot", "로우앵글": "low-angle shot", "아이레벨": "eye-level shot", "클로즈업": "close-up shot", "익스트림 클로즈업": "extreme close-up shot", "버드아이 뷰": "bird's eye view", "웜즈아이 뷰": "worm's eye view", "더치 앵글": "dutch angle shot", "초광각": "ultra-wide angle shot", "망원 샷": "telephoto lens shot", "풀 샷": "full body shot", "드론 샷": "aerial drone shot" },
+  cameraAngle: { "선택안함": "", "정면": "frontal shot", "미디움 샷": "medium shot", "하이앵글": "high-angle shot", "로우앵글": "low-angle shot", "아이레벨": "eye-level shot", "클로즈업": "close-up shot", "익스트림 클로즈업": "extreme close-up shot", "버드아이 뷰": "bird's eye view", "웜즈아이 뷰": "worm's eye view", "바텀업 뷰": "bottom-up perspective", "더치 앵글": "dutch angle shot", "초광각": "ultra-wide angle shot", "망원 샷": "telephoto lens shot", "풀 샷": "full body shot", "드론 샷": "aerial drone shot" },
   shotStyle: {
     "컬러블로킹": "color blocking aesthetic", "네거티브 스페이스": "negative space composition", "hard shadows": "hard shadows",
     "톤온톤-모노크로매틱": "tone-on-tone monochromatic palette", "플랫 레이": "flat lay perspective", "매크로-디테일": "macro detail shot",
     "와비사비-어스톤": "wabi-sabi earth tone aesthetic", "모션 캡쳐-동적 연출": "motion capture dynamic pose",
-    "인테리어 잡지 샷(사실적)": "realistic interior magazine photography", "와이드 건축/공간 샷": "wide architectural space shot",
-    "인테리어 비네트(코너)": "interior vignette corner shot", "라이프스타일 인테리어": "lifestyle interior scene",
-    "클로즈업 디테일": "close-up detail focus", "심도 얕은 샷(아웃포커싱)": "shallow depth of field with bokeh"
+    "인테리어 잡지 샷": "realistic interior magazine photography", "와이드 건축/공간 샷": "wide architectural space shot",
+    "라이프스타일": "lifestyle interior scene",
+    "심도 얕은 샷(아웃포커싱)": "shallow depth of field with bokeh"
   },
   country: { "선택안함": "", "한국": "Korea", "일본": "Japan", "동남아 휴양지": "Southeast Asia resort", "미국": "USA", "독일": "Germany", "이탈리아": "Italy", "동유럽": "Eastern Europe" },
   locationContext: { "선택안함": "", "수도": "in the capital city", "도심": "in the downtown area", "번화가": "on a busy main street", "교외": "in the suburbs", "휴양지": "at a holiday resort" }
@@ -191,10 +191,10 @@ const OPTIONS_DATA = {
   copySpace: ["선택안함", "좌측 여백", "우측 여백"],
   productAnchor: ["선택안함", "라벨 목업", "전경 클린", "합성 베이스"],
   productLayout: ["선택안함", "공중부양", "대각선 안착", "액체 스플래시", "파우더 폭발"],
-  cameraAngle: ["선택안함", "정면", "미디움 샷", "풀 샷", "하이앵글", "로우앵글", "아이레벨", "클로즈업", "익스트림 클로즈업", "버드아이 뷰", "웜즈아이 뷰", "더치 앵글", "초광각", "망원 샷", "드론 샷"],
+  cameraAngle: ["선택안함", "정면", "미디움 샷", "풀 샷", "하이앵글", "로우앵글", "아이레벨", "클로즈업", "익스트림 클로즈업", "버드아이 뷰", "웜즈아이 뷰", "바텀업 뷰", "더치 앵글", "초광각", "망원 샷", "드론 샷"],
   shotStyle: [
     "컬러블로킹", "네거티브 스페이스", "하드 섀도우", "톤온톤-모노크로매틱", "플랫 레이", "매크로-디테일", "와비사비-어스톤", "모션 캡쳐-동적 연출",
-    "인테리어 잡지 샷(사실적)", "와이드 건축/공간 샷", "인테리어 비네트(코너)", "라이프스타일 인테리어", "클로즈업 디테일", "심도 얕은 샷(아웃포커싱)"
+    "인테리어 잡지 샷", "와이드 건축/공간 샷", "라이프스타일", "심도 얕은 샷(아웃포커싱)"
   ],
   aspectRatio: ["1:1 (Square)", "16:9 (Widescreen)", "4:3 (Standard)", "3:4 (Portrait)", "4:5 (SNS)", "9:16 (Vertical)"],
   country: ["선택안함", "한국", "일본", "동남아 휴양지", "미국", "독일", "이탈리아", "동유럽"],
@@ -278,9 +278,9 @@ export default function App() {
     aspectRatio: "1:1 (Square)",
     country: "선택안함",
     locationContext: "선택안함",
-    brightness: 1.0,
     useLight: true
   });
+  const [showLightboxOptions, setShowLightboxOptions] = useState(true);
   const [enableImageGeneration, setEnableImageGeneration] = useState(false);
   const [useDetailMaterial, setUseDetailMaterial] = useState(false);
   const [smartUseSubject, setSmartUseSubject] = useState(false);
@@ -642,9 +642,18 @@ export default function App() {
     }
   }, [activeEditImage]);
 
-  // Reset lightbox loaded state when lightbox image changes
+  // Reset lightbox loaded state & Lock body scroll when lightbox image opens
   useEffect(() => {
     setLightboxLoaded(false);
+    setShowLightboxOptions(true);
+    if (lightboxImage) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [lightboxImage]);
 
   // Reset gallery page when folder, sort order, or currentMode changes
@@ -859,7 +868,42 @@ export default function App() {
   const handleSmartTemplate = (templateType) => {
     setActiveTemplate(templateType);
     setActiveLibraryTemplateId(null);
-    let targetConfig = { ...config };
+    
+    // 이전의 모든 찌꺼기 속성들을 완벽하게 배제하기 위해 기본값 객체로 깨끗하게 시작합니다.
+    let targetConfig = {
+      productName: config.productName, // 제품명은 유지
+      monochromeColor: "Cobalt Blue",
+      subjectNum: "없음",
+      subjectGender: "선택안함",
+      subjectAge: "선택안함",
+      subjectRegion: "선택안함",
+      subjectAction: "기본",
+      subjectClothesStyle: "선택안함",
+      subjectClothesTop: "선택안함",
+      subjectClothesBottom: "선택안함",
+      femaleClothesTop: "선택안함",
+      femaleClothesBottom: "선택안함",
+      maleClothesTop: "선택안함",
+      maleClothesBottom: "선택안함",
+      subjectHair: "선택안함",
+      spaceType: "스튜디오",
+      spaceDetail: "단색 배경",
+      interiorStyle: "선택안함",
+      light: "선택안함",
+      detailFloor: "밝은 우드 마루",
+      detailWood: "오크(참나무)",
+      detailMetal: "황동(브라스)",
+      detailWall: "화이트 페인트",
+      cameraAngle: "선택안함",
+      copySpace: "선택안함",
+      productAnchor: "선택안함",
+      productLayout: "선택안함",
+      shotStyle: [],
+      aspectRatio: "1:1 (Square)",
+      country: "선택안함",
+      locationContext: "선택안함",
+      useLight: true
+    };
 
     if (templateType === 'TITLE SCENE') {
       targetConfig.subjectNum = '없음';
@@ -876,7 +920,7 @@ export default function App() {
       targetConfig.shotStyle = [];
       targetConfig.country = '선택안함';
 
-      // 기본색은 Cobalt Blue로 적용 (혹은 누를때마다 랜덤 적용)
+      // 기본색은 Cobalt Blue로 적용
       const colors = ['Cobalt Blue', 'Terracotta', 'Sage Green', 'Warm Sand', 'Matte Black', 'Pure White', 'Ash Gray', 'Ruby Red'];
       if (config.monochromeColor === 'Cobalt Blue') {
         const otherColors = colors.filter(c => c !== 'Cobalt Blue');
@@ -884,7 +928,7 @@ export default function App() {
       } else {
         targetConfig.monochromeColor = 'Cobalt Blue';
       }
-
+      setSmartUseSubject(false);
       setActiveMarquee("TITLE SCENE Active: Surrealist floating product on monochrome studio backdrop...");
 
     } else if (templateType === 'DETAIL SCENE') {
@@ -898,9 +942,10 @@ export default function App() {
       targetConfig.aspectRatio = '4:3 (Standard)';
       targetConfig.useLight = true;
       targetConfig.light = '스포트라이트 조명';
-      targetConfig.shotStyle = ['매크로-디테일', '클로즈업 디테일', '하드 섀도우'];
+      targetConfig.shotStyle = ['매크로-디테일', '하드 섀도우'];
       targetConfig.interiorStyle = '선택안함';
       targetConfig.country = '선택안함';
+      setSmartUseSubject(false);
       setActiveMarquee("DETAIL SCENE Active: High-end catalog close-up focusing strictly on product details and texture...");
 
     } else if (templateType === 'INSTA SCENE') {
@@ -919,8 +964,9 @@ export default function App() {
       targetConfig.productAnchor = '선택안함';
       targetConfig.useLight = true;
       targetConfig.light = '자연광';
-      targetConfig.shotStyle = ['라이프스타일 인테리어', '심도 얕은 샷(아웃포커싱)'];
+      targetConfig.shotStyle = ['라이프스타일', '심도 얕은 샷(아웃포커싱)'];
       targetConfig.country = '한국';
+      setSmartUseSubject(true);
       setActiveMarquee("INSTA SCENE Active: MZ trendy SNS lifestyle snap with natural sunlight vibes...");
 
     } else if (templateType === 'USAGE SCENE') {
@@ -940,10 +986,18 @@ export default function App() {
       targetConfig.shotStyle = [];
       targetConfig.interiorStyle = '선택안함';
       targetConfig.country = '선택안함';
+      setSmartUseSubject(true);
       setActiveMarquee("USAGE SCENE Active: Lifestyle product-in-use inside clean white studio backdrop...");
 
     } else if (templateType === 'HOME LIVING') {
-      targetConfig.subjectNum = '없음';
+      // Home: 20대 여성, 혼자, 캐주얼, 긴바지, 리빙룸, 휴식
+      targetConfig.subjectNum = '혼자';
+      targetConfig.subjectGender = '여성';
+      targetConfig.subjectAge = '20대';
+      targetConfig.subjectClothesStyle = '캐주얼';
+      targetConfig.subjectClothesBottom = '긴바지';
+      targetConfig.femaleClothesBottom = '긴바지';
+      targetConfig.subjectAction = '휴식';
       targetConfig.spaceType = '홈';
       targetConfig.spaceDetail = '리빙';
       targetConfig.cameraAngle = '아이레벨';
@@ -953,18 +1007,24 @@ export default function App() {
       targetConfig.aspectRatio = '16:9 (Widescreen)';
       targetConfig.useLight = true;
       targetConfig.light = '앤비언트 라이트';
-      targetConfig.shotStyle = ['라이프스타일 인테리어', '인테리어 잡지 샷(사실적)', '심도 얕은 샷(아웃포커싱)'];
+      targetConfig.shotStyle = ['라이프스타일', '인테리어 잡지 샷', '심도 얕은 샷(아웃포커싱)'];
       targetConfig.interiorStyle = '내추럴 우드';
       targetConfig.country = '선택안함';
+      setSmartUseSubject(true);
       setActiveMarquee("HOME LIVING Active: Cozy living room and bedroom backdrop for real-life domestic setup...");
 
     } else if (templateType === 'OFFICE TECH') {
+      // Office: 20대 여성, 다수, 긴머리, 비지니스, 미니스커트, 사무실
       targetConfig.subjectNum = '다수';
       targetConfig.subjectGender = '여성';
       targetConfig.subjectAge = '20대';
+      targetConfig.subjectHair = '긴머리';
+      targetConfig.subjectClothesStyle = '비즈니스';
+      targetConfig.subjectClothesBottom = '미니스커트';
+      targetConfig.femaleClothesBottom = '미니스커트';
       targetConfig.subjectAction = '업무';
       targetConfig.spaceType = '오피스';
-      targetConfig.spaceDetail = '공유오피스';
+      targetConfig.spaceDetail = '사무실';
       targetConfig.cameraAngle = '미디움 샷';
       targetConfig.copySpace = '선택안함';
       targetConfig.productLayout = '선택안함';
@@ -972,9 +1032,10 @@ export default function App() {
       targetConfig.aspectRatio = '16:9 (Widescreen)';
       targetConfig.useLight = true;
       targetConfig.light = '자연광';
-      targetConfig.shotStyle = ['인테리어 잡지 샷(사실적)', '와이드 건축/공간 샷'];
+      targetConfig.shotStyle = ['인테리어 잡지 샷', '와이드 건축/공간 샷'];
       targetConfig.interiorStyle = '모던 미니멀';
       targetConfig.country = '선택안함';
+      setSmartUseSubject(true);
       setActiveMarquee("OFFICE TECH Active: Clean desk setup and shared office business photography...");
 
     } else if (templateType === 'NATURE ORGANIC') {
@@ -991,15 +1052,21 @@ export default function App() {
       targetConfig.shotStyle = ['와비사비-어스톤', '심도 얕은 샷(아웃포커싱)'];
       targetConfig.interiorStyle = '플랜테리어';
       targetConfig.country = '선택안함';
+      setSmartUseSubject(false);
       setActiveMarquee("OUTDOOR SCENE Active: Eco-friendly outdoor natural environment snap with natural elements...");
 
     } else if (templateType === 'RETAIL SCENE') {
+      // Retail: 20대 여성, 다수, 긴머리, 캐주얼, 미니스커트, 카페
       targetConfig.subjectNum = '다수';
       targetConfig.subjectGender = '여성';
       targetConfig.subjectAge = '20대';
+      targetConfig.subjectHair = '긴머리';
+      targetConfig.subjectClothesStyle = '캐주얼';
+      targetConfig.subjectClothesBottom = '미니스커트';
+      targetConfig.femaleClothesBottom = '미니스커트';
       targetConfig.subjectAction = '대화';
       targetConfig.spaceType = '리테일';
-      targetConfig.spaceDetail = '쇼룸';
+      targetConfig.spaceDetail = '카페';
       targetConfig.cameraAngle = '정면';
       targetConfig.copySpace = '선택안함';
       targetConfig.productLayout = '선택안함';
@@ -1007,37 +1074,14 @@ export default function App() {
       targetConfig.aspectRatio = '4:3 (Standard)';
       targetConfig.useLight = true;
       targetConfig.light = '시네마틱';
-      targetConfig.shotStyle = ['인테리어 잡지 샷(사실적)', '와이드 건축/공간 샷'];
+      targetConfig.shotStyle = ['인테리어 잡지 샷', '와이드 건축/공간 샷'];
       targetConfig.interiorStyle = '모던 미니멀';
       targetConfig.country = '선택안함';
+      setSmartUseSubject(true);
       setActiveMarquee("RETAIL SCENE Active: Premium commercial showroom and luxury retail display photography...");
     }
 
-    // Title 씬 and Detail 씬을 제외한 스마트 씬에 대해 인물 유무 스위치(smartUseSubject) 최종 반영
-    if (templateType !== 'TITLE SCENE' && templateType !== 'DETAIL SCENE') {
-      if (smartUseSubject) {
-        if (templateType === 'OFFICE TECH' || templateType === 'RETAIL SCENE') {
-          targetConfig.subjectNum = '다수';
-          targetConfig.subjectGender = '여성';
-          if (targetConfig.subjectAge === '선택안함') targetConfig.subjectAge = '20대';
-          if (targetConfig.subjectAction === '선택안함') {
-            targetConfig.subjectAction = templateType === 'OFFICE TECH' ? '업무' : '대화';
-          }
-        } else {
-          targetConfig.subjectNum = '혼자';
-          if (targetConfig.subjectGender === '선택안함') targetConfig.subjectGender = '여성';
-          if (targetConfig.subjectAge === '선택안함') targetConfig.subjectAge = '20대';
-          if (targetConfig.subjectAction === '선택안함') {
-            targetConfig.subjectAction = templateType === 'HOME LIVING' ? '휴식' : '기본';
-          }
-        }
-      } else {
-        targetConfig.subjectNum = '없음';
-      }
-    } else {
-      // 타이틀과 디테일은 인물을 항상 '없음'으로 강제 격리
-      targetConfig.subjectNum = '없음';
-    }
+
 
     // Cascading Effect: Apply changed properties sequentially
     const keysToChange = Object.keys(targetConfig).filter(k => targetConfig[k] !== config[k]);
@@ -1110,9 +1154,8 @@ export default function App() {
       const lights = ['스포트라이트 조명', '시네마틱', '나르스 확산광'];
       const angles = ['익스트림 클로즈업', '클로즈업'];
       const styleOptions = [
-        ['매크로-디테일', '클로즈업 디테일'],
         ['매크로-디테일', '하드 섀도우'],
-        ['클로즈업 디테일', '톤온톤-모노크로매틱'],
+        ['매크로-디테일', '톤온톤-모노크로매틱'],
         ['매크로-디테일', '심도 얕은 샷(아웃포커싱)']
       ];
       targetConfig.light = lights[Math.floor(Math.random() * lights.length)];
@@ -1125,7 +1168,7 @@ export default function App() {
       const clothes = ['스트릿', '캐주얼', '미니멀'];
       const spaces = ['힙한곳', '도심', '공원', '카페'];
       const styles = [
-        ['라이프스타일 인테리어', '심도 얕은 샷(아웃포커싱)'],
+        ['라이프스타일', '심도 얕은 샷(아웃포커싱)'],
         ['컬러블로킹', '심도 얕은 샷(아웃포커싱)'],
         ['네거티브 스페이스', '심도 얕은 샷(아웃포커싱)']
       ];
@@ -1594,7 +1637,7 @@ export default function App() {
           parts.push(`rendered with ${styles.join(", ")}`);
         }
         if (config.useLight && config.light !== "선택안함") {
-          parts.push(`illuminated by ${DICTIONARY.light[config.light]} with ${config.brightness} brightness`);
+          parts.push(`illuminated by ${DICTIONARY.light[config.light]}`);
         }
       }
       if (removeText) {
@@ -1661,14 +1704,14 @@ export default function App() {
         }
       }
 
-      let envStr = DICTIONARY.spaceType[config.spaceType];
+      let envStr = "";
       if (config.spaceDetail) {
         if (config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경') {
           const color = config.monochromeColor || 'Cobalt Blue';
           const bgType = config.spaceDetail === '그라데이션 배경' ? 'gradient' : 'monochrome solid color';
-          envStr += `, with a perfect ${color} ${bgType} background`;
+          envStr = `a perfect ${color} ${bgType} background`;
         } else {
-          envStr += `, ${DICTIONARY.spaceDetail[config.spaceDetail]}`;
+          envStr = DICTIONARY.spaceDetail[config.spaceDetail];
         }
       }
       if (config.spaceType !== '스튜디오') {
@@ -1677,7 +1720,12 @@ export default function App() {
         }
         if (config.country !== "선택안함") envStr += ` in ${DICTIONARY.country[config.country]}`;
       }
-      parts.push(`set in ${envStr}`);
+      
+      if (envStr.startsWith("in ") || envStr.startsWith("within ") || envStr.startsWith("surrounded ")) {
+        parts.push(envStr);
+      } else {
+        parts.push(`set in ${envStr}`);
+      }
 
       if (config.spaceType !== '스튜디오' && config.interiorStyle !== "선택안함") {
         parts.push(`designed with ${DICTIONARY.interiorStyle[config.interiorStyle]}`);
@@ -1695,7 +1743,7 @@ export default function App() {
       }
 
       if (config.useLight && config.light !== "선택안함") {
-        parts.push(`illuminated by ${DICTIONARY.light[config.light]} with ${config.brightness} brightness`);
+        parts.push(`illuminated by ${DICTIONARY.light[config.light]}`);
       }
       if (config.productLayout && config.productLayout !== "선택안함") parts.push(DICTIONARY.productLayout[config.productLayout]);
       if (config.copySpace && config.copySpace !== "선택안함") parts.push(DICTIONARY.copySpace[config.copySpace]);
@@ -2016,6 +2064,8 @@ export default function App() {
             const DOUBLE_PRESS_DELAY = 300;
             if (now - lastTapRef.current < DOUBLE_PRESS_DELAY) {
               setIsZoomed(prev => !prev);
+            } else {
+              setShowLightboxOptions(prev => !prev);
             }
             lastTapRef.current = now;
           };
@@ -2195,7 +2245,6 @@ export default function App() {
                   position: 'absolute',
                   bottom: '20px',
                   left: '50%',
-                  transform: 'translateX(-50%)',
                   backgroundColor: 'rgba(0,0,0,0.75)',
                   backdropFilter: 'blur(10px)',
                   border: '1px solid rgba(255,255,255,0.2)',
@@ -2204,7 +2253,11 @@ export default function App() {
                   alignItems: 'center',
                   gap: '12px',
                   zIndex: 10,
-                  maxWidth: '90vw'
+                  maxWidth: '90vw',
+                  opacity: showLightboxOptions ? 1 : 0,
+                  pointerEvents: showLightboxOptions ? 'auto' : 'none',
+                  transition: 'opacity 0.25s ease-in-out, transform 0.25s ease-in-out',
+                  transform: showLightboxOptions ? 'translate(-50%, 0)' : 'translate(-50%, 20px)'
                 }}
               >
                 <button
@@ -3580,7 +3633,6 @@ export default function App() {
                     )}
                     {config.spaceType !== '스튜디오' && (
                       <>
-                        <div style={{ borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)', margin: '24px 0' }} />
                         <OptionSelect label="인테리어 양식" value={config.interiorStyle} onChange={(v) => handleConfigChange('interiorStyle', v)} options={OPTIONS_DATA.interiorStyle} theme="green" />
                         <div className="mt-4">
                           <OptionSelect label="국가/지역 (Country)" value={config.country} onChange={(v) => handleConfigChange('country', v)} options={OPTIONS_DATA.country} theme="green" />
@@ -3639,7 +3691,7 @@ export default function App() {
 
                     <div className="mt-4 border-t border-gray-100 pt-4">
                       <IOSToggle
-                        label="조명 밝기(Lighting Brightness)"
+                        label="조명 사용 (Lighting)"
                         isOn={config.useLight}
                         onToggle={() => handleConfigChange('useLight', !config.useLight)}
                         activeColor="#0055FF"
@@ -3648,22 +3700,6 @@ export default function App() {
                         {config.useLight && (
                           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                             <OptionSelect label="조명 스타일" value={config.light} onChange={(v) => handleConfigChange('light', v)} options={OPTIONS_DATA.light} theme="purple" />
-                            <div className="p-4 bg-gray-50 dark:bg-zinc-800 rounded-2xl mt-2 mb-4">
-                              <div className="flex justify-between items-center mb-2">
-                                <label className="text-[11px] font-black text-gray-400 uppercase tracking-wider">Brightness (밝기)</label>
-                                <span className="text-[11px] font-black text-[#0055FF]">{config.brightness}</span>
-                              </div>
-                              <input
-                                type="range"
-                                min="0.1"
-                                max="2.0"
-                                step="0.1"
-                                value={config.brightness}
-                                onChange={(e) => handleConfigChange('brightness', parseFloat(e.target.value))}
-                                className="w-full h-1 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer"
-                                style={{ accentColor: '#0055FF' }}
-                              />
-                            </div>
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -4777,8 +4813,8 @@ export default function App() {
                 }
               });
 
-              if (config.useLight && config.brightness) {
-                tags.push({ key: 'light-brightness', val: `조명: ${config.brightness}`, group: 4, bgColor: '#AF52DE', textColor: '#FFFFFF' });
+              if (config.useLight) {
+                tags.push({ key: 'light-on', val: '조명 사용', group: 4, bgColor: '#AF52DE', textColor: '#FFFFFF' });
               }
               if (removeText) {
                 tags.push({ key: 'remove-text', val: '텍스트 제거', group: 4, bgColor: '#AF52DE', textColor: '#FFFFFF' });
