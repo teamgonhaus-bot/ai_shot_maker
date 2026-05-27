@@ -102,7 +102,7 @@ const enhancePrompt = (prompt) => {
 };
 
 const DICTIONARY = {
-  subjectNum: { "없음": "", "혼자": "a single person", "다수": "a group of people" },
+  subjectNum: { "없음": "", "혼자": "a single person", "2인": "two people", "소수": "a few people", "다수": "a group of people" },
   subjectGender: { "선택안함": "", "여성": "female", "남성": "male", "혼성": "mixed gender" },
   subjectAge: { "선택안함": "", "10대": "teenager", "20대": "in their 20s", "30대": "in their 30s", "40대": "in their 40s", "중장년": "middle-aged" },
   subjectRegion: { "선택안함": "", "한국": "Korean", "일본": "Japanese", "북유럽": "Northern European", "북미": "North American" },
@@ -158,7 +158,7 @@ const DICTIONARY = {
 };
 
 const OPTIONS_DATA = {
-  subjectNum: ["없음", "혼자", "다수"],
+  subjectNum: ["없음", "혼자", "2인", "소수", "다수"],
   subjectGender: ["선택안함", "여성", "남성", "혼성"],
   subjectAge: ["선택안함", "10대", "20대", "30대", "40대", "중장년"],
   subjectRegion: ["선택안함", "한국", "일본", "북유럽", "북미"],
