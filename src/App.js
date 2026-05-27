@@ -427,43 +427,56 @@ export default function App() {
     await handleApplyAsReference(img.url, true);
   };
 
-  // 2.6. Cross-Platform 지능형 이미지 다운로더
+  // 2.6. Cross-Platform 지능형 이미지 다운로더 (Web Share API 및 Blob 직접 다운로드 연계)
   const handleDownloadImage = async (imageUrl) => {
     try {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      
-      if (isIOS) {
-        triggerToast("아이폰/iOS 기기에서는 이미지를 새 창으로 엽니다. 길게 눌러 '사진 앱에 저장'을 선택하세요!");
-        window.open(imageUrl, '_blank');
-        return;
+      triggerToast("이미지 저장을 진행 중입니다...");
+
+      let blob;
+      // 1. Data URL 또는 원격 URL을 분기하여 Blob 객체로 변환
+      if (imageUrl.startsWith('data:')) {
+        blob = dataURLtoBlob(imageUrl);
+      } else {
+        const response = await fetch(imageUrl);
+        blob = await response.blob();
       }
 
-      triggerToast("이미지 다운로드를 시작합니다...");
-      if (imageUrl.startsWith('blob:') || imageUrl.startsWith('data:')) {
-        const link = document.createElement('a');
-        link.href = imageUrl;
-        link.download = `shotmaker_${Date.now()}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        triggerToast("다운로드 완료!");
-        return;
+      const fileName = `shotmaker_${Date.now()}.png`;
+
+      // 2. 모바일/태블릿 환경일 경우 Web Share API를 시도하여 시스템 사진첩 저장 유도
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (isMobile && navigator.canShare && navigator.share) {
+        try {
+          const file = new File([blob], fileName, { type: blob.type });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: 'Shot Maker Image',
+              text: 'Save this image to your photo gallery'
+            });
+            triggerToast("사진첩 저장(공유) 창이 활성화되었습니다. '이미지 저장'을 선택해 저장하세요!");
+            return;
+          }
+        } catch (shareError) {
+          console.warn("Web Share API failed, falling back to direct download:", shareError);
+        }
       }
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
+
+      // 3. 데스크톱 및 일반 브라우저를 위한 Blob 강제 직접 다운로드 흐름 (새 창 안 열림)
       const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = blobUrl;
-      link.download = `shotmaker_${Date.now()}.png`;
+      link.download = fileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
-      triggerToast("다운로드 완료!");
+      triggerToast("이미지가 성공적으로 저장되었습니다!");
     } catch (err) {
-      console.warn("Blob downloader failed, using Safari/mobile fallback:", err);
+      console.error("❌ 이미지 다운로드 오류:", err);
+      // 브라우저 샌드박스 보안 규칙 등으로 막힐 때 최후의 대비책으로만 새 탭 띄움
       window.open(imageUrl, '_blank');
-      triggerToast("새 창이 열렸습니다. 길게 눌러 사진첩에 저장해 주세요!");
+      triggerToast("새 창으로 열린 이미지를 길게 누르거나 우클릭하여 저장해 주세요.");
     }
   };
 
@@ -1942,10 +1955,7 @@ export default function App() {
 
   const handleDownload = () => {
     if (!generatedImage) return;
-    const a = document.createElement("a");
-    a.href = generatedImage;
-    a.download = `shotmaker_${Date.now()}.png`;
-    a.click();
+    handleDownloadImage(generatedImage);
   };
 
   return (
@@ -2102,7 +2112,7 @@ export default function App() {
                   </div>
                 )}
 
-                <motion.img 
+                 <motion.img 
                   key={lightboxImage}
                   ref={(el) => {
                     if (el) {
@@ -2111,10 +2121,11 @@ export default function App() {
                       }
                     }
                   }}
-                  drag="x"
+                  drag={isZoomed ? false : "x"}
                   dragConstraints={{ left: 0, right: 0 }}
                   dragElastic={0.6}
                   onDragEnd={(event, info) => {
+                    if (isZoomed) return; // 줌 상태에서는 스와이프 완전 방어
                     const swipeThreshold = 100; // 100px drag to swipe
                     if (info.offset.x > swipeThreshold) {
                       // Dragged right -> Previous Image
@@ -2129,14 +2140,15 @@ export default function App() {
                   className="ios-lightbox-img" 
                   onLoad={() => setLightboxLoaded(true)}
                   onClick={handleImageTap}
+                  animate={{ scale: isZoomed ? 1.8 : 1 }}
+                  transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                   style={{
-                    transform: isZoomed ? 'scale(1.8)' : 'scale(1)',
-                    transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease',
                     cursor: isZoomed ? 'zoom-out' : 'zoom-in',
                     maxHeight: '80vh',
                     maxWidth: '90vw',
                     objectFit: 'contain',
-                    opacity: lightboxLoaded ? 1 : 0
+                    opacity: lightboxLoaded ? 1 : 0,
+                    touchAction: 'none'
                   }}
                 />
               </motion.div>
