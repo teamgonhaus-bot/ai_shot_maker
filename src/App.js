@@ -135,7 +135,7 @@ const DICTIONARY = {
   },
   detailWall: { "화이트 페인트": "clean white painted walls", "노출 콘크리트": "exposed raw concrete walls", "웨인스코팅": "elegant wainscoted walls", "파스텔톤 벽지": "soft pastel wallpaper", "붉은 벽돌": "rustic red brick walls", "세라믹타일": "ceramic tiled walls", "paneled walls": "paneled walls", "템바보드": "tambour board walls", "원목패널": "solid wood paneled walls", "스틸패널": "steel paneled walls", "스톤패널": "stone paneled walls" },
   interiorStyle: { "선택안함": "", "미드센추리 모던": "mid-century modern style", "모던 미니멀": "modern minimal style", "내추럴 우드": "natural wood interior style", "젠 스타일": "Zen-inspired style", "인더스트리얼": "industrial style", "스칸디나비안": "Scandinavian style", "플랜테리어": "planterior style with many indoor plants" },
-  light: { "선택안함": "", "자연광": "natural sunlight", "시네마틱": "cinematic dramatic lighting", "스튜디오 조명": "professional studio softbox lighting", "스포트라이트 조명": "focused spotlight lighting", "무드등": "soft mood lighting", "나르스 확산광": "soft, diffused lighting", "앤비언트 라이트": "warm ambient indoor light", "균일하게 비치는 조명": "evenly distributed bright studio light" },
+  light: { "선택안함": "", "자연광": "natural sunlight", "시네마틱": "cinematic dramatic lighting", "스튜디오 조명": "professional studio softbox lighting", "스포트라이트 조명": "focused spotlight lighting", "무드등": "soft mood lighting", "나르스 확산광": "soft, diffused lighting", "앰비언트 라이트": "warm ambient indoor light", "균일하게 비치는 조명": "evenly distributed bright studio light" },
 
   detailFloor: { "밝은 우드 마루": "light wood flooring", "어두운 우드 마루": "dark walnut wood flooring", "테라조 타일": "modern terrazzo tile floor", "대리석": "premium marble flooring", "콘크리트": "polished concrete floor", "조약돌 바닥": "pebble stone floor", "자갈 바닥": "gravel floor", "카펫": "with cozy carpet texture", "포세린타일": "with polished porcelain tiles", "에폭시": "with industrial epoxy flooring" },
   detailWood: { "오크(참나무)": "natural oak wood textures", "월넛(호두나무)": "rich walnut wood details", "자작나무": "birch wood accents", "티크": "premium teak wood", "애쉬": "with natural ash wood grain", "마호가니": "with rich mahogany wood finish", "미송": "with clean pine wood textures", "OBS": "with rugged OSB textures", "합판": "with minimalist plywood details" },
@@ -191,7 +191,7 @@ const OPTIONS_DATA = {
     "야외": ["도심", "자연", "테라스", "공원", "강가", "쇼핑가", "힙한곳"]
   },
   interiorStyle: ["선택안함", "미드센추리 모던", "모던 미니멀", "내추럴 우드", "젠 스타일", "인더스트리얼", "스칸디나비안", "플랜테리어"],
-  light: ["선택안함", "자연광", "시네마틱", "스튜디오 조명", "스포트라이트 조명", "무드등", "나르스 확산광", "앤비언트 라이트", "균일하게 비치는 조명"],
+  light: ["선택안함", "자연광", "시네마틱", "스튜디오 조명", "스포트라이트 조명", "무드등", "나르스 확산광", "앰비언트 라이트", "균일하게 비치는 조명"],
   detailFloor: ["밝은 우드 마루", "어두운 우드 마루", "테라조 타일", "대리석", "콘크리트", "조약돌 바닥", "자갈 바닥", "카펫", "포세린타일", "에폭시"],
   detailWood: ["오크(참나무)", "월넛(호두나무)", "자작나무", "티크", "애쉬", "마호가니", "미송", "OBS", "합판"],
   detailMetal: ["황동(브라스)", "크롬/실버", "무광 블랙", "유광 블랙", "로즈골드"],
@@ -964,8 +964,11 @@ export default function App() {
       targetConfig.subjectNum = '혼자';
       targetConfig.subjectGender = '여성';
       targetConfig.subjectAge = '20대';
-      targetConfig.subjectAction = '활발함';
+      targetConfig.subjectRegion = '한국';
       targetConfig.subjectClothesStyle = '스트릿';
+      targetConfig.subjectClothesBottom = '미니스커트';
+      targetConfig.femaleClothesBottom = '미니스커트';
+      targetConfig.subjectAction = '활발함';
       targetConfig.spaceType = '야외';
       targetConfig.spaceDetail = '힙한곳';
       targetConfig.interiorStyle = '플랜테리어';
@@ -1010,13 +1013,14 @@ export default function App() {
       setActiveMarquee("USAGE SCENE Active: Lifestyle product-in-use inside clean white studio backdrop...");
 
     } else if (templateType === 'HOME LIVING') {
-      // Home: 20대 여성, 혼자, 캐주얼, 긴바지, 리빙룸, 휴식
+      // Home: 20대 여성, 혼자, 캐주얼, 기본 스커트, 리빙룸, 휴식, 일본 지역/인종
       targetConfig.subjectNum = '혼자';
       targetConfig.subjectGender = '여성';
       targetConfig.subjectAge = '20대';
+      targetConfig.subjectRegion = '일본';
       targetConfig.subjectClothesStyle = '캐주얼';
-      targetConfig.subjectClothesBottom = '긴바지';
-      targetConfig.femaleClothesBottom = '긴바지';
+      targetConfig.subjectClothesBottom = '기본 스커트';
+      targetConfig.femaleClothesBottom = '기본 스커트';
       targetConfig.subjectAction = '휴식';
       targetConfig.spaceType = '홈';
       targetConfig.spaceDetail = '리빙';
@@ -1026,7 +1030,7 @@ export default function App() {
       targetConfig.productAnchor = '선택안함';
       targetConfig.aspectRatio = '16:9 (Widescreen)';
       targetConfig.useLight = true;
-      targetConfig.light = '앤비언트 라이트';
+      targetConfig.light = '앰비언트 라이트';
       targetConfig.shotStyle = ['라이프스타일', '인테리어 잡지 샷', '심도 얕은 샷(아웃포커싱)'];
       targetConfig.interiorStyle = '내추럴 우드';
       targetConfig.country = '선택안함';
@@ -1168,7 +1172,6 @@ export default function App() {
       marqueeMsg = `Detail Scene Shuffle: High-contrast Close-up Re-arranged!`;
 
     } else if (activeTemplate === 'INSTA SCENE') {
-      const genders = ['여성', '남성'];
       const clothes = ['스트릿', '캐주얼', '미니멀'];
       const spaces = ['힙한곳', '도심', '공원', '카페'];
       const styles = [
@@ -1176,26 +1179,44 @@ export default function App() {
         ['컬러블로킹', '심도 얕은 샷(아웃포커싱)'],
         ['네거티브 스페이스', '심도 얕은 샷(아웃포커싱)']
       ];
-      targetConfig.subjectGender = genders[Math.floor(Math.random() * genders.length)];
+      const bottomClothes = ['미니스커트', '반바지', '긴바지'];
+      const hairs = ['단발', '긴머리', '짧은머리', '묶은머리'];
+      const actions = ['기본', '활발함', '대화'];
+      const detailedActions = ['선택안함', '잡기', '들기', '사용', '서기'];
+      const regions = ['한국', '선택안함'];
+
+      targetConfig.subjectGender = '여성'; // 성별 여성 고정
+      targetConfig.subjectAge = '20대';
+      targetConfig.subjectRegion = regions[Math.floor(Math.random() * regions.length)];
+      targetConfig.subjectHair = hairs[Math.floor(Math.random() * hairs.length)];
       targetConfig.subjectClothesStyle = clothes[Math.floor(Math.random() * clothes.length)];
+      targetConfig.subjectClothesBottom = bottomClothes[Math.floor(Math.random() * bottomClothes.length)];
+      targetConfig.femaleClothesBottom = targetConfig.subjectClothesBottom;
+      targetConfig.subjectAction = actions[Math.floor(Math.random() * actions.length)];
+      targetConfig.subjectDetailAction = detailedActions[Math.floor(Math.random() * detailedActions.length)];
+
       targetConfig.spaceDetail = spaces[Math.floor(Math.random() * spaces.length)];
       targetConfig.shotStyle = styles[Math.floor(Math.random() * styles.length)];
-      marqueeMsg = `Insta Scene Shuffle: New SNS Snap composition loaded!`;
+      marqueeMsg = `Insta Scene Shuffle: MZ-themed SNS Snap refreshed (Gender: Female)!`;
 
     } else if (activeTemplate === 'USAGE SCENE') {
-      const genders = ['여성', '남성'];
       const actions = ['기본', '차분함', '활발함', '업무', '휴식', '대화'];
       const detailedActions = ['선택안함', '잡기', '들기', '사용', '앉기', '서기'];
       const ages = ['20대', '30대', '40대'];
       const hairs = ['긴머리', '짧은머리', '단발', '묶은머리'];
       const clothesStyles = ['캐주얼', '비즈니스', '미니멀'];
+      const bottomClothes = ['기본 스커트', '미니스커트', '긴바지', '반바지'];
+      const regions = ['한국', '일본', '선택안함'];
 
-      targetConfig.subjectGender = genders[Math.floor(Math.random() * genders.length)];
-      targetConfig.subjectAction = actions[Math.floor(Math.random() * actions.length)];
-      targetConfig.subjectDetailAction = detailedActions[Math.floor(Math.random() * detailedActions.length)];
+      targetConfig.subjectGender = '여성'; // 성별 여성 고정
       targetConfig.subjectAge = ages[Math.floor(Math.random() * ages.length)];
+      targetConfig.subjectRegion = regions[Math.floor(Math.random() * regions.length)];
       targetConfig.subjectHair = hairs[Math.floor(Math.random() * hairs.length)];
       targetConfig.subjectClothesStyle = clothesStyles[Math.floor(Math.random() * clothesStyles.length)];
+      targetConfig.subjectClothesBottom = bottomClothes[Math.floor(Math.random() * bottomClothes.length)];
+      targetConfig.femaleClothesBottom = targetConfig.subjectClothesBottom;
+      targetConfig.subjectAction = actions[Math.floor(Math.random() * actions.length)];
+      targetConfig.subjectDetailAction = detailedActions[Math.floor(Math.random() * detailedActions.length)];
 
       // 인물 외 공간(스튜디오, 단색 배경) 및 주요 세팅은 바뀌지 않도록 명시적 고정
       targetConfig.spaceType = '스튜디오';
@@ -1209,34 +1230,88 @@ export default function App() {
       targetConfig.interiorStyle = '선택안함';
       targetConfig.country = '선택안함';
 
-      marqueeMsg = `User Scene Shuffle: Lifestyle subject traits updated, backdrop locked!`;
+      marqueeMsg = `User Scene Shuffle: Subject features updated (Gender: Female), backdrop locked!`;
 
     } else if (activeTemplate === 'HOME LIVING') {
       const spaces = ['리빙', '다이닝', '룸', '워크룸', '베드룸', '테라스'];
-      const lights = ['자연광', '앤비언트 라이트', '무드등'];
+      const lights = ['자연광', '앰비언트 라이트', '무드등']; // 오타 수정
       const interiors = ['내추럴 우드', '모던 미니멀', '스칸디나비안', '플랜테리어'];
+      
+      const bottomClothes = ['기본 스커트', '긴바지', '반바지'];
+      const hairs = ['긴머리', '단발', '묶은머리', '짧은머리'];
+      const ages = ['20대', '30대'];
+      const actions = ['휴식', '차분함', '기본'];
+      const detailedActions = ['선택안함', '잡기', '사용', '앉기'];
+      const regions = ['일본', '한국', '선택안함'];
+
+      targetConfig.subjectGender = '여성'; // 성별 여성 고정
+      targetConfig.subjectAge = ages[Math.floor(Math.random() * ages.length)];
+      targetConfig.subjectRegion = regions[Math.floor(Math.random() * regions.length)];
+      targetConfig.subjectHair = hairs[Math.floor(Math.random() * hairs.length)];
+      targetConfig.subjectClothesStyle = ['캐주얼', '미니멀'][Math.floor(Math.random() * 2)];
+      targetConfig.subjectClothesBottom = bottomClothes[Math.floor(Math.random() * bottomClothes.length)];
+      targetConfig.femaleClothesBottom = targetConfig.subjectClothesBottom;
+      targetConfig.subjectAction = actions[Math.floor(Math.random() * actions.length)];
+      targetConfig.subjectDetailAction = detailedActions[Math.floor(Math.random() * detailedActions.length)];
+
       targetConfig.spaceDetail = spaces[Math.floor(Math.random() * spaces.length)];
       targetConfig.light = lights[Math.floor(Math.random() * lights.length)];
       targetConfig.interiorStyle = interiors[Math.floor(Math.random() * interiors.length)];
-      marqueeMsg = `Home Scene Shuffle: ${targetConfig.spaceDetail} & ${targetConfig.interiorStyle} Cozy Setting Active!`;
+      marqueeMsg = `Home Scene Shuffle: Cozy setting updated (Gender: Female)!`;
 
     } else if (activeTemplate === 'OFFICE TECH') {
       const spaces = ['공유오피스', '사무실', '회의실', '중역실'];
-      const lights = ['자연광', '앤비언트 라이트', '나르스 확산광'];
+      const lights = ['자연광', '앰비언트 라이트', '나르스 확산광']; // 오타 수정
       const interiors = ['모던 미니멀', '인더스트리얼', '미드센추리 모던'];
+      
+      const bottomClothes = ['기본 스커트', '미니스커트', '긴바지'];
+      const hairs = ['긴머리', '짧은머리', '묶은머리', '단발'];
+      const ages = ['20대', '30대', '40대'];
+      const actions = ['업무', '대화', '차분함'];
+      const detailedActions = ['선택안함', '사용', '앉기', '서기'];
+      const regions = ['한국', '일본', '북미', '북유럽', '선택안함'];
+
+      targetConfig.subjectGender = '여성'; // 성별 여성 고정
+      targetConfig.subjectAge = ages[Math.floor(Math.random() * ages.length)];
+      targetConfig.subjectRegion = regions[Math.floor(Math.random() * regions.length)];
+      targetConfig.subjectHair = hairs[Math.floor(Math.random() * hairs.length)];
+      targetConfig.subjectClothesStyle = ['비즈니스', '미니멀'][Math.floor(Math.random() * 2)];
+      targetConfig.subjectClothesBottom = bottomClothes[Math.floor(Math.random() * bottomClothes.length)];
+      targetConfig.femaleClothesBottom = targetConfig.subjectClothesBottom;
+      targetConfig.subjectAction = actions[Math.floor(Math.random() * actions.length)];
+      targetConfig.subjectDetailAction = detailedActions[Math.floor(Math.random() * detailedActions.length)];
+
       targetConfig.spaceDetail = spaces[Math.floor(Math.random() * spaces.length)];
       targetConfig.light = lights[Math.floor(Math.random() * lights.length)];
       targetConfig.interiorStyle = interiors[Math.floor(Math.random() * interiors.length)];
-      marqueeMsg = `Office Scene Shuffle: ${targetConfig.spaceDetail} workspace reorganized!`;
+      marqueeMsg = `Office Scene Shuffle: Business setting rearranged (Gender: Female)!`;
 
     } else if (activeTemplate === 'RETAIL SCENE') {
       const spaces = ['쇼룸', '카페', '식당', '갤러리', '로비'];
-      const lights = ['시네마틱', '앤비언트 라이트', '스포트라이트 조명'];
+      const lights = ['시네마틱', '앰비언트 라이트', '스포트라이트 조명']; // 오타 수정
       const interiors = ['모던 미니멀', '인더스트리얼', '젠 스타일'];
+
+      const bottomClothes = ['기본 스커트', '미니스커트', '긴바지'];
+      const hairs = ['긴머리', '단발', '묶은머리', '짧은머리'];
+      const ages = ['20대', '30대'];
+      const actions = ['대화', '휴식', '기본'];
+      const detailedActions = ['선택안함', '잡기', '들기', '사용', '앉기', '서기'];
+      const regions = ['한국', '일본', '북유럽', '선택안함'];
+
+      targetConfig.subjectGender = '여성'; // 성별 여성 고정
+      targetConfig.subjectAge = ages[Math.floor(Math.random() * ages.length)];
+      targetConfig.subjectRegion = regions[Math.floor(Math.random() * regions.length)];
+      targetConfig.subjectHair = hairs[Math.floor(Math.random() * hairs.length)];
+      targetConfig.subjectClothesStyle = ['캐주얼', '미니멀', '스트릿'][Math.floor(Math.random() * 3)];
+      targetConfig.subjectClothesBottom = bottomClothes[Math.floor(Math.random() * bottomClothes.length)];
+      targetConfig.femaleClothesBottom = targetConfig.subjectClothesBottom;
+      targetConfig.subjectAction = actions[Math.floor(Math.random() * actions.length)];
+      targetConfig.subjectDetailAction = detailedActions[Math.floor(Math.random() * detailedActions.length)];
+
       targetConfig.spaceDetail = spaces[Math.floor(Math.random() * spaces.length)];
       targetConfig.light = lights[Math.floor(Math.random() * lights.length)];
       targetConfig.interiorStyle = interiors[Math.floor(Math.random() * interiors.length)];
-      marqueeMsg = `Retail Scene Shuffle: Premium ${targetConfig.spaceDetail} space display updated!`;
+      marqueeMsg = `Retail Scene Shuffle: Premium showroom setting updated (Gender: Female)!`;
 
     } else if (activeTemplate === 'NATURE ORGANIC') {
       const spaces = ['자연', '공원', '강가', '도심'];
@@ -1246,10 +1321,28 @@ export default function App() {
          ['네거티브 스페이스', '심도 얕은 샷(아웃포커싱)'],
          ['와이드 건축/공간 샷', '심도 얕은 샷(아웃포커싱)']
       ];
+
+      const bottomClothes = ['긴바지', '반바지', '롱스커트'];
+      const hairs = ['긴머리', '단발', '묶은머리', '짧은머리'];
+      const ages = ['20대', '30대'];
+      const actions = ['휴식', '기본', '차분함'];
+      const detailedActions = ['선택안함', '앉기', '서기', '들기'];
+      const regions = ['한국', '일본', '북유럽', '선택안함'];
+
+      targetConfig.subjectGender = '여성'; // 성별 여성 고정
+      targetConfig.subjectAge = ages[Math.floor(Math.random() * ages.length)];
+      targetConfig.subjectRegion = regions[Math.floor(Math.random() * regions.length)];
+      targetConfig.subjectHair = hairs[Math.floor(Math.random() * hairs.length)];
+      targetConfig.subjectClothesStyle = ['캐주얼', '미니멀', '스트릿'][Math.floor(Math.random() * 3)];
+      targetConfig.subjectClothesBottom = bottomClothes[Math.floor(Math.random() * bottomClothes.length)];
+      targetConfig.femaleClothesBottom = targetConfig.subjectClothesBottom;
+      targetConfig.subjectAction = actions[Math.floor(Math.random() * actions.length)];
+      targetConfig.subjectDetailAction = detailedActions[Math.floor(Math.random() * detailedActions.length)];
+
       targetConfig.spaceDetail = spaces[Math.floor(Math.random() * spaces.length)];
       targetConfig.light = lights[Math.floor(Math.random() * lights.length)];
       targetConfig.shotStyle = styles[Math.floor(Math.random() * styles.length)];
-      marqueeMsg = `Outdoor Scene Shuffle: Natural elements and background landscape rearranged!`;
+      marqueeMsg = `Outdoor Scene Shuffle: Natural elements updated (Gender: Female)!`;
     }
 
     // 인물 유무 스위치 상태 반영
