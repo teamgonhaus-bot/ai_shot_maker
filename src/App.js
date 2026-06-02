@@ -108,21 +108,21 @@ const DICTIONARY = {
   subjectRegion: { "선택안함": "", "한국": "Korean", "일본": "Japanese", "북유럽": "Northern European", "북미": "North American" },
   subjectAction: {
     "선택안함": "",
-    "기본": "posing naturally",
-    "차분함": "with a calm demeanor",
-    "활발함": "with energetic and active movement",
-    "업무": "focused on work, writing, or using a laptop with professional concentration",
-    "휴식": "relaxing comfortably, sitting back, or enjoying a warm beverage with a peaceful look",
-    "대화": "engaging in a friendly conversation, smiling, talking, and gesturing warmly"
+    "기본": "posing",
+    "차분함": "calm",
+    "활발함": "active",
+    "업무": "working",
+    "휴식": "relaxing",
+    "대화": "conversing"
   },
   subjectClothesStyle: { "선택안함": "", "캐주얼": "casual style", "비즈니스": "business style", "스트릿": "streetwear style", "미니멀": "minimalist style", "포멀/정장": "formal suit style" },
   subjectClothesTop: {
     "선택안함": "", "반팔티": "wearing a short sleeve t-shirt", "긴팔티": "wearing a long sleeve t-shirt", "자켓": "wearing a jacket", "아우터": "wearing outerwear", "원피스": "wearing a dress", "스포츠 복장": "wearing sportswear", "아웃도어": "wearing outdoor apparel"
   },
   subjectClothesBottom: {
-    "선택안함": "", "기본 스커트": "with a basic skirt", "미니스커트": "with a miniskirt", "롱스커트": "with a long skirt", "긴바지": "with long pants", "반바지": "with shorts"
+    "선택안함": "", "기본 스커트": "in skirt", "미니스커트": "in miniskirt", "롱스커트": "in long skirt", "긴바지": "in pants", "반바지": "in shorts"
   },
-  subjectHair: { "선택안함": "", "긴머리": "with long hair", "짧은머리": "with short hair", "단발": "with bob hair", "펌": "with permed hair", "염색": "with dyed hair", "묶은머리": "with tied hair" },
+  subjectHair: { "선택안함": "", "긴머리": "long hair", "짧은머리": "short hair", "단발": "bob hair", "펌": "permed hair", "염색": "dyed hair", "묶은머리": "tied hair" },
 
   spaceType: { "스튜디오": "a professional studio environment", "오피스": "a modern office space", "홈": "a cozy home interior", "리테일": "a retail commercial space", "라운지": "a luxury lounge area", "야외": "an outdoor setting" },
   spaceDetail: {
@@ -361,6 +361,119 @@ export default function App() {
   const [activeMarquee, setActiveMarquee] = useState("");
   const [activeLibraryTemplateId, setActiveLibraryTemplateId] = useState(null);
   const [aboutModalTarget, setAboutModalTarget] = useState(null);
+
+  // Smart scene preview states (Moodboard gallery)
+  const [smartScenePreviews, setSmartScenePreviews] = useState(() => {
+    try {
+      const saved = localStorage.getItem('smart_scene_previews');
+      return saved ? JSON.parse(saved) : {
+        'TITLE SCENE': [],
+        'DETAIL SCENE': [],
+        'INSTA SCENE': [],
+        'USAGE SCENE': [],
+        'HOME LIVING': [],
+        'OFFICE TECH': [],
+        'RETAIL SCENE': [],
+        'NATURE ORGANIC': []
+      };
+    } catch (e) {
+      console.error(e);
+      return {
+        'TITLE SCENE': [],
+        'DETAIL SCENE': [],
+        'INSTA SCENE': [],
+        'USAGE SCENE': [],
+        'HOME LIVING': [],
+        'OFFICE TECH': [],
+        'RETAIL SCENE': [],
+        'NATURE ORGANIC': []
+      };
+    }
+  });
+
+  const [showSmartPreview, setShowSmartPreview] = useState(() => {
+    const saved = localStorage.getItem('show_smart_preview');
+    return saved !== 'false';
+  });
+
+  const [activePreviewIndex, setActivePreviewIndex] = useState(0);
+
+  // Smart Scene Preview upload, deletion, and toggle helpers
+  const handleUploadSmartPreview = (e, templateId) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+
+    let processedCount = 0;
+    const newImages = [];
+
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const maxDim = 800;
+          let width = img.width;
+          let height = img.height;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL('image/jpeg', 0.7);
+
+          newImages.push(compressed);
+          processedCount++;
+
+          if (processedCount === files.length) {
+            setSmartScenePreviews(prev => {
+              const updated = {
+                ...prev,
+                [templateId]: [...(prev[templateId] || []), ...newImages]
+              };
+              localStorage.setItem('smart_scene_previews', JSON.stringify(updated));
+              return updated;
+            });
+            setActivePreviewIndex(0);
+            triggerToast(`${files.length}개의 참고 이미지가 추가되었습니다.`);
+          }
+        };
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleDeleteSmartPreview = (templateId, indexToDelete) => {
+    setSmartScenePreviews(prev => {
+      const currentList = prev[templateId] || [];
+      const updatedList = currentList.filter((_, idx) => idx !== indexToDelete);
+      const updated = {
+        ...prev,
+        [templateId]: updatedList
+      };
+      localStorage.setItem('smart_scene_previews', JSON.stringify(updated));
+      return updated;
+    });
+    setActivePreviewIndex(prev => Math.max(0, prev - 1));
+    triggerToast(`참고 이미지가 삭제되었습니다.`);
+  };
+
+  const toggleSmartPreview = () => {
+    setShowSmartPreview(prev => {
+      const nextVal = !prev;
+      localStorage.setItem('show_smart_preview', String(nextVal));
+      return nextVal;
+    });
+  };
 
   // 1. Firebase Gallery & Folders Load (컴포넌트 레벨 공용 함수, Stale-While-Revalidate 캐싱)
   const fetchGalleryData = async (force = false) => {
@@ -742,7 +855,7 @@ export default function App() {
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.65F Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.66 Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -1080,10 +1193,11 @@ export default function App() {
       setActiveMarquee("OUTDOOR SCENE Active: Eco-friendly outdoor natural environment snap with natural elements...");
 
     } else if (templateType === 'RETAIL SCENE') {
-      // Retail: 20대 여성, 다수, 긴머리, 캐주얼, 미니스커트, 카페
+      // Retail: 20대 여성, 다수, 일본 인종, 긴머리, 캐주얼, 미니스커트, 카페, 자연광
       targetConfig.subjectNum = '다수';
       targetConfig.subjectGender = '여성';
       targetConfig.subjectAge = '20대';
+      targetConfig.subjectRegion = '일본';
       targetConfig.subjectHair = '긴머리';
       targetConfig.subjectClothesStyle = '캐주얼';
       targetConfig.subjectClothesBottom = '미니스커트';
@@ -1097,7 +1211,7 @@ export default function App() {
       targetConfig.productAnchor = '선택안함';
       targetConfig.aspectRatio = '4:3 (Standard)';
       targetConfig.useLight = true;
-      targetConfig.light = '시네마틱';
+      targetConfig.light = '자연광';
       targetConfig.shotStyle = ['인테리어 잡지 샷', '와이드 건축/공간 샷'];
       targetConfig.interiorStyle = '모던 미니멀';
       targetConfig.country = '선택안함';
@@ -2144,7 +2258,7 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.65F | Shot Maker Workspace
+              v0.66 | Shot Maker Workspace
             </div>
           </div>
         </div>
@@ -3482,6 +3596,233 @@ export default function App() {
                 );
               })}
             </div>
+
+            {/* 3. 스마트씬별 예상느낌 참고 이미지 무드보드 */}
+            {activeTemplate && (
+              <div 
+                style={{ 
+                  marginTop: '24px', 
+                  border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`, 
+                  borderRadius: '0px', 
+                  backgroundColor: isDarkMode ? '#1C1C1E' : '#FFFFFF', 
+                  padding: '16px',
+                  boxShadow: isDarkMode ? 'none' : '4px 4px 0px #0022FF',
+                  fontFamily: "'Outfit', 'Inter', sans-serif"
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '13px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>
+                      Moodboard Preview
+                    </span>
+                    <span style={{ fontSize: '11px', fontWeight: '800', opacity: 0.6, color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>
+                      ({smartScenePreviews[activeTemplate]?.length || 0})
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {/* Toggle Button */}
+                    <button
+                      onClick={toggleSmartPreview}
+                      style={{
+                        padding: '4px 10px',
+                        fontSize: '10px',
+                        fontWeight: '900',
+                        backgroundColor: showSmartPreview
+                          ? (isDarkMode ? '#FFFFFF' : '#0022FF')
+                          : 'transparent',
+                        color: showSmartPreview
+                          ? (isDarkMode ? '#0022FF' : '#FFFFFF')
+                          : (isDarkMode ? '#FFFFFF' : '#0022FF'),
+                        border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+                        cursor: 'pointer',
+                        borderRadius: '0px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        transition: 'all 0.2s',
+                        outline: 'none'
+                      }}
+                    >
+                      {showSmartPreview ? 'Preview ON' : 'Preview OFF'}
+                    </button>
+
+                    {/* Upload File Input Hidden */}
+                    <label
+                      style={{
+                        padding: '4px 10px',
+                        fontSize: '10px',
+                        fontWeight: '900',
+                        backgroundColor: 'transparent',
+                        color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                        border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+                        cursor: 'pointer',
+                        borderRadius: '0px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.2s',
+                        margin: 0
+                      }}
+                      className="hover:opacity-80"
+                    >
+                      Add Image
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={(e) => handleUploadSmartPreview(e, activeTemplate)}
+                        style={{ display: 'none' }}
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {showSmartPreview && (
+                  <div>
+                    {smartScenePreviews[activeTemplate] && smartScenePreviews[activeTemplate].length > 0 ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {/* Carousel Wrapper */}
+                        <div style={{ position: 'relative', border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`, overflow: 'hidden', height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: isDarkMode ? '#2C2C2E' : '#E5E5EA' }}>
+                          <img 
+                            src={smartScenePreviews[activeTemplate][Math.min(activePreviewIndex, smartScenePreviews[activeTemplate].length - 1)]} 
+                            alt="Scene vibe preview" 
+                            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                          />
+                          
+                          {/* Carousel Navigation Arrows */}
+                          {smartScenePreviews[activeTemplate].length > 1 && (
+                            <>
+                              <button
+                                onClick={() => setActivePreviewIndex(prev => (prev === 0 ? smartScenePreviews[activeTemplate].length - 1 : prev - 1))}
+                                style={{
+                                  position: 'absolute',
+                                  left: '8px',
+                                  backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+                                  color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                                  border: `1px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+                                  width: '28px',
+                                  height: '28px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  cursor: 'pointer',
+                                  fontSize: '16px',
+                                  fontWeight: '900',
+                                  outline: 'none'
+                                }}
+                              >
+                                &lsaquo;
+                              </button>
+                              <button
+                                onClick={() => setActivePreviewIndex(prev => (prev === smartScenePreviews[activeTemplate].length - 1 ? 0 : prev + 1))}
+                                style={{
+                                  position: 'absolute',
+                                  right: '8px',
+                                  backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+                                  color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                                  border: `1px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+                                  width: '28px',
+                                  height: '28px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  cursor: 'pointer',
+                                  fontSize: '16px',
+                                  fontWeight: '900',
+                                  outline: 'none'
+                                }}
+                              >
+                                &rsaquo;
+                              </button>
+                            </>
+                          )}
+
+                          {/* Delete current image button */}
+                          <button
+                            onClick={() => handleDeleteSmartPreview(activeTemplate, activePreviewIndex)}
+                            style={{
+                              position: 'absolute',
+                              top: '8px',
+                              right: '8px',
+                              backgroundColor: '#FF3B30',
+                              color: '#FFFFFF',
+                              border: 'none',
+                              width: '20px',
+                              height: '20px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              fontSize: '11px',
+                              fontWeight: 'bold',
+                              borderRadius: '4px'
+                            }}
+                            title="참고 이미지 삭제"
+                          >
+                            X
+                          </button>
+
+                          {/* Page Indicators */}
+                          <div style={{
+                            position: 'absolute',
+                            bottom: '8px',
+                            backgroundColor: 'rgba(0, 0, 0, 0.65)',
+                            color: '#FFFFFF',
+                            padding: '2px 8px',
+                            borderRadius: '0px',
+                            border: '1px solid rgba(255, 255, 255, 0.3)',
+                            fontSize: '9px',
+                            fontWeight: '800',
+                            letterSpacing: '0.05em'
+                          }}>
+                            {Math.min(activePreviewIndex + 1, smartScenePreviews[activeTemplate].length)} / {smartScenePreviews[activeTemplate].length}
+                          </div>
+                        </div>
+
+                        {/* Thumbnails Row */}
+                        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+                          {smartScenePreviews[activeTemplate].map((imgUrl, idx) => (
+                            <div 
+                              key={idx}
+                              onClick={() => setActivePreviewIndex(idx)}
+                              style={{ 
+                                position: 'relative',
+                                width: '48px',
+                                height: '48px',
+                                border: `2px solid ${activePreviewIndex === idx ? (isDarkMode ? '#FFFFFF' : '#0022FF') : 'transparent'}`,
+                                cursor: 'pointer',
+                                flexShrink: 0,
+                                backgroundColor: isDarkMode ? '#2C2C2E' : '#E5E5EA',
+                                overflow: 'hidden'
+                              }}
+                            >
+                              <img src={imgUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div 
+                        style={{ 
+                          border: `1px dashed ${isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,34,255,0.3)'}`, 
+                          padding: '36px 16px', 
+                          textAlign: 'center', 
+                          color: isDarkMode ? '#AEAEB2' : '#8E8E93',
+                          fontSize: '11px',
+                          fontWeight: '600',
+                          lineHeight: '1.6'
+                        }}
+                      >
+                        등록된 예상 느낌 참고 이미지가 없습니다.<br/>
+                        <span style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF', fontWeight: '800' }}>[Add Image]</span> 버튼을 클릭해 참고용 사진을 추가해 보세요!
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
           </motion.div>
         )}
@@ -5071,7 +5412,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.65F | Shot Maker Workspace
+      v0.66 | Shot Maker Workspace
     </footer>
     <div className="h-12"></div>
     </div>
