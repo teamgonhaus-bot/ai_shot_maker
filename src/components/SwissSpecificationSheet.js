@@ -69,9 +69,13 @@ export default function SwissSpecificationSheet({
 
     // 3. Subject
     if (safeConfig.subjectNum && safeConfig.subjectNum !== "없음") {
+      let subjVal = `${safeConfig.subjectNum} (${safeConfig.subjectGender || 'SOLO'})`;
+      if (safeConfig.subjectDetailAction && safeConfig.subjectDetailAction !== "선택안함") {
+        subjVal += ` / ${safeConfig.subjectDetailAction}`;
+      }
       specs.push({ 
         label: 'SUBJECT', 
-        value: `${safeConfig.subjectNum} (${safeConfig.subjectGender || 'SOLO'})` 
+        value: subjVal 
       });
     }
 

@@ -154,7 +154,15 @@ const DICTIONARY = {
     "심도 얕은 샷(아웃포커싱)": "shallow depth of field with bokeh"
   },
   country: { "선택안함": "", "한국": "Korea", "일본": "Japan", "동남아 휴양지": "Southeast Asia resort", "미국": "USA", "독일": "Germany", "이탈리아": "Italy", "동유럽": "Eastern Europe" },
-  locationContext: { "선택안함": "", "수도": "in the capital city", "도심": "in the downtown area", "번화가": "on a busy main street", "교외": "in the suburbs", "휴양지": "at a holiday resort" }
+  locationContext: { "선택안함": "", "수도": "in the capital city", "도심": "in the downtown area", "번화가": "on a busy main street", "교외": "in the suburbs", "휴양지": "at a holiday resort" },
+  subjectDetailAction: {
+    "선택안함": "",
+    "잡기": "holding the product",
+    "들기": "lifting the product",
+    "사용": "using the product",
+    "앉기": "sitting",
+    "서기": "standing"
+  }
 };
 
 const OPTIONS_DATA = {
@@ -198,7 +206,8 @@ const OPTIONS_DATA = {
   ],
   aspectRatio: ["1:1 (Square)", "16:9 (Widescreen)", "4:3 (Standard)", "3:4 (Portrait)", "4:5 (SNS)", "9:16 (Vertical)"],
   country: ["선택안함", "한국", "일본", "동남아 휴양지", "미국", "독일", "이탈리아", "동유럽"],
-  locationContext: ["선택안함", "수도", "도심", "번화가", "교외", "휴양지"]
+  locationContext: ["선택안함", "수도", "도심", "번화가", "교외", "휴양지"],
+  subjectDetailAction: ["선택안함", "잡기", "들기", "사용", "앉기", "서기"]
 };
 
 const getColorHex = (colorName) => {
@@ -254,6 +263,7 @@ export default function App() {
     subjectAge: "선택안함",
     subjectRegion: "선택안함",
     subjectAction: "기본",
+    subjectDetailAction: "선택안함",
     subjectClothesStyle: "선택안함",
     subjectClothesTop: "선택안함",
     subjectClothesBottom: "선택안함",
@@ -732,7 +742,7 @@ export default function App() {
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.65E Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.65F Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -878,6 +888,7 @@ export default function App() {
       subjectAge: "선택안함",
       subjectRegion: "선택안함",
       subjectAction: "기본",
+      subjectDetailAction: "선택안함",
       subjectClothesStyle: "선택안함",
       subjectClothesTop: "선택안함",
       subjectClothesBottom: "선택안함",
@@ -974,8 +985,11 @@ export default function App() {
       targetConfig.subjectGender = '여성';
       targetConfig.subjectAge = '20대';
       targetConfig.subjectAction = '기본';
+      targetConfig.subjectDetailAction = '사용';
       targetConfig.spaceType = '스튜디오';
       targetConfig.spaceDetail = '단색 배경';
+      targetConfig.monochromeColor = 'Pure White';
+      targetConfig.productName = 'Attached object';
       targetConfig.cameraAngle = '풀 샷';
       targetConfig.copySpace = '선택안함';
       targetConfig.productLayout = '선택안함';
@@ -987,6 +1001,7 @@ export default function App() {
       targetConfig.interiorStyle = '선택안함';
       targetConfig.country = '선택안함';
       setSmartUseSubject(true);
+      setUseProduct(true);
       setActiveMarquee("USAGE SCENE Active: Lifestyle product-in-use inside clean white studio backdrop...");
 
     } else if (templateType === 'HOME LIVING') {
@@ -1117,7 +1132,8 @@ export default function App() {
         subjectAge: isOn && prev.subjectAge === '선택안함' ? '20대' : prev.subjectAge,
         subjectAction: isOn && prev.subjectAction === '선택안함' 
           ? (activeTemplate === 'OFFICE TECH' ? '업무' : (activeTemplate === 'RETAIL SCENE' ? '대화' : (activeTemplate === 'HOME LIVING' ? '휴식' : '기본')))
-          : prev.subjectAction
+          : prev.subjectAction,
+        subjectDetailAction: isOn && prev.subjectDetailAction === '선택안함' && activeTemplate === 'USAGE SCENE' ? '사용' : prev.subjectDetailAction
       }));
     } else {
       setConfig(prev => ({
@@ -1181,12 +1197,14 @@ export default function App() {
     } else if (activeTemplate === 'USAGE SCENE') {
       const genders = ['여성', '남성'];
       const actions = ['기본', '차분함', '활발함', '업무', '휴식', '대화'];
+      const detailedActions = ['선택안함', '잡기', '들기', '사용', '앉기', '서기'];
       const ages = ['20대', '30대', '40대'];
       const hairs = ['긴머리', '짧은머리', '단발', '묶은머리'];
       const clothesStyles = ['캐주얼', '비즈니스', '미니멀'];
 
       targetConfig.subjectGender = genders[Math.floor(Math.random() * genders.length)];
       targetConfig.subjectAction = actions[Math.floor(Math.random() * actions.length)];
+      targetConfig.subjectDetailAction = detailedActions[Math.floor(Math.random() * detailedActions.length)];
       targetConfig.subjectAge = ages[Math.floor(Math.random() * ages.length)];
       targetConfig.subjectHair = hairs[Math.floor(Math.random() * hairs.length)];
       targetConfig.subjectClothesStyle = clothesStyles[Math.floor(Math.random() * clothesStyles.length)];
@@ -1194,6 +1212,8 @@ export default function App() {
       // 인물 외 공간(스튜디오, 단색 배경) 및 주요 세팅은 바뀌지 않도록 명시적 고정
       targetConfig.spaceType = '스튜디오';
       targetConfig.spaceDetail = '단색 배경';
+      targetConfig.monochromeColor = 'Pure White';
+      targetConfig.productName = 'Attached object';
       targetConfig.cameraAngle = '풀 샷';
       targetConfig.light = '균일하게 비치는 조명';
       targetConfig.useLight = true;
@@ -1647,7 +1667,7 @@ export default function App() {
         parts.push("photorealistic");
       }
     } else {
-      let subjectStr = activeProductName ? `a high-end ${activeProductName}` : "a high-end masterpiece";
+      let subjectStr = activeProductName ? activeProductName : "a masterpiece";
 
       if (config.subjectNum !== "없음") {
         const traits = [];
@@ -1687,11 +1707,32 @@ export default function App() {
 
         if (details.length > 0) humanStr += ` ${details.join(", ")}`;
 
-        let actionStr = "";
+        // Connect detailed action naturally
+        const interactiveActions = ["잡기", "들기", "사용"];
+        const isInteractive = interactiveActions.includes(config.subjectDetailAction);
+
+        let actionParts = [];
         if (config.subjectAction && config.subjectAction !== "선택안함") {
-          actionStr = ` ${DICTIONARY.subjectAction[config.subjectAction]}`;
+          actionParts.push(DICTIONARY.subjectAction[config.subjectAction]);
         }
-        parts.push(`featuring ${humanStr}${actionStr} with ${subjectStr}`);
+        if (config.subjectDetailAction && config.subjectDetailAction !== "선택안함") {
+          let detailActionDesc = DICTIONARY.subjectDetailAction[config.subjectDetailAction];
+          if (activeProductName) {
+            detailActionDesc = detailActionDesc.replace(/\bthe product\b/g, activeProductName);
+          }
+          actionParts.push(detailActionDesc);
+        }
+
+        let actionStr = "";
+        if (actionParts.length > 0) {
+          actionStr = ` ${actionParts.join(", ")}`;
+        }
+
+        if (isInteractive) {
+          parts.push(`featuring ${humanStr}${actionStr}`);
+        } else {
+          parts.push(`featuring ${humanStr}${actionStr} with ${subjectStr}`);
+        }
 
         if (useImageRef && refImage) {
           parts.push("The person is naturally interacting with/holding the product in the attached image");
@@ -1772,7 +1813,7 @@ export default function App() {
     });
 
     if (useImageRef) {
-      filteredParts.push("highly preserve the original structure, do not add or alter any elements, strictly keep the original shape intact");
+      filteredParts.push("strictly preserve original shape and design of reference image");
     }
 
     // 4. 요구사항에 맞춘 완벽한 순서 고정 재조합
@@ -2022,7 +2063,7 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.65E | Shot Maker Workspace
+              v0.65F | Shot Maker Workspace
             </div>
           </div>
         </div>
@@ -3495,6 +3536,7 @@ export default function App() {
                         <OptionSelect label="연령대" value={config.subjectAge} onChange={(v) => handleConfigChange('subjectAge', v)} options={OPTIONS_DATA.subjectAge} theme="red" />
                         <OptionSelect label="지역/인종" value={config.subjectRegion} onChange={(v) => handleConfigChange('subjectRegion', v)} options={OPTIONS_DATA.subjectRegion} theme="red" />
                         <OptionSelect label="행동" value={config.subjectAction} onChange={(v) => handleConfigChange('subjectAction', v)} options={OPTIONS_DATA.subjectAction} theme="red" />
+                        <OptionSelect label="세부행동" value={config.subjectDetailAction} onChange={(v) => handleConfigChange('subjectDetailAction', v)} options={OPTIONS_DATA.subjectDetailAction} theme="red" />
                         <OptionSelect label="옷 스타일" value={config.subjectClothesStyle} onChange={(v) => handleConfigChange('subjectClothesStyle', v)} options={OPTIONS_DATA.subjectClothesStyle} theme="red" />
 
                         {config.subjectGender === '혼성' ? (
@@ -4945,7 +4987,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.65E | Shot Maker Workspace
+      v0.65F | Shot Maker Workspace
     </footer>
     <div className="h-12"></div>
     </div>
