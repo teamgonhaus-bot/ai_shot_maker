@@ -878,6 +878,7 @@ export default function App() {
   const handleSmartTemplate = (templateType) => {
     setActiveTemplate(templateType);
     setActiveLibraryTemplateId(null);
+    setUseProduct(false); // 스마트 씬 변경 시 대상 제품명은 기본적으로 꺼짐
     
     // 이전의 모든 찌꺼기 속성들을 완벽하게 배제하기 위해 기본값 객체로 깨끗하게 시작합니다.
     let targetConfig = {
@@ -1006,7 +1007,6 @@ export default function App() {
       targetConfig.interiorStyle = '선택안함';
       targetConfig.country = '선택안함';
       setSmartUseSubject(true);
-      setUseProduct(true);
       setActiveMarquee("USAGE SCENE Active: Lifestyle product-in-use inside clean white studio backdrop...");
 
     } else if (templateType === 'HOME LIVING') {
@@ -1103,26 +1103,9 @@ export default function App() {
 
 
 
-    // Cascading Effect: Apply changed properties sequentially
-    const keysToChange = Object.keys(targetConfig).filter(k => targetConfig[k] !== config[k]);
-
-    if (keysToChange.length === 0) {
-      setConfig(targetConfig);
-      setIsSaved(false);
-      return;
-    }
-
-    // 0.2s total duration approximate (e.g. 15ms * 15 keys ~ 225ms)
-    const staggerMs = 20;
-    keysToChange.forEach((key, index) => {
-      setTimeout(() => {
-        setConfig(prev => ({ ...prev, [key]: targetConfig[key] }));
-      }, index * staggerMs);
-    });
-
-    setTimeout(() => {
-      setIsSaved(false);
-    }, keysToChange.length * staggerMs);
+    // Update state atomically to prevent race conditions and staggered rendering bugs
+    setConfig(targetConfig);
+    setIsSaved(false);
   };
 
   const handleSmartSubjectToggle = (isOn) => {
@@ -1638,7 +1621,7 @@ export default function App() {
 
   // Auto-sync prompt reactive pipeline (v0.63 Real-Time Auto-Sync Engine)
   useEffect(() => {
-    const activeProductName = useProduct ? config.productName : "";
+    const activeProductName = useProduct ? (config.productName.trim() || "Attached object") : "";
     const parts = [];
     const isSolidBackground = (config.spaceDetail === '단색 배경' || config.spaceDetail === '그라데이션 배경') && config.subjectNum === '없음';
 
@@ -3431,7 +3414,7 @@ export default function App() {
                 <div className="save-bar" style={{ padding: '4px 4px 4px 16px', marginTop: '8px' }}>
                   <input
                     type="text"
-                    placeholder="예: perfume bottle, wireless earbuds, luxury watch"
+                    placeholder="Attached object"
                     value={config.productName}
                     onChange={(e) => handleConfigChange('productName', e.target.value)}
                     className="save-input"
@@ -4828,8 +4811,11 @@ export default function App() {
 
                 // 혼성/단일 성별에 따른 의상 분기
                 if (config.subjectNum !== "없음") {
-                  if (config.subjectGender === "혼성" && key.startsWith("subjectClothes")) return;
-                  if (config.subjectGender !== "혼성" && (key.startsWith("female") || key.startsWith("male"))) return;
+                  if (config.subjectGender === "혼성") {
+                    if (key.startsWith("subjectClothes")) return;
+                  } else {
+                    if (key.startsWith("female") || key.startsWith("male")) return;
+                  }
                 }
 
                 let group = 0;
