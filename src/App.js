@@ -111,7 +111,7 @@ const DICTIONARY = {
     "기본": "posing",
     "차분함": "calm",
     "활발함": "active",
-    "업무": "working",
+    "업무": "working at a desk",
     "휴식": "relaxing",
     "대화": "conversing"
   },
@@ -120,7 +120,7 @@ const DICTIONARY = {
     "선택안함": "", "반팔티": "wearing a short sleeve t-shirt", "긴팔티": "wearing a long sleeve t-shirt", "자켓": "wearing a jacket", "아우터": "wearing outerwear", "원피스": "wearing a dress", "스포츠 복장": "wearing sportswear", "아웃도어": "wearing outdoor apparel"
   },
   subjectClothesBottom: {
-    "선택안함": "", "기본 스커트": "in skirt", "미니스커트": "in miniskirt", "롱스커트": "in long skirt", "긴바지": "in pants", "반바지": "in shorts"
+    "선택안함": "", "기본 스커트": "in cute basic skirt", "미니스커트": "in sexy miniskirt", "롱스커트": "in cute flowy long skirt", "긴바지": "in pants", "반바지": "in shorts"
   },
   subjectHair: { "선택안함": "", "긴머리": "long hair", "짧은머리": "short hair", "단발": "bob hair", "펌": "permed hair", "염색": "dyed hair", "묶은머리": "tied hair" },
 
@@ -236,8 +236,68 @@ const getValidHexColor = (color) => {
   return isHexColor(resolved) ? resolved : '#0047AB';
 };
 
+const getSubjectNounPhrase = (config) => {
+  const isPlural = config.subjectNum !== "혼자" && config.subjectNum !== "없음";
+  
+  let noun = "";
+  if (config.subjectGender === "여성") {
+    const isYoung = config.subjectAge === "10대" || config.subjectAge === "20대" || config.subjectAge === "선택안함";
+    noun = isYoung ? (isPlural ? "girls" : "girl") : (isPlural ? "women" : "woman");
+  } else if (config.subjectGender === "남성") {
+    noun = isPlural ? "men" : "man";
+  } else if (config.subjectGender === "혼성") {
+    noun = "people";
+  } else {
+    noun = isPlural ? "people" : "person";
+  }
+
+  let ageAdj = "";
+  if (config.subjectAge === "10대") ageAdj = "10s";
+  else if (config.subjectAge === "20대") ageAdj = "20s";
+  else if (config.subjectAge === "30대") ageAdj = "30s";
+  else if (config.subjectAge === "40대") ageAdj = "40s";
+  else if (config.subjectAge === "중장년") ageAdj = "middle-aged";
+
+  let regionAdj = "";
+  if (config.subjectRegion === "한국") regionAdj = "Korean";
+  else if (config.subjectRegion === "일본") regionAdj = "Japanese";
+  else if (config.subjectRegion === "북유럽") regionAdj = "Northern European";
+  else if (config.subjectRegion === "북미") regionAdj = "North American";
+
+  const adjs = [];
+  if (ageAdj) adjs.push(ageAdj);
+  if (regionAdj) adjs.push(regionAdj);
+
+  let numPrefix = "";
+  if (config.subjectNum === "혼자") {
+    const firstWord = adjs[0] || noun;
+    const startsWithVowel = /^[aeiou]/i.test(firstWord);
+    numPrefix = startsWithVowel ? "an" : "a";
+  } else if (config.subjectNum === "2인") {
+    numPrefix = "two";
+  } else if (config.subjectNum === "소수") {
+    numPrefix = "a few";
+  } else if (config.subjectNum === "다수") {
+    numPrefix = "a group of";
+  }
+
+  const parts = [];
+  if (numPrefix) parts.push(numPrefix);
+  if (adjs.length > 0) parts.push(adjs.join(" "));
+  parts.push(noun);
+
+  return parts.join(" ");
+};
+
 export default function App() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => {
+    try {
+      const cached = localStorage.getItem('shotmaker_cached_templates');
+      return cached && JSON.parse(cached).length > 0 ? false : true;
+    } catch (e) {
+      return true;
+    }
+  });
   const [showSplash, setShowSplash] = useState(true);
   const [splashFade, setSplashFade] = useState(false);
   const [minTimePassed, setMinTimePassed] = useState(false);
@@ -301,7 +361,14 @@ export default function App() {
     return saved === 'true'; // 기본값은 false, 로컬 저장값이 'true'일 때만 복원
   });
   const [generatedPrompt, setGeneratedPrompt] = useState("");
-  const [savedTemplates, setSavedTemplates] = useState([]);
+  const [savedTemplates, setSavedTemplates] = useState(() => {
+    try {
+      const cached = localStorage.getItem('shotmaker_cached_templates');
+      return cached ? JSON.parse(cached) : [];
+    } catch (e) {
+      return [];
+    }
+  });
   const [templateName, setTemplateName] = useState("");
   const [isSaved, setIsSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -333,9 +400,30 @@ export default function App() {
   const [moveTarget, setMoveTarget] = useState(null);
 
   // v0.64 Gallery states
-  const [galleryImages, setGalleryImages] = useState([]);
-  const [galleryFolders, setGalleryFolders] = useState(['기본', '인물', '공간', '사물']);
-  const [isGalleryLoading, setIsGalleryLoading] = useState(true);
+  const [galleryImages, setGalleryImages] = useState(() => {
+    try {
+      const cached = localStorage.getItem('shotmaker_cached_gallery');
+      return cached ? JSON.parse(cached) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+  const [galleryFolders, setGalleryFolders] = useState(() => {
+    try {
+      const cached = localStorage.getItem('shotmaker_cached_gallery_folders');
+      return cached ? JSON.parse(cached) : ['기본', '인물', '공간', '사물'];
+    } catch (e) {
+      return ['기본', '인물', '공간', '사물'];
+    }
+  });
+  const [isGalleryLoading, setIsGalleryLoading] = useState(() => {
+    try {
+      const cached = localStorage.getItem('shotmaker_cached_gallery');
+      return cached && JSON.parse(cached).length > 0 ? false : true;
+    } catch (e) {
+      return true;
+    }
+  });
   const [activeGalleryFolder, setActiveGalleryFolder] = useState('전체');
   const [galleryPage, setGalleryPage] = useState(0);
   const [newFolderName, setNewFolderName] = useState('');
@@ -726,21 +814,32 @@ Return ONLY valid JSON matching this schema:
         const data = foldersDocSnap.data();
         if (data && Array.isArray(data.list)) {
           currentFolders = data.list;
-          setGalleryFolders(currentFolders);
         } else {
           await setDoc(foldersDocRef, { list: currentFolders });
-          setGalleryFolders(currentFolders);
         }
       } else {
         await setDoc(foldersDocRef, { list: currentFolders });
+      }
+
+      const foldersStr = JSON.stringify(currentFolders);
+      if (localStorage.getItem('shotmaker_cached_gallery_folders') !== foldersStr) {
         setGalleryFolders(currentFolders);
+        localStorage.setItem('shotmaker_cached_gallery_folders', foldersStr);
       }
 
       const galleryQ = query(collection(db, "gallery"), orderBy("timestamp", "desc"));
       const gallerySnap = await getDocs(galleryQ);
       const images = gallerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setGalleryImages(images);
-      console.log(`✅ Firebase Gallery Loaded: ${images.length} images loaded.`);
+
+      const cachedImagesStr = localStorage.getItem('shotmaker_cached_gallery');
+      const fetchedImagesStr = JSON.stringify(images);
+      if (cachedImagesStr !== fetchedImagesStr) {
+        setGalleryImages(images);
+        localStorage.setItem('shotmaker_cached_gallery', fetchedImagesStr);
+        console.log(`✅ Firebase Gallery Synced: ${images.length} images loaded.`);
+      } else {
+        console.log(`✅ Firebase Gallery Matches Cache: ${images.length} images.`);
+      }
     } catch (error) {
       console.error("❌ Firebase gallery load error:", error);
     } finally {
@@ -1093,7 +1192,7 @@ Return ONLY valid JSON matching this schema:
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.66a Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.66b Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -1128,7 +1227,13 @@ Return ONLY valid JSON matching this schema:
         const snapshot = await getDocs(q);
         const templates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         console.log(`✅ Firebase Loaded: ${templates.length} templates loaded.`);
-        setSavedTemplates(templates);
+        
+        const cachedStr = localStorage.getItem('shotmaker_cached_templates');
+        const fetchedStr = JSON.stringify(templates);
+        if (cachedStr !== fetchedStr) {
+          setSavedTemplates(templates);
+          localStorage.setItem('shotmaker_cached_templates', fetchedStr);
+        }
       } catch (error) {
         console.error("❌ Firebase load error:", error);
       } finally {
@@ -1157,6 +1262,7 @@ Return ONLY valid JSON matching this schema:
       fetchSmartPreviewsData();
     };
     initFirebase();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ⏳ Splash Intro Timer (at least 1.2s exposure + 0.3s smooth fade out)
@@ -1211,6 +1317,19 @@ Return ONLY valid JSON matching this schema:
       setUseDetailMaterial(false);
     }
   }, [config.spaceType]);
+
+  // SWR local cache synchronizer effects
+  useEffect(() => {
+    localStorage.setItem('shotmaker_cached_templates', JSON.stringify(savedTemplates));
+  }, [savedTemplates]);
+
+  useEffect(() => {
+    localStorage.setItem('shotmaker_cached_gallery', JSON.stringify(galleryImages));
+  }, [galleryImages]);
+
+  useEffect(() => {
+    localStorage.setItem('shotmaker_cached_gallery_folders', JSON.stringify(galleryFolders));
+  }, [galleryFolders]);
 
   // Lock body scroll when fullscreen preview is active
   useEffect(() => {
@@ -2116,13 +2235,7 @@ Return ONLY valid JSON matching this schema:
       let subjectStr = activeProductName ? activeProductName : "a masterpiece";
 
       if (config.subjectNum !== "없음") {
-        const traits = [];
-        if (config.subjectAge !== "선택안함") traits.push(DICTIONARY.subjectAge[config.subjectAge]);
-        if (config.subjectGender !== "선택안함") traits.push(DICTIONARY.subjectGender[config.subjectGender]);
-        if (config.subjectRegion !== "선택안함") traits.push(DICTIONARY.subjectRegion[config.subjectRegion]);
-
-        let humanStr = DICTIONARY.subjectNum[config.subjectNum];
-        if (traits.length > 0) humanStr += ` (${traits.join(", ")})`;
+        let humanStr = getSubjectNounPhrase(config);
 
         const details = [];
         if (config.subjectHair !== "선택안함") details.push(DICTIONARY.subjectHair[config.subjectHair]);
@@ -2151,7 +2264,7 @@ Return ONLY valid JSON matching this schema:
           if (bot) details.push(bot);
         }
 
-        if (details.length > 0) humanStr += ` ${details.join(", ")}`;
+        if (details.length > 0) humanStr += `, ${details.join(", ")}`;
 
         // Connect detailed action naturally
         const interactiveActions = ["잡기", "들기", "사용"];
@@ -2509,7 +2622,7 @@ Return ONLY valid JSON matching this schema:
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.66a | Shot Maker Workspace
+              v0.66b | Shot Maker Workspace
             </div>
           </div>
         </div>
@@ -4129,7 +4242,7 @@ Return ONLY valid JSON matching this schema:
                     {smartScenePreviews[activeTemplate] && smartScenePreviews[activeTemplate].length > 0 ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {/* Carousel Wrapper */}
-                        <div style={{ position: 'relative', border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`, overflow: 'hidden', height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: isDarkMode ? '#2C2C2E' : '#E5E5EA' }}>
+                        <div style={{ position: 'relative', border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`, overflow: 'hidden', width: '100%', aspectRatio: '4/3', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: isDarkMode ? '#2C2C2E' : '#E5E5EA' }}>
                           <img 
                             src={smartScenePreviews[activeTemplate][Math.min(activePreviewIndex, smartScenePreviews[activeTemplate].length - 1)]} 
                             alt="Scene vibe preview" 
@@ -5862,7 +5975,7 @@ Return ONLY valid JSON matching this schema:
     </div>
 
     <footer className="ios-footer">
-      v0.66a | Shot Maker Workspace
+      v0.66b | Shot Maker Workspace
     </footer>
     <div className="h-12"></div>
     </div>
