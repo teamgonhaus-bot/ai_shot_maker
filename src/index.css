@@ -10,22 +10,23 @@
 }
 
 :root {
+  --accent-color: #0022FF;
   --bg-main: #FFFFFF;
   --bg-card: #FFFFFF;
-  --color-black: #0022FF;
-  --text-primary: #0022FF;
-  --text-secondary: #0022FF;
-  --text-muted: #0022FF;
-  --color-red: #0022FF;
-  --color-green: #0022FF;
-  --color-purple: #0022FF;
-  --color-border: #0022FF;
+  --color-black: var(--accent-color);
+  --text-primary: var(--accent-color);
+  --text-secondary: var(--accent-color);
+  --text-muted: var(--accent-color);
+  --color-red: var(--accent-color);
+  --color-green: var(--accent-color);
+  --color-purple: var(--accent-color);
+  --color-border: var(--accent-color);
   --color-bg-light: #FFFFFF;
 }
 
 body {
   background-color: #FFFFFF;
-  color: #0022FF;
+  color: var(--accent-color);
   font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -143,7 +144,7 @@ body {
   border-radius: 20px !important;
   padding: 20px !important;
   box-shadow: none !important;
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
   margin-bottom: 12px !important;
   position: relative !important;
 }
@@ -154,7 +155,7 @@ body {
 .ios-option-label {
   font-size: 12px !important;
   font-weight: 700 !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   text-transform: uppercase !important;
   letter-spacing: 0.08em !important;
   margin-bottom: 10px !important;
@@ -179,8 +180,8 @@ body {
   transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
   cursor: pointer !important;
   background-color: #FFFFFF !important;
-  color: #0022FF !important;
-  border: 1px solid #0022FF !important;
+  color: var(--accent-color) !important;
+  border: 1px solid var(--accent-color) !important;
   font-family: inherit !important;
 }
 
@@ -194,9 +195,9 @@ body {
 .ios-pill.selected-purple,
 .ios-pill.selected-blue,
 .ios-pill.selected-yellow {
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
   color: #FFFFFF !important;
-  border-color: #0022FF !important;
+  border-color: var(--accent-color) !important;
   box-shadow: none !important;
 }
 
@@ -208,8 +209,8 @@ body {
   grid-template-columns: repeat(4, 1fr) !important;
   gap: 0 !important;
   margin-bottom: 24px !important;
-  border-top: 1px solid #0022FF !important;
-  border-left: 1px solid #0022FF !important;
+  border-top: 1px solid var(--accent-color) !important;
+  border-left: 1px solid var(--accent-color) !important;
 }
 
 @media (max-width: 480px) {
@@ -235,14 +236,14 @@ body.dark-mode .template-grid {
   border-radius: 0px !important;
   background-color: #FFFFFF !important;
   border: none !important;
-  border-right: 1px solid #0022FF !important;
-  border-bottom: 1px solid #0022FF !important;
+  border-right: 1px solid var(--accent-color) !important;
+  border-bottom: 1px solid var(--accent-color) !important;
   box-shadow: none !important;
   cursor: pointer !important;
   transition: background-color 0.15s ease, color 0.15s ease !important;
   font-family: inherit !important;
   width: 100% !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   position: relative !important;
   overflow: hidden !important;
 }
@@ -252,16 +253,16 @@ body.dark-mode .template-grid {
 }
 
 .ios-smart-template-btn:hover {
-  background-color: rgba(0, 34, 255, 0.05) !important;
+  background-color: color-mix(in srgb, var(--accent-color) 5%, transparent) !important;
 }
 
 .ios-smart-template-btn:active {
   transform: none !important;
-  background-color: rgba(0, 34, 255, 0.12) !important;
+  background-color: color-mix(in srgb, var(--accent-color) 12%, transparent) !important;
 }
 
 .ios-smart-template-btn.active {
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
   color: #FFFFFF !important;
   box-shadow: none !important;
   transform: none !important;
@@ -283,7 +284,7 @@ body.dark-mode .template-grid {
   font-size: 9px !important;
   font-weight: 800 !important;
   letter-spacing: 0.08em !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   opacity: 0.55 !important;
   line-height: 1.0 !important;
   margin-bottom: 8px !important;
@@ -302,14 +303,14 @@ body.dark-mode .template-grid {
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   line-height: 1.0 !important;
 }
 
 .template-desc {
   font-size: 9.5px !important;
   font-weight: 500 !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   opacity: 0.75 !important;
   text-align: left !important;
   line-height: 1.3 !important;
@@ -365,7 +366,7 @@ body.dark-mode .template-grid {
   transition: all 0.2s ease !important;
   
   /* Light mode: Blue background, white icon */
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
   color: #FFFFFF !important;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
 }
@@ -381,7 +382,7 @@ body.dark-mode .template-grid {
 /* Dark mode (Blue mode): White background, blue icon */
 body.dark-mode .ios-apply-preset-btn {
   background-color: #FFFFFF !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   border: none !important;
 }
 
@@ -398,9 +399,9 @@ body.dark-mode .ios-apply-preset-btn:active {
    ============================================= */
 .generate-btn {
   width: 100% !important;
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
   color: #FFFFFF !important;
-  border: 2px solid #0022FF !important;
+  border: 2px solid var(--accent-color) !important;
   border-radius: 2px !important;
   padding: 20px 24px !important;
   font-size: 16px !important;
@@ -419,13 +420,13 @@ body.dark-mode .ios-apply-preset-btn:active {
 
 .generate-btn:hover {
   background-color: #FFFFFF !important;
-  color: #0022FF !important;
-  border-color: #0022FF !important;
+  color: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
 }
 
 .generate-btn:active {
-  background-color: rgba(0, 34, 255, 0.1) !important;
-  color: #0022FF !important;
+  background-color: color-mix(in srgb, var(--accent-color) 10%, transparent) !important;
+  color: var(--accent-color) !important;
   box-shadow: none !important;
 }
 
@@ -445,7 +446,7 @@ body.dark-mode .ios-apply-preset-btn:active {
   border-radius: 20px !important;
   padding: 24px !important;
   box-shadow: none !important;
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
   position: relative !important;
   margin-top: 40px !important;  /* 40px gap from generate button */
 }
@@ -453,7 +454,7 @@ body.dark-mode .ios-apply-preset-btn:active {
 .result-card-label {
   font-size: 10px !important;
   font-weight: 700 !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   text-transform: uppercase !important;
   letter-spacing: 0.14em !important;
   margin-bottom: 12px !important;
@@ -463,7 +464,7 @@ body.dark-mode .ios-apply-preset-btn:active {
 .result-card-text {
   font-size: 14px !important;
   font-weight: 500 !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   line-height: 1.35 !important;
   letter-spacing: -0.01em !important;
   margin: 0 !important;
@@ -480,8 +481,8 @@ body.dark-mode .ios-apply-preset-btn:active {
   gap: 5px !important;
   padding: 6px 14px !important;
   background-color: #FFFFFF !important;
-  color: #0022FF !important;
-  border: 1px solid #0022FF !important;
+  color: var(--accent-color) !important;
+  border: 1px solid var(--accent-color) !important;
   border-radius: 9999px !important;
   font-size: 11px !important;
   font-weight: 700 !important;
@@ -493,7 +494,7 @@ body.dark-mode .ios-apply-preset-btn:active {
 }
 
 .copy-btn:hover {
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
   color: #FFFFFF !important;
 }
 
@@ -502,7 +503,7 @@ body.dark-mode .ios-apply-preset-btn:active {
 }
 
 .copy-btn.copied {
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
   color: #FFFFFF !important;
 }
 
@@ -514,7 +515,7 @@ body.dark-mode .ios-apply-preset-btn:active {
   border-radius: 24px !important;
   padding: 24px !important;
   box-shadow: none !important;
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
   margin-top: 16px !important;
 }
 
@@ -535,7 +536,7 @@ body.dark-mode .ios-apply-preset-btn:active {
   border-radius: 9999px !important;
   padding: 6px 6px 6px 20px !important;
   gap: 10px !important;
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
   box-shadow: none !important;
 }
 
@@ -546,18 +547,18 @@ body.dark-mode .ios-apply-preset-btn:active {
   outline: none !important;
   font-size: 14px !important;
   font-weight: 500 !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   font-family: inherit !important;
   padding: 6px 0 !important;
 }
 
 .save-input::placeholder {
-  color: rgba(0, 34, 255, 0.5) !important;
+  color: color-mix(in srgb, var(--accent-color) 50%, transparent) !important;
 }
 
 .save-btn {
   padding: 12px 24px !important;
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
   color: #FFFFFF !important;
   border: none !important;
   border-radius: 9999px !important;
@@ -579,7 +580,7 @@ body.dark-mode .ios-apply-preset-btn:active {
 }
 
 .save-btn.saved {
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
 }
 
 /* =============================================
@@ -630,13 +631,13 @@ body.dark-mode .ios-apply-preset-btn:active {
   border-radius: 9999px !important;
   transition: all 0.22s ease !important;
   cursor: pointer !important;
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
   outline: none !important;
   flex-shrink: 0 !important;
 }
 
 .ios-switch.active {
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
 }
 
 .ios-switch.inactive {
@@ -660,7 +661,7 @@ body.dark-mode .ios-apply-preset-btn:active {
 }
 
 .ios-switch.inactive .ios-switch-handle {
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
   transform: translateX(0) !important;
 }
 
@@ -798,7 +799,7 @@ body.dark-mode .ios-apply-preset-btn:active {
   max-width: 420px !important;
   padding: 32px !important;
   box-shadow: none !important;
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
 }
 
 body.dark-mode .settings-modal {
@@ -1121,9 +1122,9 @@ body.dark-mode .engine-radio::after {
 
 .modal-pill-btn.active {
   background: transparent !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   font-weight: 800 !important;
-  border-bottom: 2px solid #0022FF !important;
+  border-bottom: 2px solid var(--accent-color) !important;
   box-shadow: none !important;
 }
 
@@ -1184,7 +1185,7 @@ body.dark-mode .settings-input:focus {
    BLUE MODE OVERRIDES (REPLACING STANDARD DARK MODE)
    ============================================= */
 body.dark-mode {
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
   color: #FFFFFF !important;
 }
 
@@ -1207,7 +1208,7 @@ body.dark-mode .result-card {
 /* 블루모드에서 테두리가 없어야 하는 요소 (라이트모드에서 테두리가 없었던 요소들, 강제 테두리 씌우기 금지!) */
 body.dark-mode .settings-modal,
 body.dark-mode .header-nav {
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
   box-shadow: none !important;
   border: none !important;
 }
@@ -1216,7 +1217,7 @@ body.dark-mode .header-nav {
 body.dark-mode .about-modal {
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
   border-radius: 24px !important;
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
 }
 
 /* 블루모드용 iOS 토글 스위치 시인성 극대화 */
@@ -1230,7 +1231,7 @@ body.dark-mode .ios-switch.inactive {
   background-color: transparent !important;
 }
 body.dark-mode .ios-switch.active .ios-switch-handle {
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
 }
 body.dark-mode .ios-switch.inactive .ios-switch-handle {
   background-color: #FFFFFF !important;
@@ -1270,7 +1271,7 @@ body.dark-mode .text-zinc-300 {
 body.dark-mode .ios-pill,
 body.dark-mode .ios-card-icon-btn,
 body.dark-mode .save-bar {
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
   color: #FFFFFF !important;
   border-color: #FFFFFF !important;
 }
@@ -1282,20 +1283,20 @@ body.dark-mode .ios-pill.selected-purple,
 body.dark-mode .ios-pill.selected-blue,
 body.dark-mode .ios-pill.selected-yellow {
   background-color: #FFFFFF !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   border-color: #FFFFFF !important;
   box-shadow: none !important;
 }
 
 body.dark-mode .header-nav-btn { color: #FFFFFFB3 !important; background: transparent !important; }
-body.dark-mode .header-nav-btn.active { background-color: #FFFFFF !important; color: #0022FF !important; }
+body.dark-mode .header-nav-btn.active { background-color: #FFFFFF !important; color: var(--accent-color) !important; }
 
-body.dark-mode .skeleton-container { background-color: #0022FF !important; border: 1px solid #FFFFFF !important; }
-body.dark-mode .skeleton-pulse { background: linear-gradient(90deg, #0022FF 25%, rgba(255, 255, 255, 0.15) 50%, #0022FF 75%) !important; background-size: 200% 100% !important; }
+body.dark-mode .skeleton-container { background-color: var(--accent-color) !important; border: 1px solid #FFFFFF !important; }
+body.dark-mode .skeleton-pulse { background: linear-gradient(90deg, var(--accent-color) 25%, rgba(255, 255, 255, 0.15) 50%, var(--accent-color) 75%) !important; background-size: 200% 100% !important; }
 
-body.dark-mode .ios-loading-screen { background: #0022FF !important; color: #FFFFFF !important; }
-body.dark-mode .ios-footer { background: #0022FF !important; border-top-color: #FFFFFF !important; color: #FFFFFF !important; }
-body.dark-mode .ios-library-close { background: #0022FF !important; color: #FFFFFF !important; border: 1px solid #FFFFFF !important; }
+body.dark-mode .ios-loading-screen { background: var(--accent-color) !important; color: #FFFFFF !important; }
+body.dark-mode .ios-footer { background: var(--accent-color) !important; border-top-color: #FFFFFF !important; color: #FFFFFF !important; }
+body.dark-mode .ios-library-close { background: var(--accent-color) !important; color: #FFFFFF !important; border: 1px solid #FFFFFF !important; }
 
 /* Input fields inverted */
 body.dark-mode .settings-input {
@@ -1322,7 +1323,7 @@ body.dark-mode .save-input:focus {
 
 /* Invert smart mode template grid borders in Blue Mode */
 body.dark-mode .ios-smart-template-btn {
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
   border-right-color: #FFFFFF !important;
   border-bottom-color: #FFFFFF !important;
   color: #FFFFFF !important;
@@ -1333,18 +1334,18 @@ body.dark-mode .ios-smart-template-btn:hover {
 }
 body.dark-mode .ios-smart-template-btn.active {
   background-color: #FFFFFF !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
 }
 body.dark-mode .ios-smart-template-btn.active .template-index {
-  color: rgba(0, 34, 255, 0.55) !important;
+  color: color-mix(in srgb, var(--accent-color) 55%, transparent) !important;
   opacity: 1 !important;
 }
 body.dark-mode .ios-smart-template-btn.active .template-desc {
-  color: rgba(0, 34, 255, 0.75) !important;
+  color: color-mix(in srgb, var(--accent-color) 75%, transparent) !important;
   opacity: 1 !important;
 }
 body.dark-mode .ios-smart-template-btn.active .template-title {
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
 }
 body.dark-mode .template-desc {
   color: rgba(255, 255, 255, 0.75) !important;
@@ -1360,11 +1361,11 @@ body.dark-mode .template-index {
 /* Invert Generate Button in Blue Mode */
 body.dark-mode .generate-btn {
   background-color: #FFFFFF !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   border: 2px solid #FFFFFF !important;
 }
 body.dark-mode .generate-btn:hover {
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
   color: #FFFFFF !important;
   border-color: #FFFFFF !important;
 }
@@ -1444,7 +1445,7 @@ body.dark-mode .ios-toast {
   border-radius: 9999px !important;
   margin: 16px 0 !important;
   gap: 2px !important;
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
 }
 
 .category-tab {
@@ -1453,7 +1454,7 @@ body.dark-mode .ios-toast {
   border-radius: 9999px !important;
   font-size: 13px !important;
   font-weight: 700 !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   background: transparent !important;
   border: none !important;
   transition: all 0.2s ease !important;
@@ -1461,13 +1462,13 @@ body.dark-mode .ios-toast {
 }
 
 .category-tab.active {
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
   color: #FFFFFF !important;
   box-shadow: none !important;
 }
 
 body.dark-mode .ios-category-tabs {
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
   border-color: #FFFFFF !important;
 }
 
@@ -1477,7 +1478,7 @@ body.dark-mode .category-tab {
 
 body.dark-mode .category-tab.active {
   background: #FFFFFF !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
 }
 
 /* =============================================
@@ -1485,7 +1486,7 @@ body.dark-mode .category-tab.active {
    ============================================= */
 .ios-upload-zone {
   background: transparent !important;
-  border: 2px dashed #0022FF !important; /* 2px 코발트 블루 대시 보더 */
+  border: 2px dashed var(--accent-color) !important; /* 2px 코발트 블루 대시 보더 */
   border-radius: 2px !important; /* 직각 엣지 2px */
   padding: 16px !important;
   display: flex !important;
@@ -1498,13 +1499,13 @@ body.dark-mode .category-tab.active {
 }
 
 .ios-upload-zone:hover {
-  border-color: #0022FF !important;
-  background: rgba(0, 34, 255, 0.06) !important; /* 드래그 오버 투명 블루 트랜지션 */
+  border-color: var(--accent-color) !important;
+  background: color-mix(in srgb, var(--accent-color) 6%, transparent) !important; /* 드래그 오버 투명 블루 트랜지션 */
 }
 
 .ios-upload-zone.dragging {
-  border-color: #0022FF !important;
-  background: rgba(0, 34, 255, 0.12) !important;
+  border-color: var(--accent-color) !important;
+  background: color-mix(in srgb, var(--accent-color) 12%, transparent) !important;
   transform: scale(1.01) !important;
 }
 
@@ -1532,7 +1533,7 @@ body.dark-mode .ios-upload-zone.dragging {
 .upload-sub-text {
   font-size: 11px !important;
   font-weight: 900 !important;
-  color: #0022FF !important; /* 파란 글자 */
+  color: var(--accent-color) !important; /* 파란 글자 */
   margin-bottom: 12px !important;
   letter-spacing: 0.12em !important;
   text-transform: uppercase !important;
@@ -1546,9 +1547,9 @@ body.dark-mode .upload-sub-text {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background: #0022FF !important; /* 파란색 배경 */
+  background: var(--accent-color) !important; /* 파란색 배경 */
   color: #FFFFFF !important; /* 흰 글자 */
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
   border-radius: 2px !important; /* 엣지 2px */
   padding: 6px 18px !important;
   font-size: 11px !important;
@@ -1559,7 +1560,7 @@ body.dark-mode .upload-sub-text {
 
 body.dark-mode .ios-upload-capsule {
   background: #FFFFFF !important; /* 흰색 배경 */
-  color: #0022FF !important; /* 파란 글자 */
+  color: var(--accent-color) !important; /* 파란 글자 */
   border: 1px solid #FFFFFF !important;
 }
 
@@ -1577,7 +1578,7 @@ body.dark-mode .ios-upload-capsule {
   position: absolute !important;
   top: 8px !important;
   right: 8px !important;
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
   color: white !important;
   width: 24px !important;
   height: 24px !important;
@@ -1691,28 +1692,28 @@ body.dark-mode .ios-pill-mini.active {
    v0.42 POINT COLOR BUTTON
    ============================================= */
 .generate-btn.point-color {
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
   color: #FFFFFF !important;
-  border: 2px solid #0022FF !important;
+  border: 2px solid var(--accent-color) !important;
   box-shadow: none !important;
 }
 
 .generate-btn.point-color:hover {
   background: #FFFFFF !important;
-  color: #0022FF !important;
-  border-color: #0022FF !important;
+  color: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
   box-shadow: none !important;
 }
 
 body.dark-mode .generate-btn.point-color {
   background: #FFFFFF !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   border: 2px solid #FFFFFF !important;
   box-shadow: none !important;
 }
 
 body.dark-mode .generate-btn.point-color:hover {
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
   color: #FFFFFF !important;
   border-color: #FFFFFF !important;
   box-shadow: none !important;
@@ -1843,7 +1844,7 @@ body.dark-mode .mode-nav-btn.active {
   overflow: visible !important;
   background: transparent !important;
   border: none !important;
-  border-bottom: 1px solid #0022FF !important;
+  border-bottom: 1px solid var(--accent-color) !important;
   box-shadow: none !important;
 }
 
@@ -1852,7 +1853,7 @@ body.dark-mode .mode-nav-btn.active {
 }
 
 .about-card:hover {
-  background-color: rgba(0, 34, 255, 0.04) !important;
+  background-color: color-mix(in srgb, var(--accent-color) 4%, transparent) !important;
 }
 
 .about-card:active {
@@ -1877,7 +1878,7 @@ body.dark-mode .mode-nav-btn.active {
 .about-card.library {
   background: transparent !important;
   border: none !important;
-  border-bottom: 1px solid #0022FF !important;
+  border-bottom: 1px solid var(--accent-color) !important;
 }
 
 /* Dark mode (Blue Mode) specific about-cards */
@@ -1976,7 +1977,7 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
 .ios-splash-screen {
   position: fixed !important;
   inset: 0 !important;
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
   z-index: 99999 !important;
   display: flex !important;
   align-items: center !important;
@@ -2049,7 +2050,7 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   position: relative !important;
   z-index: 5 !important; /* Higher than envelope body (z-index: 2) */
   overflow-y: hidden !important; /* Changed from visible to hidden to prevent vertical scroll jitters! */
-  border-bottom: 2px solid #0022FF !important; /* Consistently thick, drawn once by container */
+  border-bottom: 2px solid var(--accent-color) !important; /* Consistently thick, drawn once by container */
   
   /* Prevent text dragging layout scrolling issues */
   user-select: none !important;
@@ -2081,8 +2082,8 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
   
   /* 기본 상태: 하얀 배경 + 블루 상/좌/우 테두리, 하단은 컨테이너가 담당 */
   background: #FFFFFF !important;
-  color: #0022FF !important;
-  border: 1px solid #0022FF !important;
+  color: var(--accent-color) !important;
+  border: 1px solid var(--accent-color) !important;
   border-bottom: none !important; /* Container's 2px border handles the bottom line */
   z-index: 3 !important;
   margin-bottom: 0 !important;
@@ -2101,10 +2102,10 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
 
 /* Active 탭: 솔리드 코발트 블루 배경 + 화이트 텍스트 + 하단 컨테이너 선 덮기 */
 .folder-tab.active {
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
   color: #FFFFFF !important;
   z-index: 10 !important; /* Highest priority to cover adjacent tabs and envelope border */
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
   border-bottom: none !important; /* Merge seamlessly with container border without extra thickness */
   margin-bottom: 0 !important;
 }
@@ -2112,7 +2113,7 @@ body.dark-mode .ios-bento-card div[class*="border-t"] {
 /* 아래 서류 봉투 내부 컨테이너 */
 .folder-content-envelope {
   background: #FFFFFF !important;
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
   border-top: none !important; /* Tab container's bottom border serves as the top edge */
   border-radius: 0 0 16px 16px !important;
   padding: 12px !important;
@@ -2128,7 +2129,7 @@ body.dark-mode .folder-tabs-container {
 }
 
 body.dark-mode .folder-tab {
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
   color: #FFFFFF !important;
   border: 1px solid #FFFFFF !important;
   border-bottom: none !important; /* Container's 2px handles bottom in dark mode */
@@ -2136,14 +2137,14 @@ body.dark-mode .folder-tab {
 
 body.dark-mode .folder-tab.active {
   background: #FFFFFF !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   border: 1px solid #FFFFFF !important;
   border-bottom: none !important;
   margin-bottom: 0 !important;
 }
 
 body.dark-mode .folder-content-envelope {
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
   border: 1px solid #FFFFFF !important;
   border-top: none !important; /* Tab container's 2px white border serves as top edge */
 }
@@ -2227,7 +2228,7 @@ body.dark-mode .ios-template-card-footer {
   border-radius: 20px !important;
   padding: 4px 16px !important;
   box-shadow: none !important;
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
   margin-bottom: 8px !important;
   position: relative !important;
   transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -2241,7 +2242,7 @@ body.dark-mode .ios-template-card-footer {
   border-radius: 20px !important;
   padding: 10px 14px !important;
   box-shadow: none !important;
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
   margin-bottom: 8px !important;
   position: relative !important;
   transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -2249,7 +2250,7 @@ body.dark-mode .ios-template-card-footer {
 
 body.dark-mode .ios-bento-card-compact,
 body.dark-mode .ios-bento-card-expanded {
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
   border: 1px solid #FFFFFF !important;
 }
 
@@ -2265,7 +2266,7 @@ body.dark-mode .ios-bento-card-expanded .save-input {
 .ios-product-label {
   font-size: 11px !important;
   font-weight: 700 !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   text-transform: uppercase !important;
   letter-spacing: 0.08em !important;
   margin: 0 !important;
@@ -2290,7 +2291,7 @@ body.dark-mode .ios-product-label {
 
 .workspace-left {
   width: 100% !important;
-  border-bottom: 1.5px solid #0022FF !important;
+  border-bottom: 1.5px solid var(--accent-color) !important;
   padding-bottom: 32px !important;
   box-sizing: border-box !important;
 }
@@ -2316,7 +2317,7 @@ body.dark-mode .workspace-left {
 
   .workspace-left {
     border-bottom: none !important;
-    border-right: 1.5px solid #0022FF !important;
+    border-right: 1.5px solid var(--accent-color) !important;
     padding-bottom: 0 !important;
     padding-right: 48px !important;
   }
@@ -2347,7 +2348,7 @@ body.dark-mode .workspace-left {
   border-radius: 0px !important;
   box-shadow: none !important;
   border: none !important;
-  border-bottom: 1.5px solid #0022FF !important;
+  border-bottom: 1.5px solid var(--accent-color) !important;
   padding: 16px 0 !important;
   margin-bottom: 0 !important;
 }
@@ -2372,7 +2373,7 @@ body.dark-mode .save-card {
 .settings-modal {
   border-radius: 0px !important;
   box-shadow: none !important;
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
   background-color: #FFFFFF !important;
 }
 
@@ -2385,7 +2386,7 @@ body.dark-mode .settings-modal {
 .swiss-option-row {
   display: flex !important;
   align-items: flex-start !important;
-  border-bottom: 1px solid #0022FF !important;
+  border-bottom: 1px solid var(--accent-color) !important;
   padding: 12px 0 !important;
   margin-bottom: 0 !important;
   width: 100% !important;
@@ -2401,7 +2402,7 @@ body.dark-mode .swiss-option-row {
   min-width: 100px !important;
   font-size: 10.5px !important;
   font-weight: 800 !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   text-transform: uppercase !important;
   letter-spacing: 0.08em !important;
   margin: 0 !important;
@@ -2440,7 +2441,7 @@ body.dark-mode .swiss-option-label {
 }
 
 .swiss-option-btn:hover {
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
 }
 
 body.dark-mode .swiss-option-btn:hover {
@@ -2449,8 +2450,8 @@ body.dark-mode .swiss-option-btn:hover {
 
 .swiss-option-btn.active {
   font-weight: 800 !important;
-  color: #0022FF !important;
-  border-bottom: 2px solid #0022FF !important;
+  color: var(--accent-color) !important;
+  border-bottom: 2px solid var(--accent-color) !important;
 }
 
 body.dark-mode .swiss-option-btn.active {
@@ -2462,8 +2463,8 @@ body.dark-mode .swiss-option-btn.active {
 .ios-summary-panel {
   background: transparent !important;
   border: none !important;
-  border-top: 1px solid #0022FF !important;
-  border-bottom: 1px solid #0022FF !important;
+  border-top: 1px solid var(--accent-color) !important;
+  border-bottom: 1px solid var(--accent-color) !important;
   padding: 12px 0 !important;
   border-radius: 0px !important;
   box-shadow: none !important;
@@ -2481,7 +2482,7 @@ body.dark-mode .ios-summary-panel {
   margin: 0 !important;
   font-size: 12px !important;
   font-weight: 800 !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   border-radius: 0px !important;
 }
 
@@ -2506,11 +2507,11 @@ body.dark-mode .ios-summary-tag {
 .save-input {
   border-radius: 0px !important;
   border: none !important;
-  border-bottom: 1px solid #0022FF !important;
+  border-bottom: 1px solid var(--accent-color) !important;
   background: transparent !important;
   box-shadow: none !important;
   padding: 8px 0 !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   font-weight: 700 !important;
 }
 
@@ -2532,9 +2533,9 @@ body.dark-mode .save-input {
 .save-btn, .cancel-pill-btn {
   background: transparent !important;
   border: none !important;
-  border-bottom: 1px solid #0022FF !important;
+  border-bottom: 1px solid var(--accent-color) !important;
   border-radius: 0px !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   font-weight: 800 !important;
   font-size: 12px !important;
   padding: 4px 0 !important;
@@ -2551,7 +2552,7 @@ body.dark-mode .save-btn, body.dark-mode .cancel-pill-btn {
 .ios-switch {
   background: #E5E5EA !important;
   border-radius: 9999px !important;
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
 }
 
 body.dark-mode .ios-switch {
@@ -2560,7 +2561,7 @@ body.dark-mode .ios-switch {
 }
 
 .ios-switch.active {
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
 }
 
 body.dark-mode .ios-switch.active {
@@ -2575,13 +2576,13 @@ body.dark-mode .swiss-option-btn {
 /* Custom Swiss Copy Button Hover & Contrast Patch */
 .swiss-copy-btn {
   background-color: transparent !important;
-  color: #0022FF !important;
-  border: 1px solid #0022FF !important;
+  color: var(--accent-color) !important;
+  border: 1px solid var(--accent-color) !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .swiss-copy-btn:hover {
-  background-color: #0022FF !important;
+  background-color: var(--accent-color) !important;
   color: #FFFFFF !important;
 }
 
@@ -2615,8 +2616,8 @@ body.dark-mode .gallery-workspace {
 .gallery-folder-edit-btn-action {
   width: 100% !important;
   background: transparent !important;
-  border: 1.5px solid #0022FF !important;
-  color: #0022FF !important;
+  border: 1.5px solid var(--accent-color) !important;
+  color: var(--accent-color) !important;
   font-size: 10px !important;
   font-weight: 900 !important;
   padding: 8px 4px !important;
@@ -2628,7 +2629,7 @@ body.dark-mode .gallery-workspace {
 }
 
 .gallery-folder-edit-btn-action:hover {
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
   color: #FFFFFF !important;
 }
 
@@ -2639,14 +2640,14 @@ body.dark-mode .gallery-folder-edit-btn-action {
 
 body.dark-mode .gallery-folder-edit-btn-action:hover {
   background: #FFFFFF !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
 }
 
 /* Sidebar for folders - matching 100px width constraint from folders tab or similar option rows */
 .gallery-sidebar {
   width: 120px !important;
   min-width: 120px !important;
-  border-right: 1.5px solid #0022FF !important;
+  border-right: 1.5px solid var(--accent-color) !important;
   display: flex !important;
   flex-direction: column !important;
   box-sizing: border-box !important;
@@ -2656,13 +2657,13 @@ body.dark-mode .gallery-folder-edit-btn-action:hover {
 
 body.dark-mode .gallery-sidebar {
   border-right: 1.5px solid #FFFFFF !important;
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
 }
 
 .gallery-sidebar-title {
   font-size: 10px !important;
   font-weight: 900 !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   letter-spacing: 0.1em !important;
   margin-bottom: 16px !important;
   padding-left: 4px !important;
@@ -2695,7 +2696,7 @@ body.dark-mode .gallery-sidebar-title {
 }
 
 .gallery-folder-item:hover {
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
 }
 
 body.dark-mode .gallery-folder-item:hover {
@@ -2703,10 +2704,10 @@ body.dark-mode .gallery-folder-item:hover {
 }
 
 .gallery-folder-item.active {
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   font-weight: 900 !important;
-  background-color: rgba(0, 34, 255, 0.05) !important;
-  border-left: 3px solid #0022FF !important;
+  background-color: color-mix(in srgb, var(--accent-color) 5%, transparent) !important;
+  border-left: 3px solid var(--accent-color) !important;
   padding-left: 3px !important;
 }
 
@@ -2736,7 +2737,7 @@ body.dark-mode .gallery-folder-item.active {
 .gallery-add-folder {
   margin-top: auto !important;
   padding-top: 16px !important;
-  border-top: 1px solid rgba(0, 34, 255, 0.2) !important;
+  border-top: 1px solid color-mix(in srgb, var(--accent-color) 20%, transparent) !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 8px !important;
@@ -2749,9 +2750,9 @@ body.dark-mode .gallery-add-folder {
 .gallery-folder-input {
   width: 100% !important;
   box-sizing: border-box !important;
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
   background: transparent !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   font-size: 11px !important;
   font-weight: 700 !important;
   padding: 6px !important;
@@ -2765,7 +2766,7 @@ body.dark-mode .gallery-folder-input {
 
 .gallery-folder-add-btn {
   width: 100% !important;
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
   color: #FFFFFF !important;
   border: none !important;
   font-size: 9px !important;
@@ -2782,7 +2783,7 @@ body.dark-mode .gallery-folder-input {
 
 body.dark-mode .gallery-folder-add-btn {
   background: #FFFFFF !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
 }
 
 /* Main Area */
@@ -2795,7 +2796,7 @@ body.dark-mode .gallery-folder-add-btn {
 }
 
 body.dark-mode .gallery-main {
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
 }
 
 .gallery-main-header {
@@ -2803,7 +2804,7 @@ body.dark-mode .gallery-main {
   justify-content: space-between !important;
   align-items: center !important;
   padding: 8px 16px !important;
-  border-bottom: 1px solid #0022FF !important;
+  border-bottom: 1px solid var(--accent-color) !important;
 }
 
 body.dark-mode .gallery-main-header {
@@ -2813,7 +2814,7 @@ body.dark-mode .gallery-main-header {
 .gallery-folder-indicator {
   font-size: 14px !important;
   font-weight: 900 !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   letter-spacing: -0.01em !important;
 }
 
@@ -2860,7 +2861,7 @@ body.dark-mode .gallery-empty-text {
 }
 
 .gallery-item-card {
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
   background: #FFFFFF !important;
   display: flex !important;
   flex-direction: column !important;
@@ -2869,14 +2870,14 @@ body.dark-mode .gallery-empty-text {
 
 body.dark-mode .gallery-item-card {
   border: 1px solid #FFFFFF !important;
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
 }
 
 .gallery-image-wrapper {
   width: 100% !important;
   aspect-ratio: 1 / 1 !important;
   overflow: hidden !important;
-  border-bottom: 1px solid #0022FF !important;
+  border-bottom: 1px solid var(--accent-color) !important;
 }
 
 body.dark-mode .gallery-image-wrapper {
@@ -2927,8 +2928,8 @@ body.dark-mode .gallery-item-prompt {
 
 .gallery-item-btn {
   background: transparent !important;
-  border: 1px solid #0022FF !important;
-  color: #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
+  color: var(--accent-color) !important;
   font-size: 9px !important;
   font-weight: 900 !important;
   padding: 4px 6px !important;
@@ -2937,7 +2938,7 @@ body.dark-mode .gallery-item-prompt {
 }
 
 .gallery-item-btn:hover {
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
   color: #FFFFFF !important;
 }
 
@@ -2948,16 +2949,16 @@ body.dark-mode .gallery-item-btn {
 
 body.dark-mode .gallery-item-btn:hover {
   background: #FFFFFF !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
 }
 
 .gallery-move-select {
   flex-grow: 1 !important;
   font-size: 9px !important;
   font-weight: 700 !important;
-  border: 1px solid #0022FF !important;
+  border: 1px solid var(--accent-color) !important;
   background: transparent !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
   padding: 3px !important;
   outline: none !important;
   cursor: pointer !important;
@@ -2967,16 +2968,16 @@ body.dark-mode .gallery-item-btn:hover {
 body.dark-mode .gallery-move-select {
   border: 1px solid #FFFFFF !important;
   color: #FFFFFF !important;
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
 }
 
 .gallery-move-select option {
   background: #FFFFFF !important;
-  color: #0022FF !important;
+  color: var(--accent-color) !important;
 }
 
 body.dark-mode .gallery-move-select option {
-  background: #0022FF !important;
+  background: var(--accent-color) !important;
   color: #FFFFFF !important;
 }
 
@@ -3017,7 +3018,7 @@ body.dark-mode .gallery-item-delete:hover {
     width: 100% !important;
     min-width: 100% !important;
     border-right: none !important;
-    border-bottom: 1.5px solid #0022FF !important;
+    border-bottom: 1.5px solid var(--accent-color) !important;
   }
   
   body.dark-mode .gallery-sidebar {
@@ -3037,7 +3038,7 @@ body.dark-mode .gallery-item-delete:hover {
   
   .gallery-folder-item.active {
     border-left: none !important;
-    border-bottom: 3px solid #0022FF !important;
+    border-bottom: 3px solid var(--accent-color) !important;
     padding-left: 6px !important;
   }
   
@@ -3064,7 +3065,7 @@ body.dark-mode .gallery-item-delete:hover {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #0022FF !important; /* Swiss Cobalt Blue default */
+  background: var(--accent-color) !important; /* Swiss Cobalt Blue default */
   border-radius: 0px !important;
 }
 

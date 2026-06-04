@@ -28,7 +28,7 @@ export default function TemplateCard({
         isSelected ? 'bg-blue-50/40 dark:bg-zinc-800/40' : 'hover:bg-gray-50/50 dark:hover:bg-zinc-800/20'
       }`}
       style={{
-        borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+        borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)',
         padding: '12px 8px',
       }}
     >
@@ -37,14 +37,14 @@ export default function TemplateCard({
         <div className="flex items-baseline gap-2 text-left">
           <span 
             className="text-[28px] font-sans font-black tracking-tighter uppercase" 
-            style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF', lineHeight: '1.0' }}
+            style={{ color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', lineHeight: '1.0' }}
           >
             {formattedIndex} / {template.name}
           </span>
         </div>
         <span 
           className="text-[11px] font-sans uppercase tracking-wider opacity-60 font-medium" 
-          style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF', paddingBottom: '2px', textAlign: 'right' }}
+          style={{ color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', paddingBottom: '2px', textAlign: 'right' }}
         >
           {aspectRatio.split(' ')[0]}
         </span>
@@ -79,8 +79,8 @@ export default function TemplateCard({
             }}
             className="hover:opacity-90 active:scale-95 transition-all duration-150"
             style={{
-              backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-              color: isDarkMode ? '#0022FF' : '#FFFFFF',
+              backgroundColor: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+              color: isDarkMode ? 'var(--accent-color)' : '#FFFFFF',
               border: 'none',
               borderRadius: '0px',
               padding: '8px 20px',

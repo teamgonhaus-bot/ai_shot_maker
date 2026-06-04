@@ -129,8 +129,8 @@ export default function SwissSpecificationSheet({
     <div 
       className="swiss-spec-panel"
       style={{
-        backgroundColor: isDarkMode ? '#0022FF' : '#FFFFFF',
-        color: isDarkMode ? '#FFFFFF' : '#0022FF',
+        backgroundColor: isDarkMode ? 'var(--accent-color)' : '#FFFFFF',
+        color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         padding: '0 0 40px 0',
       }}
@@ -141,7 +141,7 @@ export default function SwissSpecificationSheet({
           width: 100%;
         }
         .swiss-line-divider {
-          border-bottom: 1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'};
+          border-bottom: 1.5px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'};
           margin: 0;
           padding: 24px 0;
         }
@@ -150,7 +150,7 @@ export default function SwissSpecificationSheet({
           justify-content: space-between;
           align-items: flex-end;
           padding-bottom: 12px;
-          border-bottom: 3px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'};
+          border-bottom: 3px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'};
         }
         .swiss-scene-num {
           font-size: clamp(48px, 6vw, 64px);
@@ -171,7 +171,7 @@ export default function SwissSpecificationSheet({
           justify-content: space-between;
           align-items: flex-end;
           padding: 24px 0 6px 0;
-          border-bottom: 1px solid ${isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,34,255,0.4)'};
+          border-bottom: 1px solid ${isDarkMode ? 'rgba(255,255,255,0.4)' : 'color-mix(in srgb, var(--accent-color) 40%, transparent)'};
           position: relative !important;
           overflow: hidden !important;
         }
@@ -185,7 +185,7 @@ export default function SwissSpecificationSheet({
           left: -150% !important;
           width: 50% !important;
           height: 1.5px !important;
-          background: linear-gradient(90deg, transparent, ${isDarkMode ? '#FFFFFF' : '#0022FF'}, transparent) !important;
+          background: linear-gradient(90deg, transparent, ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'}, transparent) !important;
           animation: glow-shimmer 1.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
           z-index: 5 !important;
         }
@@ -205,7 +205,7 @@ export default function SwissSpecificationSheet({
           line-height: 1.1;
         }
         .swiss-image-container {
-          border: 1px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'};
+          border: 1px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'};
           margin-top: 24px;
           overflow: hidden;
           position: relative;
@@ -222,8 +222,8 @@ export default function SwissSpecificationSheet({
         }
         .swiss-image-controls {
           display: flex;
-          border-top: 1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'};
-          background-color: ${isDarkMode ? '#0022FF' : '#FFFFFF'};
+          border-top: 1.5px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'};
+          background-color: ${isDarkMode ? 'var(--accent-color)' : '#FFFFFF'};
         }
         .swiss-image-btn {
           flex: 1;
@@ -243,17 +243,17 @@ export default function SwissSpecificationSheet({
           transition: background-color 0.2s ease, opacity 0.2s;
         }
         .swiss-image-btn:hover {
-          background-color: ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,34,255,0.06)'};
+          background-color: ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'color-mix(in srgb, var(--accent-color) 6%, transparent)'};
         }
         .swiss-image-btn:active {
           opacity: 0.8;
         }
         .swiss-image-btn:not(:last-child) {
-          border-right: 1px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'};
+          border-right: 1px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'};
         }
         .swiss-prompt-box {
           padding: 28px 0;
-          border-bottom: 1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'};
+          border-bottom: 1.5px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'};
         }
         .swiss-prompt-title {
           font-size: 10px;
@@ -276,7 +276,7 @@ export default function SwissSpecificationSheet({
           justify-content: space-between;
           align-items: center;
           padding: 16px 0;
-          border-bottom: 1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'};
+          border-bottom: 1.5px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'};
         }
         .swiss-footer-id {
           font-size: 10.5px;
@@ -284,8 +284,8 @@ export default function SwissSpecificationSheet({
           letter-spacing: 0.05em;
         }
         .swiss-copy-tab {
-          background-color: ${isDarkMode ? '#FFFFFF' : '#0022FF'};
-          color: ${isDarkMode ? '#0022FF' : '#FFFFFF'};
+          background-color: ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'};
+          color: ${isDarkMode ? 'var(--accent-color)' : '#FFFFFF'};
           border: none;
           font-size: 10px;
           font-weight: 900;
@@ -309,7 +309,7 @@ export default function SwissSpecificationSheet({
         .swiss-empty-spec {
           text-align: center;
           padding: 64px 16px;
-          border-bottom: 1px solid ${isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,34,255,0.2)'};
+          border-bottom: 1px solid ${isDarkMode ? 'rgba(255,255,255,0.2)' : 'color-mix(in srgb, var(--accent-color) 20%, transparent)'};
         }
         .swiss-empty-text {
           font-size: 12px;
@@ -321,7 +321,7 @@ export default function SwissSpecificationSheet({
         .skeleton-line {
           height: 240px;
           width: 100%;
-          border: 1px dashed ${isDarkMode ? '#FFFFFF' : '#0022FF'};
+          border: 1px dashed ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'};
           display: flex;
           flex-direction: column;
           align-items: center;

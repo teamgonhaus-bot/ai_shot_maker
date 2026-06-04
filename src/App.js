@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders, Zap, Shuffle, ChevronLeft, ChevronRight, FolderOpen, RotateCw, Download, ZoomIn
+  Wand2, LayoutTemplate, X, Image as ImageIcon, Menu, Settings, LogIn, LogOut, Copy, Sliders, Zap, Shuffle, ChevronLeft, ChevronRight, RotateCw, Download, ZoomIn, ZoomOut
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db, auth, storage } from './firebase';
@@ -13,6 +13,7 @@ import OptionSelect from './components/OptionSelect';
 import IOSToggle from './components/IOSToggle';
 import SwissSpecificationSheet from './components/SwissSpecificationSheet';
 import TemplateCard from './components/TemplateCard';
+import BrutalistSelect from './components/BrutalistSelect';
 
 // 갤러리 라이브러리 레이지 로드 및 페이드인 이미지 컴포넌트 (v0.65 성능 최적화)
 const GalleryImage = ({ src, alt, onClick, className }) => {
@@ -716,6 +717,55 @@ const getSubjectNounPhrase = (config) => {
   return parts.join(" ");
 };
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  show: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 260,
+      damping: 25
+    }
+  }
+};
+
+const slideVariants = {
+  enter: (direction) => ({
+    x: direction > 0 ? '100%' : '-100%',
+    opacity: 0,
+    scale: 0.95
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+    scale: 1,
+    transition: {
+      x: { type: "spring", stiffness: 300, damping: 30 },
+      opacity: { duration: 0.2 }
+    }
+  },
+  exit: (direction) => ({
+    x: direction < 0 ? '100%' : '-100%',
+    opacity: 0,
+    scale: 0.95,
+    transition: {
+      x: { type: "spring", stiffness: 300, damping: 30 },
+      opacity: { duration: 0.2 }
+    }
+  })
+};
+
 export default function App() {
   const [isLoading, setIsLoading] = useState(() => {
     try {
@@ -808,6 +858,9 @@ export default function App() {
   const [googleApiKey, setGoogleApiKey] = useState("");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [accentColor, setAccentColor] = useState(() => {
+    return localStorage.getItem('accent_color') || '#0022FF';
+  });
   const [generatedImage, setGeneratedImage] = useState(null);
   const [isImageGenerating, setIsImageGenerating] = useState(false);
   const [isUpscaling, setIsUpscaling] = useState(false);
@@ -870,10 +923,16 @@ export default function App() {
   const [fullscreenPreviewUrl, setFullscreenPreviewUrl] = useState(null);
   const [lightboxLoaded, setLightboxLoaded] = useState(false);
   const [gallerySortOrder, setGallerySortOrder] = useState('newest');
-  const [isZoomed, setIsZoomed] = useState(false);
+  const [zoomScale, setZoomScale] = useState(1);
+  const setIsZoomed = (val) => {
+    if (typeof val === 'function') {
+      setZoomScale(prev => val(prev > 1) ? 2 : 1);
+    } else {
+      setZoomScale(val ? 2 : 1);
+    }
+  };
   const [isShaking, setIsShaking] = useState(false);
   const lastTapRef = useRef(0);
-  const touchStartXRef = useRef(0);
 
   // Rename Modal State
   const [renameTarget, setRenameTarget] = useState(null); // { id, name }
@@ -923,6 +982,7 @@ export default function App() {
   });
 
   const [activePreviewIndex, setActivePreviewIndex] = useState(0);
+  const [carouselDirection, setCarouselDirection] = useState(0);
 
   // Smart Scene Preview upload, deletion, and toggle helpers (Synced with Firebase Storage & Firestore)
   const handleUploadSmartPreview = async (e, templateId) => {
@@ -1524,6 +1584,11 @@ Return ONLY valid JSON matching this schema:
     localStorage.setItem('shotmaker_useProduct_v13', useProduct);
   }, [useProduct]);
 
+  // Sync accentColor to CSS variable
+  useEffect(() => {
+    document.documentElement.style.setProperty('--accent-color', accentColor);
+  }, [accentColor]);
+
   // Initialize editPrompt when activeEditImage opens
   useEffect(() => {
     if (activeEditImage) {
@@ -1623,7 +1688,7 @@ Return ONLY valid JSON matching this schema:
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.67a Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.68 Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -3086,7 +3151,7 @@ Return ONLY valid JSON matching this schema:
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.67a | Shot Maker Workspace
+              v0.68 | Shot Maker Workspace
             </div>
           </div>
         </div>
@@ -3162,8 +3227,8 @@ Return ONLY valid JSON matching this schema:
             });
 
           const activeIndex = filteredSortedImages.findIndex(img => img.url === lightboxImage);
-          const limitX = typeof window !== 'undefined' ? window.innerWidth * 0.35 : 300;
-          const limitY = typeof window !== 'undefined' ? window.innerHeight * 0.25 : 200;
+          const limitX = (typeof window !== 'undefined' ? window.innerWidth * 0.35 : 300) * (zoomScale - 0.5);
+          const limitY = (typeof window !== 'undefined' ? window.innerHeight * 0.25 : 200) * (zoomScale - 0.5);
 
           const handlePrevLightboxImage = (e) => {
             if (e) e.stopPropagation();
@@ -3296,11 +3361,11 @@ Return ONLY valid JSON matching this schema:
                       }
                     }
                   }}
-                  drag={isZoomed ? true : "x"}
-                  dragConstraints={isZoomed ? { left: -limitX, right: limitX, top: -limitY, bottom: limitY } : { left: 0, right: 0 }}
-                  dragElastic={isZoomed ? 0.15 : 0.6}
+                  drag={zoomScale > 1 ? true : "x"}
+                  dragConstraints={zoomScale > 1 ? { left: -limitX, right: limitX, top: -limitY, bottom: limitY } : { left: 0, right: 0 }}
+                  dragElastic={zoomScale > 1 ? 0.15 : 0.6}
                   onDragEnd={(event, info) => {
-                    if (isZoomed) return; // 줌 상태에서는 스와이프 완전 방어
+                    if (zoomScale > 1) return; // 줌 상태에서는 스와이프 완전 방어
                     const swipeThreshold = 100; // 100px drag to swipe
                     if (info.offset.x > swipeThreshold) {
                       // Dragged right -> Previous Image
@@ -3316,13 +3381,13 @@ Return ONLY valid JSON matching this schema:
                   onLoad={() => setLightboxLoaded(true)}
                   onClick={handleImageTap}
                   animate={{ 
-                    scale: isZoomed ? 2.0 : 1,
-                    x: isZoomed ? undefined : 0,
-                    y: isZoomed ? undefined : 0
+                    scale: zoomScale,
+                    x: zoomScale > 1 ? undefined : 0,
+                    y: zoomScale > 1 ? undefined : 0
                   }}
                   transition={{ type: 'spring', damping: 28, stiffness: 220 }}
                   style={{
-                    cursor: isZoomed ? 'grab' : 'zoom-in',
+                    cursor: zoomScale > 1 ? 'grab' : 'zoom-in',
                     maxHeight: '80vh',
                     maxWidth: '90vw',
                     objectFit: 'contain',
@@ -3330,7 +3395,7 @@ Return ONLY valid JSON matching this schema:
                     touchAction: 'none',
                     userSelect: 'none'
                   }}
-                  whileDrag={{ cursor: isZoomed ? 'grabbing' : 'grabbing' }}
+                  whileDrag={{ cursor: zoomScale > 1 ? 'grabbing' : 'grabbing' }}
                 />
               </motion.div>
 
@@ -3386,7 +3451,7 @@ Return ONLY valid JSON matching this schema:
                 <button
                   onClick={() => handleDownloadImage(lightboxImage)}
                   style={{
-                    backgroundColor: '#0022FF',
+                    backgroundColor: 'var(--accent-color)',
                     color: '#FFFFFF',
                     border: 'none',
                     padding: '6px 12px',
@@ -3403,29 +3468,74 @@ Return ONLY valid JSON matching this schema:
                   <span>DOWNLOAD</span>
                 </button>
 
-                {/* 🔍 Zoom Toggle Button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsZoomed(prev => !prev);
-                  }}
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: '#FFFFFF',
-                    border: '1px solid rgba(255,255,255,0.5)',
-                    padding: '6px 12px',
-                    fontSize: '11px',
-                    fontWeight: 'bold',
-                    textTransform: 'uppercase',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
+                {/* 🔍 Zoom Slider Controls */}
+                <div 
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px', 
+                    borderLeft: '1px solid rgba(255,255,255,0.2)', 
+                    paddingLeft: '12px',
+                    borderRight: '1px solid rgba(255,255,255,0.2)',
+                    paddingRight: '12px'
                   }}
                 >
-                  <ZoomIn size={12} />
-                  <span>{isZoomed ? "ZOOM OUT" : "ZOOM IN"}</span>
-                </button>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setZoomScale(s => Math.max(1, s - 0.25)); }}
+                    style={{ 
+                      background: 'transparent', 
+                      border: '1px solid rgba(255,255,255,0.5)', 
+                      color: '#FFFFFF', 
+                      width: '24px', 
+                      height: '24px', 
+                      borderRadius: '0px', 
+                      cursor: 'pointer', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      outline: 'none'
+                    }}
+                    title="Zoom Out"
+                  >
+                    <ZoomOut size={12} />
+                  </button>
+                  <input 
+                    type="range" 
+                    min="1" 
+                    max="3" 
+                    step="0.05" 
+                    value={zoomScale} 
+                    onChange={(e) => { e.stopPropagation(); setZoomScale(parseFloat(e.target.value)); }}
+                    style={{ 
+                      width: '80px', 
+                      accentColor: 'var(--accent-color)', 
+                      cursor: 'pointer' 
+                    }}
+                  />
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setZoomScale(s => Math.min(3, s + 0.25)); }}
+                    style={{ 
+                      background: 'transparent', 
+                      border: '1px solid rgba(255,255,255,0.5)', 
+                      color: '#FFFFFF', 
+                      width: '24px', 
+                      height: '24px', 
+                      borderRadius: '0px', 
+                      cursor: 'pointer', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      outline: 'none'
+                    }}
+                    title="Zoom In"
+                  >
+                    <ZoomIn size={12} />
+                  </button>
+                  <span style={{ fontSize: '11px', color: '#FFFFFF', minWidth: '40px', fontWeight: 'bold', textAlign: 'right', fontFamily: 'monospace' }}>
+                    {Math.round(zoomScale * 100)}%
+                  </span>
+                </div>
 
                 {filteredSortedImages[activeIndex]?.prompt && (
                   <button
@@ -3480,28 +3590,28 @@ Return ONLY valid JSON matching this schema:
                 padding: '24px',
                 borderRadius: '0px',
                 backgroundColor: isDarkMode ? '#000000' : '#FFFFFF',
-                border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                border: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)',
                 boxShadow: 'none',
                 width: '90%',
                 maxWidth: '400px'
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF', margin: '0 0 4px 0' }} className="text-[20px] font-black tracking-tight text-center uppercase">Edit Image</h3>
+              <h3 style={{ color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', margin: '0 0 4px 0' }} className="text-[20px] font-black tracking-tight text-center uppercase">Edit Image</h3>
               <p className="text-[11px] font-bold text-gray-400 mb-6 text-center">폴더 이동, 이미지 동기화 및 영구 삭제</p>
 
               {/* 1. Thumbnail & Prompt preview */}
-              <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', borderBottom: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid #0022FF', paddingBottom: '16px' }}>
+              <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', borderBottom: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid var(--accent-color)', paddingBottom: '16px' }}>
                 <img 
                   src={activeEditImage.url} 
                   alt="Edit target preview" 
-                  style={{ width: '80px', height: '80px', objectFit: 'cover', border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF' }} 
+                  style={{ width: '80px', height: '80px', objectFit: 'cover', border: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)' }} 
                 />
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <div style={{
                     fontSize: '9px',
                     fontWeight: '900',
-                    backgroundColor: (activeEditImage.isTemp || activeEditImage.id.startsWith('temp_')) ? '#FF3B30' : '#0022FF',
+                    backgroundColor: (activeEditImage.isTemp || activeEditImage.id.startsWith('temp_')) ? '#FF3B30' : 'var(--accent-color)',
                     color: '#FFFFFF',
                     padding: '2px 6px',
                     borderRadius: '2px',
@@ -3529,7 +3639,7 @@ Return ONLY valid JSON matching this schema:
 
               {/* 1.5. Edit Prompt Content */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-                <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', textTransform: 'uppercase', textAlign: 'left' }}>Edit Prompt</div>
+                <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', textTransform: 'uppercase', textAlign: 'left' }}>Edit Prompt</div>
                 <textarea
                   value={editPrompt}
                   onChange={(e) => setEditPrompt(e.target.value)}
@@ -3540,7 +3650,7 @@ Return ONLY valid JSON matching this schema:
                     padding: '10px 14px',
                     backgroundColor: isDarkMode ? '#1C1C1E' : '#F8F8FF',
                     color: isDarkMode ? '#FFFFFF' : '#000000',
-                    border: isDarkMode ? '1px solid rgba(255,255,255,0.3)' : '1px solid #0022FF',
+                    border: isDarkMode ? '1px solid rgba(255,255,255,0.3)' : '1px solid var(--accent-color)',
                     borderRadius: '0px',
                     fontSize: '12px',
                     fontWeight: 'normal',
@@ -3554,8 +3664,8 @@ Return ONLY valid JSON matching this schema:
                   style={{
                     width: '100%',
                     padding: '10px',
-                    backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                    color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                    backgroundColor: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                    color: isDarkMode ? 'var(--accent-color)' : '#FFFFFF',
                     border: 'none',
                     borderRadius: '0px',
                     fontWeight: '900',
@@ -3570,73 +3680,46 @@ Return ONLY valid JSON matching this schema:
 
               {/* 2. Folder Move Selector */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-                <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', textTransform: 'uppercase', textAlign: 'left' }}>Move to Folder</div>
-                <select
+                <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', textTransform: 'uppercase', textAlign: 'left' }}>Move to Folder</div>
+                <BrutalistSelect
                   value={activeEditImage.folder || '기본'}
-                  onChange={(e) => {
-                    const destFolder = e.target.value;
+                  onChange={(destFolder) => {
                     handleMoveImageFolder(activeEditImage, destFolder);
                   }}
-                  style={{
-                    width: '100%',
-                    padding: '10px 14px',
-                    backgroundColor: isDarkMode ? '#1C1C1E' : '#F8F8FF',
-                    color: isDarkMode ? '#FFFFFF' : '#0022FF',
-                    border: isDarkMode ? '1px solid rgba(255,255,255,0.3)' : '1px solid #0022FF',
-                    borderRadius: '0px',
-                    fontWeight: 'bold',
-                    fontSize: '12px',
-                    outline: 'none'
-                  }}
-                >
-                  {galleryFolders.map(f => (
-                    <option key={f} value={f}>{f}</option>
-                  ))}
-                </select>
+                  options={galleryFolders}
+                  isDarkMode={isDarkMode}
+                />
               </div>
 
               {/* 2.5. Add to Smart Preview Carousel */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-                <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', textTransform: 'uppercase', textAlign: 'left' }}>Add to Smart Preview</div>
+                <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', textTransform: 'uppercase', textAlign: 'left' }}>Add to Smart Preview</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <select
+                    <BrutalistSelect
                       value={selectedSmartPreviewTemplate}
-                      onChange={(e) => {
-                        setSelectedSmartPreviewTemplate(e.target.value);
+                      onChange={(val) => {
+                        setSelectedSmartPreviewTemplate(val);
                         setSelectedSmartPreviewSubOptionIndex(0);
                       }}
-                      style={{
-                        flex: 1,
-                        padding: '10px 14px',
-                        backgroundColor: isDarkMode ? '#1C1C1E' : '#F8F8FF',
-                        color: isDarkMode ? '#FFFFFF' : '#0022FF',
-                        border: isDarkMode ? '1px solid rgba(255,255,255,0.3)' : '1px solid #0022FF',
-                        borderRadius: '0px',
-                        fontWeight: 'bold',
-                        fontSize: '12px',
-                        outline: 'none'
-                      }}
-                    >
-                      {[
-                        { id: 'TITLE SCENE', label: 'Title' },
-                        { id: 'DETAIL SCENE', label: 'Detail' },
-                        { id: 'INSTA SCENE', label: 'Insta' },
-                        { id: 'USAGE SCENE', label: 'User' },
-                        { id: 'HOME LIVING', label: 'Home' },
-                        { id: 'OFFICE TECH', label: 'Office' },
-                        { id: 'RETAIL SCENE', label: 'Retail' },
-                        { id: 'NATURE ORGANIC', label: 'Outdoor' }
-                      ].map(t => (
-                        <option key={t.id} value={t.id}>{t.label}</option>
-                      ))}
-                    </select>
+                      options={[
+                        { value: 'TITLE SCENE', label: 'Title' },
+                        { value: 'DETAIL SCENE', label: 'Detail' },
+                        { value: 'INSTA SCENE', label: 'Insta' },
+                        { value: 'USAGE SCENE', label: 'User' },
+                        { value: 'HOME LIVING', label: 'Home' },
+                        { value: 'OFFICE TECH', label: 'Office' },
+                        { value: 'RETAIL SCENE', label: 'Retail' },
+                        { value: 'NATURE ORGANIC', label: 'Outdoor' }
+                      ]}
+                      isDarkMode={isDarkMode}
+                    />
                     <button
                       onClick={() => handleAddImageToSmartPreview(activeEditImage.url, selectedSmartPreviewTemplate, selectedSmartPreviewSubOptionIndex)}
                       style={{
                         padding: '10px 16px',
-                        backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                        color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                        backgroundColor: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                        color: isDarkMode ? 'var(--accent-color)' : '#FFFFFF',
                         border: 'none',
                         borderRadius: '0px',
                         fontWeight: '900',
@@ -3648,39 +3731,29 @@ Return ONLY valid JSON matching this schema:
                       ADD
                     </button>
                   </div>
-                  <select
+                  <BrutalistSelect
                     value={selectedSmartPreviewSubOptionIndex}
-                    onChange={(e) => setSelectedSmartPreviewSubOptionIndex(Number(e.target.value))}
-                    style={{
-                      width: '100%',
-                      padding: '10px 14px',
-                      backgroundColor: isDarkMode ? '#1C1C1E' : '#F8F8FF',
-                      color: isDarkMode ? '#FFFFFF' : '#0022FF',
-                      border: isDarkMode ? '1px solid rgba(255,255,255,0.3)' : '1px solid #0022FF',
-                      borderRadius: '0px',
-                      fontWeight: 'bold',
-                      fontSize: '12px',
-                      outline: 'none'
-                    }}
-                  >
-                    {SMART_SUB_OPTIONS[selectedSmartPreviewTemplate]?.map((opt, idx) => (
-                      <option key={opt.name} value={idx}>{opt.name}</option>
-                    ))}
-                  </select>
+                    onChange={(val) => setSelectedSmartPreviewSubOptionIndex(Number(val))}
+                    options={SMART_SUB_OPTIONS[selectedSmartPreviewTemplate]?.map((opt, idx) => ({
+                      value: idx,
+                      label: opt.name
+                    })) || []}
+                    isDarkMode={isDarkMode}
+                  />
                 </div>
               </div>
 
               {/* 3. Manual sync for local-only */}
               {(activeEditImage.isTemp || activeEditImage.id.startsWith('temp_')) && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', textTransform: 'uppercase', textAlign: 'left' }}>Cloud Backup</div>
+                  <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', textTransform: 'uppercase', textAlign: 'left' }}>Cloud Backup</div>
                   <button
                     onClick={() => handleEditModalSync(activeEditImage)}
                     style={{
                       width: '100%',
                       padding: '12px',
-                      backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                      color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                      backgroundColor: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                      color: isDarkMode ? 'var(--accent-color)' : '#FFFFFF',
                       border: 'none',
                       borderRadius: '0px',
                       fontWeight: '900',
@@ -3719,8 +3792,8 @@ Return ONLY valid JSON matching this schema:
                     flex: 1,
                     padding: '12px',
                     backgroundColor: 'transparent',
-                    color: isDarkMode ? '#FFFFFF' : '#0022FF',
-                    border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                    color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                    border: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)',
                     borderRadius: '0px',
                     fontWeight: '900',
                     fontSize: '11px',
@@ -3902,18 +3975,18 @@ Return ONLY valid JSON matching this schema:
               style={{
                 display: 'flex', flexDirection: 'column', maxHeight: '80vh', padding: '24px', borderRadius: '0px',
                 backgroundColor: isDarkMode ? '#000000' : '#FFFFFF',
-                border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                border: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)',
                 boxShadow: 'none',
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF' }} className="text-[20px] font-black mb-4 tracking-tight text-center uppercase">Prompt Detail</h3>
+              <h3 style={{ color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)' }} className="text-[20px] font-black mb-4 tracking-tight text-center uppercase">Prompt Detail</h3>
               <div className="flex-1 overflow-y-auto" style={{
                 padding: '16px 0',
                 backgroundColor: 'transparent',
                 borderRadius: '0px',
                 marginBottom: '20px',
-                borderBottom: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid #0022FF',
+                borderBottom: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid var(--accent-color)',
               }}>
                 <p style={{
                   fontSize: '13px', fontWeight: 600,
@@ -3950,9 +4023,9 @@ Return ONLY valid JSON matching this schema:
                     alignItems: 'center', borderRadius: '0px',
                     backgroundColor: 'transparent',
                     border: 'none',
-                    borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                    borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)',
                     cursor: 'pointer',
-                    color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                    color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
                     flexShrink: 0, outline: 'none',
                   }}
                 >
@@ -4021,15 +4094,15 @@ Return ONLY valid JSON matching this schema:
                 alignItems: 'center', 
                 gap: '14px', 
                 paddingBottom: '20px', 
-                borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)', 
+                borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid color-mix(in srgb, var(--accent-color) 12%, transparent)', 
                 marginBottom: '20px', 
                 paddingRight: '24px' 
               }}>
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center"
                   style={{ 
-                    backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                    color: isDarkMode ? '#0022FF' : '#FFFFFF'
+                    backgroundColor: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                    color: isDarkMode ? 'var(--accent-color)' : '#FFFFFF'
                   }}
                 >
                   {aboutModalTarget.icon === 'sliders' && <Sliders className="w-5 h-5" />}
@@ -4038,10 +4111,10 @@ Return ONLY valid JSON matching this schema:
                   {aboutModalTarget.icon === 'smart' && <Zap className="w-5 h-5" />}
                 </div>
                 <div style={{ textAlign: 'left' }}>
-                  <h3 style={{ fontSize: '18px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', margin: 0, letterSpacing: '-0.03em' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', margin: 0, letterSpacing: '-0.03em' }}>
                     {aboutModalTarget.title}
                   </h3>
-                  <p style={{ fontSize: '11px', fontWeight: '700', color: isDarkMode ? '#FFFFFFB3' : '#0022FF80', margin: 0, marginTop: '2px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                  <p style={{ fontSize: '11px', fontWeight: '700', color: isDarkMode ? '#FFFFFFB3' : 'var(--accent-color)80', margin: 0, marginTop: '2px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                     {aboutModalTarget.subtitle}
                   </p>
                 </div>
@@ -4062,7 +4135,7 @@ Return ONLY valid JSON matching this schema:
                       key={idx} 
                       style={{
                         paddingBottom: idx === aboutModalTarget.content.length - 1 ? '0' : '20px',
-                        borderBottom: idx === aboutModalTarget.content.length - 1 ? 'none' : (isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)'),
+                        borderBottom: idx === aboutModalTarget.content.length - 1 ? 'none' : (isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid color-mix(in srgb, var(--accent-color) 12%, transparent)'),
                         textAlign: 'left'
                       }}
                     >
@@ -4070,7 +4143,7 @@ Return ONLY valid JSON matching this schema:
                         style={{ 
                           fontSize: '15px', 
                           fontWeight: '800', 
-                          color: isDarkMode ? '#FFFFFF' : '#0022FF', 
+                          color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', 
                           margin: '0 0 8px 0',
                           letterSpacing: '-0.02em'
                         }}
@@ -4098,13 +4171,13 @@ Return ONLY valid JSON matching this schema:
               {aboutModalTarget.footer && (
                 <div style={{
                   paddingTop: '16px',
-                  borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)',
+                  borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid color-mix(in srgb, var(--accent-color) 12%, transparent)',
                   marginTop: '4px'
                 }}>
                   <p 
                     style={{ 
                       fontSize: '11px', 
-                      color: isDarkMode ? '#FFFFFFB3' : '#0022FFCC', 
+                      color: isDarkMode ? '#FFFFFFB3' : 'var(--accent-color)CC', 
                       fontWeight: '600', 
                       lineHeight: '1.5', 
                       textAlign: 'left',
@@ -4140,7 +4213,7 @@ Return ONLY valid JSON matching this schema:
               </div>
               <div className="settings-body space-y-4">
                 {/* Dark Mode Section */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', paddingBottom: '16px', borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', paddingBottom: '16px', borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid color-mix(in srgb, var(--accent-color) 12%, transparent)' }}>
                   <div>
                     <label className="settings-prop-label">블루 모드</label>
                     <p className="settings-desc-text">앱 테마를 블루로 변경합니다.</p>
@@ -4153,17 +4226,52 @@ Return ONLY valid JSON matching this schema:
                   />
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', paddingBottom: '16px', borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 34, 255, 0.12)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', paddingBottom: '16px', borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid color-mix(in srgb, var(--accent-color) 12%, transparent)' }}>
                   <div>
                     <label className="settings-prop-label">이미지 생성 기능</label>
                     <p className="settings-desc-text">메인 화면에서 이미지 생성 버튼을 표시합니다.</p>
                   </div>
                   <IOSToggle
-                    label=""
-                    isOn={enableImageGeneration}
-                    onToggle={() => setEnableImageGeneration(!enableImageGeneration)}
-                    activeColor="#0055FF"
+                     label=""
+                     isOn={enableImageGeneration}
+                     onToggle={() => setEnableImageGeneration(!enableImageGeneration)}
+                     activeColor="#0055FF"
                   />
+                </div>
+
+                {/* Accent Color Selection Section */}
+                <div style={{ paddingTop: '16px', paddingBottom: '16px', borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid color-mix(in srgb, var(--accent-color) 12%, transparent)' }}>
+                  <label className="settings-prop-label" style={{ marginBottom: '8px', display: 'block' }}>테마 악센트 컬러</label>
+                  <p className="settings-desc-text" style={{ marginBottom: '12px' }}>경계선 및 브랜드 포인트 요소를 실시간으로 반영합니다.</p>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    {[
+                      { name: 'Cobalt Blue', value: '#0022FF' },
+                      { name: 'Terracotta', value: '#E05A47' },
+                      { name: 'Sage Green', value: '#5B8C5A' },
+                      { name: 'Warm Sand', value: '#CDBA96' },
+                      { name: 'Matte Black', value: '#1A1A1A' }
+                    ].map(color => (
+                      <button
+                        key={color.name}
+                        onClick={() => {
+                          setAccentColor(color.value);
+                          localStorage.setItem('accent_color', color.value);
+                        }}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          backgroundColor: color.value,
+                          border: `2.5px solid ${accentColor === color.value ? (isDarkMode ? '#FFFFFF' : '#000000') : 'transparent'}`,
+                          cursor: 'pointer',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                          transition: 'transform 0.15s ease',
+                          transform: accentColor === color.value ? 'scale(1.15)' : 'scale(1)'
+                        }}
+                        title={color.name}
+                      />
+                    ))}
+                  </div>
                 </div>
 
                 {/* Google Gemini API Key Section */}
@@ -4186,7 +4294,7 @@ Return ONLY valid JSON matching this schema:
                       marginTop: '8px',
                       background: isDarkMode ? '#1C1C1E' : '#F2F2F7',
                       color: isDarkMode ? '#FFFFFF' : '#000000',
-                      border: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid #0022FF',
+                      border: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid var(--accent-color)',
                       borderRadius: '0px',
                       padding: '10px 14px',
                       fontSize: '13px',
@@ -4204,7 +4312,7 @@ Return ONLY valid JSON matching this schema:
 
       <header className="app-header">
         <h1 
-          className={`text-2xl font-black tracking-tight leading-none m-0 cursor-pointer select-none ${isDarkMode ? 'text-white' : 'text-[#0022FF]'}`}
+          className={`text-2xl font-black tracking-tight leading-none m-0 cursor-pointer select-none ${isDarkMode ? 'text-white' : 'text-[var(--accent-color)]'}`}
           onClick={triggerSplashShow}
         >
           Shot Maker
@@ -4272,8 +4380,8 @@ Return ONLY valid JSON matching this schema:
           position: 'relative',
           marginBottom: '36px',
           boxShadow: 'none',
-          borderTop: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
-          borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF'
+          borderTop: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)',
+          borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)'
         }}
       >
         <style>{`
@@ -4294,7 +4402,7 @@ Return ONLY valid JSON matching this schema:
             font-weight: 900 !important;
             letter-spacing: 0.15em !important;
             text-transform: uppercase;
-            color: ${isDarkMode ? '#FFFFFF' : '#0022FF'};
+            color: ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'};
             padding: 0 40px;
           }
         `}</style>
@@ -4347,7 +4455,7 @@ Return ONLY valid JSON matching this schema:
           {/* 🔍 AI 스마트 제안 검색 바 */}
           <div 
             style={{
-              border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+              border: `1.5px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'}`,
               borderRadius: '0px',
               padding: '12px',
               marginBottom: '16px',
@@ -4356,10 +4464,10 @@ Return ONLY valid JSON matching this schema:
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ fontSize: '11px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <span style={{ fontSize: '11px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 AI 스마트 설정 검색 / 제안
               </span>
-              <span style={{ fontSize: '9px', fontWeight: '800', opacity: 0.6, color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>
+              <span style={{ fontSize: '9px', fontWeight: '800', opacity: 0.6, color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)' }}>
                 Gemini AI
               </span>
             </div>
@@ -4378,7 +4486,7 @@ Return ONLY valid JSON matching this schema:
                   fontSize: '12px',
                   backgroundColor: isDarkMode ? '#2C2C2E' : '#F8F8FF',
                   color: isDarkMode ? '#FFFFFF' : '#000000',
-                  border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+                  border: `1.5px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'}`,
                   outline: 'none',
                   borderRadius: '0px'
                 }}
@@ -4388,8 +4496,8 @@ Return ONLY valid JSON matching this schema:
                 disabled={isAiSearching}
                 style={{
                   padding: '8px 16px',
-                  backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                  color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                  backgroundColor: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                  color: isDarkMode ? 'var(--accent-color)' : '#FFFFFF',
                   border: 'none',
                   fontSize: '11px',
                   fontWeight: '900',
@@ -4409,8 +4517,8 @@ Return ONLY valid JSON matching this schema:
                   lineHeight: '1.45',
                   padding: '10px',
                   backgroundColor: isDarkMode ? '#2C2C2E' : '#F0F0FF',
-                  color: isDarkMode ? '#FFFFFF' : '#0022FF',
-                  borderLeft: `3px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+                  color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                  borderLeft: `3px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'}`,
                   textAlign: 'left'
                 }}
               >
@@ -4421,9 +4529,9 @@ Return ONLY valid JSON matching this schema:
 
           <AnimatePresence mode="wait">
         {currentMode === 'smart' && (
-          <motion.div key="smart" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-4">
+          <motion.div key="smart" variants={containerVariants} initial="hidden" animate="show" exit="hidden" className="space-y-4">
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', marginBottom: '16px' }}>
+            <motion.div variants={itemVariants} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', marginBottom: '16px' }}>
               <h2 className="ios-section-title" style={{ margin: 0 }}>Smart</h2>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 {/* 1. Subject Toggle Switch */}
@@ -4432,7 +4540,7 @@ Return ONLY valid JSON matching this schema:
                   alignItems: 'center', 
                   gap: '8px'
                 }}>
-                  <span style={{ fontSize: '12px', fontWeight: '800', color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>인물</span>
+                  <span style={{ fontSize: '12px', fontWeight: '800', color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)' }}>인물</span>
                   <div 
                     onClick={() => handleSmartSubjectToggle(!smartUseSubject)}
                     className={`ios-switch ${smartUseSubject ? 'active' : 'inactive'}`}
@@ -4449,8 +4557,8 @@ Return ONLY valid JSON matching this schema:
                     width: '30px',
                     height: '30px',
                     borderRadius: '50%',
-                    backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                    color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                    backgroundColor: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                    color: isDarkMode ? 'var(--accent-color)' : '#FFFFFF',
                     border: 'none',
                     display: 'flex',
                     alignItems: 'center',
@@ -4466,17 +4574,18 @@ Return ONLY valid JSON matching this schema:
                   <Shuffle size={13} strokeWidth={2.5} />
                 </button>
               </div>
-            </div>
+            </motion.div>
 
             {/* Smart Template Grid — Neo-Brutalism 4x2 Grid Overhaul (v0.65) */}
-            <div 
+            <motion.div 
+              variants={itemVariants}
               style={{ 
                 marginTop: '12px',
                 display: 'grid',
                 gridTemplateColumns: 'repeat(4, 1fr)',
                 gap: '0px',
-                borderTop: `1px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
-                borderLeft: `1px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+                borderTop: `1px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'}`,
+                borderLeft: `1px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'}`,
                 margin: '0px',
                 padding: '0px',
               }}
@@ -4492,7 +4601,7 @@ Return ONLY valid JSON matching this schema:
                 { id: 'NATURE ORGANIC', num: '08', title: 'Outdoor', desc: '야외 자연 연출', shape: 'hexagon' }
               ].map(item => {
                 const isActive = activeTemplate === item.id;
-                const borderColor = isDarkMode ? '#FFFFFF' : '#0022FF';
+                const borderColor = isDarkMode ? '#FFFFFF' : 'var(--accent-color)';
                 
                 // 각 도형의 CSS 렌더링 헬퍼
                 const getShapeStyle = () => {
@@ -4506,8 +4615,8 @@ Return ONLY valid JSON matching this schema:
                   
                   // Active일 때는 다크모드 시 코발트 블루, 라이트모드 시 화이트
                   const color = isActive 
-                    ? (isDarkMode ? '#0022FF' : '#FFFFFF') 
-                    : (isDarkMode ? 'rgba(255, 255, 255, 0.45)' : 'rgba(0, 34, 255, 0.35)');
+                    ? (isDarkMode ? 'var(--accent-color)' : '#FFFFFF') 
+                    : (isDarkMode ? 'rgba(255, 255, 255, 0.45)' : 'color-mix(in srgb, var(--accent-color) 35%, transparent)');
                     
                   if (item.shape === 'circle') {
                     return { ...base, backgroundColor: color, borderRadius: '50%' };
@@ -4549,7 +4658,7 @@ Return ONLY valid JSON matching this schema:
                       padding: '12px 6px',
                       margin: '0px',
                       background: isActive 
-                        ? (isDarkMode ? '#FFFFFF' : '#0022FF') 
+                        ? (isDarkMode ? '#FFFFFF' : 'var(--accent-color)') 
                         : 'transparent',
                       border: 'none',
                       borderBottom: `1px solid ${borderColor}`,
@@ -4557,8 +4666,8 @@ Return ONLY valid JSON matching this schema:
                       borderTop: 'none',
                       borderLeft: 'none',
                       color: isActive 
-                        ? (isDarkMode ? '#0022FF' : '#FFFFFF') 
-                        : (isDarkMode ? '#FFFFFF' : '#0022FF'),
+                        ? (isDarkMode ? 'var(--accent-color)' : '#FFFFFF') 
+                        : (isDarkMode ? '#FFFFFF' : 'var(--accent-color)'),
                       cursor: 'pointer',
                       transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
                       outline: 'none',
@@ -4632,18 +4741,18 @@ Return ONLY valid JSON matching this schema:
                   </button>
                 );
               })}
-            </div>
+            </motion.div>
 
             {/* 2.5. 스마트 씬 세부 연출 옵션 (v0.67) */}
             {activeTemplate && SMART_SUB_OPTIONS[activeTemplate] && (
-              <div style={{ marginTop: '20px', fontFamily: "'Outfit', 'Inter', sans-serif" }}>
+              <motion.div variants={itemVariants} style={{ marginTop: '20px', fontFamily: "'Outfit', 'Inter', sans-serif" }}>
                 <div 
                   style={{ 
                     fontSize: '11px', 
                     fontWeight: '900', 
                     textTransform: 'uppercase', 
                     letterSpacing: '0.05em', 
-                    color: isDarkMode ? '#FFFFFF' : '#0022FF', 
+                    color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', 
                     marginBottom: '10px' 
                   }}
                 >
@@ -4663,15 +4772,15 @@ Return ONLY valid JSON matching this schema:
                           fontSize: '12px',
                           fontWeight: '800',
                           backgroundColor: isSubActive 
-                            ? (isDarkMode ? '#FFFFFF' : '#0022FF') 
+                            ? (isDarkMode ? '#FFFFFF' : 'var(--accent-color)') 
                             : (isDarkMode ? '#2C2C2E' : '#F2F2F7'),
                           color: isSubActive 
-                            ? (isDarkMode ? '#0022FF' : '#FFFFFF') 
+                            ? (isDarkMode ? 'var(--accent-color)' : '#FFFFFF') 
                             : (isDarkMode ? '#FFFFFF' : '#1C1C1E'),
-                          border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+                          border: `1.5px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'}`,
                           boxShadow: isSubActive 
                             ? 'none' 
-                            : `3px 3px 0px ${isDarkMode ? 'rgba(255,255,255,0.15)' : '#0022FF'}`,
+                            : `3px 3px 0px ${isDarkMode ? 'rgba(255,255,255,0.15)' : 'var(--accent-color)'}`,
                           cursor: 'pointer',
                           borderRadius: '0px',
                           transition: 'all 0.15s ease',
@@ -4685,19 +4794,20 @@ Return ONLY valid JSON matching this schema:
                     );
                   })}
                 </div>
-              </div>
+              </motion.div>
             )}
 
             {/* 3. 스마트씬별 예상느낌 참고 이미지 무드보드 */}
             {activeTemplate && (
-              <div 
+              <motion.div 
+                variants={itemVariants}
                 style={{ 
                   marginTop: '24px', 
-                  border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`, 
+                  border: `1.5px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'}`, 
                   borderRadius: '0px', 
                   backgroundColor: isDarkMode ? '#1C1C1E' : '#FFFFFF', 
                   padding: '16px',
-                  boxShadow: isDarkMode ? 'none' : '4px 4px 0px #0022FF',
+                  boxShadow: isDarkMode ? 'none' : '4px 4px 0px var(--accent-color)',
                   fontFamily: "'Outfit', 'Inter', sans-serif"
                 }}
               >
@@ -4709,13 +4819,13 @@ Return ONLY valid JSON matching this schema:
                         fontWeight: '900', 
                         textTransform: 'uppercase', 
                         letterSpacing: '0.05em', 
-                        color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                        color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
                         whiteSpace: 'nowrap'
                       }}
                     >
                       Moodboard
                     </span>
-                    <span style={{ fontSize: '10px', fontWeight: '800', opacity: 0.6, color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>
+                    <span style={{ fontSize: '10px', fontWeight: '800', opacity: 0.6, color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)' }}>
                       ({activePreviews.length})
                     </span>
                   </div>
@@ -4729,12 +4839,12 @@ Return ONLY valid JSON matching this schema:
                         fontSize: '9px',
                         fontWeight: '900',
                         backgroundColor: showSmartPreview
-                          ? (isDarkMode ? '#FFFFFF' : '#0022FF')
+                          ? (isDarkMode ? '#FFFFFF' : 'var(--accent-color)')
                           : 'transparent',
                         color: showSmartPreview
-                          ? (isDarkMode ? '#0022FF' : '#FFFFFF')
-                          : (isDarkMode ? '#FFFFFF' : '#0022FF'),
-                        border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+                          ? (isDarkMode ? 'var(--accent-color)' : '#FFFFFF')
+                          : (isDarkMode ? '#FFFFFF' : 'var(--accent-color)'),
+                        border: `1.5px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'}`,
                         cursor: 'pointer',
                         borderRadius: '0px',
                         textTransform: 'uppercase',
@@ -4753,8 +4863,8 @@ Return ONLY valid JSON matching this schema:
                         fontSize: '9px',
                         fontWeight: '900',
                         backgroundColor: 'transparent',
-                        color: isDarkMode ? '#FFFFFF' : '#0022FF',
-                        border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+                        color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                        border: `1.5px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'}`,
                         cursor: 'pointer',
                         borderRadius: '0px',
                         textTransform: 'uppercase',
@@ -4784,29 +4894,55 @@ Return ONLY valid JSON matching this schema:
                     {activePreviews.length > 0 ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {/* Carousel Wrapper */}
-                        <div style={{ position: 'relative', border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`, overflow: 'hidden', width: '100%', aspectRatio: '4/3', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: isDarkMode ? '#2C2C2E' : '#E5E5EA' }}>
-                          <img 
-                            src={activePreviews[Math.min(activePreviewIndex, activePreviews.length - 1)]} 
-                            alt="Scene vibe preview" 
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'zoom-in' }}
-                            onClick={() => {
-                              const list = activePreviews;
-                              const currentImg = list[Math.min(activePreviewIndex, list.length - 1)];
-                              if (currentImg) setFullscreenPreviewUrl(currentImg);
-                            }}
-                          />
+                        <div style={{ position: 'relative', border: `1.5px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'}`, overflow: 'hidden', width: '100%', aspectRatio: '4/3', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: isDarkMode ? '#2C2C2E' : '#E5E5EA' }}>
+                          <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+                            <AnimatePresence initial={false} custom={carouselDirection}>
+                              <motion.img 
+                                key={activePreviewIndex}
+                                src={activePreviews[Math.min(activePreviewIndex, activePreviews.length - 1)]} 
+                                alt="Scene vibe preview" 
+                                custom={carouselDirection}
+                                variants={slideVariants}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                drag="x"
+                                dragConstraints={{ left: 0, right: 0 }}
+                                dragElastic={0.6}
+                                onDragEnd={(e, info) => {
+                                  const swipeThreshold = 50;
+                                  if (info.offset.x > swipeThreshold) {
+                                    setCarouselDirection(-1);
+                                    setActivePreviewIndex(prev => (prev === 0 ? activePreviews.length - 1 : prev - 1));
+                                  } else if (info.offset.x < -swipeThreshold) {
+                                    setCarouselDirection(1);
+                                    setActivePreviewIndex(prev => (prev === activePreviews.length - 1 ? 0 : prev + 1));
+                                  }
+                                }}
+                                style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', cursor: 'zoom-in' }}
+                                onClick={() => {
+                                  const list = activePreviews;
+                                  const currentImg = list[Math.min(activePreviewIndex, list.length - 1)];
+                                  if (currentImg) setFullscreenPreviewUrl(currentImg);
+                                }}
+                              />
+                            </AnimatePresence>
+                          </div>
                           
                           {/* Carousel Navigation Arrows */}
                           {activePreviews.length > 1 && (
                             <>
                               <button
-                                onClick={() => setActivePreviewIndex(prev => (prev === 0 ? activePreviews.length - 1 : prev - 1))}
+                                onClick={() => {
+                                  setCarouselDirection(-1);
+                                  setActivePreviewIndex(prev => (prev === 0 ? activePreviews.length - 1 : prev - 1));
+                                }}
                                 style={{
                                   position: 'absolute',
                                   left: '8px',
-                                  backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                                  color: isDarkMode ? '#0022FF' : '#FFFFFF',
-                                  border: `1px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+                                  backgroundColor: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                                  color: isDarkMode ? 'var(--accent-color)' : '#FFFFFF',
+                                  border: `1px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'}`,
                                   width: '28px',
                                   height: '28px',
                                   display: 'flex',
@@ -4815,19 +4951,23 @@ Return ONLY valid JSON matching this schema:
                                   cursor: 'pointer',
                                   fontSize: '16px',
                                   fontWeight: '900',
-                                  outline: 'none'
+                                  outline: 'none',
+                                  zIndex: 10
                                 }}
                               >
                                 &lsaquo;
                               </button>
                               <button
-                                onClick={() => setActivePreviewIndex(prev => (prev === activePreviews.length - 1 ? 0 : prev + 1))}
+                                onClick={() => {
+                                  setCarouselDirection(1);
+                                  setActivePreviewIndex(prev => (prev === activePreviews.length - 1 ? 0 : prev + 1));
+                                }}
                                 style={{
                                   position: 'absolute',
                                   right: '8px',
-                                  backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                                  color: isDarkMode ? '#0022FF' : '#FFFFFF',
-                                  border: `1px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+                                  backgroundColor: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                                  color: isDarkMode ? 'var(--accent-color)' : '#FFFFFF',
+                                  border: `1px solid ${isDarkMode ? '#FFFFFF' : 'var(--accent-color)'}`,
                                   width: '28px',
                                   height: '28px',
                                   display: 'flex',
@@ -4836,7 +4976,8 @@ Return ONLY valid JSON matching this schema:
                                   cursor: 'pointer',
                                   fontSize: '16px',
                                   fontWeight: '900',
-                                  outline: 'none'
+                                  outline: 'none',
+                                  zIndex: 10
                                 }}
                               >
                                 &rsaquo;
@@ -4862,7 +5003,8 @@ Return ONLY valid JSON matching this schema:
                               cursor: 'pointer',
                               fontSize: '11px',
                               fontWeight: 'bold',
-                              borderRadius: '4px'
+                              borderRadius: '4px',
+                              zIndex: 10
                             }}
                             title="참고 이미지 삭제"
                           >
@@ -4880,7 +5022,8 @@ Return ONLY valid JSON matching this schema:
                             border: '1px solid rgba(255, 255, 255, 0.3)',
                             fontSize: '9px',
                             fontWeight: '800',
-                            letterSpacing: '0.05em'
+                            letterSpacing: '0.05em',
+                            zIndex: 10
                           }}>
                             {Math.min(activePreviewIndex + 1, activePreviews.length)} / {activePreviews.length}
                           </div>
@@ -4891,12 +5034,15 @@ Return ONLY valid JSON matching this schema:
                           {activePreviews.map((imgUrl, idx) => (
                             <div 
                               key={idx}
-                              onClick={() => setActivePreviewIndex(idx)}
+                              onClick={() => {
+                                setCarouselDirection(idx > activePreviewIndex ? 1 : -1);
+                                setActivePreviewIndex(idx);
+                              }}
                               style={{ 
                                 position: 'relative',
                                 width: '48px',
                                 height: '48px',
-                                border: `2px solid ${activePreviewIndex === idx ? (isDarkMode ? '#FFFFFF' : '#0022FF') : 'transparent'}`,
+                                border: `2px solid ${activePreviewIndex === idx ? (isDarkMode ? '#FFFFFF' : 'var(--accent-color)') : 'transparent'}`,
                                 cursor: 'pointer',
                                 flexShrink: 0,
                                 backgroundColor: isDarkMode ? '#2C2C2E' : '#E5E5EA',
@@ -4921,24 +5067,24 @@ Return ONLY valid JSON matching this schema:
                         }}
                       >
                         등록된 예상 느낌 참고 이미지가 없습니다.<br/>
-                        <span style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF', fontWeight: '800' }}>[Add Image]</span> 버튼을 클릭해 참고용 사진을 추가해 보세요!
+                        <span style={{ color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', fontWeight: '800' }}>[Add Image]</span> 버튼을 클릭해 참고용 사진을 추가해 보세요!
                       </div>
                     )}
                   </div>
                 )}
-              </div>
+              </motion.div>
             )}
 
           </motion.div>
         )}
 
         {currentMode === 'mix' && (
-          <motion.div key="mix" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
+          <motion.div key="mix" variants={containerVariants} initial="hidden" animate="show" exit="hidden" className="space-y-6">
 
-            <h2 className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>Mix</h2>
+            <motion.h2 variants={itemVariants} className="ios-section-title" style={{ marginTop: '4px', marginBottom: '16px' }}>Mix</motion.h2>
 
             {/* Product Name Input */}
-            <div className={useProduct ? "ios-bento-card-expanded" : "ios-bento-card-compact"}>
+            <motion.div variants={itemVariants} className={useProduct ? "ios-bento-card-expanded" : "ios-bento-card-compact"}>
               <div className="flex items-center justify-between" style={{ minHeight: '26px' }}>
                 <label className="ios-product-label" style={{ fontSize: useProduct ? '12px' : '11px' }}>대상 제품명 (Product Name)</label>
                 <div 
@@ -4961,12 +5107,12 @@ Return ONLY valid JSON matching this schema:
                   />
                 </div>
               )}
-            </div>
+            </motion.div>
 
             {/* Image Reference Mode (Image-to-Image) - 수직 이설 */}
-            <div className={useImageRef ? "ios-bento-card-expanded" : "ios-bento-card-compact"} style={{ marginTop: '12px' }}>
+            <motion.div variants={itemVariants} className={useImageRef ? "ios-bento-card-expanded" : "ios-bento-card-compact"} style={{ marginTop: '12px' }}>
               <div className="flex items-center justify-between" style={{ minHeight: '26px' }}>
-                <label className="ios-product-label" style={{ fontSize: useImageRef ? '12px' : '11px', color: '#0022FF', fontWeight: '800' }}>이미지 참조 모드 (Image-to-Image)</label>
+                <label className="ios-product-label" style={{ fontSize: useImageRef ? '12px' : '11px', color: 'var(--accent-color)', fontWeight: '800' }}>이미지 참조 모드 (Image-to-Image)</label>
                 <div 
                   onClick={() => setUseImageRef(!useImageRef)}
                   className={`ios-switch ${useImageRef ? 'active' : 'inactive'}`}
@@ -5041,10 +5187,10 @@ Return ONLY valid JSON matching this schema:
                   </div>
                 </div>
               )}
-            </div>
+            </motion.div>
 
             {/* Category Tabs & Content Wrapper */}
-            <div style={{ position: 'relative' }}>
+            <motion.div variants={itemVariants} style={{ position: 'relative' }}>
               <div className="folder-tabs-container">
               <button className={`folder-tab ${activeCategory === 'subject' ? 'active' : ''}`} onClick={() => setActiveCategory('subject')}>인물</button>
               <button className={`folder-tab ${activeCategory === 'space' ? 'active' : ''}`} onClick={() => setActiveCategory('space')}>공간</button>
@@ -5068,8 +5214,8 @@ Return ONLY valid JSON matching this schema:
 
                         {config.subjectGender === '혼성' ? (
                           <>
-                            <div className={`mt-6 mb-3 pt-4 border-t ${isDarkMode ? 'border-white/30' : 'border-[#0022FF]/30'} flex items-center`}>
-                              <span className={`text-[11px] font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-[#0022FF]'}`}>/ 여성 의상</span>
+                            <div className={`mt-6 mb-3 pt-4 border-t ${isDarkMode ? 'border-white/30' : 'border-[var(--accent-color)]/30'} flex items-center`}>
+                              <span className={`text-[11px] font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-[var(--accent-color)]'}`}>/ 여성 의상</span>
                             </div>
                             <OptionSelect
                               label="상의"
@@ -5086,8 +5232,8 @@ Return ONLY valid JSON matching this schema:
                               theme="red"
                             />
 
-                            <div className={`mt-6 mb-3 pt-4 border-t ${isDarkMode ? 'border-white/30' : 'border-[#0022FF]/30'} flex items-center`}>
-                              <span className={`text-[11px] font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-[#0022FF]'}`}>/ 남성 의상</span>
+                            <div className={`mt-6 mb-3 pt-4 border-t ${isDarkMode ? 'border-white/30' : 'border-[var(--accent-color)]/30'} flex items-center`}>
+                              <span className={`text-[11px] font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-[var(--accent-color)]'}`}>/ 남성 의상</span>
                             </div>
                             <OptionSelect
                               label="상의"
@@ -5107,8 +5253,8 @@ Return ONLY valid JSON matching this schema:
                         ) : (
                           <>
                             {config.subjectGender !== "선택안함" && (
-                              <div className={`mt-6 mb-3 pt-4 border-t ${isDarkMode ? 'border-white/30' : 'border-[#0022FF]/30'} flex items-center`}>
-                                <span className={`text-[11px] font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-[#0022FF]'}`}>
+                              <div className={`mt-6 mb-3 pt-4 border-t ${isDarkMode ? 'border-white/30' : 'border-[var(--accent-color)]/30'} flex items-center`}>
+                                <span className={`text-[11px] font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-[var(--accent-color)]'}`}>
                                   / {config.subjectGender === '여성' ? '여성 의상' : '남성 의상'}
                                 </span>
                               </div>
@@ -5295,7 +5441,7 @@ Return ONLY valid JSON matching this schema:
                 </motion.section>
               )}
             </AnimatePresence>
-            </div>
+            </motion.div>
           </motion.div>
         )}
 
@@ -5378,11 +5524,11 @@ Return ONLY valid JSON matching this schema:
                               borderRadius: '0px',
                               border: libraryPage === 0 
                                 ? (isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(0,34,255,0.2)') 
-                                : (isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF'),
+                                : (isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)'),
                               background: 'transparent',
                               color: libraryPage === 0 
                                 ? (isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,34,255,0.2)') 
-                                : (isDarkMode ? '#FFFFFF' : '#0022FF'),
+                                : (isDarkMode ? '#FFFFFF' : 'var(--accent-color)'),
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
                               cursor: libraryPage === 0 ? 'default' : 'pointer',
                               transition: 'all 0.15s'
@@ -5393,7 +5539,7 @@ Return ONLY valid JSON matching this schema:
                           <span style={{ 
                             fontSize: '11px', 
                             fontWeight: '800', 
-                            color: isDarkMode ? '#FFFFFF' : '#0022FF', 
+                            color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', 
                             letterSpacing: '0.08em',
                             minWidth: '48px', 
                             textAlign: 'center' 
@@ -5409,11 +5555,11 @@ Return ONLY valid JSON matching this schema:
                               borderRadius: '0px',
                               border: libraryPage === totalPages - 1 
                                 ? (isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(0,34,255,0.2)') 
-                                : (isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF'),
+                                : (isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)'),
                               background: 'transparent',
                               color: libraryPage === totalPages - 1 
                                 ? (isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,34,255,0.2)') 
-                                : (isDarkMode ? '#FFFFFF' : '#0022FF'),
+                                : (isDarkMode ? '#FFFFFF' : 'var(--accent-color)'),
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
                               cursor: libraryPage === totalPages - 1 ? 'default' : 'pointer',
                               transition: 'all 0.15s'
@@ -5448,14 +5594,14 @@ Return ONLY valid JSON matching this schema:
                 className="about-card smart-mode"
                 style={{
                   padding: '24px 0',
-                  borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
+                  borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid var(--accent-color)',
                   cursor: 'pointer',
                   backgroundColor: 'transparent'
                 }}
                 onClick={() => setAboutModalTarget({
                   title: 'Smart Mode',
                   subtitle: '스마트 모드 자동화',
-                  color: '#0022FF',
+                  color: 'var(--accent-color)',
                   icon: 'smart',
                   content: [
                     { label: '빠른 프리셋 적용', text: '복잡한 설정 없이 원하는 씬(Scene) 템플릿을 선택하면 최적의 조명, 샷 스타일, 공간이 자동으로 세팅됩니다.' },
@@ -5467,7 +5613,7 @@ Return ONLY valid JSON matching this schema:
                 <h3 
                   className="font-[900] tracking-tighter uppercase m-0"
                   style={{ 
-                    color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                    color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
                     fontSize: 'clamp(28px, 4.5vw, 42px)',
                     lineHeight: '1.0'
                   }}
@@ -5494,14 +5640,14 @@ Return ONLY valid JSON matching this schema:
                 className="about-card mix-mode"
                 style={{
                   padding: '24px 0',
-                  borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
+                  borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid var(--accent-color)',
                   cursor: 'pointer',
                   backgroundColor: 'transparent'
                 }}
                 onClick={() => setAboutModalTarget({
                   title: 'Professional Mix Mode',
                   subtitle: '믹스 모드 핵심 마스터',
-                  color: '#0022FF',
+                  color: 'var(--accent-color)',
                   icon: 'sliders',
                   content: [
                     { label: '인물 (Person)', text: '모델의 연령, 국적, 스타일, 파지/사용 행동을 정의합니다. 제품 위주 촬영 시 토글을 끄면 인물이 프롬프트에서 완전히 배제됩니다.' },
@@ -5515,7 +5661,7 @@ Return ONLY valid JSON matching this schema:
                 <h3 
                   className="font-[900] tracking-tighter uppercase m-0"
                   style={{ 
-                    color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                    color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
                     fontSize: 'clamp(28px, 4.5vw, 42px)',
                     lineHeight: '1.0'
                   }}
@@ -5542,14 +5688,14 @@ Return ONLY valid JSON matching this schema:
                 className="about-card library"
                 style={{
                   padding: '24px 0',
-                  borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
+                  borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid var(--accent-color)',
                   cursor: 'pointer',
                   backgroundColor: 'transparent'
                 }}
                 onClick={() => setAboutModalTarget({
                   title: 'Library Management',
                   subtitle: '라이브러리 저장 및 이용',
-                  color: '#0022FF',
+                  color: 'var(--accent-color)',
                   icon: 'library',
                   content: [
                     { label: '프리셋 저장', text: '현재 내가 조합한 최고의 옵션 세트를 보관하고 싶다면 결과창 근처의 SAVE TO LIBRARY 버튼을 누르세요. 나만의 상업용 프리셋 창고에 고유한 이름으로 저장됩니다.' },
@@ -5561,7 +5707,7 @@ Return ONLY valid JSON matching this schema:
                 <h3 
                   className="font-[900] tracking-tighter uppercase m-0"
                   style={{ 
-                    color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                    color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
                     fontSize: 'clamp(28px, 4.5vw, 42px)',
                     lineHeight: '1.0'
                   }}
@@ -5588,14 +5734,14 @@ Return ONLY valid JSON matching this schema:
                 className="about-card workflow"
                 style={{
                   padding: '24px 0',
-                  borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
+                  borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid var(--accent-color)',
                   cursor: 'pointer',
                   backgroundColor: 'transparent'
                 }}
                 onClick={() => setAboutModalTarget({
                   title: 'Workflow',
                   subtitle: '생성 및 복사 활용법',
-                  color: '#0022FF',
+                  color: 'var(--accent-color)',
                   icon: 'wand',
                   content: [
                     { label: '프롬프트 완성', text: '스마트 모드나 믹스 모드의 다양한 옵션들을 자유롭게 조합하여 원하는 연출 방향을 설정할 수 있습니다. 설정 완료 후 Generate Prompt 버튼을 누르면 이미지 생성용 고화질 프롬프트가 즉시 생성됩니다.' },
@@ -5607,7 +5753,7 @@ Return ONLY valid JSON matching this schema:
                 <h3 
                   className="font-[900] tracking-tighter uppercase m-0"
                   style={{ 
-                    color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                    color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
                     fontSize: 'clamp(28px, 4.5vw, 42px)',
                     lineHeight: '1.0'
                   }}
@@ -5632,9 +5778,9 @@ Return ONLY valid JSON matching this schema:
             </div>
 
             {/* Quick tips Banner */}
-            <div className="ios-bento-card" style={{ padding: '12px 16px', background: 'transparent', border: 'none', borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF', margin: '0', borderRadius: '0' }}>
+            <div className="ios-bento-card" style={{ padding: '12px 16px', background: 'transparent', border: 'none', borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid var(--accent-color)', margin: '0', borderRadius: '0' }}>
               <p className="text-[11px] text-gray-500 dark:text-zinc-400 font-semibold m-0 text-left leading-relaxed">
-                <strong style={{ fontWeight: 900, color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>Tip</strong>: `Mix Mode`에서 적합한 공간과 여백을 확보한 뒤 타 AI 툴과 조합해 고품질 상업용 연출 샷을 쉽게 완성해 보세요.
+                <strong style={{ fontWeight: 900, color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)' }}>Tip</strong>: `Mix Mode`에서 적합한 공간과 여백을 확보한 뒤 타 AI 툴과 조합해 고품질 상업용 연출 샷을 쉽게 완성해 보세요.
               </p>
             </div>
           </motion.div>
@@ -5696,17 +5842,17 @@ Return ONLY valid JSON matching this schema:
                         padding: '24px',
                         borderRadius: '0px',
                         backgroundColor: isDarkMode ? '#000000' : '#FFFFFF',
-                        border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                        border: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)',
                         boxShadow: 'none',
                       }}
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <h3 style={{ color: isDarkMode ? '#FFFFFF' : '#0022FF', margin: '0 0 4px 0' }} className="text-[20px] font-black tracking-tight text-center uppercase">Tab Manager</h3>
+                      <h3 style={{ color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', margin: '0 0 4px 0' }} className="text-[20px] font-black tracking-tight text-center uppercase">Tab Manager</h3>
                       <p className="text-[11px] font-bold text-gray-400 mb-6 text-center">갤러리 탭(폴더)을 관리하고 추가할 수 있습니다.</p>
 
                       {/* 1. Add New Folder sub-section */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingBottom: '20px', borderBottom: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid #0022FF', marginBottom: '20px' }}>
-                        <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', textTransform: 'uppercase', textAlign: 'left' }}>Create New Tab</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingBottom: '20px', borderBottom: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid var(--accent-color)', marginBottom: '20px' }}>
+                        <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', textTransform: 'uppercase', textAlign: 'left' }}>Create New Tab</div>
                         <div style={{ display: 'flex', gap: '8px' }}>
                           <input
                             type="text"
@@ -5718,7 +5864,7 @@ Return ONLY valid JSON matching this schema:
                               padding: '10px 14px',
                               fontSize: '12px',
                               backgroundColor: isDarkMode ? '#111111' : '#F9F9F9',
-                              border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                              border: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)',
                               color: isDarkMode ? '#FFFFFF' : '#000000',
                               outline: 'none',
                               borderRadius: '0px'
@@ -5727,8 +5873,8 @@ Return ONLY valid JSON matching this schema:
                           <button
                             style={{
                               padding: '0 18px',
-                              backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                              color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                              backgroundColor: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                              color: isDarkMode ? 'var(--accent-color)' : '#FFFFFF',
                               fontSize: '11px',
                               fontWeight: '900',
                               border: 'none',
@@ -5771,7 +5917,7 @@ Return ONLY valid JSON matching this schema:
 
                       {/* 2. Rename / Delete Folder Action */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-                        <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', textTransform: 'uppercase', textAlign: 'left' }}>Current Tab Action</div>
+                        <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', textTransform: 'uppercase', textAlign: 'left' }}>Current Tab Action</div>
                         <div style={{ 
                           display: 'flex', 
                           alignItems: 'center', 
@@ -5781,7 +5927,7 @@ Return ONLY valid JSON matching this schema:
                           border: isDarkMode ? '1px dashed rgba(255,255,255,0.3)' : '1px dashed rgba(0,34,255,0.25)',
                           marginBottom: '12px'
                         }}>
-                          <span style={{ fontSize: '13px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>
+                          <span style={{ fontSize: '13px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)' }}>
                             📁 {activeGalleryFolder.toUpperCase()}
                           </span>
                           <span style={{ fontSize: '10px', fontWeight: '800', color: '#AEAEB2' }}>
@@ -5802,8 +5948,8 @@ Return ONLY valid JSON matching this schema:
                                 flex: 1,
                                 padding: '10px',
                                 backgroundColor: 'transparent',
-                                border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
-                                color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                                border: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)',
+                                color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
                                 fontSize: '11px',
                                 fontWeight: '900',
                                 textTransform: 'uppercase',
@@ -5908,8 +6054,8 @@ Return ONLY valid JSON matching this schema:
                         style={{
                           width: '100%',
                           height: '40px',
-                          backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                          color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                          backgroundColor: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                          color: isDarkMode ? 'var(--accent-color)' : '#FFFFFF',
                           fontWeight: '900',
                           border: 'none',
                           borderRadius: '0px',
@@ -5943,13 +6089,13 @@ Return ONLY valid JSON matching this schema:
 
                   return (
                     <div className="gallery-main" style={{ border: 'none', background: 'transparent' }}>
-                      <div className="gallery-main-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 16px', borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF' }}>
+                      <div className="gallery-main-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 16px', borderBottom: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           <span className="gallery-image-count" style={{ display: 'flex', alignItems: 'baseline', gap: '6px', whiteSpace: 'nowrap' }}>
                             <span style={{ 
                               fontSize: '26px', 
                               fontWeight: '955', 
-                              color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                              color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
                               fontFamily: 'Inter, sans-serif'
                             }}>
                               {sortedImages.length}
@@ -5957,7 +6103,7 @@ Return ONLY valid JSON matching this schema:
                             <span style={{ 
                               fontSize: '11px', 
                               fontWeight: '900', 
-                              color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                              color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
                               letterSpacing: '0.08em',
                               fontFamily: 'Inter, sans-serif'
                             }}>
@@ -5974,8 +6120,8 @@ Return ONLY valid JSON matching this schema:
                               alignItems: 'center',
                               justifyContent: 'center',
                               backgroundColor: 'transparent',
-                              color: isDarkMode ? '#FFFFFF' : '#0022FF',
-                              border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                              color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                              border: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)',
                               borderRadius: '2px',
                               padding: '6px 10px',
                               height: '32px',
@@ -5998,8 +6144,8 @@ Return ONLY valid JSON matching this schema:
                               alignItems: 'center', 
                               justifyContent: 'center', 
                               backgroundColor: 'transparent',
-                              color: isDarkMode ? '#FFFFFF' : '#0022FF',
-                              border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                              color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                              border: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)',
                               borderRadius: '2px',
                               padding: '6px 10px',
                               height: '32px',
@@ -6021,9 +6167,9 @@ Return ONLY valid JSON matching this schema:
                               alignItems: 'center', 
                               justifyContent: 'center',
                               gap: '6px', 
-                              backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                              color: isDarkMode ? '#0022FF' : '#FFFFFF',
-                              border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                              backgroundColor: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                              color: isDarkMode ? 'var(--accent-color)' : '#FFFFFF',
+                              border: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)',
                               borderRadius: '2px',
                               padding: '6px 14px',
                               fontSize: '11px',
@@ -6055,7 +6201,7 @@ Return ONLY valid JSON matching this schema:
                               height: '32px',
                               border: 'none',
                               background: 'transparent',
-                              color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                              color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -6078,8 +6224,8 @@ Return ONLY valid JSON matching this schema:
                               style={{
                                 width: '32px',
                                 height: '32px',
-                                border: '2px solid rgba(0, 34, 255, 0.2)',
-                                borderTop: isDarkMode ? '2px solid #FFFFFF' : '2px solid #0022FF',
+                                border: '2px solid color-mix(in srgb, var(--accent-color) 20%, transparent)',
+                                borderTop: isDarkMode ? '2px solid #FFFFFF' : '2px solid var(--accent-color)',
                                 borderRadius: '50%',
                                 animation: 'spin 1s linear infinite',
                                 marginBottom: '16px'
@@ -6117,8 +6263,8 @@ Return ONLY valid JSON matching this schema:
                                     position: 'absolute',
                                     top: '8px',
                                     right: '8px',
-                                    backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                                    color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                                    backgroundColor: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                                    color: isDarkMode ? 'var(--accent-color)' : '#FFFFFF',
                                     fontSize: '9px',
                                     fontWeight: '900',
                                     padding: '3px 6px',
@@ -6153,8 +6299,8 @@ Return ONLY valid JSON matching this schema:
                                       style={{
                                         flex: 1,
                                         background: 'transparent',
-                                        border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
-                                        color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                                        border: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)',
+                                        color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
                                         fontWeight: '900',
                                         fontSize: '10px',
                                         padding: '6px 8px',
@@ -6177,9 +6323,9 @@ Return ONLY valid JSON matching this schema:
                                       className="gallery-item-btn"
                                       style={{
                                         flex: 1,
-                                        backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                                        color: isDarkMode ? '#0022FF' : '#FFFFFF',
-                                        border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #0022FF',
+                                        backgroundColor: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                                        color: isDarkMode ? 'var(--accent-color)' : '#FFFFFF',
+                                        border: isDarkMode ? '1px solid #FFFFFF' : '1px solid var(--accent-color)',
                                         fontWeight: '900',
                                         fontSize: '10px',
                                         padding: '6px 8px',
@@ -6211,7 +6357,7 @@ Return ONLY valid JSON matching this schema:
                             gap: '12px',
                             marginTop: '28px',
                             paddingTop: '20px',
-                            borderTop: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(0, 34, 255, 0.2)',
+                            borderTop: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid color-mix(in srgb, var(--accent-color) 20%, transparent)',
                             paddingBottom: '16px'
                           }}>
                             <button
@@ -6223,10 +6369,10 @@ Return ONLY valid JSON matching this schema:
                               }}
                               style={{
                                 backgroundColor: 'transparent',
-                                color: galleryPage === 0 ? 'rgba(128,128,128,0.4)' : (isDarkMode ? '#FFFFFF' : '#0022FF'),
+                                color: galleryPage === 0 ? 'rgba(128,128,128,0.4)' : (isDarkMode ? '#FFFFFF' : 'var(--accent-color)'),
                                 border: isDarkMode 
                                   ? `1px solid ${galleryPage === 0 ? 'rgba(255,255,255,0.2)' : '#FFFFFF'}` 
-                                  : `1px solid ${galleryPage === 0 ? 'rgba(0, 34, 255, 0.2)' : '#0022FF'}`,
+                                  : `1px solid ${galleryPage === 0 ? 'color-mix(in srgb, var(--accent-color) 20%, transparent)' : 'var(--accent-color)'}`,
                                 padding: '6px 14px',
                                 fontSize: '11px',
                                 fontWeight: '900',
@@ -6241,7 +6387,7 @@ Return ONLY valid JSON matching this schema:
                             <span style={{
                               fontSize: '11px',
                               fontWeight: '900',
-                              color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                              color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
                               letterSpacing: '0.08em',
                               fontFamily: 'Inter, sans-serif'
                             }}>
@@ -6257,10 +6403,10 @@ Return ONLY valid JSON matching this schema:
                               }}
                               style={{
                                 backgroundColor: 'transparent',
-                                color: galleryPage >= totalPages - 1 ? 'rgba(128,128,128,0.4)' : (isDarkMode ? '#FFFFFF' : '#0022FF'),
+                                color: galleryPage >= totalPages - 1 ? 'rgba(128,128,128,0.4)' : (isDarkMode ? '#FFFFFF' : 'var(--accent-color)'),
                                 border: isDarkMode 
                                   ? `1px solid ${galleryPage >= totalPages - 1 ? 'rgba(255,255,255,0.2)' : '#FFFFFF'}` 
-                                  : `1px solid ${galleryPage >= totalPages - 1 ? 'rgba(0, 34, 255, 0.2)' : '#0022FF'}`,
+                                  : `1px solid ${galleryPage >= totalPages - 1 ? 'color-mix(in srgb, var(--accent-color) 20%, transparent)' : 'var(--accent-color)'}`,
                                 padding: '6px 14px',
                                 fontSize: '11px',
                                 fontWeight: '900',
@@ -6289,7 +6435,7 @@ Return ONLY valid JSON matching this schema:
           style={{ 
             fontSize: '20px', 
             fontWeight: 900, 
-            color: isDarkMode ? '#FFFFFF' : '#0022FF', 
+            color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)', 
             textAlign: 'left', 
             textTransform: 'uppercase', 
             letterSpacing: '-0.02em', 
@@ -6474,7 +6620,7 @@ Return ONLY valid JSON matching this schema:
             marginTop: 'auto',
             paddingTop: '16px',
             paddingBottom: '16px',
-            borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid #0022FF',
+            borderBottom: isDarkMode ? '1.5px solid #FFFFFF' : '1.5px solid var(--accent-color)',
             textAlign: 'left'
           }}
         >
@@ -6482,7 +6628,7 @@ Return ONLY valid JSON matching this schema:
             style={{
               fontSize: 'clamp(24px, 3.5vw, 28px)',
               fontWeight: 900,
-              color: isDarkMode ? '#FFFFFF' : '#0022FF',
+              color: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
               fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
               letterSpacing: '-0.07em',
               lineHeight: 1.0,
@@ -6517,7 +6663,7 @@ Return ONLY valid JSON matching this schema:
     </div>
 
     <footer className="ios-footer">
-      v0.67a | Shot Maker Workspace
+      v0.68 | Shot Maker Workspace
     </footer>
     <div className="h-12"></div>
     </div>
