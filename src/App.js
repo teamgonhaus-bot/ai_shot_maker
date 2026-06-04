@@ -858,6 +858,7 @@ export default function App() {
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [activeEditImage, setActiveEditImage] = useState(null);
   const [selectedSmartPreviewTemplate, setSelectedSmartPreviewTemplate] = useState('HOME LIVING');
+  const [selectedSmartPreviewSubOptionIndex, setSelectedSmartPreviewSubOptionIndex] = useState(0);
   const [editPrompt, setEditPrompt] = useState("");
   
   // AI Search & Suggestion states
@@ -970,8 +971,9 @@ export default function App() {
         const blob = dataURLtoBlob(compressedBase64);
 
         // 3. Upload to Firebase Storage
+        const previewKey = `${templateId}_${activeSubOptionIndex}`;
         const fileId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        const storageRef = ref(storage, `smart_previews/${templateId}/${fileId}.jpg`);
+        const storageRef = ref(storage, `smart_previews/${previewKey}/${fileId}.jpg`);
         await withTimeout(uploadBytes(storageRef, blob), 15000);
         const downloadUrl = await getDownloadURL(storageRef);
         uploadedUrls.push(downloadUrl);
@@ -979,8 +981,9 @@ export default function App() {
 
       if (uploadedUrls.length > 0) {
         // 4. Update in Firestore
-        const docRef = doc(db, "smart_previews", templateId);
-        const currentList = smartScenePreviews[templateId] || [];
+        const previewKey = `${templateId}_${activeSubOptionIndex}`;
+        const docRef = doc(db, "smart_previews", previewKey);
+        const currentList = smartScenePreviews[previewKey] || [];
         const newList = [...currentList, ...uploadedUrls];
 
         await setDoc(docRef, { images: newList }, { merge: true });
@@ -989,7 +992,7 @@ export default function App() {
         setSmartScenePreviews(prev => {
           const updated = {
             ...prev,
-            [templateId]: newList
+            [previewKey]: newList
           };
           localStorage.setItem('smart_scene_previews', JSON.stringify(updated));
           return updated;
@@ -1005,7 +1008,13 @@ export default function App() {
   };
 
   const handleDeleteSmartPreview = async (templateId, indexToDelete) => {
-    const currentList = smartScenePreviews[templateId] || [];
+    const key = `${templateId}_${activeSubOptionIndex}`;
+    let currentList = smartScenePreviews[key] || [];
+    let isLegacy = false;
+    if (currentList.length === 0) {
+      currentList = smartScenePreviews[templateId] || [];
+      isLegacy = true;
+    }
     const urlToDelete = currentList[indexToDelete];
     if (!urlToDelete) return;
 
@@ -1028,14 +1037,15 @@ export default function App() {
 
       // 2. Update Firestore
       const newList = currentList.filter((_, idx) => idx !== indexToDelete);
-      const docRef = doc(db, "smart_previews", templateId);
+      const targetDocId = isLegacy ? templateId : key;
+      const docRef = doc(db, "smart_previews", targetDocId);
       await setDoc(docRef, { images: newList }, { merge: true });
 
       // 3. Update Local State & Cache
       setSmartScenePreviews(prev => {
         const updated = {
           ...prev,
-          [templateId]: newList
+          [targetDocId]: newList
         };
         localStorage.setItem('smart_scene_previews', JSON.stringify(updated));
         return updated;
@@ -1062,16 +1072,7 @@ export default function App() {
     try {
       const q = query(collection(db, "smart_previews"));
       const querySnapshot = await getDocs(q);
-      const data = {
-        'TITLE SCENE': [],
-        'DETAIL SCENE': [],
-        'INSTA SCENE': [],
-        'USAGE SCENE': [],
-        'HOME LIVING': [],
-        'OFFICE TECH': [],
-        'RETAIL SCENE': [],
-        'NATURE ORGANIC': []
-      };
+      const data = {};
       querySnapshot.forEach((doc) => {
         const id = doc.id;
         const docData = doc.data();
@@ -1088,9 +1089,10 @@ export default function App() {
   };
 
   // Add a gallery image directly to a selected smart template's previews
-  const handleAddImageToSmartPreview = async (imageUrl, destTemplateId) => {
+  const handleAddImageToSmartPreview = async (imageUrl, destTemplateId, subOptionIdx = 0) => {
     try {
-      const currentList = smartScenePreviews[destTemplateId] || [];
+      const key = `${destTemplateId}_${subOptionIdx}`;
+      const currentList = smartScenePreviews[key] || [];
       if (currentList.includes(imageUrl)) {
         triggerToast("이미 동일한 이미지가 등록되어 있습니다.");
         return;
@@ -1102,25 +1104,26 @@ export default function App() {
       if (imageUrl.startsWith("data:image/")) {
         const blob = dataURLtoBlob(imageUrl);
         const fileId = `gallery_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        const storageRef = ref(storage, `smart_previews/${destTemplateId}/${fileId}.jpg`);
+        const storageRef = ref(storage, `smart_previews/${key}/${fileId}.jpg`);
         await withTimeout(uploadBytes(storageRef, blob), 15000);
         finalUrl = await getDownloadURL(storageRef);
       }
 
       const newList = [...currentList, finalUrl];
-      const docRef = doc(db, "smart_previews", destTemplateId);
+      const docRef = doc(db, "smart_previews", key);
       await setDoc(docRef, { images: newList }, { merge: true });
 
       setSmartScenePreviews(prev => {
         const updated = {
           ...prev,
-          [destTemplateId]: newList
+          [key]: newList
         };
         localStorage.setItem('smart_scene_previews', JSON.stringify(updated));
         return updated;
       });
 
-      triggerToast(`'${destTemplateId}' 스마트씬 프리뷰에 추가되었습니다.`);
+      const optName = SMART_SUB_OPTIONS[destTemplateId]?.[subOptionIdx]?.name || subOptionIdx;
+      triggerToast(`'${destTemplateId} - ${optName}' 스마트씬 프리뷰에 추가되었습니다.`);
       setActiveEditImage(null); // Close Edit modal
     } catch (err) {
       console.error("Error adding gallery image to smart preview:", err);
@@ -1620,7 +1623,7 @@ Return ONLY valid JSON matching this schema:
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.67 Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.67a Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -3058,6 +3061,15 @@ Return ONLY valid JSON matching this schema:
     handleDownloadImage(generatedImage);
   };
 
+  const getActivePreviewList = () => {
+    if (!activeTemplate) return [];
+    const key = `${activeTemplate}_${activeSubOptionIndex}`;
+    const list = smartScenePreviews[key];
+    if (list && list.length > 0) return list;
+    return smartScenePreviews[activeTemplate] || [];
+  };
+  const activePreviews = getActivePreviewList();
+
   return (
     <ErrorBoundary>
       <div className="app-container">
@@ -3074,7 +3086,7 @@ Return ONLY valid JSON matching this schema:
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.67 | Shot Maker Workspace
+              v0.67a | Shot Maker Workspace
             </div>
           </div>
         </div>
@@ -3586,12 +3598,61 @@ Return ONLY valid JSON matching this schema:
               {/* 2.5. Add to Smart Preview Carousel */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
                 <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', textTransform: 'uppercase', textAlign: 'left' }}>Add to Smart Preview</div>
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <select
+                      value={selectedSmartPreviewTemplate}
+                      onChange={(e) => {
+                        setSelectedSmartPreviewTemplate(e.target.value);
+                        setSelectedSmartPreviewSubOptionIndex(0);
+                      }}
+                      style={{
+                        flex: 1,
+                        padding: '10px 14px',
+                        backgroundColor: isDarkMode ? '#1C1C1E' : '#F8F8FF',
+                        color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                        border: isDarkMode ? '1px solid rgba(255,255,255,0.3)' : '1px solid #0022FF',
+                        borderRadius: '0px',
+                        fontWeight: 'bold',
+                        fontSize: '12px',
+                        outline: 'none'
+                      }}
+                    >
+                      {[
+                        { id: 'TITLE SCENE', label: 'Title' },
+                        { id: 'DETAIL SCENE', label: 'Detail' },
+                        { id: 'INSTA SCENE', label: 'Insta' },
+                        { id: 'USAGE SCENE', label: 'User' },
+                        { id: 'HOME LIVING', label: 'Home' },
+                        { id: 'OFFICE TECH', label: 'Office' },
+                        { id: 'RETAIL SCENE', label: 'Retail' },
+                        { id: 'NATURE ORGANIC', label: 'Outdoor' }
+                      ].map(t => (
+                        <option key={t.id} value={t.id}>{t.label}</option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={() => handleAddImageToSmartPreview(activeEditImage.url, selectedSmartPreviewTemplate, selectedSmartPreviewSubOptionIndex)}
+                      style={{
+                        padding: '10px 16px',
+                        backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+                        color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                        border: 'none',
+                        borderRadius: '0px',
+                        fontWeight: '900',
+                        fontSize: '11px',
+                        textTransform: 'uppercase',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      ADD
+                    </button>
+                  </div>
                   <select
-                    value={selectedSmartPreviewTemplate}
-                    onChange={(e) => setSelectedSmartPreviewTemplate(e.target.value)}
+                    value={selectedSmartPreviewSubOptionIndex}
+                    onChange={(e) => setSelectedSmartPreviewSubOptionIndex(Number(e.target.value))}
                     style={{
-                      flex: 1,
+                      width: '100%',
                       padding: '10px 14px',
                       backgroundColor: isDarkMode ? '#1C1C1E' : '#F8F8FF',
                       color: isDarkMode ? '#FFFFFF' : '#0022FF',
@@ -3602,35 +3663,10 @@ Return ONLY valid JSON matching this schema:
                       outline: 'none'
                     }}
                   >
-                    {[
-                      { id: 'TITLE SCENE', label: 'Title' },
-                      { id: 'DETAIL SCENE', label: 'Detail' },
-                      { id: 'INSTA SCENE', label: 'Insta' },
-                      { id: 'USAGE SCENE', label: 'User' },
-                      { id: 'HOME LIVING', label: 'Home' },
-                      { id: 'OFFICE TECH', label: 'Office' },
-                      { id: 'RETAIL SCENE', label: 'Retail' },
-                      { id: 'NATURE ORGANIC', label: 'Outdoor' }
-                    ].map(t => (
-                      <option key={t.id} value={t.id}>{t.label}</option>
+                    {SMART_SUB_OPTIONS[selectedSmartPreviewTemplate]?.map((opt, idx) => (
+                      <option key={opt.name} value={idx}>{opt.name}</option>
                     ))}
                   </select>
-                  <button
-                    onClick={() => handleAddImageToSmartPreview(activeEditImage.url, selectedSmartPreviewTemplate)}
-                    style={{
-                      padding: '10px 16px',
-                      backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
-                      color: isDarkMode ? '#0022FF' : '#FFFFFF',
-                      border: 'none',
-                      borderRadius: '0px',
-                      fontWeight: '900',
-                      fontSize: '11px',
-                      textTransform: 'uppercase',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    ADD
-                  </button>
                 </div>
               </div>
 
@@ -4680,7 +4716,7 @@ Return ONLY valid JSON matching this schema:
                       Moodboard
                     </span>
                     <span style={{ fontSize: '10px', fontWeight: '800', opacity: 0.6, color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>
-                      ({smartScenePreviews[activeTemplate]?.length || 0})
+                      ({activePreviews.length})
                     </span>
                   </div>
 
@@ -4745,26 +4781,26 @@ Return ONLY valid JSON matching this schema:
 
                 {showSmartPreview && (
                   <div>
-                    {smartScenePreviews[activeTemplate] && smartScenePreviews[activeTemplate].length > 0 ? (
+                    {activePreviews.length > 0 ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {/* Carousel Wrapper */}
                         <div style={{ position: 'relative', border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`, overflow: 'hidden', width: '100%', aspectRatio: '4/3', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: isDarkMode ? '#2C2C2E' : '#E5E5EA' }}>
                           <img 
-                            src={smartScenePreviews[activeTemplate][Math.min(activePreviewIndex, smartScenePreviews[activeTemplate].length - 1)]} 
+                            src={activePreviews[Math.min(activePreviewIndex, activePreviews.length - 1)]} 
                             alt="Scene vibe preview" 
                             style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'zoom-in' }}
                             onClick={() => {
-                              const list = smartScenePreviews[activeTemplate] || [];
+                              const list = activePreviews;
                               const currentImg = list[Math.min(activePreviewIndex, list.length - 1)];
                               if (currentImg) setFullscreenPreviewUrl(currentImg);
                             }}
                           />
                           
                           {/* Carousel Navigation Arrows */}
-                          {smartScenePreviews[activeTemplate].length > 1 && (
+                          {activePreviews.length > 1 && (
                             <>
                               <button
-                                onClick={() => setActivePreviewIndex(prev => (prev === 0 ? smartScenePreviews[activeTemplate].length - 1 : prev - 1))}
+                                onClick={() => setActivePreviewIndex(prev => (prev === 0 ? activePreviews.length - 1 : prev - 1))}
                                 style={{
                                   position: 'absolute',
                                   left: '8px',
@@ -4785,7 +4821,7 @@ Return ONLY valid JSON matching this schema:
                                 &lsaquo;
                               </button>
                               <button
-                                onClick={() => setActivePreviewIndex(prev => (prev === smartScenePreviews[activeTemplate].length - 1 ? 0 : prev + 1))}
+                                onClick={() => setActivePreviewIndex(prev => (prev === activePreviews.length - 1 ? 0 : prev + 1))}
                                 style={{
                                   position: 'absolute',
                                   right: '8px',
@@ -4807,7 +4843,7 @@ Return ONLY valid JSON matching this schema:
                               </button>
                             </>
                           )}
-
+ 
                           {/* Delete current image button */}
                           <button
                             onClick={() => handleDeleteSmartPreview(activeTemplate, activePreviewIndex)}
@@ -4832,7 +4868,7 @@ Return ONLY valid JSON matching this schema:
                           >
                             X
                           </button>
-
+ 
                           {/* Page Indicators */}
                           <div style={{
                             position: 'absolute',
@@ -4846,13 +4882,13 @@ Return ONLY valid JSON matching this schema:
                             fontWeight: '800',
                             letterSpacing: '0.05em'
                           }}>
-                            {Math.min(activePreviewIndex + 1, smartScenePreviews[activeTemplate].length)} / {smartScenePreviews[activeTemplate].length}
+                            {Math.min(activePreviewIndex + 1, activePreviews.length)} / {activePreviews.length}
                           </div>
                         </div>
-
+ 
                         {/* Thumbnails Row */}
                         <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
-                          {smartScenePreviews[activeTemplate].map((imgUrl, idx) => (
+                          {activePreviews.map((imgUrl, idx) => (
                             <div 
                               key={idx}
                               onClick={() => setActivePreviewIndex(idx)}
@@ -6481,7 +6517,7 @@ Return ONLY valid JSON matching this schema:
     </div>
 
     <footer className="ios-footer">
-      v0.67 | Shot Maker Workspace
+      v0.67a | Shot Maker Workspace
     </footer>
     <div className="h-12"></div>
     </div>
