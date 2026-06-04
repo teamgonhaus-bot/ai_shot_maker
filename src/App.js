@@ -924,6 +924,7 @@ export default function App() {
   const [lightboxLoaded, setLightboxLoaded] = useState(false);
   const [gallerySortOrder, setGallerySortOrder] = useState('newest');
   const [zoomScale, setZoomScale] = useState(1);
+  const [isPinching, setIsPinching] = useState(false);
   const setIsZoomed = (val) => {
     if (typeof val === 'function') {
       setZoomScale(prev => val(prev > 1) ? 2 : 1);
@@ -3363,7 +3364,7 @@ Return ONLY valid JSON matching this schema:
                       }
                     }
                   }}
-                  drag={zoomScale > 1 ? true : "x"}
+                  drag={isPinching ? false : (zoomScale > 1 ? true : "x")}
                   dragConstraints={zoomScale > 1 ? { left: -limitX, right: limitX, top: -limitY, bottom: limitY } : { left: 0, right: 0 }}
                   dragElastic={zoomScale > 1 ? 0.15 : 0.6}
                   onDragEnd={(event, info) => {
@@ -3379,6 +3380,7 @@ Return ONLY valid JSON matching this schema:
                   }}
                   onTouchStart={(e) => {
                     if (e.touches.length === 2) {
+                      setIsPinching(true);
                       const dist = Math.hypot(
                         e.touches[0].clientX - e.touches[1].clientX,
                         e.touches[0].clientY - e.touches[1].clientY
@@ -3389,6 +3391,7 @@ Return ONLY valid JSON matching this schema:
                   }}
                   onTouchMove={(e) => {
                     if (e.touches.length === 2 && touchStartDistRef.current > 0) {
+                      if (!isPinching) setIsPinching(true);
                       const dist = Math.hypot(
                         e.touches[0].clientX - e.touches[1].clientX,
                         e.touches[0].clientY - e.touches[1].clientY
@@ -3399,8 +3402,11 @@ Return ONLY valid JSON matching this schema:
                       setZoomScale(newScale);
                     }
                   }}
-                  onTouchEnd={() => {
-                    touchStartDistRef.current = 0;
+                  onTouchEnd={(e) => {
+                    if (e.touches.length < 2) {
+                      setIsPinching(false);
+                      touchStartDistRef.current = 0;
+                    }
                   }}
                   src={lightboxImage} 
                   alt="Fullscreen" 
@@ -4785,7 +4791,7 @@ Return ONLY valid JSON matching this schema:
                 >
                   Detail Scene Options
                 </div>
-                <div className="no-scrollbar" style={{ display: 'flex', gap: '8px', flexWrap: 'nowrap', overflowX: 'auto', paddingBottom: '6px' }}>
+                <div className="no-scrollbar" style={{ display: 'flex', gap: '8px', flexWrap: 'nowrap', overflowX: 'auto', paddingTop: '2px', paddingBottom: '8px', paddingLeft: '2px' }}>
                   {SMART_SUB_OPTIONS[activeTemplate].map((subOpt, idx) => {
                     const isSubActive = activeSubOptionIndex === idx;
                     return (
@@ -4820,6 +4826,8 @@ Return ONLY valid JSON matching this schema:
                       </button>
                     );
                   })}
+                  {/* Spacer to prevent clipping on the right edge */}
+                  <div style={{ width: '8px', flexShrink: 0 }} />
                 </div>
               </motion.div>
             )}
