@@ -210,6 +210,433 @@ const OPTIONS_DATA = {
   subjectDetailAction: ["선택안함", "잡기", "들기", "사용", "앉기", "서기"]
 };
 
+const SMART_SUB_OPTIONS = {
+  'TITLE SCENE': [
+    {
+      name: "공중 부양",
+      config: {
+        productLayout: '공중부양',
+        spaceDetail: '단색 배경',
+        light: '나르스 확산광',
+        shotStyle: []
+      }
+    },
+    {
+      name: "인테리어 잡지",
+      config: {
+        spaceType: '홈',
+        spaceDetail: '리빙',
+        cameraAngle: '아이레벨',
+        light: '자연광',
+        shotStyle: ['인테리어 잡지 샷'],
+        productAnchor: '전경 클린',
+        monochromeColor: '선택안함',
+        productLayout: '선택안함'
+      }
+    },
+    {
+      name: "컬러 블로킹",
+      config: {
+        productLayout: '대각선 안착',
+        spaceDetail: '단색 배경',
+        monochromeColor: 'Cobalt Blue',
+        light: '균일하게 비치는 조명',
+        shotStyle: ['컬러블로킹']
+      }
+    },
+    {
+      name: "매직 아워",
+      config: {
+        productLayout: '공중부양',
+        spaceDetail: '그라데이션 배경',
+        monochromeColor: 'Warm Sand',
+        light: '자연광',
+        shotStyle: ['와비사비-어스톤']
+      }
+    }
+  ],
+  'DETAIL SCENE': [
+    {
+      name: "초접사 매크로",
+      config: {
+        cameraAngle: '익스트림 클로즈업',
+        productAnchor: '전경 클린',
+        light: '스포트라이트 조명',
+        shotStyle: ['매크로-디테일', '하드 섀도우']
+      }
+    },
+    {
+      name: "워터 스플래시",
+      config: {
+        cameraAngle: '클로즈업',
+        productLayout: '액체 스플래시',
+        light: '스튜디오 조명',
+        shotStyle: ['심도 얕은 샷(아웃포커싱)']
+      }
+    },
+    {
+      name: "파우더 폭발",
+      config: {
+        cameraAngle: '정면',
+        productLayout: '파우더 폭발',
+        light: '스튜디오 조명',
+        shotStyle: ['모션 캡쳐-동적 연출']
+      }
+    },
+    {
+      name: "하드 섀도우",
+      config: {
+        cameraAngle: '미디움 샷',
+        productAnchor: '합성 베이스',
+        light: '스포트라이트 조명',
+        shotStyle: ['하드 섀도우', '네거티브 스페이스']
+      }
+    }
+  ],
+  'INSTA SCENE': [
+    {
+      name: "카페 감성 스냅",
+      config: {
+        subjectNum: '혼자',
+        subjectGender: '여성',
+        subjectAge: '20대',
+        subjectRegion: '한국',
+        subjectAction: '휴식',
+        spaceType: '야외',
+        spaceDetail: '카페',
+        light: '자연광',
+        shotStyle: ['라이프스타일', '심도 얕은 샷(아웃포커싱)']
+      }
+    },
+    {
+      name: "도심 시티 룩",
+      config: {
+        subjectNum: '혼자',
+        subjectGender: '여성',
+        subjectAge: '20대',
+        subjectRegion: '한국',
+        subjectClothesStyle: '스트릿',
+        subjectClothesBottom: '미니스커트',
+        subjectAction: '활발함',
+        spaceType: '야외',
+        spaceDetail: '힙한곳',
+        light: '자연광',
+        shotStyle: ['라이프스타일', '모션 캡쳐-동적 연출']
+      }
+    },
+    {
+      name: "룸 셀피",
+      config: {
+        subjectNum: '혼자',
+        subjectGender: '여성',
+        subjectAge: '20대',
+        subjectRegion: '한국',
+        subjectClothesStyle: '캐주얼',
+        subjectAction: '휴식',
+        spaceType: '홈',
+        spaceDetail: '룸',
+        light: '자연광',
+        shotStyle: ['라이프스타일']
+      }
+    },
+    {
+      name: "플랫 레이",
+      config: {
+        subjectNum: '없음',
+        spaceType: '스튜디오',
+        spaceDetail: '단색 배경',
+        cameraAngle: '정면',
+        shotStyle: ['플랫 레이', '컬러블로킹']
+      }
+    }
+  ],
+  'USAGE SCENE': [
+    {
+      name: "사용 중",
+      config: {
+        subjectNum: '혼자',
+        subjectGender: '여성',
+        subjectAge: '20대',
+        subjectAction: '기본',
+        subjectDetailAction: '사용',
+        spaceType: '스튜디오',
+        spaceDetail: '단색 배경',
+        light: '균일하게 비치는 조명'
+      }
+    },
+    {
+      name: "들고 포징",
+      config: {
+        subjectNum: '혼자',
+        subjectGender: '여성',
+        subjectAge: '20대',
+        subjectAction: '기본',
+        subjectDetailAction: '들기',
+        spaceType: '스튜디오',
+        spaceDetail: '단색 배경',
+        light: '균일하게 비치는 조명'
+      }
+    },
+    {
+      name: "전경 포커스",
+      config: {
+        subjectNum: '혼자',
+        subjectGender: '여성',
+        subjectAge: '20대',
+        subjectAction: '기본',
+        subjectDetailAction: '사용',
+        cameraAngle: '클로즈업',
+        shotStyle: ['심도 얕은 샷(아웃포커싱)']
+      }
+    },
+    {
+      name: "동적 액션",
+      config: {
+        subjectNum: '혼자',
+        subjectGender: '여성',
+        subjectAge: '20대',
+        subjectAction: '활발함',
+        subjectDetailAction: '사용',
+        shotStyle: ['모션 캡쳐-동적 연출']
+      }
+    }
+  ],
+  'HOME LIVING': [
+    {
+      name: "휴식",
+      config: {
+        subjectNum: '혼자',
+        subjectGender: '여성',
+        subjectAge: '20대',
+        subjectRegion: '일본',
+        subjectClothesStyle: '캐주얼',
+        subjectClothesBottom: '기본 스커트',
+        femaleClothesBottom: '기본 스커트',
+        subjectAction: '휴식',
+        spaceType: '홈',
+        spaceDetail: '리빙',
+        light: '앰비언트 라이트',
+        shotStyle: ['라이프스타일', '인테리어 잡지 샷', '심도 얕은 샷(아웃포커싱)'],
+        interiorStyle: '내추럴 우드'
+      }
+    },
+    {
+      name: "홈워크",
+      config: {
+        subjectNum: '혼자',
+        subjectGender: '여성',
+        subjectAge: '20대',
+        subjectRegion: '일본',
+        subjectClothesStyle: '캐주얼',
+        subjectAction: '업무',
+        spaceType: '홈',
+        spaceDetail: '워크룸',
+        light: '자연광',
+        shotStyle: ['라이프스타일', '인테리어 잡지 샷'],
+        interiorStyle: '모던 미니멀'
+      }
+    },
+    {
+      name: "게임",
+      config: {
+        subjectNum: '혼자',
+        subjectGender: '여성',
+        subjectAge: '20대',
+        subjectRegion: '일본',
+        subjectClothesStyle: '스트릿',
+        subjectAction: '활발함',
+        spaceType: '홈',
+        spaceDetail: '룸',
+        light: '무드등',
+        shotStyle: ['라이프스타일'],
+        interiorStyle: '인더스트리얼'
+      }
+    },
+    {
+      name: "식사",
+      config: {
+        subjectNum: '혼자',
+        subjectGender: '여성',
+        subjectAge: '20대',
+        subjectRegion: '일본',
+        subjectClothesStyle: '캐주얼',
+        subjectAction: '휴식',
+        spaceType: '홈',
+        spaceDetail: '다이닝',
+        light: '자연광',
+        shotStyle: ['라이프스타일', '인테리어 잡지 샷'],
+        interiorStyle: '내추럴 우드'
+      }
+    }
+  ],
+  'OFFICE TECH': [
+    {
+      name: "사무실업무",
+      config: {
+        subjectNum: '다수',
+        subjectGender: '여성',
+        subjectAge: '20대',
+        subjectClothesStyle: '비즈니스',
+        subjectAction: '업무',
+        spaceType: '오피스',
+        spaceDetail: '사무실',
+        light: '자연광',
+        shotStyle: ['인테리어 잡지 샷', '와이드 건축/공간 샷'],
+        interiorStyle: '모던 미니멀'
+      }
+    },
+    {
+      name: "회의",
+      config: {
+        subjectNum: '다수',
+        subjectGender: '혼성',
+        subjectAction: '대화',
+        spaceType: '오피스',
+        spaceDetail: '회의실',
+        light: '자연광',
+        shotStyle: ['인테리어 잡지 샷'],
+        interiorStyle: '모던 미니멀'
+      }
+    },
+    {
+      name: "라운지미팅",
+      config: {
+        subjectNum: '소수',
+        subjectGender: '혼성',
+        subjectAction: '대화',
+        spaceType: '오피스',
+        spaceDetail: '오피스 라운지',
+        light: '앰비언트 라이트',
+        shotStyle: ['라이프스타일'],
+        interiorStyle: '스칸디나비안'
+      }
+    },
+    {
+      name: "중역실",
+      config: {
+        subjectNum: '혼자',
+        subjectGender: '남성',
+        subjectAge: '40대',
+        subjectClothesStyle: '포멀/정장',
+        subjectAction: '업무',
+        spaceType: '오피스',
+        spaceDetail: '중역실',
+        light: '자연광',
+        shotStyle: ['인테리어 잡지 샷'],
+        interiorStyle: '내추럴 우드'
+      }
+    }
+  ],
+  'RETAIL SCENE': [
+    {
+      name: "카페",
+      config: {
+        subjectNum: '다수',
+        subjectGender: '여성',
+        subjectAge: '20대',
+        subjectRegion: '일본',
+        subjectAction: '대화',
+        spaceType: '리테일',
+        spaceDetail: '카페',
+        light: '자연광',
+        shotStyle: ['라이프스타일', '인테리어 잡지 샷'],
+        interiorStyle: '내추럴 우드'
+      }
+    },
+    {
+      name: "식당",
+      config: {
+        subjectNum: '2인',
+        subjectGender: '혼성',
+        subjectAction: '대화',
+        spaceType: '리테일',
+        spaceDetail: '식당',
+        light: '자연광',
+        shotStyle: ['라이프스타일', '인테리어 잡지 샷'],
+        interiorStyle: '내추럴 우드'
+      }
+    },
+    {
+      name: "쇼핑몰",
+      config: {
+        subjectNum: '다수',
+        subjectGender: '혼성',
+        subjectAction: '활발함',
+        spaceType: '리테일',
+        spaceDetail: '쇼핑몰',
+        light: '자연광',
+        shotStyle: ['와이드 건축/공간 샷'],
+        interiorStyle: '모던 미니멀'
+      }
+    },
+    {
+      name: "쇼룸진열",
+      config: {
+        subjectNum: '없음',
+        spaceType: '리테일',
+        spaceDetail: '쇼룸',
+        cameraAngle: '정면',
+        light: '스포트라이트 조명',
+        shotStyle: ['인테리어 잡지 샷'],
+        interiorStyle: '모던 미니멀'
+      }
+    }
+  ],
+  'NATURE ORGANIC': [
+    {
+      name: "숲속 공터",
+      config: {
+        subjectNum: '없음',
+        spaceType: '야외',
+        spaceDetail: '자연',
+        light: '자연광',
+        shotStyle: ['와비사비-어스톤', '심도 얕은 샷(아웃포커싱)'],
+        interiorStyle: '플랜테리어'
+      }
+    },
+    {
+      name: "강가 야외",
+      config: {
+        subjectNum: '없음',
+        spaceType: '야외',
+        spaceDetail: '강가',
+        light: '자연광',
+        shotStyle: ['와비사비-어스톤'],
+        interiorStyle: '젠 스타일'
+      }
+    },
+    {
+      name: "테라스 정원",
+      config: {
+        subjectNum: '혼자',
+        subjectGender: '여성',
+        subjectAge: '20대',
+        subjectAction: '휴식',
+        spaceType: '야외',
+        spaceDetail: '테라스',
+        light: '자연광',
+        shotStyle: ['라이프스타일'],
+        interiorStyle: '플랜테리어'
+      }
+    },
+    {
+      name: "휴양지 해변",
+      config: {
+        subjectNum: '혼자',
+        subjectGender: '여성',
+        subjectAge: '20대',
+        subjectAction: '휴식',
+        spaceType: '야외',
+        spaceDetail: '자연',
+        country: '동남아 휴양지',
+        light: '자연광',
+        shotStyle: ['라이프스타일', '심도 얕은 샷(아웃포커싱)'],
+        interiorStyle: '내추럴 우드'
+      }
+    }
+  ]
+};
+
 const getColorHex = (colorName) => {
   const mapping = {
     'Cobalt Blue': '#0047AB',
@@ -388,6 +815,7 @@ export default function App() {
   const [cooldownTime, setCooldownTime] = useState(0);
   const [activeCategory, setActiveCategory] = useState('subject');
   const [activeTemplate, setActiveTemplate] = useState(null);
+  const [activeSubOptionIndex, setActiveSubOptionIndex] = useState(0);
 
   // Image-to-Image & Lightbox states
   const [refImage, setRefImage] = useState(null); // { mimeType, data }
@@ -1192,7 +1620,7 @@ Return ONLY valid JSON matching this schema:
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.66b Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.67 Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -1358,8 +1786,9 @@ Return ONLY valid JSON matching this schema:
     setIsSaved(false); // Reset complete state on option change
   };
 
-  const handleSmartTemplate = (templateType) => {
+  const handleSmartTemplate = (templateType, subOptionIndex = 0) => {
     setActiveTemplate(templateType);
+    setActiveSubOptionIndex(subOptionIndex);
     setActiveLibraryTemplateId(null);
     setUseProduct(false); // 스마트 씬 변경 시 대상 제품명은 기본적으로 꺼짐
     
@@ -1590,6 +2019,20 @@ Return ONLY valid JSON matching this schema:
     }
 
 
+
+    // Merge selected sub-option configuration
+    const subOpts = SMART_SUB_OPTIONS[templateType];
+    if (subOpts && subOpts[subOptionIndex]) {
+      const subOpt = subOpts[subOptionIndex];
+      targetConfig = {
+        ...targetConfig,
+        ...subOpt.config
+      };
+      
+      const needsSubject = targetConfig.subjectNum && targetConfig.subjectNum !== '없음';
+      setSmartUseSubject(needsSubject);
+      setActiveMarquee(`${templateType.replace(" SCENE", "")} - ${subOpt.name} Active: Custom smart scene layout...`);
+    }
 
     // Update state atomically to prevent race conditions and staggered rendering bugs
     setConfig(targetConfig);
@@ -2238,6 +2681,10 @@ Return ONLY valid JSON matching this schema:
         let humanStr = getSubjectNounPhrase(config);
 
         const details = [];
+        if (activeTemplate === 'USAGE SCENE') {
+          details.push("looking away from camera");
+          details.push("candid portrait");
+        }
         if (config.subjectHair !== "선택안함") details.push(DICTIONARY.subjectHair[config.subjectHair]);
         if (config.subjectClothesStyle !== "선택안함") details.push(DICTIONARY.subjectClothesStyle[config.subjectClothesStyle]);
 
@@ -2321,6 +2768,10 @@ Return ONLY valid JSON matching this schema:
         if (config.country !== "선택안함") envStr += ` in ${DICTIONARY.country[config.country]}`;
       }
       
+      if (activeTemplate === 'NATURE ORGANIC' && activeSubOptionIndex === 0) {
+        envStr += " in a quiet forest clearing";
+      }
+      
       if (envStr.startsWith("in ") || envStr.startsWith("within ") || envStr.startsWith("surrounded ")) {
         parts.push(envStr);
       } else {
@@ -2394,6 +2845,7 @@ Return ONLY valid JSON matching this schema:
   }, [
     config,
     activeTemplate,
+    activeSubOptionIndex,
     useProduct,
     useDetailMaterial,
     removeText,
@@ -2622,7 +3074,7 @@ Return ONLY valid JSON matching this schema:
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.66b | Shot Maker Workspace
+              v0.67 | Shot Maker Workspace
             </div>
           </div>
         </div>
@@ -4145,6 +4597,60 @@ Return ONLY valid JSON matching this schema:
                 );
               })}
             </div>
+
+            {/* 2.5. 스마트 씬 세부 연출 옵션 (v0.67) */}
+            {activeTemplate && SMART_SUB_OPTIONS[activeTemplate] && (
+              <div style={{ marginTop: '20px', fontFamily: "'Outfit', 'Inter', sans-serif" }}>
+                <div 
+                  style={{ 
+                    fontSize: '11px', 
+                    fontWeight: '900', 
+                    textTransform: 'uppercase', 
+                    letterSpacing: '0.05em', 
+                    color: isDarkMode ? '#FFFFFF' : '#0022FF', 
+                    marginBottom: '10px' 
+                  }}
+                >
+                  Detail Scene Options
+                </div>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {SMART_SUB_OPTIONS[activeTemplate].map((subOpt, idx) => {
+                    const isSubActive = activeSubOptionIndex === idx;
+                    return (
+                      <button
+                        key={subOpt.name}
+                        onClick={() => handleSmartTemplate(activeTemplate, idx)}
+                        style={{
+                          flex: '1 1 calc(25% - 8px)',
+                          minWidth: '90px',
+                          padding: '10px 8px',
+                          fontSize: '12px',
+                          fontWeight: '800',
+                          backgroundColor: isSubActive 
+                            ? (isDarkMode ? '#FFFFFF' : '#0022FF') 
+                            : (isDarkMode ? '#2C2C2E' : '#F2F2F7'),
+                          color: isSubActive 
+                            ? (isDarkMode ? '#0022FF' : '#FFFFFF') 
+                            : (isDarkMode ? '#FFFFFF' : '#1C1C1E'),
+                          border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+                          boxShadow: isSubActive 
+                            ? 'none' 
+                            : `3px 3px 0px ${isDarkMode ? 'rgba(255,255,255,0.15)' : '#0022FF'}`,
+                          cursor: 'pointer',
+                          borderRadius: '0px',
+                          transition: 'all 0.15s ease',
+                          transform: isSubActive ? 'translate(2px, 2px)' : 'none',
+                          outline: 'none'
+                        }}
+                        className="hover:opacity-90"
+                      >
+                        {subOpt.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* 3. 스마트씬별 예상느낌 참고 이미지 무드보드 */}
             {activeTemplate && (
@@ -5975,7 +6481,7 @@ Return ONLY valid JSON matching this schema:
     </div>
 
     <footer className="ios-footer">
-      v0.66b | Shot Maker Workspace
+      v0.67 | Shot Maker Workspace
     </footer>
     <div className="h-12"></div>
     </div>
