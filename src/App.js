@@ -4791,7 +4791,7 @@ Return ONLY valid JSON matching this schema:
                 >
                   Detail Scene Options
                 </div>
-                <div className="no-scrollbar" style={{ display: 'flex', gap: '8px', flexWrap: 'nowrap', overflowX: 'auto', paddingTop: '2px', paddingBottom: '8px', paddingLeft: '2px' }}>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'nowrap', paddingTop: '2px', paddingBottom: '8px', paddingLeft: '2px', paddingRight: '4px' }}>
                   {SMART_SUB_OPTIONS[activeTemplate].map((subOpt, idx) => {
                     const isSubActive = activeSubOptionIndex === idx;
                     return (
@@ -4799,10 +4799,10 @@ Return ONLY valid JSON matching this schema:
                         key={subOpt.name}
                         onClick={() => handleSmartTemplate(activeTemplate, idx)}
                         style={{
-                          flex: '1 0 auto',
-                          minWidth: '90px',
-                          padding: '10px 8px',
-                          fontSize: '12px',
+                          flex: 1,
+                          minWidth: 0,
+                          padding: '10px 4px',
+                          fontSize: '11px',
                           fontWeight: '800',
                           backgroundColor: isSubActive 
                             ? (isDarkMode ? '#FFFFFF' : 'var(--accent-color)') 
@@ -4818,7 +4818,13 @@ Return ONLY valid JSON matching this schema:
                           borderRadius: '0px',
                           transition: 'all 0.15s ease',
                           transform: isSubActive ? 'translate(2px, 2px)' : 'none',
-                          outline: 'none'
+                          outline: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          textAlign: 'center',
+                          wordBreak: 'keep-all',
+                          lineHeight: '1.25'
                         }}
                         className="hover:opacity-90"
                       >
@@ -4826,8 +4832,6 @@ Return ONLY valid JSON matching this schema:
                       </button>
                     );
                   })}
-                  {/* Spacer to prevent clipping on the right edge */}
-                  <div style={{ width: '8px', flexShrink: 0 }} />
                 </div>
               </motion.div>
             )}
