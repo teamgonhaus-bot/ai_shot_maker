@@ -933,6 +933,8 @@ export default function App() {
   };
   const [isShaking, setIsShaking] = useState(false);
   const lastTapRef = useRef(0);
+  const touchStartDistRef = useRef(0);
+  const touchStartZoomRef = useRef(1);
 
   // Rename Modal State
   const [renameTarget, setRenameTarget] = useState(null); // { id, name }
@@ -3375,6 +3377,31 @@ Return ONLY valid JSON matching this schema:
                       handleNextLightboxImage();
                     }
                   }}
+                  onTouchStart={(e) => {
+                    if (e.touches.length === 2) {
+                      const dist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                      );
+                      touchStartDistRef.current = dist;
+                      touchStartZoomRef.current = zoomScale;
+                    }
+                  }}
+                  onTouchMove={(e) => {
+                    if (e.touches.length === 2 && touchStartDistRef.current > 0) {
+                      const dist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                      );
+                      const ratio = dist / touchStartDistRef.current;
+                      let newScale = touchStartZoomRef.current * ratio;
+                      newScale = Math.min(3, Math.max(1, newScale));
+                      setZoomScale(newScale);
+                    }
+                  }}
+                  onTouchEnd={() => {
+                    touchStartDistRef.current = 0;
+                  }}
                   src={lightboxImage} 
                   alt="Fullscreen" 
                   className="ios-lightbox-img" 
@@ -4758,7 +4785,7 @@ Return ONLY valid JSON matching this schema:
                 >
                   Detail Scene Options
                 </div>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <div className="no-scrollbar" style={{ display: 'flex', gap: '8px', flexWrap: 'nowrap', overflowX: 'auto', paddingBottom: '6px' }}>
                   {SMART_SUB_OPTIONS[activeTemplate].map((subOpt, idx) => {
                     const isSubActive = activeSubOptionIndex === idx;
                     return (
@@ -4766,7 +4793,7 @@ Return ONLY valid JSON matching this schema:
                         key={subOpt.name}
                         onClick={() => handleSmartTemplate(activeTemplate, idx)}
                         style={{
-                          flex: '1 1 calc(25% - 8px)',
+                          flex: '1 0 auto',
                           minWidth: '90px',
                           padding: '10px 8px',
                           fontSize: '12px',
