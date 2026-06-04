@@ -341,7 +341,16 @@ export default function App() {
   const [newFolderName, setNewFolderName] = useState('');
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [activeEditImage, setActiveEditImage] = useState(null);
+  const [selectedSmartPreviewTemplate, setSelectedSmartPreviewTemplate] = useState('HOME LIVING');
   const [editPrompt, setEditPrompt] = useState("");
+  
+  // AI Search & Suggestion states
+  const [aiSearchQuery, setAiSearchQuery] = useState("");
+  const [isAiSearching, setIsAiSearching] = useState(false);
+  const [aiSearchExplanation, setAiSearchExplanation] = useState("");
+
+  // Fullscreen preview lightbox state
+  const [fullscreenPreviewUrl, setFullscreenPreviewUrl] = useState(null);
   const [lightboxLoaded, setLightboxLoaded] = useState(false);
   const [gallerySortOrder, setGallerySortOrder] = useState('newest');
   const [isZoomed, setIsZoomed] = useState(false);
@@ -398,73 +407,130 @@ export default function App() {
 
   const [activePreviewIndex, setActivePreviewIndex] = useState(0);
 
-  // Smart Scene Preview upload, deletion, and toggle helpers
-  const handleUploadSmartPreview = (e, templateId) => {
+  // Smart Scene Preview upload, deletion, and toggle helpers (Synced with Firebase Storage & Firestore)
+  const handleUploadSmartPreview = async (e, templateId) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
 
-    let processedCount = 0;
-    const newImages = [];
+    triggerToast("이미지를 업로드하는 중입니다...");
 
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = () => {
-          const maxDim = 800;
-          let width = img.width;
-          let height = img.height;
-          if (width > maxDim || height > maxDim) {
-            if (width > height) {
-              height = Math.round((height * maxDim) / width);
-              width = maxDim;
-            } else {
-              width = Math.round((width * maxDim) / height);
-              height = maxDim;
-            }
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-          const compressed = canvas.toDataURL('image/jpeg', 0.7);
+    try {
+      const uploadedUrls = [];
 
-          newImages.push(compressed);
-          processedCount++;
+      for (const file of files) {
+        // 1. Resize & Compress
+        const compressedBase64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+              const maxDim = 800;
+              let width = img.width;
+              let height = img.height;
+              if (width > maxDim || height > maxDim) {
+                if (width > height) {
+                  height = Math.round((height * maxDim) / width);
+                  width = maxDim;
+                } else {
+                  width = Math.round((width * maxDim) / height);
+                  height = maxDim;
+                }
+              }
+              const canvas = document.createElement('canvas');
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+              resolve(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.onerror = reject;
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
 
-          if (processedCount === files.length) {
-            setSmartScenePreviews(prev => {
-              const updated = {
-                ...prev,
-                [templateId]: [...(prev[templateId] || []), ...newImages]
-              };
-              localStorage.setItem('smart_scene_previews', JSON.stringify(updated));
-              return updated;
-            });
-            setActivePreviewIndex(0);
-            triggerToast(`${files.length}개의 참고 이미지가 추가되었습니다.`);
-          }
-        };
-      };
-      reader.readAsDataURL(file);
-    });
+        // 2. Base64 to Blob
+        const blob = dataURLtoBlob(compressedBase64);
+
+        // 3. Upload to Firebase Storage
+        const fileId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const storageRef = ref(storage, `smart_previews/${templateId}/${fileId}.jpg`);
+        await withTimeout(uploadBytes(storageRef, blob), 15000);
+        const downloadUrl = await getDownloadURL(storageRef);
+        uploadedUrls.push(downloadUrl);
+      }
+
+      if (uploadedUrls.length > 0) {
+        // 4. Update in Firestore
+        const docRef = doc(db, "smart_previews", templateId);
+        const currentList = smartScenePreviews[templateId] || [];
+        const newList = [...currentList, ...uploadedUrls];
+
+        await setDoc(docRef, { images: newList }, { merge: true });
+
+        // 5. Update Local State and Cache
+        setSmartScenePreviews(prev => {
+          const updated = {
+            ...prev,
+            [templateId]: newList
+          };
+          localStorage.setItem('smart_scene_previews', JSON.stringify(updated));
+          return updated;
+        });
+
+        setActivePreviewIndex(newList.length - 1);
+        triggerToast(`${uploadedUrls.length}개의 참고 이미지가 업로드 되었습니다.`);
+      }
+    } catch (err) {
+      console.error("Smart preview upload error:", err);
+      triggerToast("업로드 중 오류가 발생했습니다.");
+    }
   };
 
-  const handleDeleteSmartPreview = (templateId, indexToDelete) => {
-    setSmartScenePreviews(prev => {
-      const currentList = prev[templateId] || [];
-      const updatedList = currentList.filter((_, idx) => idx !== indexToDelete);
-      const updated = {
-        ...prev,
-        [templateId]: updatedList
-      };
-      localStorage.setItem('smart_scene_previews', JSON.stringify(updated));
-      return updated;
-    });
-    setActivePreviewIndex(prev => Math.max(0, prev - 1));
-    triggerToast(`참고 이미지가 삭제되었습니다.`);
+  const handleDeleteSmartPreview = async (templateId, indexToDelete) => {
+    const currentList = smartScenePreviews[templateId] || [];
+    const urlToDelete = currentList[indexToDelete];
+    if (!urlToDelete) return;
+
+    try {
+      triggerToast("이미지를 삭제하는 중입니다...");
+
+      // 1. Delete from Firebase Storage if it's a storage URL
+      if (urlToDelete.includes("firebasestorage.googleapis.com")) {
+        try {
+          const decodedUrl = decodeURIComponent(urlToDelete);
+          const pathStartIndex = decodedUrl.indexOf("/o/") + 3;
+          const pathEndIndex = decodedUrl.indexOf("?alt=media");
+          const storagePath = decodedUrl.substring(pathStartIndex, pathEndIndex);
+          const fileRef = ref(storage, storagePath);
+          await deleteObject(fileRef);
+        } catch (storageErr) {
+          console.warn("Storage deletion warning (might already be deleted):", storageErr);
+        }
+      }
+
+      // 2. Update Firestore
+      const newList = currentList.filter((_, idx) => idx !== indexToDelete);
+      const docRef = doc(db, "smart_previews", templateId);
+      await setDoc(docRef, { images: newList }, { merge: true });
+
+      // 3. Update Local State & Cache
+      setSmartScenePreviews(prev => {
+        const updated = {
+          ...prev,
+          [templateId]: newList
+        };
+        localStorage.setItem('smart_scene_previews', JSON.stringify(updated));
+        return updated;
+      });
+
+      setActivePreviewIndex(prev => Math.max(0, Math.min(prev, newList.length - 1)));
+      triggerToast("참고 이미지가 삭제되었습니다.");
+    } catch (e) {
+      console.error("Error deleting smart preview image:", e);
+      triggerToast("삭제 중 오류가 발생했습니다.");
+    }
   };
 
   const toggleSmartPreview = () => {
@@ -473,6 +539,178 @@ export default function App() {
       localStorage.setItem('show_smart_preview', String(nextVal));
       return nextVal;
     });
+  };
+
+  // Fetch Smart Previews from Firestore and Cache in localStorage (SWR pattern)
+  const fetchSmartPreviewsData = async () => {
+    try {
+      const q = query(collection(db, "smart_previews"));
+      const querySnapshot = await getDocs(q);
+      const data = {
+        'TITLE SCENE': [],
+        'DETAIL SCENE': [],
+        'INSTA SCENE': [],
+        'USAGE SCENE': [],
+        'HOME LIVING': [],
+        'OFFICE TECH': [],
+        'RETAIL SCENE': [],
+        'NATURE ORGANIC': []
+      };
+      querySnapshot.forEach((doc) => {
+        const id = doc.id;
+        const docData = doc.data();
+        if (docData && Array.isArray(docData.images)) {
+          data[id] = docData.images;
+        }
+      });
+      setSmartScenePreviews(data);
+      localStorage.setItem('smart_scene_previews', JSON.stringify(data));
+      console.log("✅ Firebase Smart Previews synced and cached.");
+    } catch (e) {
+      console.error("❌ Firebase smart previews sync error:", e);
+    }
+  };
+
+  // Add a gallery image directly to a selected smart template's previews
+  const handleAddImageToSmartPreview = async (imageUrl, destTemplateId) => {
+    try {
+      const currentList = smartScenePreviews[destTemplateId] || [];
+      if (currentList.includes(imageUrl)) {
+        triggerToast("이미 동일한 이미지가 등록되어 있습니다.");
+        return;
+      }
+      triggerToast("이미지를 스마트씬 프리뷰에 추가하는 중입니다...");
+
+      let finalUrl = imageUrl;
+      // If base64 (local unsynced image), upload to Storage first
+      if (imageUrl.startsWith("data:image/")) {
+        const blob = dataURLtoBlob(imageUrl);
+        const fileId = `gallery_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const storageRef = ref(storage, `smart_previews/${destTemplateId}/${fileId}.jpg`);
+        await withTimeout(uploadBytes(storageRef, blob), 15000);
+        finalUrl = await getDownloadURL(storageRef);
+      }
+
+      const newList = [...currentList, finalUrl];
+      const docRef = doc(db, "smart_previews", destTemplateId);
+      await setDoc(docRef, { images: newList }, { merge: true });
+
+      setSmartScenePreviews(prev => {
+        const updated = {
+          ...prev,
+          [destTemplateId]: newList
+        };
+        localStorage.setItem('smart_scene_previews', JSON.stringify(updated));
+        return updated;
+      });
+
+      triggerToast(`'${destTemplateId}' 스마트씬 프리뷰에 추가되었습니다.`);
+      setActiveEditImage(null); // Close Edit modal
+    } catch (err) {
+      console.error("Error adding gallery image to smart preview:", err);
+      triggerToast("프리뷰 추가 중 오류가 발생했습니다.");
+    }
+  };
+
+  // AI Smart setup query search mapping intent to options via Gemini
+  const handleAISearch = async () => {
+    if (!aiSearchQuery.trim()) {
+      triggerToast("검색어를 입력해 주세요.");
+      return;
+    }
+    if (!googleApiKey) {
+      triggerToast("설정에서 Gemini API 키를 먼저 등록해 주세요.");
+      return;
+    }
+
+    setIsAiSearching(true);
+    setAiSearchExplanation("AI가 최적의 스마트씬 설정을 분석 중입니다...");
+
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${googleApiKey}`;
+      
+      const systemInstruction = `You are a professional concept photography assistant for "Shot Maker".
+Analyze the user's concept search query and suggest the best configuration setting by returning a JSON object.
+Return ONLY valid JSON matching this schema:
+{
+  "activeTemplate": "One of ['TITLE SCENE', 'DETAIL SCENE', 'INSTA SCENE', 'USAGE SCENE', 'HOME LIVING', 'OFFICE TECH', 'RETAIL SCENE', 'NATURE ORGANIC']",
+  "config": {
+    "subjectNum": "One of ['없음', '혼자', '2인', '소수', '다수']",
+    "subjectGender": "One of ['선택안함', '여성', '남성', '혼성']",
+    "subjectAge": "One of ['선택안함', '10대', '20대', '30대', '40대', '중장년']",
+    "subjectRegion": "One of ['선택안함', '한국', '일본', '북유럽', '북미']",
+    "subjectAction": "One of ['선택안함', '기본', '차분함', '활발함', '업무', '휴식', '대화']",
+    "subjectClothesStyle": "One of ['선택안함', '캐주얼', '비즈니스', '스트릿', '미니멀', '포멀/정장']",
+    "subjectClothesTop": "One of ['선택안함', '반팔티', '긴팔티', '자켓', '아우터', '원피스', '스포츠 복장', '아웃도어']",
+    "subjectClothesBottom": "One of ['선택안함', '기본 스커트', '미니스커트', '롱스커트', '긴바지', '반바지']",
+    "subjectHair": "One of ['선택안함', '긴머리', '짧은머리', '단발', '펌', '염색', '묶은머리']",
+    "spaceType": "One of ['스튜디오', '오피스', '홈', '리테일', '라운지', '야외']",
+    "spaceDetail": "One of valid spaceDetails:
+      If 스튜디오: ['단색 배경', '그라데이션 배경', '인테리어 세트장', '크로마키 배경']
+      If 오피스: ['사무실', '회의실', '중역실', '오피스 라운지', '트레이닝룸', '공유오피스']
+      If 홈: ['리빙', '다이닝', '룸', '워크룸', '베드룸', '테라스']
+      If 리테일: ['카페', '식당', '쇼룸', '쇼케이스', '로비', '쇼핑몰', '박람회', '갤러리', '도서관', '강의실']
+      If 라운지: ['호텔 라운지', '공항 라운지', '쇼핑몰라운지', '쇼케이스 라운지']
+      If 야외: ['도심', '자연', '테라스', '공원', '강가', '쇼핑가', '힙한곳']",
+    "light": "One of ['선택안함', '자연광', '시네마틱', '스튜디오 조명', '스포트라이트 조명', '무드등', '나르스 확산광', '앰비언트 라이트', '균일하게 비치는 조명']",
+    "cameraAngle": "One of ['선택안함', '정면', '미디움 샷', '풀 샷', '하이앵글', '로우앵글', '아이레벨', '클로즈업', '익스트림 클로즈업', '버드아이 뷰', '웜즈아이 뷰', '바텀업 뷰', '더치 앵글', '초광각', '망원 샷', '드론 샷']"
+  },
+  "explanation": "설명: Provide a 1-2 sentence explanation in Korean explaining why these options were chosen."
+}`;
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{
+            role: "user",
+            parts: [{ text: `${systemInstruction}\n\nUser Query: "${aiSearchQuery}"` }]
+          }],
+          generationConfig: {
+            responseMimeType: "application/json"
+          }
+        })
+      });
+
+      if (!res.ok) {
+        throw new Error(`API Response Error: ${res.statusText}`);
+      }
+
+      const resData = await res.json();
+      const text = resData.candidates[0].content.parts[0].text;
+
+      let cleanText = text.trim();
+      if (cleanText.startsWith("```")) {
+        const firstLineEnd = cleanText.indexOf("\n");
+        const lastBackticks = cleanText.lastIndexOf("```");
+        if (firstLineEnd !== -1 && lastBackticks !== -1) {
+          cleanText = cleanText.substring(firstLineEnd + 1, lastBackticks).trim();
+        }
+      }
+
+      const result = JSON.parse(cleanText);
+
+      if (result.activeTemplate) {
+        setActiveTemplate(result.activeTemplate);
+      }
+      if (result.config) {
+        setConfig(prev => ({
+          ...prev,
+          ...result.config
+        }));
+        if (result.config.subjectNum) {
+          setSmartUseSubject(result.config.subjectNum !== '없음');
+        }
+      }
+      setAiSearchExplanation(result.explanation || "AI가 최적의 스마트 씬 매핑 설정을 구성하였습니다.");
+      triggerToast("AI 검색 매핑 완료!");
+    } catch (error) {
+      console.error("AI Search Error:", error);
+      triggerToast("AI 제안 생성 중 오류가 발생했습니다.");
+      setAiSearchExplanation("죄송합니다. 요청하신 개념을 매핑하지 못했습니다. 검색 키워드나 네트워크를 확인해 주세요.");
+    } finally {
+      setIsAiSearching(false);
+    }
   };
 
   // 1. Firebase Gallery & Folders Load (컴포넌트 레벨 공용 함수, Stale-While-Revalidate 캐싱)
@@ -855,7 +1093,7 @@ export default function App() {
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.66 Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.66a Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -916,6 +1154,7 @@ export default function App() {
       await autoSignIn();
       fetchTemplates();
       fetchGalleryData();
+      fetchSmartPreviewsData();
     };
     initFirebase();
   }, []);
@@ -972,6 +1211,18 @@ export default function App() {
       setUseDetailMaterial(false);
     }
   }, [config.spaceType]);
+
+  // Lock body scroll when fullscreen preview is active
+  useEffect(() => {
+    if (fullscreenPreviewUrl) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [fullscreenPreviewUrl]);
 
   const handleConfigChange = (key, value) => {
     setActiveTemplate(null);
@@ -2258,11 +2509,70 @@ export default function App() {
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.66 | Shot Maker Workspace
+              v0.66a | Shot Maker Workspace
             </div>
           </div>
         </div>
       )}
+
+      {/* 🔍 Fullscreen Preview Modal */}
+      <AnimatePresence>
+        {fullscreenPreviewUrl && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              backgroundColor: 'rgba(0,0,0,0.95)',
+              zIndex: 999999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'zoom-out'
+            }}
+            onClick={() => setFullscreenPreviewUrl(null)}
+          >
+            <img
+              src={fullscreenPreviewUrl}
+              alt="Preview Fullscreen"
+              style={{
+                maxWidth: '95%',
+                maxHeight: '95%',
+                objectFit: 'contain',
+                border: '1px solid rgba(255,255,255,0.2)'
+              }}
+            />
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setFullscreenPreviewUrl(null);
+              }}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                backgroundColor: '#FFFFFF',
+                color: '#000000',
+                border: 'none',
+                padding: '8px 16px',
+                fontSize: '12px',
+                fontWeight: '900',
+                cursor: 'pointer',
+                textTransform: 'uppercase',
+                outline: 'none'
+              }}
+            >
+              Close
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* 🖼️ Lightbox Modal */}
       <AnimatePresence>
         {lightboxImage && (() => {
@@ -2706,6 +3016,57 @@ export default function App() {
                     <option key={f} value={f}>{f}</option>
                   ))}
                 </select>
+              </div>
+
+              {/* 2.5. Add to Smart Preview Carousel */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+                <div style={{ fontSize: '10px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', textTransform: 'uppercase', textAlign: 'left' }}>Add to Smart Preview</div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <select
+                    value={selectedSmartPreviewTemplate}
+                    onChange={(e) => setSelectedSmartPreviewTemplate(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: '10px 14px',
+                      backgroundColor: isDarkMode ? '#1C1C1E' : '#F8F8FF',
+                      color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                      border: isDarkMode ? '1px solid rgba(255,255,255,0.3)' : '1px solid #0022FF',
+                      borderRadius: '0px',
+                      fontWeight: 'bold',
+                      fontSize: '12px',
+                      outline: 'none'
+                    }}
+                  >
+                    {[
+                      { id: 'TITLE SCENE', label: 'Title' },
+                      { id: 'DETAIL SCENE', label: 'Detail' },
+                      { id: 'INSTA SCENE', label: 'Insta' },
+                      { id: 'USAGE SCENE', label: 'User' },
+                      { id: 'HOME LIVING', label: 'Home' },
+                      { id: 'OFFICE TECH', label: 'Office' },
+                      { id: 'RETAIL SCENE', label: 'Retail' },
+                      { id: 'NATURE ORGANIC', label: 'Outdoor' }
+                    ].map(t => (
+                      <option key={t.id} value={t.id}>{t.label}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => handleAddImageToSmartPreview(activeEditImage.url, selectedSmartPreviewTemplate)}
+                    style={{
+                      padding: '10px 16px',
+                      backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+                      color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                      border: 'none',
+                      borderRadius: '0px',
+                      fontWeight: '900',
+                      fontSize: '11px',
+                      textTransform: 'uppercase',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    ADD
+                  </button>
+                </div>
               </div>
 
               {/* 3. Manual sync for local-only */}
@@ -3382,6 +3743,81 @@ export default function App() {
       <div className="workspace-layout">
         {/* 💻 Left Column: Control Center */}
         <div className="workspace-left">
+          {/* 🔍 AI 스마트 제안 검색 바 */}
+          <div 
+            style={{
+              border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+              borderRadius: '0px',
+              padding: '12px',
+              marginBottom: '16px',
+              backgroundColor: isDarkMode ? '#1C1C1E' : '#FFFFFF',
+              fontFamily: "'Outfit', 'Inter', sans-serif"
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <span style={{ fontSize: '11px', fontWeight: '900', color: isDarkMode ? '#FFFFFF' : '#0022FF', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                AI 스마트 설정 검색 / 제안
+              </span>
+              <span style={{ fontSize: '9px', fontWeight: '800', opacity: 0.6, color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>
+                Gemini AI
+              </span>
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                type="text"
+                placeholder="원하는 씬 설명 예: '커피숍에서 맥북 코딩하는 한국 여성'"
+                value={aiSearchQuery}
+                onChange={(e) => setAiSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleAISearch();
+                }}
+                style={{
+                  flex: 1,
+                  padding: '8px 12px',
+                  fontSize: '12px',
+                  backgroundColor: isDarkMode ? '#2C2C2E' : '#F8F8FF',
+                  color: isDarkMode ? '#FFFFFF' : '#000000',
+                  border: `1.5px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+                  outline: 'none',
+                  borderRadius: '0px'
+                }}
+              />
+              <button
+                onClick={handleAISearch}
+                disabled={isAiSearching}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: isDarkMode ? '#FFFFFF' : '#0022FF',
+                  color: isDarkMode ? '#0022FF' : '#FFFFFF',
+                  border: 'none',
+                  fontSize: '11px',
+                  fontWeight: '900',
+                  cursor: 'pointer',
+                  textTransform: 'uppercase',
+                  outline: 'none'
+                }}
+              >
+                {isAiSearching ? '분석중...' : '검색'}
+              </button>
+            </div>
+            {aiSearchExplanation && (
+              <div 
+                style={{
+                  marginTop: '10px',
+                  fontSize: '11px',
+                  lineHeight: '1.45',
+                  padding: '10px',
+                  backgroundColor: isDarkMode ? '#2C2C2E' : '#F0F0FF',
+                  color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                  borderLeft: `3px solid ${isDarkMode ? '#FFFFFF' : '#0022FF'}`,
+                  textAlign: 'left'
+                }}
+              >
+                {aiSearchExplanation}
+              </div>
+            )}
+          </div>
+
           <AnimatePresence mode="wait">
         {currentMode === 'smart' && (
           <motion.div key="smart" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-4">
@@ -3610,23 +4046,32 @@ export default function App() {
                   fontFamily: "'Outfit', 'Inter', sans-serif"
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>
-                      Moodboard Preview
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', marginBottom: '14px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span 
+                      style={{ 
+                        fontSize: 'clamp(11px, 2.8vw, 13px)', 
+                        fontWeight: '900', 
+                        textTransform: 'uppercase', 
+                        letterSpacing: '0.05em', 
+                        color: isDarkMode ? '#FFFFFF' : '#0022FF',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      Moodboard
                     </span>
-                    <span style={{ fontSize: '11px', fontWeight: '800', opacity: 0.6, color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>
+                    <span style={{ fontSize: '10px', fontWeight: '800', opacity: 0.6, color: isDarkMode ? '#FFFFFF' : '#0022FF' }}>
                       ({smartScenePreviews[activeTemplate]?.length || 0})
                     </span>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     {/* Toggle Button */}
                     <button
                       onClick={toggleSmartPreview}
                       style={{
-                        padding: '4px 10px',
-                        fontSize: '10px',
+                        padding: '4px 8px',
+                        fontSize: '9px',
                         fontWeight: '900',
                         backgroundColor: showSmartPreview
                           ? (isDarkMode ? '#FFFFFF' : '#0022FF')
@@ -3649,8 +4094,8 @@ export default function App() {
                     {/* Upload File Input Hidden */}
                     <label
                       style={{
-                        padding: '4px 10px',
-                        fontSize: '10px',
+                        padding: '4px 8px',
+                        fontSize: '9px',
                         fontWeight: '900',
                         backgroundColor: 'transparent',
                         color: isDarkMode ? '#FFFFFF' : '#0022FF',
@@ -3688,7 +4133,12 @@ export default function App() {
                           <img 
                             src={smartScenePreviews[activeTemplate][Math.min(activePreviewIndex, smartScenePreviews[activeTemplate].length - 1)]} 
                             alt="Scene vibe preview" 
-                            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'zoom-in' }}
+                            onClick={() => {
+                              const list = smartScenePreviews[activeTemplate] || [];
+                              const currentImg = list[Math.min(activePreviewIndex, list.length - 1)];
+                              if (currentImg) setFullscreenPreviewUrl(currentImg);
+                            }}
                           />
                           
                           {/* Carousel Navigation Arrows */}
@@ -5412,7 +5862,7 @@ export default function App() {
     </div>
 
     <footer className="ios-footer">
-      v0.66 | Shot Maker Workspace
+      v0.66a | Shot Maker Workspace
     </footer>
     <div className="h-12"></div>
     </div>
