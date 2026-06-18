@@ -1689,6 +1689,27 @@ Return ONLY valid JSON matching this schema:
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMode]);
 
+  // Firebase Templates Load (Component level helper function)
+  const fetchTemplates = async () => {
+    try {
+      const q = query(collection(db, "templates"), orderBy("createdAt", "desc"));
+      const snapshot = await getDocs(q);
+      const templates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      console.log(`✅ Firebase Loaded: ${templates.length} templates loaded.`);
+      
+      const cachedStr = localStorage.getItem('shotmaker_cached_templates');
+      const fetchedStr = JSON.stringify(templates);
+      if (cachedStr !== fetchedStr) {
+        setSavedTemplates(templates);
+        localStorage.setItem('shotmaker_cached_templates', fetchedStr);
+      }
+    } catch (error) {
+      console.error("❌ Firebase load error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Initial Data Load & Persistence Sync
   useEffect(() => {
     console.log("🚀 Initializing Shot Maker v0.68 Professional Studio...");
@@ -1719,26 +1740,7 @@ Return ONLY valid JSON matching this schema:
     const storedGen = localStorage.getItem('shotmaker_enableImageGeneration');
     if (storedGen !== null) setEnableImageGeneration(storedGen === 'true');
 
-    // 2. Firebase Initial Load (One-time fetch as requested)
-    const fetchTemplates = async () => {
-      try {
-        const q = query(collection(db, "templates"), orderBy("createdAt", "desc"));
-        const snapshot = await getDocs(q);
-        const templates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        console.log(`✅ Firebase Loaded: ${templates.length} templates loaded.`);
-        
-        const cachedStr = localStorage.getItem('shotmaker_cached_templates');
-        const fetchedStr = JSON.stringify(templates);
-        if (cachedStr !== fetchedStr) {
-          setSavedTemplates(templates);
-          localStorage.setItem('shotmaker_cached_templates', fetchedStr);
-        }
-      } catch (error) {
-        console.error("❌ Firebase load error:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    // 2. Firebase Initial Load is now handled by the outer scope fetchTemplates()
 
 
 
@@ -2374,12 +2376,32 @@ Return ONLY valid JSON matching this schema:
     const pwd = window.prompt("관리자 암호를 입력하세요:");
     if (!pwd) return;
     const hashed = await hashPassword(pwd);
-    if (hashed === process.env.REACT_APP_ADMIN_PWD_HASH) {
+    
+    let isValid = false;
+    try {
+      const authDocRef = doc(db, "gallery_meta", "auth");
+      const authDocSnap = await getDoc(authDocRef);
+      if (authDocSnap.exists() && authDocSnap.data().passwordHash) {
+        isValid = (hashed === authDocSnap.data().passwordHash);
+      } else {
+        isValid = (hashed === process.env.REACT_APP_ADMIN_PWD_HASH);
+      }
+    } catch (error) {
+      console.warn("Firestore에서 비밀번호 해시를 가져오지 못했습니다. .env 기본값 사용:", error);
+      isValid = (hashed === process.env.REACT_APP_ADMIN_PWD_HASH);
+    }
+
+    if (isValid) {
       try {
         await signInAnonymously(auth);
         setIsAdmin(true);
         localStorage.setItem('shotmaker_is_admin', 'true');
         triggerToast("관리자 로그인 성공");
+        
+        // 로그인 성공 시 데이터를 새로고침 없이 즉시 로드
+        fetchTemplates();
+        fetchGalleryData(true);
+        fetchSmartPreviewsData();
       } catch (error) {
         console.error("Firebase Auth Error:", error);
         triggerToast("인증 실패: " + error.message);
@@ -2394,8 +2416,69 @@ Return ONLY valid JSON matching this schema:
       await signOut(auth);
       setIsAdmin(false);
       localStorage.removeItem('shotmaker_is_admin');
+      
+      // 상태 및 캐시 클리어
+      setGalleryImages([]);
+      setSavedTemplates([]);
+      setSmartScenePreviews({});
+      
+      localStorage.removeItem('shotmaker_cached_gallery');
+      localStorage.removeItem('shotmaker_cached_gallery_folders');
+      localStorage.removeItem('shotmaker_cached_templates');
+      localStorage.removeItem('smart_scene_previews');
+      
+      triggerToast("로그아웃 되었습니다.");
     } catch (error) {
       console.error("Logout Error:", error);
+      triggerToast("로그아웃 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleChangePassword = async () => {
+    const currentPwd = window.prompt("현재 암호를 입력하세요:");
+    if (!currentPwd) return;
+    const currentHashed = await hashPassword(currentPwd);
+
+    let isValid = false;
+    try {
+      const authDocRef = doc(db, "gallery_meta", "auth");
+      const authDocSnap = await getDoc(authDocRef);
+      if (authDocSnap.exists() && authDocSnap.data().passwordHash) {
+        isValid = (currentHashed === authDocSnap.data().passwordHash);
+      } else {
+        isValid = (currentHashed === process.env.REACT_APP_ADMIN_PWD_HASH);
+      }
+    } catch (error) {
+      console.warn("Firestore에서 기존 암호 해시 조회 실패, .env 기본값 사용:", error);
+      isValid = (currentHashed === process.env.REACT_APP_ADMIN_PWD_HASH);
+    }
+
+    if (!isValid) {
+      triggerToast("현재 암호가 일치하지 않습니다.");
+      return;
+    }
+
+    const newPwd = window.prompt("새로 사용할 암호를 입력하세요:");
+    if (!newPwd) return;
+    if (newPwd.length < 4) {
+      triggerToast("암호는 최소 4글자 이상이어야 합니다.");
+      return;
+    }
+
+    const confirmPwd = window.prompt("새 암호를 한 번 더 입력하세요:");
+    if (newPwd !== confirmPwd) {
+      triggerToast("새 암호가 일치하지 않습니다.");
+      return;
+    }
+
+    try {
+      const newHashed = await hashPassword(newPwd);
+      const authDocRef = doc(db, "gallery_meta", "auth");
+      await setDoc(authDocRef, { passwordHash: newHashed }, { merge: true });
+      triggerToast("암호가 성공적으로 변경되었습니다.");
+    } catch (error) {
+      console.error("Failed to change password:", error);
+      triggerToast("암호 변경 중 오류가 발생했습니다: " + error.message);
     }
   };
 
@@ -4335,6 +4418,36 @@ Return ONLY valid JSON matching this schema:
                     }}
                   />
                 </div>
+
+                {/* Admin Password Change Section */}
+                {isAdmin && (
+                  <div style={{ 
+                    paddingTop: '16px', 
+                    marginTop: '16px', 
+                    borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid color-mix(in srgb, var(--accent-color) 12%, transparent)' 
+                  }}>
+                    <label className="settings-prop-label">관리자 암호 변경</label>
+                    <p className="settings-desc-text" style={{ marginBottom: '12px' }}>접속 시 사용할 관리자 암호를 변경합니다.</p>
+                    <button
+                      onClick={handleChangePassword}
+                      style={{
+                        width: '100%',
+                        height: '40px',
+                        backgroundColor: isDarkMode ? '#FFFFFF' : 'var(--accent-color)',
+                        color: isDarkMode ? 'var(--accent-color)' : '#FFFFFF',
+                        fontWeight: '900',
+                        border: 'none',
+                        borderRadius: '0px',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                        textTransform: 'uppercase',
+                        transition: 'opacity 0.2s'
+                      }}
+                    >
+                      암호 변경하기
+                    </button>
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>
