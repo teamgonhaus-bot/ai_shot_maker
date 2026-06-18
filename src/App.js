@@ -1753,14 +1753,20 @@ Return ONLY valid JSON matching this schema:
         }
       } catch (err) {
         console.error("🔑 Anonymous sign-in failed:", err);
+        triggerToast("자동 익명 로그인 실패: " + err.message);
       }
     };
 
     const initFirebase = async () => {
       await autoSignIn();
-      fetchTemplates();
-      fetchGalleryData();
-      fetchSmartPreviewsData();
+      const isCurrentlyAdmin = localStorage.getItem('shotmaker_is_admin') === 'true';
+      if (isCurrentlyAdmin) {
+        fetchTemplates();
+        fetchGalleryData();
+        fetchSmartPreviewsData();
+      } else {
+        console.log("🔑 Not admin. Firestore loads skipped until login.");
+      }
     };
     initFirebase();
     // eslint-disable-next-line react-hooks/exhaustive-deps
