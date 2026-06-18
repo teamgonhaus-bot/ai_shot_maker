@@ -1766,6 +1766,7 @@ Return ONLY valid JSON matching this schema:
         fetchSmartPreviewsData();
       } else {
         console.log("🔑 Not admin. Firestore loads skipped until login.");
+        setIsLoading(false);
       }
     };
     initFirebase();
