@@ -1148,6 +1148,9 @@ export default function App() {
       console.log("✅ Firebase Smart Previews synced and cached.");
     } catch (e) {
       console.error("❌ Firebase smart previews sync error:", e);
+      if (e.code === 'permission-denied') {
+        triggerToast("Firestore 권한 오류: Firebase Console에서 'smart_previews' 규칙을 확인해 주세요.");
+      }
     }
   };
 
@@ -1336,6 +1339,9 @@ Return ONLY valid JSON matching this schema:
       }
     } catch (error) {
       console.error("❌ Firebase gallery load error:", error);
+      if (error.code === 'permission-denied') {
+        triggerToast("Firestore 권한 오류: Firebase Console에서 'gallery' 규칙을 확인해 주세요.");
+      }
     } finally {
       setIsGalleryLoading(false);
     }
@@ -1705,6 +1711,9 @@ Return ONLY valid JSON matching this schema:
       }
     } catch (error) {
       console.error("❌ Firebase load error:", error);
+      if (error.code === 'permission-denied') {
+        triggerToast("Firestore 권한 오류: Firebase Console에서 'templates' 규칙을 확인해 주세요.");
+      }
     } finally {
       setIsLoading(false);
     }
