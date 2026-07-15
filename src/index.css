@@ -784,8 +784,8 @@ body.dark-mode .ios-apply-preset-btn:active {
 .settings-modal-overlay {
   position: fixed !important;
   inset: 0 !important;
-  background: rgba(0, 0, 0, 0.4) !important;
-  backdrop-filter: blur(4px) !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(12px) !important;
   z-index: 99999 !important;
   display: flex !important;
   align-items: center !important;
@@ -798,13 +798,14 @@ body.dark-mode .ios-apply-preset-btn:active {
   width: 90% !important;
   max-width: 420px !important;
   padding: 32px !important;
-  box-shadow: none !important;
+  box-shadow: 8px 8px 0px var(--accent-color) !important;
   border: 1px solid var(--accent-color) !important;
 }
 
 body.dark-mode .settings-modal {
   background: #000000 !important;
   border: 1px solid #FFFFFF !important;
+  box-shadow: 8px 8px 0px #FFFFFF !important;
 }
 
 .settings-header {

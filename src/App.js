@@ -124,7 +124,9 @@ const DICTIONARY = {
 
   spaceType: { "스튜디오": "in the studio", "오피스": "in the office", "홈": "at home", "리테일": "in the retail shop", "라운지": "in the lounge", "야외": "outdoors" },
   spaceDetail: {
-    "단색 배경": "with a solid color background", "인테리어 세트장": "in an interior set", "그라데이션 배경": "with a gradient background", "쇼케이스": "in the showcase", "크로마키 배경": "with a chroma key background",
+    "단색 배경": "with a solid color background", "인테리어 세트장": "in a clean empty studio interior set", "그라데이션 배경": "with a gradient background", "쇼케이스": "in the showcase", "크로마키 배경": "with a chroma key background",
+    "다이(화이트 디스플레이박스)": "placed on a minimalist white display box pedestal, clean geometric stand",
+    "스테이지 플로어": "on a premium minimalist presentation stage floor",
     "사무실": "in the office", "회의실": "in the meeting room", "중역실": "in the executive room", "오피스 라운지": "in the office lounge", "트레이닝룸": "in the training room", "공유오피스": "in the coworking space",
     "리빙": "in the living room", "다이닝": "in the dining room", "룸": "in the room", "워크룸": "in the study", "베드룸": "in the bedroom", "테라스": "on the terrace",
     "카페": "in the cafe", "식당": "in the restaurant", "쇼룸": "in the showroom", "로비": "in the lobby", "쇼핑몰": "in the shopping mall", "박람회": "at the exhibition", "갤러리": "in the gallery", "도서관": "in the library", "강의실": "in the classroom",
@@ -182,7 +184,7 @@ const OPTIONS_DATA = {
   subjectHair: ["선택안함", "긴머리", "짧은머리", "단발", "펌", "염색", "묶은머리"],
   spaceType: ["스튜디오", "오피스", "홈", "리테일", "라운지", "야외"],
   spaceDetail: {
-    "스튜디오": ["단색 배경", "그라데이션 배경", "인테리어 세트장", "크로마키 배경"],
+    "스튜디오": ["단색 배경", "그라데이션 배경", "인테리어 세트장", "크로마키 배경", "다이(화이트 디스플레이박스)", "스테이지 플로어"],
     "오피스": ["사무실", "회의실", "중역실", "오피스 라운지", "트레이닝룸", "공유오피스"],
     "홈": ["리빙", "다이닝", "룸", "워크룸", "베드룸", "테라스"],
     "리테일": ["카페", "식당", "쇼룸", "쇼케이스", "로비", "쇼핑몰", "박람회", "갤러리", "도서관", "강의실"],
@@ -235,12 +237,13 @@ const SMART_SUB_OPTIONS = {
       }
     },
     {
-      name: "컬러 블로킹",
+      name: "쇼케이스",
       config: {
-        productLayout: '대각선 안착',
-        spaceDetail: '단색 배경',
-        monochromeColor: 'Cobalt Blue',
-        light: '균일하게 비치는 조명',
+        spaceType: '스튜디오',
+        spaceDetail: '다이(화이트 디스플레이박스)',
+        productLayout: '선택안함',
+        productAnchor: '전경 클린',
+        light: '스튜디오 조명',
         shotStyle: ['컬러블로킹']
       }
     },
@@ -1728,7 +1731,7 @@ Return ONLY valid JSON matching this schema:
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.69 Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.69a Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -2134,7 +2137,7 @@ Return ONLY valid JSON matching this schema:
       setActiveMarquee(`${templateType.replace(" SCENE", "")} - ${subOpt.name} Active: Custom smart scene layout...`);
     }
 
-    // [v0.69 추가] 세부 구도 자동 토글 처리
+    // [v0.69a 추가] 세부 구도 자동 토글 처리
     if (targetConfig.cameraAngle && targetConfig.cameraAngle !== '선택안함') {
       targetConfig.useDetailCameraAngle = true;
     } else {
@@ -2392,7 +2395,7 @@ Return ONLY valid JSON matching this schema:
       targetConfig.subjectNum = '없음';
     }
 
-    // [v0.69 추가] 셔플 결과에 따른 세부 구도 토글 상태 싱크
+    // [v0.69a 추가] 셔플 결과에 따른 세부 구도 토글 상태 싱크
     if (targetConfig.cameraAngle && targetConfig.cameraAngle !== '선택안함') {
       targetConfig.useDetailCameraAngle = true;
     } else {
@@ -3006,7 +3009,7 @@ Return ONLY valid JSON matching this schema:
         const styles = config.shotStyle.map(s => DICTIONARY.shotStyle[s]);
         parts.push(`rendered with ${styles.join(", ")}`);
       }
-      if (removeText) parts.push("textless, no text, no watermarks, clear image");
+      if (removeText) parts.push("textless, clear image");
       parts.push("photorealistic");
     }
 
@@ -3274,7 +3277,7 @@ Return ONLY valid JSON matching this schema:
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.69 | Shot Maker Workspace
+              v0.69a | Shot Maker Workspace
             </div>
           </div>
         </div>
@@ -4368,8 +4371,8 @@ Return ONLY valid JSON matching this schema:
                 {/* Dark Mode Section */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', paddingBottom: '16px', borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid color-mix(in srgb, var(--accent-color) 12%, transparent)' }}>
                   <div>
-                    <label className="settings-prop-label">블루 모드</label>
-                    <p className="settings-desc-text">앱 테마를 블루로 변경합니다.</p>
+                    <label className="settings-prop-label">반전 모드</label>
+                    <p className="settings-desc-text">앱 테마 색상을 반전(Dark/Light)시킵니다.</p>
                   </div>
                   <IOSToggle
                     label=""
@@ -6867,7 +6870,7 @@ Return ONLY valid JSON matching this schema:
     </div>
 
     <footer className="ios-footer">
-      v0.69 | Shot Maker Workspace
+      v0.69a | Shot Maker Workspace
     </footer>
     <div className="h-12"></div>
     </div>
