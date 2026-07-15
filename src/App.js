@@ -109,9 +109,6 @@ const DICTIONARY = {
   subjectRegion: { "선택안함": "", "한국": "Korean", "일본": "Japanese", "북유럽": "Northern European", "북미": "North American" },
   subjectAction: {
     "선택안함": "",
-    "기본": "posing",
-    "차분함": "calm",
-    "활발함": "active",
     "업무": "working at a desk",
     "휴식": "relaxing",
     "대화": "conversing"
@@ -125,14 +122,14 @@ const DICTIONARY = {
   },
   subjectHair: { "선택안함": "", "긴머리": "long hair", "짧은머리": "short hair", "단발": "bob hair", "펌": "permed hair", "염색": "dyed hair", "묶은머리": "tied hair" },
 
-  spaceType: { "스튜디오": "a professional studio environment", "오피스": "a modern office space", "홈": "a cozy home interior", "리테일": "a retail commercial space", "라운지": "a luxury lounge area", "야외": "an outdoor setting" },
+  spaceType: { "스튜디오": "in the studio", "오피스": "in the office", "홈": "at home", "리테일": "in the retail shop", "라운지": "in the lounge", "야외": "outdoors" },
   spaceDetail: {
-    "단색 배경": "with a solid color background", "인테리어 세트장": "within a designed interior set", "그라데이션 배경": "with a gradient background", "쇼케이스": "in a showcase display area", "크로마키 배경": "with a chroma key background",
-    "사무실": "in a standard office setup", "회의실": "in a formal meeting room", "중역실": "in an executive office suite", "오피스 라운지": "in a relaxed office lounge", "트레이닝룸": "in a training or lecture room", "공유오피스": "in a modern coworking space",
-    "리빙": "in a living room area", "다이닝": "in a dining room setting", "룸": "in a private room", "워크룸": "in a dedicated workroom or study", "베드룸": "in a comfortable bedroom setting", "테라스": "on a scenic terrace",
-    "카페": "in a trendy cafe", "식당": "in a modern restaurant", "쇼룸": "in a premium showroom", "로비": "in a grand lobby area", "쇼핑몰": "in a bustling shopping mall", "박람회": "at a professional exhibition or fair", "갤러리": "in a minimalist art gallery", "도서관": "in a quiet library environment", "강의실": "in a modern classroom",
-    "호텔 라운지": "in a luxury hotel lounge", "공항 라운지": "in a premium airport lounge", "쇼핑몰라운지": "in a shopping mall lounge area", "쇼케이스 라운지": "in a showcase lounge area",
-    "도심": "in a bustling city urban environment", "자연": "surrounded by natural scenery", "공원": "in a public park", "강가": "by a scenic riverside", "쇼핑가": "on a busy shopping street", "힙한곳": "in a trendy, hip neighborhood"
+    "단색 배경": "with a solid color background", "인테리어 세트장": "in an interior set", "그라데이션 배경": "with a gradient background", "쇼케이스": "in the showcase", "크로마키 배경": "with a chroma key background",
+    "사무실": "in the office", "회의실": "in the meeting room", "중역실": "in the executive room", "오피스 라운지": "in the office lounge", "트레이닝룸": "in the training room", "공유오피스": "in the coworking space",
+    "리빙": "in the living room", "다이닝": "in the dining room", "룸": "in the room", "워크룸": "in the study", "베드룸": "in the bedroom", "테라스": "on the terrace",
+    "카페": "in the cafe", "식당": "in the restaurant", "쇼룸": "in the showroom", "로비": "in the lobby", "쇼핑몰": "in the shopping mall", "박람회": "at the exhibition", "갤러리": "in the gallery", "도서관": "in the library", "강의실": "in the classroom",
+    "호텔 라운지": "in the hotel lounge", "공항 라운지": "in the airport lounge", "쇼핑몰라운지": "in the shopping mall lounge", "쇼케이스 라운지": "in the showcase lounge",
+    "도심": "in the city", "자연": "in nature", "공원": "in the park", "강가": "by the river", "쇼핑가": "in the shopping street", "힙한곳": "in a hip place"
   },
   detailWall: { "화이트 페인트": "clean white painted walls", "노출 콘크리트": "exposed raw concrete walls", "웨인스코팅": "elegant wainscoted walls", "파스텔톤 벽지": "soft pastel wallpaper", "붉은 벽돌": "rustic red brick walls", "세라믹타일": "ceramic tiled walls", "paneled walls": "paneled walls", "템바보드": "tambour board walls", "원목패널": "solid wood paneled walls", "스틸패널": "steel paneled walls", "스톤패널": "stone paneled walls" },
   interiorStyle: { "선택안함": "", "미드센추리 모던": "mid-century modern style", "모던 미니멀": "modern minimal style", "내추럴 우드": "natural wood interior style", "젠 스타일": "Zen-inspired style", "인더스트리얼": "industrial style", "스칸디나비안": "Scandinavian style", "플랜테리어": "planterior style with many indoor plants" },
@@ -145,12 +142,13 @@ const DICTIONARY = {
   copySpace: { "선택안함": "", "좌측 여백": "with ample empty copy space on the left side", "우측 여백": "with ample empty copy space on the right side" },
   productAnchor: { "선택안함": "", "라벨 목업": "a blank unbranded minimalist placeholder product container, no text, smooth surface", "전경 클린": "clear unobstructed view of the center item, no foreground occlusion, clean sharp edges", "합성 베이스": "high contrast separation between central item and background, perfect lighting for design composite" },
   productLayout: { "선택안함": "", "공중부양": "product floating in mid-air, levitating with subtle shadow below", "대각선 안착": "product suspended diagonally in mid-air at a dynamic angle", "액체 스플래시": "dramatic liquid splash effect surrounding the product", "파우더 폭발": "powder explosion burst effect around the product" },
+  baseCameraAngle: { "기본": "", "SNS": "SNS trendy photo angle", "파파라치샷": "paparazzi style shot, candid photography", "시네마틱": "cinematic style", "미니멀": "minimalist composition" },
   cameraAngle: { "선택안함": "", "정면": "frontal shot", "미디움 샷": "medium shot", "하이앵글": "high-angle shot", "로우앵글": "low-angle shot", "아이레벨": "eye-level shot", "클로즈업": "close-up shot", "익스트림 클로즈업": "extreme close-up shot", "버드아이 뷰": "bird's eye view", "웜즈아이 뷰": "worm's eye view", "바텀업 뷰": "bottom-up perspective", "더치 앵글": "dutch angle shot", "초광각": "ultra-wide angle shot", "망원 샷": "telephoto lens shot", "풀 샷": "full body shot", "드론 샷": "aerial drone shot" },
   shotStyle: {
     "컬러블로킹": "color blocking aesthetic", "네거티브 스페이스": "negative space composition", "hard shadows": "hard shadows",
     "톤온톤-모노크로매틱": "tone-on-tone monochromatic palette", "플랫 레이": "flat lay perspective", "매크로-디테일": "macro detail shot",
     "와비사비-어스톤": "wabi-sabi earth tone aesthetic", "모션 캡쳐-동적 연출": "motion capture dynamic pose",
-    "인테리어 잡지 샷": "realistic interior magazine photography", "와이드 건축/공간 샷": "wide architectural space shot",
+    "인테리어 잡지 샷": "realistic interior magazine photography, interior design magazine cover", "와이드 건축/공간 샷": "wide architectural space shot",
     "라이프스타일": "lifestyle interior scene",
     "심도 얕은 샷(아웃포커싱)": "shallow depth of field with bokeh"
   },
@@ -171,7 +169,7 @@ const OPTIONS_DATA = {
   subjectGender: ["선택안함", "여성", "남성", "혼성"],
   subjectAge: ["선택안함", "10대", "20대", "30대", "40대", "중장년"],
   subjectRegion: ["선택안함", "한국", "일본", "북유럽", "북미"],
-  subjectAction: ["선택안함", "기본", "차분함", "활발함", "업무", "휴식", "대화"],
+  subjectAction: ["선택안함", "업무", "휴식", "대화"],
   subjectClothesStyle: ["선택안함", "캐주얼", "비즈니스", "스트릿", "미니멀", "포멀/정장"],
   subjectClothesTop: {
     female: ["선택안함", "반팔티", "긴팔티", "자켓", "아우터", "원피스", "스포츠 복장", "아웃도어"],
@@ -200,6 +198,7 @@ const OPTIONS_DATA = {
   copySpace: ["선택안함", "좌측 여백", "우측 여백"],
   productAnchor: ["선택안함", "라벨 목업", "전경 클린", "합성 베이스"],
   productLayout: ["선택안함", "공중부양", "대각선 안착", "액체 스플래시", "파우더 폭발"],
+  baseCameraAngle: ["기본", "SNS", "파파라치샷", "시네마틱", "미니멀"],
   cameraAngle: ["선택안함", "정면", "미디움 샷", "풀 샷", "하이앵글", "로우앵글", "아이레벨", "클로즈업", "익스트림 클로즈업", "버드아이 뷰", "웜즈아이 뷰", "바텀업 뷰", "더치 앵글", "초광각", "망원 샷", "드론 샷"],
   shotStyle: [
     "컬러블로킹", "네거티브 스페이스", "하드 섀도우", "톤온톤-모노크로매틱", "플랫 레이", "매크로-디테일", "와비사비-어스톤", "모션 캡쳐-동적 연출",
@@ -306,7 +305,9 @@ const SMART_SUB_OPTIONS = {
         spaceType: '야외',
         spaceDetail: '카페',
         light: '자연광',
-        shotStyle: ['라이프스타일', '심도 얕은 샷(아웃포커싱)']
+        shotStyle: ['라이프스타일', '심도 얕은 샷(아웃포커싱)'],
+        baseCameraAngle: 'SNS',
+        useDetailCameraAngle: false
       }
     },
     {
@@ -318,11 +319,13 @@ const SMART_SUB_OPTIONS = {
         subjectRegion: '한국',
         subjectClothesStyle: '스트릿',
         subjectClothesBottom: '미니스커트',
-        subjectAction: '활발함',
+        subjectAction: '선택안함',
         spaceType: '야외',
         spaceDetail: '힙한곳',
         light: '자연광',
-        shotStyle: ['라이프스타일', '모션 캡쳐-동적 연출']
+        shotStyle: ['라이프스타일', '모션 캡쳐-동적 연출'],
+        baseCameraAngle: 'SNS',
+        useDetailCameraAngle: false
       }
     },
     {
@@ -337,7 +340,9 @@ const SMART_SUB_OPTIONS = {
         spaceType: '홈',
         spaceDetail: '룸',
         light: '자연광',
-        shotStyle: ['라이프스타일']
+        shotStyle: ['라이프스타일'],
+        baseCameraAngle: 'SNS',
+        useDetailCameraAngle: false
       }
     },
     {
@@ -358,7 +363,7 @@ const SMART_SUB_OPTIONS = {
         subjectNum: '혼자',
         subjectGender: '여성',
         subjectAge: '20대',
-        subjectAction: '기본',
+        subjectAction: '선택안함',
         subjectDetailAction: '사용',
         spaceType: '스튜디오',
         spaceDetail: '단색 배경',
@@ -371,7 +376,7 @@ const SMART_SUB_OPTIONS = {
         subjectNum: '혼자',
         subjectGender: '여성',
         subjectAge: '20대',
-        subjectAction: '기본',
+        subjectAction: '선택안함',
         subjectDetailAction: '들기',
         spaceType: '스튜디오',
         spaceDetail: '단색 배경',
@@ -384,7 +389,7 @@ const SMART_SUB_OPTIONS = {
         subjectNum: '혼자',
         subjectGender: '여성',
         subjectAge: '20대',
-        subjectAction: '기본',
+        subjectAction: '선택안함',
         subjectDetailAction: '사용',
         cameraAngle: '클로즈업',
         shotStyle: ['심도 얕은 샷(아웃포커싱)']
@@ -396,7 +401,7 @@ const SMART_SUB_OPTIONS = {
         subjectNum: '혼자',
         subjectGender: '여성',
         subjectAge: '20대',
-        subjectAction: '활발함',
+        subjectAction: '선택안함',
         subjectDetailAction: '사용',
         shotStyle: ['모션 캡쳐-동적 연출']
       }
@@ -445,7 +450,7 @@ const SMART_SUB_OPTIONS = {
         subjectAge: '20대',
         subjectRegion: '일본',
         subjectClothesStyle: '스트릿',
-        subjectAction: '활발함',
+        subjectAction: '선택안함',
         spaceType: '홈',
         spaceDetail: '룸',
         light: '무드등',
@@ -562,7 +567,7 @@ const SMART_SUB_OPTIONS = {
       config: {
         subjectNum: '다수',
         subjectGender: '혼성',
-        subjectAction: '활발함',
+        subjectAction: '선택안함',
         spaceType: '리테일',
         spaceDetail: '쇼핑몰',
         light: '자연광',
@@ -799,7 +804,7 @@ export default function App() {
     subjectGender: "선택안함",
     subjectAge: "선택안함",
     subjectRegion: "선택안함",
-    subjectAction: "기본",
+    subjectAction: "선택안함",
     subjectDetailAction: "선택안함",
     subjectClothesStyle: "선택안함",
     subjectClothesTop: "선택안함",
@@ -817,6 +822,8 @@ export default function App() {
     detailWood: "오크(참나무)",
     detailMetal: "황동(브라스)",
     detailWall: "화이트 페인트",
+    baseCameraAngle: "기본",
+    useDetailCameraAngle: false,
     cameraAngle: "선택안함",
     copySpace: "선택안함",
     productAnchor: "선택안함",
@@ -1721,7 +1728,7 @@ Return ONLY valid JSON matching this schema:
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.68 Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.69 Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -1889,7 +1896,7 @@ Return ONLY valid JSON matching this schema:
       subjectGender: "선택안함",
       subjectAge: "선택안함",
       subjectRegion: "선택안함",
-      subjectAction: "기본",
+      subjectAction: "선택안함",
       subjectDetailAction: "선택안함",
       subjectClothesStyle: "선택안함",
       subjectClothesTop: "선택안함",
@@ -1907,6 +1914,8 @@ Return ONLY valid JSON matching this schema:
       detailWood: "오크(참나무)",
       detailMetal: "황동(브라스)",
       detailWall: "화이트 페인트",
+      baseCameraAngle: "기본",
+      useDetailCameraAngle: false,
       cameraAngle: "선택안함",
       copySpace: "선택안함",
       productAnchor: "선택안함",
@@ -1969,11 +1978,13 @@ Return ONLY valid JSON matching this schema:
       targetConfig.subjectClothesStyle = '스트릿';
       targetConfig.subjectClothesBottom = '미니스커트';
       targetConfig.femaleClothesBottom = '미니스커트';
-      targetConfig.subjectAction = '활발함';
+      targetConfig.subjectAction = '선택안함';
       targetConfig.spaceType = '야외';
       targetConfig.spaceDetail = '힙한곳';
       targetConfig.interiorStyle = '플랜테리어';
-      targetConfig.cameraAngle = '하이앵글';
+      targetConfig.baseCameraAngle = 'SNS';
+      targetConfig.useDetailCameraAngle = false;
+      targetConfig.cameraAngle = '선택안함';
       targetConfig.aspectRatio = '4:5 (SNS)';
       targetConfig.copySpace = '선택안함';
       targetConfig.productLayout = '선택안함';
@@ -1994,7 +2005,7 @@ Return ONLY valid JSON matching this schema:
       targetConfig.subjectClothesStyle = '캐주얼';
       targetConfig.subjectClothesBottom = '미니스커트';
       targetConfig.femaleClothesBottom = '미니스커트';
-      targetConfig.subjectAction = '기본';
+      targetConfig.subjectAction = '선택안함';
       targetConfig.subjectDetailAction = '사용';
       targetConfig.spaceType = '스튜디오';
       targetConfig.spaceDetail = '단색 배경';
@@ -2123,6 +2134,13 @@ Return ONLY valid JSON matching this schema:
       setActiveMarquee(`${templateType.replace(" SCENE", "")} - ${subOpt.name} Active: Custom smart scene layout...`);
     }
 
+    // [v0.69 추가] 세부 구도 자동 토글 처리
+    if (targetConfig.cameraAngle && targetConfig.cameraAngle !== '선택안함') {
+      targetConfig.useDetailCameraAngle = true;
+    } else {
+      targetConfig.useDetailCameraAngle = false;
+    }
+
     // Update state atomically to prevent race conditions and staggered rendering bugs
     setConfig(targetConfig);
     setIsSaved(false);
@@ -2139,7 +2157,7 @@ Return ONLY valid JSON matching this schema:
         subjectGender: isOn && prev.subjectGender === '선택안함' ? '여성' : prev.subjectGender,
         subjectAge: isOn && prev.subjectAge === '선택안함' ? '20대' : prev.subjectAge,
         subjectAction: isOn && prev.subjectAction === '선택안함' 
-          ? (activeTemplate === 'OFFICE TECH' ? '업무' : (activeTemplate === 'RETAIL SCENE' ? '대화' : (activeTemplate === 'HOME LIVING' ? '휴식' : '기본')))
+          ? (activeTemplate === 'OFFICE TECH' ? '업무' : (activeTemplate === 'RETAIL SCENE' ? '대화' : (activeTemplate === 'HOME LIVING' ? '휴식' : '선택안함')))
           : prev.subjectAction,
         subjectDetailAction: isOn && prev.subjectDetailAction === '선택안함' && activeTemplate === 'USAGE SCENE' ? '사용' : prev.subjectDetailAction
       }));
@@ -2197,7 +2215,7 @@ Return ONLY valid JSON matching this schema:
       ];
       const bottomClothes = ['미니스커트', '반바지', '긴바지'];
       const hairs = ['단발', '긴머리', '짧은머리', '묶은머리'];
-      const actions = ['기본', '활발함', '대화'];
+      const actions = ['대화', '선택안함'];
       const detailedActions = ['선택안함', '잡기', '들기', '사용', '서기'];
       const regions = ['한국', '선택안함'];
 
@@ -2216,7 +2234,7 @@ Return ONLY valid JSON matching this schema:
       marqueeMsg = `Insta Scene Shuffle: MZ-themed SNS Snap refreshed (Gender: Female)!`;
 
     } else if (activeTemplate === 'USAGE SCENE') {
-      const actions = ['기본', '차분함', '활발함', '업무', '휴식', '대화'];
+      const actions = ['업무', '휴식', '대화', '선택안함'];
       const detailedActions = ['선택안함', '잡기', '들기', '사용', '앉기', '서기'];
       const ages = ['20대', '30대', '40대'];
       const hairs = ['긴머리', '짧은머리', '단발', '묶은머리'];
@@ -2256,7 +2274,7 @@ Return ONLY valid JSON matching this schema:
       const bottomClothes = ['기본 스커트', '긴바지', '반바지'];
       const hairs = ['긴머리', '단발', '묶은머리', '짧은머리'];
       const ages = ['20대', '30대'];
-      const actions = ['휴식', '차분함', '기본'];
+      const actions = ['휴식', '선택안함'];
       const detailedActions = ['선택안함', '잡기', '사용', '앉기'];
       const regions = ['일본', '한국', '선택안함'];
 
@@ -2283,7 +2301,7 @@ Return ONLY valid JSON matching this schema:
       const bottomClothes = ['기본 스커트', '미니스커트', '긴바지'];
       const hairs = ['긴머리', '짧은머리', '묶은머리', '단발'];
       const ages = ['20대', '30대', '40대'];
-      const actions = ['업무', '대화', '차분함'];
+      const actions = ['업무', '대화', '선택안함'];
       const detailedActions = ['선택안함', '사용', '앉기', '서기'];
       const regions = ['한국', '일본', '북미', '북유럽', '선택안함'];
 
@@ -2310,7 +2328,7 @@ Return ONLY valid JSON matching this schema:
       const bottomClothes = ['기본 스커트', '미니스커트', '긴바지'];
       const hairs = ['긴머리', '단발', '묶은머리', '짧은머리'];
       const ages = ['20대', '30대'];
-      const actions = ['대화', '휴식', '기본'];
+      const actions = ['대화', '휴식', '선택안함'];
       const detailedActions = ['선택안함', '잡기', '들기', '사용', '앉기', '서기'];
       const regions = ['한국', '일본', '북유럽', '선택안함'];
 
@@ -2341,7 +2359,7 @@ Return ONLY valid JSON matching this schema:
       const bottomClothes = ['긴바지', '반바지', '롱스커트'];
       const hairs = ['긴머리', '단발', '묶은머리', '짧은머리'];
       const ages = ['20대', '30대'];
-      const actions = ['휴식', '기본', '차분함'];
+      const actions = ['휴식', '선택안함'];
       const detailedActions = ['선택안함', '앉기', '서기', '들기'];
       const regions = ['한국', '일본', '북유럽', '선택안함'];
 
@@ -2367,12 +2385,18 @@ Return ONLY valid JSON matching this schema:
         targetConfig.subjectNum = '혼자';
         if (targetConfig.subjectGender === '선택안함') targetConfig.subjectGender = '여성';
         if (targetConfig.subjectAge === '선택안함') targetConfig.subjectAge = '20대';
-        if (targetConfig.subjectAction === '선택안함') targetConfig.subjectAction = '기본';
       } else {
         targetConfig.subjectNum = '없음';
       }
     } else {
       targetConfig.subjectNum = '없음';
+    }
+
+    // [v0.69 추가] 셔플 결과에 따른 세부 구도 토글 상태 싱크
+    if (targetConfig.cameraAngle && targetConfig.cameraAngle !== '선택안함') {
+      targetConfig.useDetailCameraAngle = true;
+    } else {
+      targetConfig.useDetailCameraAngle = false;
     }
 
     setConfig(targetConfig);
@@ -2917,7 +2941,7 @@ Return ONLY valid JSON matching this schema:
         if (activeProductName) {
           parts.push(`a scene using ${activeProductName}`);
         } else {
-          parts.push(`professional architectural photography of ${subjectStr}`);
+          parts.push(`a photo of ${subjectStr}`);
         }
       }
 
@@ -2969,40 +2993,37 @@ Return ONLY valid JSON matching this schema:
       if (config.productLayout && config.productLayout !== "선택안함") parts.push(DICTIONARY.productLayout[config.productLayout]);
       if (config.copySpace && config.copySpace !== "선택안함") parts.push(DICTIONARY.copySpace[config.copySpace]);
       if (config.productAnchor && config.productAnchor !== "선택안함") parts.push(DICTIONARY.productAnchor[config.productAnchor]);
-      if (config.cameraAngle !== "선택안함") parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
+      
+      // 기본 구도 및 세부 구도 반영
+      if (config.baseCameraAngle && config.baseCameraAngle !== "기본") {
+        parts.push(DICTIONARY.baseCameraAngle[config.baseCameraAngle]);
+      }
+      if (config.useDetailCameraAngle && config.cameraAngle && config.cameraAngle !== "선택안함") {
+        parts.push(`shot from ${DICTIONARY.cameraAngle[config.cameraAngle]}`);
+      }
+
       if (config.shotStyle.length > 0) {
         const styles = config.shotStyle.map(s => DICTIONARY.shotStyle[s]);
         parts.push(`rendered with ${styles.join(", ")}`);
       }
       if (removeText) parts.push("textless, no text, no watermarks, clear image");
-      parts.push("photorealistic, interior design magazine cover");
+      parts.push("photorealistic");
     }
 
     // 1. 핵심 개체명 추출 및 정제
     const productVar = activeProductName ? activeProductName.trim() : "";
 
-    // 2. 성공 프롬프트 삼총사 정의
-    const successTriad = "professional architectural photography, clear unobstructed view, clean sharp edges";
-
-    // 3. 기존 parts 배열 내 삼총사와 겹치는 표현 중복 방지를 위한 필터링
-    let filteredParts = parts.filter(p => {
-      if (!p) return false;
-      const lower = p.toLowerCase();
-      if (lower.includes("professional architectural photography")) return false;
-      return true;
-    });
+    // 2. 기존 parts 배열 내 중복 방지를 위한 필터링
+    let filteredParts = parts.filter(p => !!p);
 
     if (useImageRef) {
       filteredParts.push("strictly preserve original shape and design of reference image");
     }
 
-    // 4. 요구사항에 맞춘 완벽한 순서 고정 재조합
+    // 3. 요구사항에 맞춘 완벽한 순서 고정 재조합
     let prefixParts = [];
     if (productVar) {
       prefixParts.push(productVar);
-    }
-    if (!isSolidBackground) {
-      prefixParts.push(successTriad);
     }
 
     let finalPrompt = [...prefixParts, ...filteredParts].join(", ");
@@ -3253,7 +3274,7 @@ Return ONLY valid JSON matching this schema:
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.68 | Shot Maker Workspace
+              v0.69 | Shot Maker Workspace
             </div>
           </div>
         </div>
@@ -5550,7 +5571,22 @@ Return ONLY valid JSON matching this schema:
                 <motion.section key="camera" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ position: 'relative', zIndex: 1 }}>
                   <div className="folder-content-envelope">
                     <OptionSelect label="이미지 비율" value={config.aspectRatio} onChange={(v) => handleConfigChange('aspectRatio', v)} options={OPTIONS_DATA.aspectRatio} theme="blue" />
-                    <OptionSelect label="카메라 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
+                    <OptionSelect label="기본 구도" value={config.baseCameraAngle || "기본"} onChange={(v) => handleConfigChange('baseCameraAngle', v)} options={OPTIONS_DATA.baseCameraAngle} theme="blue" />
+                    <div className="mt-4 mb-2">
+                      <IOSToggle
+                        label="세부 구도 설정"
+                        isOn={config.useDetailCameraAngle || false}
+                        onToggle={() => handleConfigChange('useDetailCameraAngle', !config.useDetailCameraAngle)}
+                        activeColor="#0055FF"
+                      />
+                    </div>
+                    <AnimatePresence>
+                      {config.useDetailCameraAngle && (
+                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                          <OptionSelect label="세부 구도" value={config.cameraAngle} onChange={(v) => handleConfigChange('cameraAngle', v)} options={OPTIONS_DATA.cameraAngle} theme="blue" />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                     <OptionSelect label="화면 여백 (Copy Space)" value={config.copySpace || "선택안함"} onChange={(v) => handleConfigChange('copySpace', v)} options={OPTIONS_DATA.copySpace} theme="blue" />
                     <div className="mt-4 border-t border-gray-100 dark:border-zinc-800 pt-4">
                       <OptionSelect label="제품 레이아웃 (Product Layout)" value={config.productLayout} onChange={(v) => handleConfigChange('productLayout', v)} options={OPTIONS_DATA.productLayout} theme="blue" />
@@ -6831,7 +6867,7 @@ Return ONLY valid JSON matching this schema:
     </div>
 
     <footer className="ios-footer">
-      v0.68 | Shot Maker Workspace
+      v0.69 | Shot Maker Workspace
     </footer>
     <div className="h-12"></div>
     </div>
