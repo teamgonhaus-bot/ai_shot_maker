@@ -203,8 +203,7 @@ const OPTIONS_DATA = {
   baseCameraAngle: ["기본", "SNS", "파파라치샷", "시네마틱", "미니멀"],
   cameraAngle: ["선택안함", "정면", "미디움 샷", "풀 샷", "하이앵글", "로우앵글", "아이레벨", "클로즈업", "익스트림 클로즈업", "버드아이 뷰", "웜즈아이 뷰", "바텀업 뷰", "더치 앵글", "초광각", "망원 샷", "드론 샷"],
   shotStyle: [
-    "컬러블로킹", "네거티브 스페이스", "하드 섀도우", "톤온톤-모노크로매틱", "플랫 레이", "매크로-디테일", "와비사비-어스톤", "모션 캡쳐-동적 연출",
-    "인테리어 잡지 샷", "와이드 건축/공간 샷", "라이프스타일", "심도 얕은 샷(아웃포커싱)"
+    "컬러블로킹", "플랫 레이", "매크로-디테일", "인테리어 잡지 샷", "라이프스타일", "심도 얕은 샷(아웃포커싱)"
   ],
   aspectRatio: ["1:1 (Square)", "16:9 (Widescreen)", "4:3 (Standard)", "3:4 (Portrait)", "4:5 (SNS)", "9:16 (Vertical)"],
   country: ["선택안함", "한국", "일본", "동남아 휴양지", "미국", "독일", "이탈리아", "동유럽"],
@@ -254,7 +253,7 @@ const SMART_SUB_OPTIONS = {
         spaceDetail: '그라데이션 배경',
         monochromeColor: 'Warm Sand',
         light: '자연광',
-        shotStyle: ['와비사비-어스톤']
+        shotStyle: []
       }
     }
   ],
@@ -326,7 +325,7 @@ const SMART_SUB_OPTIONS = {
         spaceType: '야외',
         spaceDetail: '힙한곳',
         light: '자연광',
-        shotStyle: ['라이프스타일', '모션 캡쳐-동적 연출'],
+        shotStyle: ['라이프스타일'],
         baseCameraAngle: 'SNS',
         useDetailCameraAngle: false
       }
@@ -406,7 +405,7 @@ const SMART_SUB_OPTIONS = {
         subjectAge: '20대',
         subjectAction: '선택안함',
         subjectDetailAction: '사용',
-        shotStyle: ['모션 캡쳐-동적 연출']
+        shotStyle: []
       }
     }
   ],
@@ -490,7 +489,7 @@ const SMART_SUB_OPTIONS = {
         spaceType: '오피스',
         spaceDetail: '사무실',
         light: '자연광',
-        shotStyle: ['인테리어 잡지 샷', '와이드 건축/공간 샷'],
+        shotStyle: ['인테리어 잡지 샷'],
         interiorStyle: '모던 미니멀'
       }
     },
@@ -574,7 +573,7 @@ const SMART_SUB_OPTIONS = {
         spaceType: '리테일',
         spaceDetail: '쇼핑몰',
         light: '자연광',
-        shotStyle: ['와이드 건축/공간 샷'],
+        shotStyle: [],
         interiorStyle: '모던 미니멀'
       }
     },
@@ -599,7 +598,7 @@ const SMART_SUB_OPTIONS = {
         spaceType: '야외',
         spaceDetail: '자연',
         light: '자연광',
-        shotStyle: ['와비사비-어스톤', '심도 얕은 샷(아웃포커싱)'],
+        shotStyle: ['심도 얕은 샷(아웃포커싱)'],
         interiorStyle: '플랜테리어'
       }
     },
@@ -610,7 +609,7 @@ const SMART_SUB_OPTIONS = {
         spaceType: '야외',
         spaceDetail: '강가',
         light: '자연광',
-        shotStyle: ['와비사비-어스톤'],
+        shotStyle: [],
         interiorStyle: '젠 스타일'
       }
     },
@@ -1728,7 +1727,7 @@ Return ONLY valid JSON matching this schema:
 
   // Initial Data Load & Persistence Sync
   useEffect(() => {
-    console.log("🚀 Initializing Shot Maker v0.69a Professional Studio...");
+    console.log("🚀 Initializing Shot Maker v0.69b Professional Studio...");
 
     const storedAdmin = localStorage.getItem('shotmaker_is_admin');
     if (storedAdmin === 'true') setIsAdmin(true);
@@ -2068,7 +2067,7 @@ Return ONLY valid JSON matching this schema:
       targetConfig.aspectRatio = '16:9 (Widescreen)';
       targetConfig.useLight = true;
       targetConfig.light = '자연광';
-      targetConfig.shotStyle = ['인테리어 잡지 샷', '와이드 건축/공간 샷'];
+      targetConfig.shotStyle = ['인테리어 잡지 샷'];
       targetConfig.interiorStyle = '모던 미니멀';
       targetConfig.country = '선택안함';
       setSmartUseSubject(true);
@@ -2085,7 +2084,7 @@ Return ONLY valid JSON matching this schema:
       targetConfig.aspectRatio = '1:1 (Square)';
       targetConfig.useLight = true;
       targetConfig.light = '자연광';
-      targetConfig.shotStyle = ['와비사비-어스톤', '심도 얕은 샷(아웃포커싱)'];
+      targetConfig.shotStyle = ['심도 얕은 샷(아웃포커싱)'];
       targetConfig.interiorStyle = '플랜테리어';
       targetConfig.country = '선택안함';
       setSmartUseSubject(false);
@@ -2111,7 +2110,7 @@ Return ONLY valid JSON matching this schema:
       targetConfig.aspectRatio = '4:3 (Standard)';
       targetConfig.useLight = true;
       targetConfig.light = '자연광';
-      targetConfig.shotStyle = ['인테리어 잡지 샷', '와이드 건축/공간 샷'];
+      targetConfig.shotStyle = ['인테리어 잡지 샷'];
       targetConfig.interiorStyle = '모던 미니멀';
       targetConfig.country = '선택안함';
       setSmartUseSubject(true);
@@ -2196,8 +2195,7 @@ Return ONLY valid JSON matching this schema:
       const lights = ['스포트라이트 조명', '시네마틱', '나르스 확산광'];
       const angles = ['익스트림 클로즈업', '클로즈업'];
       const styleOptions = [
-        ['매크로-디테일', '하드 섀도우'],
-        ['매크로-디테일', '톤온톤-모노크로매틱'],
+        ['매크로-디테일'],
         ['매크로-디테일', '심도 얕은 샷(아웃포커싱)']
       ];
       targetConfig.light = lights[Math.floor(Math.random() * lights.length)];
@@ -2210,8 +2208,7 @@ Return ONLY valid JSON matching this schema:
       const spaces = ['힙한곳', '도심', '공원', '카페'];
       const styles = [
         ['라이프스타일', '심도 얕은 샷(아웃포커싱)'],
-        ['컬러블로킹', '심도 얕은 샷(아웃포커싱)'],
-        ['네거티브 스페이스', '심도 얕은 샷(아웃포커싱)']
+        ['컬러블로킹', '심도 얕은 샷(아웃포커싱)']
       ];
       const bottomClothes = ['미니스커트', '반바지', '긴바지'];
       const hairs = ['단발', '긴머리', '짧은머리', '묶은머리'];
@@ -2351,9 +2348,8 @@ Return ONLY valid JSON matching this schema:
       const spaces = ['자연', '공원', '강가', '도심'];
       const lights = ['자연광', '시네마틱'];
       const styles = [
-         ['와비사비-어스톤', '심도 얕은 샷(아웃포커싱)'],
-         ['네거티브 스페이스', '심도 얕은 샷(아웃포커싱)'],
-         ['와이드 건축/공간 샷', '심도 얕은 샷(아웃포커싱)']
+         ['라이프스타일', '심도 얕은 샷(아웃포커싱)'],
+         ['심도 얕은 샷(아웃포커싱)']
       ];
 
       const bottomClothes = ['긴바지', '반바지', '롱스커트'];
@@ -2928,10 +2924,10 @@ Return ONLY valid JSON matching this schema:
           actionStr = ` ${actionParts.join(", ")}`;
         }
 
-        if (isInteractive) {
+        if (isInteractive || !activeProductName) {
           parts.push(`featuring ${humanStr}${actionStr}`);
         } else {
-          parts.push(`featuring ${humanStr}${actionStr} with ${subjectStr}`);
+          parts.push(`featuring ${humanStr}${actionStr} with ${activeProductName}`);
         }
 
         if (useImageRef && refImage) {
@@ -3274,7 +3270,7 @@ Return ONLY valid JSON matching this schema:
               SHOT MAKER
             </div>
             <div className="ios-splash-version">
-              v0.69a | Shot Maker Workspace
+              v0.69b | Shot Maker Workspace
             </div>
           </div>
         </div>
@@ -6867,7 +6863,7 @@ Return ONLY valid JSON matching this schema:
     </div>
 
     <footer className="ios-footer">
-      v0.69a | Shot Maker Workspace
+      v0.69b | Shot Maker Workspace
     </footer>
     <div className="h-12"></div>
     </div>
