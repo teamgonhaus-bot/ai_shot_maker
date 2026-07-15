@@ -1713,12 +1713,9 @@ Return ONLY valid JSON matching this schema:
       const templates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       console.log(`✅ Firebase Loaded: ${templates.length} templates loaded.`);
       
-      const cachedStr = localStorage.getItem('shotmaker_cached_templates');
       const fetchedStr = JSON.stringify(templates);
-      if (cachedStr !== fetchedStr) {
-        setSavedTemplates(templates);
-        localStorage.setItem('shotmaker_cached_templates', fetchedStr);
-      }
+      setSavedTemplates(templates);
+      localStorage.setItem('shotmaker_cached_templates', fetchedStr);
     } catch (error) {
       console.error("❌ Firebase load error:", error);
       if (error.code === 'permission-denied') {
